@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manifest Sourcemap Browser</title>	
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="browser.js"></script>	
+	
+    <link rel="stylesheet" href="browser.css">
+</head>
+
+<body>
+	<div id="browser">
+		<div id="rewind">&laquo; </div><div id="current"></div><div id="advance"> &raquo;</div>
+	</div>
+		<script>
+		$(document).ready(function() {			
+			init(); 	
+		});
+	</script>
+</body>
+</html>
