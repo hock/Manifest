@@ -1,5 +1,5 @@
 html {overflow:hidden;}
-body{font-family: Helvetica, Arial, sans-serif; font-weight: regular; font-size: 15px; color: #eee; background: rgba(0,0,0,0.7); margin: 0;}
+body{font-family: Helvetica, Arial, sans-serif; font-weight: regular; font-size: 15px; color: #eee; background: rgba(0,0,0,0.7); margin: 0; padding:0; border:none;}
 
 #chord #circle circle{fill:none;pointer-events:all;}
 #chord .group path{stroke:#000;stroke-width:1px;}

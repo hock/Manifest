@@ -1,4 +1,4 @@
-var serviceURL = "http://sourcemap.com/services/";
+var serviceURL = "http://free.sourcemap.com/services/";
 
 data = {}, data.details = {};
 data.nodes = [], data.links = [], cvis = {};
@@ -103,9 +103,9 @@ function initVars(id) {
 	d3.select("#chord svg")
 		.remove();
 
-	cvis.width = Math.max(500, $(document)
+	cvis.width = Math.max(1, $(document)
 		.width()),
-	cvis.height = Math.max(500, $(document)
+	cvis.height = Math.max(1, $(document)
 		.height()),
 	cvis.outerRadius = Math.min(cvis.width, cvis.height) / 2 - 30,
 	cvis.innerRadius = cvis.outerRadius - 24;
@@ -126,7 +126,7 @@ function initVars(id) {
 
 	colors = d3.scale.ordinal()
 		.domain(d3.range(4))
-		.range(["A23DD1", "#A71249", "#BB2470", "A23DD1"]);
+		.range(["#2980B9", "#ffffff", "#3498DB", "#34485E"]);
 
 	cvis.chordsvg = d3.select("#chord")
 		.append("svg")

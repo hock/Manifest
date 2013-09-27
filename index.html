@@ -1,71 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Manifest Sourcemap Viewer</title>	
-    <meta name="description" content="A simple local viewer for sourcemap data.">
-    <meta name="author" content="m.hockenberry">
+	<title>Manifest</title>	
+    <meta name="description" content="A simple local viewer for supply chain data.">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-title" content="Manifest">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
 
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="lib/leaflet/leaflet-src.js"></script>
-	<script type="text/javascript" src="lib/leaflet/leaflet.label-src.js"></script>	
-	<script type="text/javascript" src="lib/leaflet/leaflet.markercluster-src.js"></script>
-	<script type="text/javascript" src="lib/arc.js"></script>	
-	<script type="text/javascript" src="lib/grate.js"></script>				
-	<script type="text/javascript" src="lib/main.js"></script>	
+	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 	
-    <link rel="stylesheet" href="css/light-theme.css">
-	<link rel="stylesheet" href="css/leaflet.css" />	
-	<link rel="shortcut icon" type="image/x-icon" href="css/images/favicon.ico">
+	<script type="text/javascript" src="lib/js/leaflet/leaflet-src.js"></script>
+	<script type="text/javascript" src="lib/js/leaflet/leaflet.label-src.js"></script>	
+	<script type="text/javascript" src="lib/js/leaflet/leaflet.markercluster-src.js"></script>
+	<script type="text/javascript" src="lib/js/grate.js"></script>				
 	
+	<script type="text/javascript" src="lib/js/manifest.js"></script>	
+	
+    <link rel="stylesheet" href="lib/css/manifest.css">
+	<link rel="stylesheet" href="lib/css/leaflet.css" />	
+	<link rel="shortcut icon" type="image/x-icon" href="lib/css/images/favicon.ico">
+
 </head>
 
 <body>
 	<div id="loader">
-	    <div class="spinner">
-	      <div class="bar1"></div> <div class="bar2"></div> <div class="bar3"></div> <div class="bar4"></div> <div class="bar5"></div> <div class="bar6"></div> <div class="bar7"></div> <div class="bar8"></div> <div class="bar9"></div> <div class="bar10"></div> <div class="bar11"></div> <div class="bar12"></div>
-	    </div>
+		<h1>Manifest</h1>
+		<h2>Supply Chain Platform</h2>
+	</div>
+	
+	<div class="sidepanel">
+		<div class="titlepanel">			
+			<h1 id="mtitle"> </h1>
+		</div>
+		<div class="wrapper">		
+			<div id="mdescription"> </div>			
+			<ul id="mlist"> </ul>
+			<div id="vizselector"> <div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div> </div>			
+		</div>
 	</div>
 	<div class="vizwrapper">
 		<div class="map" id="map"></div>
 		<div class="chordviz" id="chordviz">
-			<iframe src="viz/chord/chord.html" allowtransparency="true"></iframe>
+			<iframe src="viz/chord/chord.html" allowtransparency="true" frameborder="0"> </iframe>
 		</div>
 	</div>
-	<div class="sidepanel">
-		<div class="wrapper">		
-			<h1 id="mtitle"></h1>
-			<p id="mdescription"></p>
-
-			<div id="vizselector">
-				<div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div>
-			</div>
-			
-			<h3>Manifest</h3>
-			<ul id="mlist"></ul>
-
-			<div id="chord"></div><div class="clear"></div>
-			<div class="context footer">
-				<div id="navigation">
-					Currently viewing <a href="http://www.sourcemap.com">Sourcemap</a> #<fieldset><input type="text" id="navid" /> <input id="navsubmit" type="submit" value="&rarr;" /></fieldset>
-				</div>	
-			</div>
-			<!-- <div class="browserviz" id="browserviz">
-				<iframe src="viz/browser/browser.html" allowtransparency="true"></iframe>
-			</div> -->
-		</div>
-	</div>
-	<a href="https://github.com/hock/Manifest">
-		<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
-	</a>
 	
 	<script>
 		$(document).ready(function() {						
-			init();				
-			if(typeof(location.hash) != 'undefined' && location.hash != "") { requestid = location.hash.substr(1); } 
-			else { requestid = 2239; }
-			initViz(requestid);
-			fetchGeoJSON(requestid, "gc"); 
+			if(typeof(location.hash) != 'undefined' && location.hash != "") { id = location.hash.substr(1); } else { id = 2239; }
+			
+			ManifestInstance = new Manifest("http://free.sourcemap.com/services/");			
+			ManifestInstance.functions.fetch(id, ManifestInstance.ssc.map); 
 		});
 	</script>
 </body>
