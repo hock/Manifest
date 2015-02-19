@@ -93,6 +93,7 @@ function fetchGeoJSON(id) {
 				}
 			}
 		}
+
 		buildMatrix();
 	});
 }
@@ -165,6 +166,8 @@ function buildMatrix() {
 			row[cvis.indexByLoc[d]] = cvis.locByIndex[cvis.indexByLoc[d]].weight;
 		});
 	});
+	render();
+
 }
 
 function render() {

@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Manifest</title>	
-    <meta name="description" content="A simple local viewer for supply chain data.">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>Manifest</title>
+  <meta name="description" content="A simple viewer for supply chain data.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="apple-mobile-web-app-title" content="Manifest">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-TileImage" content="/img/favicons/mstile-144x144.png">
+	<meta name="msapplication-config" content="/img/favicons/browserconfig.xml">
 
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="lib/css/manifest.css">
+	<link rel="stylesheet" href="lib/css/leaflet.css" />
+
 	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-	
-	<script type="text/javascript" src="lib/js/leaflet/leaflet-src.js"></script>
-	<script type="text/javascript" src="lib/js/leaflet/leaflet.label-src.js"></script>	
-	<script type="text/javascript" src="lib/js/leaflet/leaflet.markercluster-src.js"></script>
-	<script type="text/javascript" src="lib/js/grate.js"></script>				
-	
-	<script type="text/javascript" src="lib/js/manifest.js"></script>	
-	
-    <link rel="stylesheet" href="lib/css/manifest.css">
-	<link rel="stylesheet" href="lib/css/leaflet.css" />	
-	<link rel="shortcut icon" type="image/x-icon" href="lib/css/images/favicon.ico">
+
+	<link rel="apple-touch-icon" sizes="57x57" href="/img/favicons/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicons/apple-touch-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicons/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/img/favicons/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/img/favicons/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/img/favicons/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/img/favicons/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/img/favicons/apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/img/favicons/apple-touch-icon-180x180.png">
+	<link rel="shortcut icon" href="/img/favicons/favicon.ico">
+	<link rel="icon" type="image/png" href="/img/favicons/favicon-192x192.png" sizes="192x192">
+	<link rel="icon" type="image/png" href="/img/favicons/favicon-160x160.png" sizes="160x160">
+	<link rel="icon" type="image/png" href="/img/favicons/favicon-96x96.png" sizes="96x96">
+	<link rel="icon" type="image/png" href="/img/favicons/favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="/img/favicons/favicon-32x32.png" sizes="32x32">
 
 </head>
 
@@ -28,15 +38,15 @@
 		<h1>Manifest</h1>
 		<h2>Supply Chain Platform</h2>
 	</div>
-	
+
 	<div class="sidepanel">
-		<div class="titlepanel">			
+		<div class="titlepanel">
 			<h1 id="mtitle"> </h1>
 		</div>
-		<div class="wrapper">		
-			<div id="mdescription"> </div>			
+		<div class="wrapper">
+			<div id="mdescription"> </div>
 			<ul id="mlist"> </ul>
-			<div id="vizselector"> <div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div> </div>			
+			<div id="vizselector"> <div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div> </div>
 		</div>
 	</div>
 	<div class="vizwrapper">
@@ -45,13 +55,27 @@
 			<iframe src="viz/chord/chord.html" allowtransparency="true" frameborder="0"> </iframe>
 		</div>
 	</div>
-	
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript" src="lib/js/waypoints.js"></script>
+	<script type="text/javascript" src="lib/js/scrollto.js"></script>
+
+	<script type="text/javascript" src="lib/js/leaflet/leaflet-src.js"></script>
+	<script type="text/javascript" src="lib/js/leaflet/leaflet.label-src.js"></script>
+	<script type="text/javascript" src="lib/js/leaflet/leaflet.markercluster-src.js"></script>
+	<script type="text/javascript" src="lib/js/grate.js"></script>
+
+	<script type="text/javascript" src="lib/js/manifest.js"></script>
+
 	<script>
-		$(document).ready(function() {						
+		$(document).ready(function() {
 			if(typeof(location.hash) != 'undefined' && location.hash != "") { id = location.hash.substr(1); } else { id = 2239; }
-			
-			ManifestInstance = new Manifest("http://free.sourcemap.com/services/");			
-			ManifestInstance.functions.fetch(id, ManifestInstance.ssc.map); 
+
+			ManifestInstance = new Manifest("http://free.sourcemap.com/services/");
+			//ManifestInstance.functions.fetch(id, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
+			ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
+			//ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#FF0080", color: "#FF0080", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
+
 		});
 	</script>
 </body>

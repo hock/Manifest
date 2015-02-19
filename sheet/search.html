@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript"> 
+		$(document).ready(function() {	
+			$.getJSON('data/smapindex-may-31-2012.json', function(data) {
+				console.log(data);
+			  /*
+			  $.each(data, function(key, val) {
+			    items.push('<li id="' + key + '">' + val + '</li>');
+			  });
+
+			  $('<ul/>', {
+			    'class': 'my-new-list',
+			    html: items.join('')
+			  }).appendTo('body');
+			  */
+			});
+			
+		}); 
+	</script>
+
+	
+</head>
+<body>
+
+</body>
+</html>
