@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>JSON Editor Example</title>
+
+    <!-- placeholders for the theme switcher -->
+    <link rel="stylesheet" id="theme_stylesheet" href="lib/bootstrap-combined.min.css">
+
+    <style>[class*="foundicon-"] {font-family: GeneralFoundicons;font-style: normal;}</style>
+    <script src="lib/jsoneditor.min.js.php"></script><style type="text/css"></style>
+
+    <script>
+    /**
+     * LZString compression library
+     * Used to create direct links to the demo.
+     * NOT REQUIRED for JSON Editor.
+     * https://github.com/pieroxy/lz-string
+     */
+
+     /* http://jeremydorn.com/json-editor/?schema=N4IgLglmA2CmIC4QGUCuAHd0CeACAwgBYCGEAdiADTjbrxID2ARgFawDGYVI6ATg3V6RYAZ0ShIMehNr0QIsL3IBzbgFtyAGVhllYQogAs1ACawAZsVTQuSAGL81uACqFYvWLjANcACXfwAL6mouxK6JAMFAgydIjyiirc5gy8asS24LAAHmDEHsTqWjp6BgjGIGaW1pkAgrgiGFh47CTkDd682AB0IMHgxMpiMTRxSApKukVk2rr6iAAMIdU28X3UIgyovOyi4qNy+bzE2Mmp6Zl5THDcqGQQAI6osACSYLBqw5bQIrDUUB9hrE5Mw2JxuHwBO5hECQGRiGppAd4hMkssrKskOsQNAGOwMhAovswLIUYkpuiamt+mYRGEIBFCdFgWTJqpKZiQNj2AxcbxiaTxuT2SAUmkMvEeXzuFUMZkAMTmSwAVgWC2xADdiNBnrCSWMQEcTmdxZdiNd4P93p8BQbQRwuNRIYIYfsANawU4jfVyVFTfpanVIn2spKBcMRjm2ADaoHhiPiyARWE8m22u24uPxkWiKBIujalAIhHIhRCdPCOfi3RrfQAuhGgAA=&value=N4IgLglmA2CmIC4QDEBOB7AtgAgCoAtZVZsx1sAJI+AGhABNYBnAY1QgAdJ0A7REAILYmAVw4doAT2wt8AQwg9hZVJIB0IOmDkBzJv00gm6EahbNEAbVA85meEgDKdiSWOnzh6OhZzufJ3keHXkIGmwAYXxFOUNGVnYuCF5+NTTDFnRvVH4AYgAzfLkAVgAGUsMANzloEQsESwBdAF8WoAAA&theme=bootstrap2&iconlib=fontawesome4&object_layout=grid&show_errors=interaction
+     */
+     
+    </script>
+<style>@-webkit-keyframes popdkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor {50% {-webkit-transform:scale(1.2);}100% {-webkit-transform:scale(1);}}@keyframes popdkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor {50% {-webkit-transform:scale(1.2);transform:scale(1.2);}100% {-webkit-transform:scale(1);transform:scale(1);}}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:solid 2px #fff !important;box-sizing:content-box !important;color:#fff !important;display:block !important;height:auto !important;margin:0 !important;opacity:0.9 !important;padding:7px 10px !important;position:fixed !important;visibility:visible !important;width:auto !important;z-index:2147483647 !important;-webkit-border-radius:5px !important;-webkit-box-shadow:0px 0px 20px #000 !important;-webkit-box-sizing:content-box !important;}.dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor-blocked{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;color:#AAA !important;display:inline !important;text-decoration:line-through !important;}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor br{display:block !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor span{background:transparent !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor div{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:0 !important;margin:0 !important;padding:0 !important;width:auto !important;letter-spacing:normal !important;font:13px Arial,Helvetica !important;text-align:left !important;text-shadow:none !important;text-transform:none !important;word-spacing:normal !important;}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor a{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;font-weight:normal !important;background:none !important;text-decoration:underline !important;color:#fff !important;}a#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor-gear{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;text-decoration:none !important;position:absolute !important;display:none !important;font-size:20px !important;width:20px !important;height:20px !important;line-height:20px !important;text-align:center !important;background-color:rgba(255,255,255,.8) !important;background-image:url(chrome-extension://mlomiejdfkolichcflejclcbmpeaniij/data/images/gear.svg) !important;background-size:16px 16px !important;background-position:center center !important;background-repeat:no-repeat !important;text-decoration:none !important;}a#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor-gear:hover{-webkit-animation-name:popdkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor !important;animation-name:popdkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor !important;-webkit-animation-duration:0.3s !important;animation-duration:0.3s !important;}#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor:hover #dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor-gear{text-decoration:none !important;display:inline-block !important;}@media print{#dkppiqykhwbrlsmhrauhgdsiaozczpyvqjjor{display:none !important;}}</style><link id="vTabsCoreCSS" rel="stylesheet" href="chrome-extension://okpnlgbgcfchbicbhjmmhldhkbkfilce/themes/styles.css"></head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="span8 col-md-8 columns eight large-8">
+            <h2>Editor</h2>
+            <p>Below is the editor generated from the JSON Schema.</p>
+
+            <div id="editor"><div data-schemaid="root" data-schematype="object" data-schemapath="root" style="position: relative;"><h3><span>Supply Chain</span><div class="btn-group" style="margin-left: 10px;"><button type="button" title="Collapse" class=" btn btn-default json-editor-btn-collapse "><i class="fa fa-caret-square-o-down"></i> </button></div><div class="btn-group" style="margin-left: 10px;"><button type="button" title="Edit JSON" class=" btn btn-default json-editor-btn-edit "><i class="fa fa-pencil"></i> JSON</button><div style="border: 1px solid black; box-shadow: black 3px 3px; position: absolute; z-index: 10; left: 0px; top: 34px; background-color: white;"><textarea style="width: 300px; height: 170px; box-sizing: border-box; display: block;"></textarea><button type="button" title="Save" class=" btn btn-default json-editor-btn-save "><i class="fa fa-save"></i> Save</button><button type="button" title="Cancel" class=" btn btn-default json-editor-btn-cancel "><i class="fa fa-ban"></i> Cancel</button></div></div><div class="btn-group" style="margin-left: 10px;"><button type="button" title="Object Properties" class=" btn btn-default json-editor-btn-edit " disabled=""><i class="fa fa-pencil"></i> Properties</button><div style="border: 1px solid black; box-shadow: black 3px 3px; position: absolute; z-index: 10; display: none; background-color: white;"><div class="property-selector" style="width: 295px; max-height: 160px; padding: 5px 0px 5px 5px; overflow-y: auto; overflow-x: hidden;"><div class="control-group" style="margin-top: 0px; padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px; height: auto;"><div class="controls" style="height: 30px;"><label class=" checkbox" style="display: inline-block; font-weight: normal;">title<input type="checkbox" style="width: auto; display: inline-block;"></label></div></div><div class="control-group" style="margin-top: 0px; padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px; height: auto;"><div class="controls" style="height: 30px;"><label class=" checkbox" style="display: inline-block; font-weight: normal;">description<input type="checkbox" style="width: auto; display: inline-block;"></label></div></div><div class="control-group" style="margin-top: 0px; padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px; height: auto;"><div class="controls" style="height: 30px;"><label class=" checkbox" style="display: inline-block; font-weight: normal;">tags<input type="checkbox" style="width: auto; display: inline-block;"></label></div></div><div class="control-group" style="margin-top: 0px; padding-top: 0px; margin-bottom: 0px; padding-bottom: 0px; height: auto;"><div class="controls" style="height: 30px;"><label class=" checkbox" style="display: inline-block; font-weight: normal;">sources<input type="checkbox" style="width: auto; display: inline-block;"></label></div></div></div><input type="text" placeholder="Property name..." style="width: 220px; margin-bottom: 0px; display: inline-block;"><button type="button" title="add" class=" btn btn-default json-editor-btn-add "><i class="fa fa-plus"></i> add</button><div style="clear: both;"></div></div></div></h3><div style="display: none;"></div><div class="well well-small" style="padding-bottom: 0px;"><div class="container-fluid"><div><div class="row-fluid"><div data-schematype="string" data-schemapath="root.title" class="span6"><div class="control-group"><label class=" control-label" style="display: inline-block; font-weight: bold;">title</label><div class="controls"><input type="text" pattern=".{4,}" name="root[title]" style="width: 98%;" disabled=""></div></div><div></div></div><div data-schematype="string" data-schemapath="root.tags" class="span6"><div class="control-group"><label class=" control-label" style="display: inline-block; font-weight: bold;">tags</label><div class="controls"><input type="text" pattern=".{0,}" name="root[tags]" style="width: 98%;" disabled=""></div></div><div></div></div></div><div class="row-fluid"><div data-schematype="string" data-schemapath="root.description" class="span12"><div class="control-group"><label class=" control-label" style="display: inline-block; font-weight: bold;">description</label><div class="controls"><textarea pattern=".{4,}" data-schemaformat="textarea" name="root[description]" style="width: 100%; height: 300px; box-sizing: border-box;" disabled=""></textarea></div></div><div></div></div></div><div class="row-fluid"><div data-schematype="array" data-schemapath="root.sources" class="span12"><h3>sources<div class="btn-group" style="margin-left: 10px;"><button type="button" title="Collapse" class=" btn btn-default json-editor-btn-collapse "><i class="fa fa-caret-square-o-down"></i> </button></div></h3><div class="well well-small" style="padding-bottom: 0px;"><div style="display: none;"></div><table class="table table-bordered" style="width: auto; max-width: none;"><thead><tr><th>name</th><th>location</th><th>description</th><th>values</th><th> </th></tr></thead><tbody><tr data-schematype="object" data-schemapath="root.sources.0"><td data-schematype="string" data-schemapath="root.sources.0.name" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][0][name]" style="width: 98%; margin-bottom: 0px;" disabled=""><span style="opacity: 1; left: 123px; top: 609.333px; width: 19px; min-width: 19px; height: 13px; position: absolute; border: none; display: inline; visibility: visible; z-index: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAANCAYAAABLjFUnAAAACXBIWXMAAAsTAAALEwEAmpwYAAABMmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarZG9SsNQGIaf04qCQxAJbsLBQVzEn61j0pYiONQokmRrkkMVbXI4Of508ia8CAcXR0HvoOIgOHkJboI4ODgECU4i+EzP9w4vL3zQWPE6frcxB6PcmqDnyzCK5cwj0zQBYJCW2uv3twHyIlf8RMD7MwLgadXr+F3+xmyqjQU+gc1MlSmIdSA7s9qCuATc5EhbEFeAa/aCNog7wBlWPgGcpPIXwDFhFIN4BdxhGMXQAHCTyl3AtercArQLPTaHwwMrN1qtlvSyIlFyd1xaNSrlVp4WRhdmYFUGVPuq3Z7Wx0oGPZ//JYxiWdnbDgIQC5M6q0lPzOn3D8TD73fdMb4HL4Cp2zrb/4DrNVhs1tnyEsxfwI3+AvOlUD7FY+VVAAAAIGNIUk0AAHolAACAgwAA9CUAAITRAABtXwAA6GwAADyLAAAbWIPnB3gAAAECSURBVHjapNK9K8UBFIfxD12im8LEYLgZjcpgUFgUCUlZTJRkMpqUxR+hDFIGhWwGwy0MFiUxSCbZ5DXiYjnqdvvpvnim0+mcZ/ieU9U6tySBNEbQjBpMoANZnGIdl4VLKcm8YCPqbgzhAT1ox1mSrFpxjtCHLdygH5tJgymlMYhhtKH+r6FishYsYBpN0dvFHu5wi9okWToC/0AmcpqM+pd7PKMRDajDNb5xlS97Qyem0BsL8IT9uOAhXpGLvL/wGXO5fFkOO7FwHvJtLOOilGALM8vE1d6xiFVlkP8aXTjAI8bKFeXLBuJ3shjFiQpIYR6zWMFaXFOlsnHM4Ng/+RkAdVE2mEeC7WYAAAAASUVORK5CYII=&quot;); background-size: 19px 13px; background-position: 0px 0px; background-repeat: no-repeat;"></span></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.0.location" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][0][location]" style="width: 98%; margin-bottom: 0px;" disabled=""><span style="opacity: 1; left: 228px; top: 609.333px; width: 19px; min-width: 19px; height: 13px; position: absolute; border: none; display: inline; visibility: visible; z-index: auto; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAANCAYAAABLjFUnAAAACXBIWXMAAAsTAAALEwEAmpwYAAABMmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarZG9SsNQGIaf04qCQxAJbsLBQVzEn61j0pYiONQokmRrkkMVbXI4Of508ia8CAcXR0HvoOIgOHkJboI4ODgECU4i+EzP9w4vL3zQWPE6frcxB6PcmqDnyzCK5cwj0zQBYJCW2uv3twHyIlf8RMD7MwLgadXr+F3+xmyqjQU+gc1MlSmIdSA7s9qCuATc5EhbEFeAa/aCNog7wBlWPgGcpPIXwDFhFIN4BdxhGMXQAHCTyl3AtercArQLPTaHwwMrN1qtlvSyIlFyd1xaNSrlVp4WRhdmYFUGVPuq3Z7Wx0oGPZ//JYxiWdnbDgIQC5M6q0lPzOn3D8TD73fdMb4HL4Cp2zrb/4DrNVhs1tnyEsxfwI3+AvOlUD7FY+VVAAAAIGNIUk0AAHolAACAgwAA9CUAAITRAABtXwAA6GwAADyLAAAbWIPnB3gAAAECSURBVHjapNK9K8UBFIfxD12im8LEYLgZjcpgUFgUCUlZTJRkMpqUxR+hDFIGhWwGwy0MFiUxSCbZ5DXiYjnqdvvpvnim0+mcZ/ieU9U6tySBNEbQjBpMoANZnGIdl4VLKcm8YCPqbgzhAT1ox1mSrFpxjtCHLdygH5tJgymlMYhhtKH+r6FishYsYBpN0dvFHu5wi9okWToC/0AmcpqM+pd7PKMRDajDNb5xlS97Qyem0BsL8IT9uOAhXpGLvL/wGXO5fFkOO7FwHvJtLOOilGALM8vE1d6xiFVlkP8aXTjAI8bKFeXLBuJ3shjFiQpIYR6zWMFaXFOlsnHM4Ng/+RkAdVE2mEeC7WYAAAAASUVORK5CYII=&quot;); background-size: 19px 13px; background-position: 0px 0px; background-repeat: no-repeat;"></span></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.0.description" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][0][description]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="array" data-schemapath="root.sources.0.values"><div><table class="table table-bordered" style="width: auto; max-width: none;"><thead><tr><th>key</th><th>value</th><th> </th></tr></thead><tbody><tr data-schematype="object" data-schemapath="root.sources.0.values.0"><td data-schematype="string" data-schemapath="root.sources.0.values.0.key" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][0][values][0][key]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.0.values.0.value" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][0][values][0][value]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td><div class="btn-group" style="margin: 0px; padding: 0px;"><button type="button" title="Delete" class=" btn btn-default json-editor-btn-delete  delete" data-i="0" disabled=""><i class="fa fa-times"></i> </button><button type="button" title="Move down" class=" btn btn-default json-editor-btn-movedown  movedown" data-i="0" style="display: none;" disabled=""><i class="fa fa-arrow-down"></i> </button></div></td></tr></tbody></table><div class="btn-group"><button type="button" title="Add row" class=" btn btn-default json-editor-btn-add " disabled=""><i class="fa fa-plus"></i> row</button><button type="button" title="Delete Last row" class=" btn btn-default json-editor-btn-delete " disabled=""><i class="fa fa-times"></i> Last row</button><button type="button" title="Delete All" class=" btn btn-default json-editor-btn-delete " style="display: none;" disabled=""><i class="fa fa-times"></i> All</button></div></div><div></div></td><td><div class="btn-group" style="margin: 0px; padding: 0px;"><button type="button" title="Delete" class=" btn btn-default json-editor-btn-delete  delete" data-i="0" disabled=""><i class="fa fa-times"></i> </button><button type="button" title="Move down" class=" btn btn-default json-editor-btn-movedown  movedown" data-i="0" disabled=""><i class="fa fa-arrow-down"></i> </button></div></td></tr><tr data-schematype="object" data-schemapath="root.sources.1"><td data-schematype="string" data-schemapath="root.sources.1.name" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][name]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.1.location" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][location]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.1.description" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][description]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="array" data-schemapath="root.sources.1.values"><div><table class="table table-bordered" style="width: auto; max-width: none;"><thead><tr><th>key</th><th>value</th><th> </th></tr></thead><tbody><tr data-schematype="object" data-schemapath="root.sources.1.values.0"><td data-schematype="string" data-schemapath="root.sources.1.values.0.key" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][values][0][key]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.1.values.0.value" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][values][0][value]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td><div class="btn-group" style="margin: 0px; padding: 0px;"><button type="button" title="Delete" class=" btn btn-default json-editor-btn-delete  delete" data-i="0" disabled=""><i class="fa fa-times"></i> </button><button type="button" title="Move down" class=" btn btn-default json-editor-btn-movedown  movedown" data-i="0" disabled=""><i class="fa fa-arrow-down"></i> </button></div></td></tr><tr data-schematype="object" data-schemapath="root.sources.1.values.1"><td data-schematype="string" data-schemapath="root.sources.1.values.1.key" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][values][1][key]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td data-schematype="string" data-schemapath="root.sources.1.values.1.value" class=" compact"><div class=""><div class=""><input type="text" name="root[sources][1][values][1][value]" style="width: 98%; margin-bottom: 0px;" disabled=""></div></div><div></div></td><td><div class="btn-group" style="margin: 0px; padding: 0px;"><button type="button" title="Delete" class=" btn btn-default json-editor-btn-delete  delete" data-i="1" disabled=""><i class="fa fa-times"></i> </button><button type="button" title="Move up" class=" btn btn-default json-editor-btn-moveup  moveup" data-i="1" disabled=""><i class="fa fa-arrow-up"></i> </button><button type="button" title="Move down" class=" btn btn-default json-editor-btn-movedown  movedown" data-i="1" style="display: none;" disabled=""><i class="fa fa-arrow-down"></i> </button></div></td></tr></tbody></table><div class="btn-group"><button type="button" title="Add row" class=" btn btn-default json-editor-btn-add " disabled=""><i class="fa fa-plus"></i> row</button><button type="button" title="Delete Last row" class=" btn btn-default json-editor-btn-delete " disabled=""><i class="fa fa-times"></i> Last row</button><button type="button" title="Delete All" class=" btn btn-default json-editor-btn-delete " disabled=""><i class="fa fa-times"></i> All</button></div></div><div></div></td><td><div class="btn-group" style="margin: 0px; padding: 0px;"><button type="button" title="Delete" class=" btn btn-default json-editor-btn-delete  delete" data-i="1" disabled=""><i class="fa fa-times"></i> </button><button type="button" title="Move up" class=" btn btn-default json-editor-btn-moveup  moveup" data-i="1" disabled=""><i class="fa fa-arrow-up"></i> </button><button type="button" title="Move down" class=" btn btn-default json-editor-btn-movedown  movedown" data-i="1" style="display: none;" disabled=""><i class="fa fa-arrow-down"></i> </button></div></td></tr></tbody></table><div class="btn-group"><button type="button" title="Add row" class=" btn btn-default json-editor-btn-add " disabled=""><i class="fa fa-plus"></i> row</button><button type="button" title="Delete Last row" class=" btn btn-default json-editor-btn-delete " disabled=""><i class="fa fa-times"></i> Last row</button><button type="button" title="Delete All" class=" btn btn-default json-editor-btn-delete " disabled=""><i class="fa fa-times"></i> All</button></div></div><div></div></div></div></div></div></div><div></div></div></div>
+        </div>
+        <div class="span4 col-md-4 columns four large-4">
+            <div>
+                <a href="http://jeremydorn.com/json-editor/?schema=N4IgLglmA2CmIC4QGUCuAHd0CeACAwgBYCGEAdiADTjbrxID2ARgFawDGYVI6ATg3V6RYAZ0ShIMehNr0QIsL3IBzbgFtyAGVhllYQogAs1ACawAZsVTQuSAGL81uACqFYvWLjANcACXfwAL6mouxK6JAMFAgydIjyiirc5gy8asS24LAAHmDEHsTqWjp6BgjGIGaW1pkAgrgiGFh47CTkDd682AB0IMHgxMpiMTRxSApKukVk2rr6iAAMIdU28X3UIgyovOyi4qNy+bzE2Mmp6Zl5THDcqGQQAI6osACSYLBqw5bQIrDUUB9hrE5Mw2JxuHwBO5hECQGRiGppAd4hMkssrKskOsQNAGOwMhAovswLIUYkpuiamt+mYRGEIBFCdFgWTJqpKZiQNiAG7EaDPWEksYgI4nM5pDLxK43f7vT7E0mMVgcLjUSGCGH7ADWsFOIyFclRU36vP5SINrKSgWtNo5tgA2qB4Yj4sgEVhPJttrtuLj8ZFoigSLo2pQCIRyIUQnTwgH4t0E30ALo2oA&amp;value=N4IgLglmA2CmIC4QDEBOB7AtgAgCoAtZVZsx1sAJI+AGhABNYBnAY1QgAdJ0A7REAILYmAVw4doAT2wt8AQwg9hZVJIB0IOmDkBzJv00gm6EahbNEAbVA85meEgDKdiSWOnzh6OhZzufJ3keHXkIGmwAYXxFOUNGVnYuCF5+NTTDADc5aBELBGsQAGtYSQM6LJyHEBAAXwBdGpobOyqvHz9kgOq6eLZOfzKQCtz9fNBi0qRM7NyDRvGSweHW+tWgAAA=&amp;theme=bootstrap2&amp;iconlib=fontawesome4&amp;object_layout=grid&amp;show_errors=interaction" id="direct_link">Direct Link</a> (preserves schema, value, and options)
+            </div>
+
+            <h2>JSON Output</h2>
+            <p>You can also make changes to the JSON here and set the value in the editor by clicking <button class="btn btn-primary" id="setvalue">Update Form</button></p>
+            <textarea id="output" style="width: 100%; height: 300px; font-family: monospace;" class="form-control"></textarea>
+
+
+
+            <h2>Validation</h2>
+            <p>This will update whenever the form changes to show validation errors if there are any.</p>
+            <textarea id="validate" style="width: 100%; height: 100px; font-family: monospace;" readonly="" disabled="" class="form-control"></textarea>
+        </div>
+        <div class="row">
+            <div class="span12 col-md-12 columns twelve large-12">
+                <h2>Schema</h2>
+                <p>You can change the schema and see how the generated form looks.  After you make changes, click <button class="btn btn-primary" id="setschema">Update Schema</button></p>
+
+                <textarea id="schema" style="width: 100%; height: 450px; font-family: monospace;" class="form-control"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    var schema;
+
+    // Default starting schema
+    if(!schema) {
+        schema = {
+            title: "Supply Chain",
+            type: "object",
+            properties: {
+              title: {
+                type: "string",
+                minLength: 4,
+                default: "From There to Here"
+              },
+              description: {
+                type: "string",
+                format: "textarea",
+                minLength: 4,
+                default: "A supply chain story."
+              },
+              tags: {
+                type: "string",
+                minLength: 0,
+                default: ""
+              },
+              sources: {
+                type: "array",
+                format: "table",
+                uniqueItems: false,
+                items: {
+                  type: "object",
+                  properties: {
+                    name: {
+                      type: "string",
+                      default: ""
+                    },
+                    location: {
+                      type: "string",
+                      default: ""
+                    },
+                    description: {
+                      type: "string",
+                      default: ""
+                    },
+                    values: {
+                      type: "array",
+                      format: "table",
+                      items: {
+                        type: "object",
+                        properties: {
+                          key: {
+                            type: "string"
+                          },
+                          value: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                default: [
+                  {
+                    name: "Sample source",
+                    location: "Shanghai, China",
+                    description: "..."
+                  }
+                ]
+              }
+            }
+          }
+    }
+
+    // Divs/textareas on the page
+    var $schema = document.getElementById('schema');
+    var $output = document.getElementById('output');
+    var $editor = document.getElementById('editor');
+    var $validate = document.getElementById('validate');
+
+    // Buttons
+    var $set_schema_button = document.getElementById('setschema');
+    var $set_value_button = document.getElementById('setvalue');
+
+    var jsoneditor;
+
+
+    var reload = function(keep_value) {
+        var startval = (jsoneditor && keep_value)? jsoneditor.getValue() : window.startval;
+        window.startval = undefined;
+
+        if(jsoneditor) jsoneditor.destroy();
+        jsoneditor = new JSONEditor($editor,{
+            schema: schema,
+            startval: startval
+        });
+        window.jsoneditor = jsoneditor;
+
+        // When the value of the editor changes, update the JSON output and validation message
+        jsoneditor.on('change',function() {
+            var json = jsoneditor.getValue();
+
+            $output.value = JSON.stringify(json,null,2);
+
+            var validation_errors = jsoneditor.validate();
+            // Show validation errors if there are any
+            if(validation_errors.length) {
+                $validate.value = JSON.stringify(validation_errors,null,2);
+            }
+            else {
+                $validate.value = 'valid';
+            }
+        });
+    };
+
+    // Start the schema and output textareas with initial values
+    $schema.value = JSON.stringify(schema,null,2);
+    $output.value = '';
+
+    // When the 'update form' button is clicked, set the editor's value
+    $set_value_button.addEventListener('click',function() {
+        jsoneditor.setValue(JSON.parse($output.value));
+    });
+
+    // Update the schema when the button is clicked
+    $set_schema_button.addEventListener('click',function() {
+        try {
+            schema = JSON.parse($schema.value);
+        }
+        catch(e) {
+            alert('Invalid Schema: '+e.message);
+            return;
+        }
+
+        reload();
+    });
+
+
+
+    reload();
+})();
+</script>

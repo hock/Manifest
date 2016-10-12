@@ -1,4 +1,4 @@
 Manifest
 ========
 
-Manifest is a viewer for the Sourcemap API.
+Manifest is a viewer for supply chain data.

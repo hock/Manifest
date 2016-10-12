@@ -2,34 +2,39 @@
 <html>
 <head>
 	<title>Manifest</title>
-  <meta name="description" content="A simple viewer for supply chain data.">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="description" content="A simple viewer for supply chain data.">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="apple-mobile-web-app-title" content="Manifest">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-TileImage" content="/img/favicons/mstile-144x144.png">
-	<meta name="msapplication-config" content="/img/favicons/browserconfig.xml">
 
-  <link rel="stylesheet" href="lib/css/manifest.css">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-TileImage" content="lib/css/images/favicons/mstile-144x144.png">
+	<meta name="msapplication-config" content="lib/css/images/favicons/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+
+	<link rel="stylesheet" href="lib/css/manifest.css">
 	<link rel="stylesheet" href="lib/css/leaflet.css" />
 
 	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
-	<link rel="apple-touch-icon" sizes="57x57" href="/img/favicons/apple-touch-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="/img/favicons/apple-touch-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/img/favicons/apple-touch-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="/img/favicons/apple-touch-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="/img/favicons/apple-touch-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/img/favicons/apple-touch-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="/img/favicons/apple-touch-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/img/favicons/apple-touch-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/img/favicons/apple-touch-icon-180x180.png">
-	<link rel="shortcut icon" href="/img/favicons/favicon.ico">
-	<link rel="icon" type="image/png" href="/img/favicons/favicon-192x192.png" sizes="192x192">
-	<link rel="icon" type="image/png" href="/img/favicons/favicon-160x160.png" sizes="160x160">
-	<link rel="icon" type="image/png" href="/img/favicons/favicon-96x96.png" sizes="96x96">
-	<link rel="icon" type="image/png" href="/img/favicons/favicon-16x16.png" sizes="16x16">
-	<link rel="icon" type="image/png" href="/img/favicons/favicon-32x32.png" sizes="32x32">
+	<link rel="apple-touch-icon" sizes="57x57" href="lib/css/images/favicons/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="lib/css/images/favicons/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="lib/css/images/favicons/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="lib/css/images/favicons/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="lib/css/images/favicons/apple-touch-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="lib/css/images/favicons/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="lib/css/images/favicons/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="lib/css/images/favicons/apple-touch-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="lib/css/images/favicons/apple-touch-icon-180x180.png">
+
+	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-32x32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="lib/css/images/favicons/android-chrome-192x192.png" sizes="192x192">
+	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-96x96.png" sizes="96x96">
+	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-16x16.png" sizes="16x16">
+
+	<link rel="manifest" href="lib/css/images/favicons/manifest.json">
+	<link rel="mask-icon" href="lib/css/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="lib/css/images/favicons/favicon.ico">
 
 </head>
 
@@ -52,7 +57,7 @@
 	<div class="vizwrapper">
 		<div class="map" id="map"></div>
 		<div class="chordviz" id="chordviz">
-			<iframe src="viz/chord/chord.html" allowtransparency="true" frameborder="0"> </iframe>
+			<iframe src="lib/viz/chord/chord.html" allowtransparency="true" frameborder="0"> </iframe>
 		</div>
 	</div>
 
@@ -73,8 +78,9 @@
 
 			ManifestInstance = new Manifest("http://free.sourcemap.com/services/");
 			//ManifestInstance.functions.fetch(id, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
-			ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
+			//ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
 			//ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#FF0080", color: "#FF0080", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
+			ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
 
 		});
 	</script>

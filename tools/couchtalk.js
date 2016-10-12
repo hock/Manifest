@@ -12,3 +12,4 @@ db.list(function(err, body) {
 		});	
   	}
 });
+console.log("Manifest...");
