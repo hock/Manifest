@@ -45,19 +45,18 @@
 	</div>
 
 	<div class="sidepanel">
-		<div class="titlepanel">
-			<h1 id="mtitle"> </h1>
-		</div>
 		<div class="wrapper">
-			<div id="mdescription"> </div>
-			<ul id="mlist"> </ul>
+			<div id="mdetails"></div>
+			<h1 id="mtitle"></h1>
+			<div id="mdescription"></div>
+			<ul id="mlist"></ul>
 			<div id="vizselector"> <div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div> </div>
 		</div>
 	</div>
 	<div class="vizwrapper">
 		<div class="map" id="map"></div>
 		<div class="chordviz" id="chordviz">
-			<iframe src="lib/viz/chord/chord.html" allowtransparency="true" frameborder="0"> </iframe>
+			<iframe allowtransparency="true" frameborder="0" name="chordframe"> </iframe>
 		</div>
 	</div>
 
@@ -73,16 +72,18 @@
 	<script type="text/javascript" src="lib/js/manifest.js"></script>
 
 	<script>
-		$(document).ready(function() {
-			if(typeof(location.hash) != 'undefined' && location.hash != "") { id = location.hash.substr(1); } else { id = 5333; }
-
-			ManifestInstance = new Manifest("https://raw.githubusercontent.com/hock/smapdata/master/");
-			ManifestInstance.functions.fetch(id, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#dbedf9", radius: 8, weight: 2, opacity: 1, fillOpacity: 1 });
-			//ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
-			//ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#FF0080", color: "#FF0080", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
-			//ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#3498DB", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 });
-
-		});
+		$( document ).ready(function() {
+			if(typeof(location.hash) != 'undefined' && location.hash != "") { 
+				smapid = location.hash.substr(1); 
+				ManifestInstance = new Manifest("https://raw.githubusercontent.com/hock/smapdata/master/");
+				ManifestInstance.functions.fetch(smapid, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#dbedf9", radius: 8, weight: 2, opacity: 1, fillOpacity: 1 }, true);
+			} else {
+				ManifestInstance = new Manifest("https://raw.githubusercontent.com/hock/smapdata/master/");
+				ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#dbedf9", radius: 8, weight: 2, opacity: 1, fillOpacity: 1 }, false);
+				ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#FF0080", color: "#dbedf9", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 }, false);
+				ManifestInstance.functions.fetch(602, ManifestInstance.ssc.map, { fillColor: "#ffffff", color: "#dbedf9", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 }, true);
+			}
+		});		
 	</script>
 </body>
 </html>
