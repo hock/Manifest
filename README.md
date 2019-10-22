@@ -11,4 +11,4 @@ Supported by the <a href="http://steinhardt.nyu.edu/mcc/">Media, Culture, and Co
 
 Necessary data sets and code repositories for Manifest, as well as <a href="https://github.com/supplychainstudies">supporting tools</a>, are made available under open source licenses and released on <a href="https://github.com/hock/Manifest">Github</a>. 
 
-A demo of a sample Manifest view is <a href="https://rawcdn.githack.com/hock/Manifest/d67cd9577e97286e0ed262d331a6e4553ab31980/index.html">available</a> which highlights its capabilities to view multiple supply chains. Manifest is also useful for viewing the repository of Sourcemap's user generated content. 
+A demo of a sample Manifest view is <a href="https://rawcdn.githack.com/hock/Manifest/c89d3dc5fdf782eec173ac5563a279a74ec28ed4/index.html">available</a> which highlights its capabilities to view multiple supply chains. Manifest is also useful for viewing the repository of Sourcemap's user generated content. 
