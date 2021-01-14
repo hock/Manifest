@@ -164,7 +164,7 @@
 .fullscreenwidget div { background-image:url("images/fullscreen.png"); background-size: 26px 26px; width:36px;height:36px; }
 
 /* Fix for 1px border bug */
-.leaflet-tile-container img {
+.leaflet-tile {
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
