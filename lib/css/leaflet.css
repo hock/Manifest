@@ -162,6 +162,11 @@
 .fullscreenwidget div {background-position:50% 50%;background-repeat:no-repeat;display:block;}
 .fullscreenwidget { cursor:pointer; box-shadow:0 1px 7px rgba(0,0,0,0.4);background:#34485E center center;-webkit-border-radius:8px;border-radius:8px;}
 .fullscreenwidget div { background-image:url("images/fullscreen.png"); background-size: 26px 26px; width:36px;height:36px; }
+
+/* Fix for 1px border bug */
+.leaflet-tile-container img {
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+}
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
      .fullscreenwidget div { background-image: url("images/fullscreen@2x.png"); }
 }
