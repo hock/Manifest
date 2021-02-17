@@ -4,86 +4,127 @@
 	<title>Manifest</title>
 	<meta name="description" content="A simple viewer for supply chain data.">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="apple-mobile-web-app-title" content="Manifest">
-	<meta name="apple-mobile-web-app-capable" content="yes" />
 
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-TileImage" content="lib/css/images/favicons/mstile-144x144.png">
-	<meta name="msapplication-config" content="lib/css/images/favicons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
+	<link rel="stylesheet" href="lib/css/manifest.css" /> 
+	<link rel="stylesheet" href="lib/css/leaflet.css" /> 
+	<link rel="stylesheet" href="lib/css/visualize.css" />
 
-	<link rel="stylesheet" href="lib/css/manifest.css">
-	<link rel="stylesheet" href="lib/css/leaflet.css" />
-
-	<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-
-	<link rel="apple-touch-icon" sizes="57x57" href="lib/css/images/favicons/apple-touch-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="lib/css/images/favicons/apple-touch-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="lib/css/images/favicons/apple-touch-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="lib/css/images/favicons/apple-touch-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="lib/css/images/favicons/apple-touch-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="lib/css/images/favicons/apple-touch-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="lib/css/images/favicons/apple-touch-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="lib/css/images/favicons/apple-touch-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="lib/css/images/favicons/apple-touch-icon-180x180.png">
-
-	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-32x32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="lib/css/images/favicons/android-chrome-192x192.png" sizes="192x192">
-	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-96x96.png" sizes="96x96">
-	<link rel="icon" type="image/png" href="lib/css/images/favicons/favicon-16x16.png" sizes="16x16">
-
-	<link rel="manifest" href="lib/css/images/favicons/manifest.json">
+	<link rel="apple-touch-icon" href="lib/css/images/favicons/apple-touch-icon-180x180.png">
 	<link rel="mask-icon" href="lib/css/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
 	<link rel="shortcut icon" href="lib/css/images/favicons/favicon.ico">
-
+	
+	<link rel="manifest" href="lib/css/images/favicons/manifest.json">
 </head>
 
-<body>
+<body class="light">
 	<div id="loader">
 		<h1>Manifest</h1>
 		<h2>Supply Chain Platform</h2>
 	</div>
-
+	
+	<div id="manifestbar">
+		<div id="minfoheader">
+			<i id="minfo-hamburger" class="fas fa-bars"></i> 
+			<span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
+		</div>
+		<div id="minfodetail" class="closed">
+			<p>Manifest is an investigative toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks. Find out more on <a href="">Supplystudies.com</a> and <a href="">Github</a>.</p>
+			<p>You can start with data from our <a href="">repositories</a>, or load a URL in one of the <a href="">file formats</a> we support.</p>
+			<div id="loadlistpanel">
+				<select name="load-samples" id="load-samples">
+					<option value="smap-5333">Apple Suppliers</option>
+					<option value="smap-2239">Western Electric 1927 Candlestick Telephone</option>
+					<option value="smap-602">Typical Laptop Computer</option>					
+					<option value="smap-5228">Petfood Analysis "My Dog's Dinner"</option>
+					<option value="smap-4532">Bridgestone Truck Tire Commodity Chain Analysis</option>
+					<option value="smap-5038">Nissan Suppliers, Manufacturing Plants & Customers</option>
+					<option value="smap-3059">Volvo Bus Inbound Supply Chain</option>
+					<option value="smap-3087">Nova Bus Manufacture and Distribution</option>
+					<option value="smap-2046">Algae Biofuels</option>
+					<option value="smap-4026">Adidas Shoe Distribution</option>
+					<option value="smap-1536">US Barley Production 2007</option>
+					<option value="smap-6585">GAP Inc. Distribution Map</option>
+					<option value="smap-6180">IDEAL Security Supply Chain</option>
+					<option value="smap-6191">Bolivian Export Map</option>
+					<option value="smap-1672">Food Alliance Connections</option>
+					<option value="smap-3980">New World Bible Translation Distribution</option>
+					<option value="smap-1705">Crave Brothers Farmstead Cheeses Connections</option>
+					<option value="smap-1986">Personal Postcard Mapping</option>
+					<option value="smap-2579">Le Vieux Pin Winery Connections</option>
+					<option value="smap-2737">Products Available At The Wilder Snail</option>
+					<option value="smap-4776">Hard Disk Drive Manufacturer Supply Chain</option>
+					<option value="smap-4848">Uranium Transportation Map</option>
+					<option value="smap-4914">Global Background of Le lycee Rene Cassin</option>
+					<option value="smap-4959">Native Canada Footwear Ltd.</option>
+					<option value="smap-2792">Personal World Travel Analysis</option>
+					<option value="smap-3798">YEC Member Map</option>
+					<option value="smap-4783">Japanese Chain Analysis</option>
+					<option value="smap-5391">Ghana Lemonade Imports</option>
+					<option value="smap-5395">Sorghum Complex</option>
+					<option value="smap-5568">UCO Analysis</option>
+					<option value="smap-5653">Champions League 2011-2012 Flight Patterns</option>
+					<option value="smap-5917">To Cure: A Food Anthology</option>
+					<option value="smap-6243">LatAm Distribution</option>
+					<option value="smap-6301">Airlines from Taiwan Taoyuan International Airport(TPE)</option>
+					<option value="other">Other...</option>				
+				</select>
+				<input type="text" id="load-samples-input" class="closed" />
+				<button id="load-samples-btn">Load</button>
+			</div>
+		</div>
+	</div>
+	
 	<div class="sidepanel">
-		<div class="wrapper">
-			<div id="mdetails"></div>
-			<h1 id="mtitle"></h1>
-			<div id="mdescription"></div>
-			<ul id="mlist"></ul>
-			<div id="vizselector"> <div id="mapselect" class="active">Map</div><div id="chordselect">Chord</div> </div>
-		</div>
+		<div id="manifestlist"></div>
 	</div>
-	<div class="vizwrapper">
+	
+	<div class="vizmenu">
+		<div class="vizmenu-entry">
+			<div class="vizmenu-label">Visualization Type</div>
+			<select name="viz-choice" id="viz-choices">
+				<option value="map">Map Visualization</option>
+				<option value="forcegraph">Force Graph</option>
+			</select>
+		</div>
+		<div class="vizmenu-entry">
+			<div class="vizmenu-label">Scale</div>	
+			<select name="measure-choice" id="measure-choices">
+				<option value="none">None</option>
+			</select>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<div class="view-wrapper">
+		<div class="vizwrap">
+			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet">
+			     <pattern id="pattern-chevron" x="0" y="0" patternUnits="userSpaceOnUse" width="100" height="180" viewBox="0 0 10 18">      
+			       <g id="chevron">
+			         <path class="left" d="M0 0l5 3v5l-5 -3z"></path>
+			         <path class="right" d="M10 0l-5 3v5l5 -3"></path>
+			       </g>
+			       <use x="0" y="9" xlink:href="#chevron"></use>
+			     </pattern>
+			     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-chevron)"></rect>
+			</svg>
+		</div>
+		
+		<div class="searchwidget"><fieldset><input type="text" placeholder="Filter..." id="searchbar" /></fieldset></div>
+		<div class="mapmenu"><div class="fullscreen-menu"><i class="fas fa-expand"></i></div></div>
 		<div class="map" id="map"></div>
-		<div class="chordviz" id="chordviz">
-			<iframe allowtransparency="true" frameborder="0" name="chordframe"> </iframe>
-		</div>
 	</div>
+	
+	<!-- Load Scripts ------------------------------------------------------------------------------------------------ -->
+	<script src="lib/js/jquery.js"></script> <script src="lib/js/fontawesome.js"></script>
+	<script src="lib/js/waypoints.js"></script> <script src="lib/js/scrollto.js"></script> <script src="lib/js/autolinker.js"></script>
+	<script src="lib/js/leaflet/leaflet.js"></script> <script src="lib/js/leaflet/markercluster.js"></script>
+	<script src="lib/js/grate.js"></script> <script src="lib/js/manifest.js"></script>	
+	<script src="https://d3js.org/d3.v4.min.js"></script> <script src="lib/js/visualize.js"></script>
+	
+	<script src="data/casper.json"></script>
 
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="lib/js/waypoints.js"></script>
-	<script type="text/javascript" src="lib/js/scrollto.js"></script>
+	
+	
+	<script src="lib/js/main.js"></script>
 
-	<script type="text/javascript" src="lib/js/leaflet/leaflet-src.js"></script>
-	<script type="text/javascript" src="lib/js/leaflet/leaflet.label-src.js"></script>
-	<script type="text/javascript" src="lib/js/leaflet/leaflet.markercluster-src.js"></script>
-	<script type="text/javascript" src="lib/js/grate.js"></script>
-
-	<script type="text/javascript" src="lib/js/manifest.js"></script>
-
-	<script>
-		$( document ).ready(function() {
-			if(typeof(location.hash) != 'undefined' && location.hash != "") { 
-				smapid = location.hash.substr(1); 
-				ManifestInstance = new Manifest("https://raw.githubusercontent.com/hock/smapdata/master/data/");
-				ManifestInstance.functions.fetch(smapid, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#dbedf9", radius: 8, weight: 2, opacity: 1, fillOpacity: 1 }, true);
-			} else {
-				ManifestInstance = new Manifest("https://raw.githubusercontent.com/hock/smapdata/master/data/");
-				ManifestInstance.functions.fetch(5333, ManifestInstance.ssc.map, { fillColor: "#3498DB", color: "#dbedf9", radius: 8, weight: 2, opacity: 1, fillOpacity: 1 }, false);
-				ManifestInstance.functions.fetch(2239, ManifestInstance.ssc.map, { fillColor: "#FF0080", color: "#dbedf9", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 }, false);
-				ManifestInstance.functions.fetch(602, ManifestInstance.ssc.map, { fillColor: "#ffffff", color: "#dbedf9", radius: 8, weight: 4, opacity: 1, fillOpacity: 1 }, true);
-			}
-		});		
-	</script>
 </body>
 </html>
