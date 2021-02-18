@@ -881,7 +881,7 @@ COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],[
 TILETYPES = {
 	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
 	'LIGHT': 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'TERRAIN': 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
+	'TERRAIN': 'https://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
 	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 };
 
