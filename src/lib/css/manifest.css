@@ -209,7 +209,7 @@ body.dark .mapmenu { background:#000;}
 @media only screen and (max-width: 920px) { 
 	.view-wrapper { position: static; width: 100%; display: block; }
 	.map { position: relative; height: 600px; width: 100%; display: block; }
-	.sidepanel { position: static; width: 100%; display:block; margin:0; padding:0; }
+	.sidepanel { position: static; width: 100%; display:block; margin:0; padding:0; overflow:hidden;}
 	#manifestbar { position: static; width: 100%; display:block; margin:0; padding:0 ;} 
 	#minfoheader { padding:1rem;}
 	#minfodetail { padding:0 1rem 1rem 1rem;}
