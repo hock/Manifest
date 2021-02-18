@@ -23122,7 +23122,7 @@ COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],[
 TILETYPES = {
 	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
 	'LIGHT': 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'TERRAIN': 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
+	'TERRAIN': 'https://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
 	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 };
 
@@ -40480,6 +40480,7 @@ function viz_forcegraph(graph, id) {
  $( document ).ready(function() {
 	var smapurl = "";
 	if(typeof(location.hash) != 'undefined' && location.hash != "") { 
+		// TODO handle bad hashes gracefully and still load the page.
 		MI = new Manifest();
 
 		smapurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/";
@@ -40497,11 +40498,12 @@ function viz_forcegraph(graph, id) {
 		var starter_id = starters[Math.floor(Math.random() * starters.length)];
 		
 		$.getJSON(smapurl + starter_id + ".geojson", function(d) { MI.functions.process("SourcemapAPI", d, {"id": starter_id});});
+		MI.functions.process("YetiAPI", yeti, {"id": "yeti"});
 		
 		setTimeout(MI.functions.cleanup, 500);		
 	}			
 	
-	$.getJSON("./data/samples.json", function(d) { 
+	$.getJSON("lib/data/samples.json", function(d) { 
 		for(var s in d) { 
 			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>');	
 		} 
