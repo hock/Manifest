@@ -19,7 +19,7 @@ $( document ).ready(function() {
 		var starter_id = starters[Math.floor(Math.random() * starters.length)];
 		
 		$.getJSON(smapurl + starter_id + ".geojson", function(d) { MI.functions.process("SourcemapAPI", d, {"id": starter_id});});
-		MI.functions.process("YetiAPI", yeti, {"id": "yeti"});
+		//MI.functions.process("YetiAPI", yeti, {"id": "yeti"});
 		
 		setTimeout(MI.functions.cleanup, 500);		
 	}			
