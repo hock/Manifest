@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manifest Geocoder Utility</title>
+	<meta name="description" content="A simple viewer for supply chain data.">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://kit.fontawesome.com/ba3e4a9110.js" crossorigin="anonymous"></script>
+
+	<script type="text/javascript" src="data/yeti.json"></script>
+	
+	
+</head>
+
+<body>
+	Manifest Geocoder Utility
+	
+	<script>
+		var key = "AIzaSyD87MYheQF8bIHazwKIgAQU-kANv_iJJDI";
+
+		function saveText(text, filename){
+		  var a = document.createElement('a');
+		  a.setAttribute('href', 'data:text/plain;charset=utf-8,'+encodeURIComponent(text));
+		  a.setAttribute('download', filename);
+		  a.click()
+		}
+		function geocode(id, address) {
+			$.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address="+encodeURIComponent(address)+"&key="+key, function(geo) {
+				console.log(id);
+				console.log(geo);
+				if(geo.status != "ZERO_RESULTS") {
+					yeti.vendor_table[id].lat =  geo.results[0].geometry.location.lat;
+					yeti.vendor_table[id].lng =  geo.results[0].geometry.location.lng;	
+				}
+							
+			});		
+		}
+		$( document ).ready(function() {
+			for (var i in yeti.vendor_table) {
+				geocode(i, yeti.vendor_table[i].vendor_address);
+						
+			}			
+		});		
+		$(document).ajaxStop(function () {
+			saveText( JSON.stringify(yeti), yeti.company_name.replace(/\s/g, '_')+".json" );			
+			
+		});
+	</script>
+</body>
+</html>
