@@ -28,7 +28,7 @@ select { cursor:pointer; }
 #minfoheader #minfo { margin-left:1rem; cursor:pointer; }
 #minfoheader #minfo:hover { text-decoration: underline; }
 
-#minfoheader #minfo #logotype { font-variant: small-caps; letter-spacing:-0.05rem;}
+#minfoheader #minfo #logotype { letter-spacing:-0.05rem;}
 
 #minfoheader .fa-bars {cursor:pointer;}
 #minfoheader .fa-bars:hover { }
