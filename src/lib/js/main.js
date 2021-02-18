@@ -1,6 +1,7 @@
 $( document ).ready(function() {
 	var smapurl = "";
 	if(typeof(location.hash) != 'undefined' && location.hash != "") { 
+		// TODO handle bad hashes gracefully and still load the page.
 		MI = new Manifest();
 
 		smapurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/";
