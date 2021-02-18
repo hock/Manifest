@@ -24,7 +24,7 @@ $( document ).ready(function() {
 		setTimeout(MI.functions.cleanup, 500);		
 	}			
 	
-	$.getJSON("lib/data/samples.json", function(d) { 
+	$.getJSON("data/samples.json", function(d) { 
 		for(var s in d) { 
 			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>');	
 		} 

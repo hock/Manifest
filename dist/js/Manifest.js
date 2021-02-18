@@ -23122,7 +23122,7 @@ COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],[
 TILETYPES = {
 	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
 	'LIGHT': 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'TERRAIN': 'https://stamen-tiles.a.ssl.fastly.net/{z}/{x}/{y}.jpg',
+	'TERRAIN': 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
 	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 };
 
@@ -40503,7 +40503,7 @@ function viz_forcegraph(graph, id) {
 		setTimeout(MI.functions.cleanup, 500);		
 	}			
 	
-	$.getJSON("lib/data/samples.json", function(d) { 
+	$.getJSON("data/samples.json", function(d) { 
 		for(var s in d) { 
 			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>');	
 		} 
