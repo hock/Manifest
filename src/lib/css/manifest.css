@@ -214,7 +214,8 @@ body.dark .mapmenu { background:#000;}
 	#minfoheader { padding:1rem;}
 	#minfodetail { padding:0 1rem 1rem 1rem;}
 	#manifestlist { width:100%;}
-	.vizmenu { position: relative !important; width: 100%; display:block; margin:0; top:auto !important; right:auto !important; margin:1rem;} 
+	.vizmenu { position: relative !important; width: 100%; display:block; margin:0 !important; padding:0 !important; top:auto !important; right:auto !important; } 
+	.vizmenu-entry { padding:1rem; }
 	.vizwrap { padding-bottom:600px !important;}
 	.leaflet-control-layers { display:none;}
 	.leaflet-left .leaflet-control {margin:1rem !important;}
