@@ -1,7 +1,7 @@
 /* Manifest Default Stylings */
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 /* General Styles */
-body { font-family: "Roboto", Arial, Helvetica, sans-serif; font-weight: normal; font-size: 1em; margin: 0; }
+body { font-family: "Roboto", Arial, Helvetica, sans-serif; font-weight: normal; font-size: 1em; margin: 0; width:100%;}
 h1 { font-weight: bold; font-size: 2em; letter-spacing: -1px; line-height: 33px; } 
 h3 { font-weight: bold; font-size: 0.8em; text-transform: uppercase; margin: 10px 0 0 0; }
 a, a:visited {text-decoration: none; }
