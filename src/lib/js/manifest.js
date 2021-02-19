@@ -27,7 +27,7 @@ function Manifest() {
 
 /* Spatial Supply Chain, Leaflet Map =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 function SpatialSupplyChain() {
-	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: true, center: new L.LatLng(40,-60), zoom: 3, scrollWheelZoom: false });
+	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40,-60), zoom: 3, scrollWheelZoom: false });
 	this.clustergroup = null;
 
 	/* Define Layers */
@@ -147,6 +147,7 @@ function SpatialSupplyChain() {
 	
 	// Map configuration
 	this.map.attributionControl.setPrefix('');
+	this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 	
 	if($("body").hasClass("light")) {
 		this.map.addLayer(layerdefs.terrain);
@@ -320,15 +321,15 @@ function SourcemapAPI(d, options) {
 	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
 	pointLayer.bringToFront();
 	
-	// Finalize Map
-	MI.scview.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 	$('.sidepanel').scrollTo( $(".mheader").last(),  500, { offset: -1* moffset } );
 	
 	var smapurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/";
 	var smapid = d.details.id;
 	$.getJSON(smapurl + smapid + ".json", function(d) { MI.functions.graph("SourcemapGraph", d, {"id": smapid});});
-	
-	//MI.functions.visualize(d.details.id, d.properties.title);
+	if(MI.supplychains.length == 1) {
+		MI.functions.cleanup();
+	}
+
 }
 
 function YetiAPI(yeti, options) {	
@@ -466,7 +467,9 @@ function YetiAPI(yeti, options) {
 	$('.sidepanel').scrollTo( $(".mheader").last(),  500, { offset: -1* moffset } );
 	
 	MI.functions.graph("YetiGraph", d, {"id": d.details.id});
-	//MI.functions.visualize(d.details.id, d.properties.title);
+	if(MI.supplychains.length == 1) {
+		MI.functions.cleanup();
+	}
 }
 
 /* Graph Builders */
@@ -575,7 +578,55 @@ function YetiGraph(d, options) {
 	sc.graph.type = "directed";
 }
 /* Miscellaneous Functions */
-function Cleanup() { console.log(MI); MI.functions.center(); $("#loader").remove(); }
+function Cleanup() { 
+	console.log(MI); 
+	
+	$("#load-samples").change(function() {
+		if($("#load-samples option:selected").val() == "other") {
+			$("#load-samples").css("width","20%");
+			$("#load-samples-input").removeClass("closed");
+		} else {
+			$("#load-samples").css("width","100%");
+			$("#load-samples-input").addClass("closed");
+		}
+	});
+
+	$("#load-samples-btn").click(function() {
+		var loadurl = "";
+		
+		if($("#load-samples").val() == "other") {
+			loadurl = $("#load-samples-input").val();
+			if (loadurl.toLowerCase().indexOf("https://raw.githubusercontent.com/hock/smapdata/master/data/") >= 0) {
+				var id = loadurl.substring(60).split(".")[0];
+				$.getJSON(loadurl, function(d) { MI.functions.process("SourcemapAPI", d, {"id": id});});					
+			}
+		} else {
+			var sample = $("#load-samples").val().split("-");
+			if(sample[0] == "smap") {
+				loadurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/" + sample[1] + ".geojson";
+				$.getJSON(loadurl, function(d) { MI.functions.process("SourcemapAPI", d, {"id": sample[1]});});
+			}		
+		}
+	});
+	
+	$("#viz-choices").change(function() {
+		visualize($("#viz-choices").val());		
+	});
+	$("#measure-choices").change(function() {
+		ui_measuresort();		
+		visualize($("#viz-choices").val());	
+	});
+	
+	$( window ).resize(function() {
+		if(!($(".vizwrap").hasClass("closed"))) {
+			viz_resize();
+		}			
+	});
+	
+	MI.functions.center(); 
+	$("#loader").remove(); 
+}
+
 function CenterView() { MI.scview.map.setView(new L.LatLng(40, -60), 3);}
 function Colorize(array) {
 	var copy = array.slice(0);

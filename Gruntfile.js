@@ -35,7 +35,7 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>.js',
 			},
 			css: {
-				src: ['src/lib/css/manifest.css','src/lib/css/leaflet.css','src/lib/css/visualize.css'],
+				src: ['src/lib/css/leaflet.css','src/lib/css/manifest.css','src/lib/css/visualize.css'],
 				dest: 'dist/css/<%= pkg.name %>.css',
 			}
 		}
