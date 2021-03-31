@@ -17,14 +17,14 @@
 var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 	options: {
-		maxClusterRadius: 80, //A cluster will cover at most this many pixels from its center
+		maxClusterRadius: 0, //A cluster will cover at most this many pixels from its center
 		iconCreateFunction: null,
 		clusterPane: L.Marker.prototype.options.pane,
 
 		spiderfyOnMaxZoom: true,
 		showCoverageOnHover: false,
 		zoomToBoundsOnClick: true,
-		singleMarkerMode: false,
+		singleMarkerMode: true,
 
 		disableClusteringAtZoom: null,
 
@@ -35,17 +35,17 @@ var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 		// Set to false to disable all animations (zoom and spiderfy).
 		// If false, option animateAddingMarkers below has no effect.
 		// If L.DomUtil.TRANSITION is falsy, this option has no effect.
-		animate: true,
+		animate: false,
 
 		//Whether to animate adding markers after adding the MarkerClusterGroup to the map
 		// If you are adding individual markers set to true, if adding bulk markers leave false for massive performance gains.
 		animateAddingMarkers: false,
 
 		//Increase to increase the distance away that spiderfied markers appear from the center
-		spiderfyDistanceMultiplier: 1,
+		spiderfyDistanceMultiplier: 1.75,
 
 		// Make it possible to specify a polyline options on a spider leg
-		spiderLegPolylineOptions: { weight: 2, color: '#fff', opacity: 0.5 },
+		spiderLegPolylineOptions: { weight: 2, color: '#fff', opacity: 0.7 },
 
 		// When bulk adding layers, adds markers in chunks. Means addLayers may not add all the layers in the call, others will be loaded during setTimeouts
 		chunkedLoading: false,
@@ -91,7 +91,6 @@ var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 	},
 
 	addLayer: function (layer) {
-
 		if (layer instanceof L.LayerGroup) {
 			return this.addLayers([layer]);
 		}
@@ -919,6 +918,8 @@ var MarkerClusterGroup = L.MarkerClusterGroup = L.FeatureGroup.extend({
 
 		this._zoom = Math.round(this._map._zoom);
 		this._currentShownBounds = this._getExpandedVisibleBounds();
+		// TODO : Improve this cludge for researching clustered markers
+		MI.functions.search();
 	},
 
 	_moveEnd: function () {
@@ -2123,6 +2124,11 @@ L.MarkerCluster.include({
 			center = map.latLngToLayerPoint(this._latlng),
 			positions;
 
+		// Disable action if all children are hidden.
+		var hidden = true;
+		for(var i in childMarkers) { if(childMarkers[i].options.opacity == 1) { hidden = false; } }
+		if(hidden) { return; }
+		
 		this._group._unspiderfy();
 		this._group._spiderfied = this;
 
@@ -2245,10 +2251,14 @@ L.MarkerClusterNonAnimated = L.MarkerCluster.extend({
 		for (i = 0; i < childMarkers.length; i++) {
 			newPos = map.layerPointToLatLng(positions[i]);
 			m = childMarkers[i];
-
+			
 			// Add the leg before the marker, so that in case the latter is a circleMarker, the leg is behind it.
 			leg = new L.Polyline([this._latlng, newPos], legOptions);
-			map.addLayer(leg);
+			
+			// TODO : Could hide the leg here, but we need a way to bring it back when search is cleared.
+			//if(m.options.opacity != 0.1) {
+				map.addLayer(leg);
+			//}
 			m._spiderLeg = leg;
 
 			// Now add the marker.
@@ -2260,7 +2270,7 @@ L.MarkerClusterNonAnimated = L.MarkerCluster.extend({
 
 			fg.addLayer(m);
 		}
-		this.setOpacity(0.3);
+		this.setOpacity(1);
 
 		group._ignoreMove = false;
 		group.fire('spiderfied', {
@@ -2369,7 +2379,7 @@ L.MarkerCluster.include({
 				leg.setStyle({opacity: finalLegOpacity});
 			}
 		}
-		this.setOpacity(0.3);
+		this.setOpacity(0.1);
 
 		group._ignoreMove = false;
 

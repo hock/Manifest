@@ -663,11 +663,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 }
 
 .marker-cluster-small{background-color:#eee;}
-.marker-cluster-small div{background-color:#999;}
-.marker-cluster-medium{background-color:#ddd;}
-.marker-cluster-medium div{background-color:#888;}
-.marker-cluster-large{background-color:#ccc;}
-.marker-cluster-large div{background-color:#777;}
+.marker-cluster-medium{background-color:#eee;}
+.marker-cluster-large{background-color:#eee;}
 
 .marker-cluster{background-clip:padding-box;border-radius:20px;}
 .marker-cluster div{width:30px;height:30px;margin-left:5px;margin-top:5px;text-align:center;border-radius:15px;font:12px sans-serif;color:#fff;}

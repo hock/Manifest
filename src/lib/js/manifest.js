@@ -6,7 +6,8 @@
 function Manifest() {
 	this.supplychains = [];
 	this.attributes = {
-		'clustering':false,
+		'initialized': false,
+		'clustering':true,
 		'initialpoi': {id: 0, length: 0},
 		'linetype': LINETYPES.GREATCIRCLE,
 		'tiletypes': TILETYPES,
@@ -15,7 +16,7 @@ function Manifest() {
 	};
 	this.functions = {
 		'process': SCProcessor,
-		'center':  CenterView, // OR InterestView
+		'center':  InterestView, // OR CenterView
 		//'visualize': Visualize,
 		'graph': SCGraph,
 		'cleanup': Cleanup,
@@ -87,7 +88,7 @@ function SpatialSupplyChain() {
 			}
 		}
 		
-		if (feature.properties && feature.properties.style) { layer.setStyle(feature.properties.style); }
+		if (feature.properties && feature.properties.style) { layer.setStyle(feature.properties.style); }		
 	};
 	
 	/* Linerender */
@@ -166,6 +167,8 @@ function SpatialSupplyChain() {
 function SCProcessor(type, d, options) {
 	if(type == "SourcemapAPI") { SourcemapAPI(d, options); } 
 	else if(type == "YetiAPI") { YetiAPI(d, options);}
+	else if(type == "GoogleSheets") { GoogleSheets(d, options);}
+	
 }
 
 function SourcemapAPI(d, options) {
@@ -190,7 +193,7 @@ function SourcemapAPI(d, options) {
 	$("#manifestlist").append(
 		'<div class="mheader" id="mheader-'+d.details.id+'"style="top:'+moffset+'px;">'+
 			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
-				'<a><i class="menu-map fas fa-globe-'+globe+'"></i> ' + d.properties.title + '</a>' +
+				'<i class="menu-map fas fa-globe-'+globe+'"></i><a>' + d.properties.title + '</a>' +
 				'<i class="fas fa-times-circle close-map"></i>'+
 			'</div>'+
 		'</div>'				
@@ -205,11 +208,12 @@ function SourcemapAPI(d, options) {
 	$( ".mtitle").text(function(i, t){ temptitle += i == 0 ? t : ' + ' + t; });
 	document.title = temptitle + " - Manifest";
 
+	$(".mheader").not("#mheader-"+d.details.id).addClass("collapsed");
 	$(".mdetails").addClass("closed");
 	$(".mlist").addClass("closed");
 	
 	$("#manifestlist").append('<div class="mdetails" id="mdetails-'+d.details.id+'"></div>');	
-	if (typeof(d.properties.description) != 'undefined') { $("#mdetails-"+d.details.id).append(
+	if (typeof(d.properties.description) != 'undefined' && d.properties.description != "") { $("#mdetails-"+d.details.id).append(
 		'<p class="mdescription">'+Autolinker.link(d.properties.description)+'</p>'
 	);}
 	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
@@ -309,7 +313,14 @@ function SourcemapAPI(d, options) {
 	}
 	
 	// Set Pointlayer or Clusterview		
-	MI.scview.clustergroup = new L.MarkerClusterGroup();
+	MI.scview.clustergroup = new L.MarkerClusterGroup({ 
+    	iconCreateFunction: function (cluster) {
+        	var markers = cluster.getAllChildMarkers();
+        	var html = '<div style="background:'+markers[0].options.fillColor+'; color:'+markers[0].options.color+'"><span>' + markers.length + '</span></div>';
+        	return L.divIcon({ html: html, className: 'marker-cluster marker-cluster-small', iconSize: L.point(40, 40) });
+    	},
+    	spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true 
+	});
 	if(MI.attributes.clustering) {
 		MI.scview.clustergroup.addLayer(pointLayer);
 		d.details.layers.push(maplayergroup.addLayer(MI.scview.clustergroup));		
@@ -319,21 +330,19 @@ function SourcemapAPI(d, options) {
 		
 	// Final Layer Setup
 	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
-	pointLayer.bringToFront();
+	pointLayer.bringToFront();	
 	
+	// Finalize Map
 	$('.sidepanel').scrollTo( $(".mheader").last(),  500, { offset: -1* moffset } );
 	
+	// Load Graph
 	var smapurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/";
 	var smapid = d.details.id;
 	$.getJSON(smapurl + smapid + ".json", function(d) { MI.functions.graph("SourcemapGraph", d, {"id": smapid});});
-	if(MI.supplychains.length == 1) {
-		MI.functions.cleanup();
-	}
-
 }
 
 function YetiAPI(yeti, options) {	
-	d = {"type":"FeatureCollection"};
+	var d = {"type":"FeatureCollection"};
 	d.details = options; d.details.layers = []; d.details.measures = {};
 	d.properties = {"title": yeti.company_name, "description": yeti.company_address};	
 	for(var item in yeti){	d.properties[item] = yeti[item]; }
@@ -359,8 +368,8 @@ function YetiAPI(yeti, options) {
 	$("#manifestlist").append(
 		'<div class="mheader" id="mheader-'+d.details.id+'"style="top:'+moffset+'px;">'+
 			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
-				'<a><i class="menu-map fas fa-globe-'+globe+'"></i> ' + d.properties.title + '</a>'+
-				'</i> <i class="fas fa-times-circle close-map"></i>'+
+				'<i class="menu-map fas fa-globe-'+globe+'"></i><a>' + d.properties.title + '</a>' +
+				'<i class="fas fa-times-circle close-map"></i>'+
 			'</div>'+
 		'</div>'				
 	);
@@ -374,11 +383,12 @@ function YetiAPI(yeti, options) {
 	$( ".mtitle").text(function(i, t){ temptitle += i == 0 ? t : ' + ' + t; });
 	document.title = temptitle + " - Manifest";
 
+	$(".mheader").not("#mheader-"+d.details.id).addClass("collapsed");
 	$(".mdetails").addClass("closed");
 	$(".mlist").addClass("closed");
 	
 	$("#manifestlist").append('<div class="mdetails" id="mdetails-'+d.details.id+'"></div>');	
-	if (typeof(d.company_address) != 'undefined') { $("#mdetails-"+d.details.id).append(
+	if (typeof(d.company_address) != 'undefined' && d.company_address != "") { $("#mdetails-"+d.details.id).append(
 		'<p class="mdescription">'+Autolinker.link(d.properties.description)+'</p>'
 	);}
 	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
@@ -431,7 +441,7 @@ function YetiAPI(yeti, options) {
 	ui_measurelist();
 	
 	delete d.tempFeatures;
-	points = {
+	var points = {
 		"type":"FeatureCollection",
 		"details": d.details,
 		"features": d.features,
@@ -450,7 +460,14 @@ function YetiAPI(yeti, options) {
 	MI.scview.detailstyle = "points";
 	
 	// Set Pointlayer or Clusterview		
-	MI.scview.clustergroup = new L.MarkerClusterGroup();
+	MI.scview.clustergroup = new L.MarkerClusterGroup({ 
+    	iconCreateFunction: function (cluster) {
+        	var markers = cluster.getAllChildMarkers();
+        	var html = '<div style="background:'+markers[0].options.fillColor+'; color:'+markers[0].options.color+'"><span>' + markers.length + '</span></div>';
+        	return L.divIcon({ html: html, className: 'marker-cluster marker-cluster-small', iconSize: L.point(40, 40) });
+    	},
+    	spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true 
+	});
 	if(MI.attributes.clustering) {
 		MI.scview.clustergroup.addLayer(pointLayer);
 		d.details.layers.push(maplayergroup.addLayer(MI.scview.clustergroup));		
@@ -463,13 +480,155 @@ function YetiAPI(yeti, options) {
 	pointLayer.bringToFront();
 	
 	// Finalize Map
-	MI.scview.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 	$('.sidepanel').scrollTo( $(".mheader").last(),  500, { offset: -1* moffset } );
 	
 	MI.functions.graph("YetiGraph", d, {"id": d.details.id});
-	if(MI.supplychains.length == 1) {
-		MI.functions.cleanup();
+}
+
+function GoogleSheets(gsheet, options) {
+	var d = {"type":"FeatureCollection"};
+	d.details = options; d.details.layers = []; d.details.measures = {}; d.features = {};
+	d.properties = {"title": gsheet.name, "description": gsheet.description};	
+	for(var item in gsheet){ d.properties[item] = gsheet[item]; }
+	//delete yeti;
+	
+
+	d.tempFeatures = gsheet.points;
+	
+	var scid = MI.supplychains.push(d);
+
+	var globe = GLOBES[Math.floor(Math.random() * GLOBES.length)];
+	var moffset = 0;
+	$('.mheader').each(function(i) { moffset += $(this).outerHeight(); });
+		
+	// Set default layerstyle
+	if(!options.style) { 
+		options.style = Object.assign({}, MI.scview.styles.point); 
+		var color = MI.scview.colorchoice();
+		options.style.fillColor = color[0];
+		options.style.color = color[1];
 	}
+		
+	$("#manifestlist").append(
+		'<div class="mheader" id="mheader-'+d.details.id+'"style="top:'+moffset+'px;">'+
+			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
+				'<i class="menu-map fas fa-globe-'+globe+'"></i><a>' + d.properties.title + '</a>' +
+				'<i class="fas fa-times-circle close-map"></i>'+
+			'</div>'+
+		'</div>'				
+	);
+	
+	// UI Setup
+	$("#mheader-"+d.details.id).click(function() { ui_mheader(d.details.id);});	
+	$("#mheader-"+d.details.id+" .close-map").click(function() { ui_mclose(d.details.id);});	
+	$("#mheader-"+d.details.id+" .menu-map").click(function() { ui_mmenu(d.details.id);});	
+	
+	temptitle = "";
+	$( ".mtitle").text(function(i, t){ temptitle += i == 0 ? t : ' + ' + t; });
+	document.title = temptitle + " - Manifest";
+
+	$(".mheader").not("#mheader-"+d.details.id).addClass("collapsed");
+	$(".mdetails").addClass("closed");
+	$(".mlist").addClass("closed");
+	
+	$("#manifestlist").append('<div class="mdetails" id="mdetails-'+d.details.id+'"></div>');	
+	if (typeof(d.properties.description) != 'undefined' && d.properties.description != "") { $("#mdetails-"+d.details.id).append(
+		'<p class="mdescription">'+Autolinker.link(d.properties.description)+'</p>'
+	);}
+	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
+	
+	// Setup Layer
+	d.features = [];
+	
+	for (var i in d.tempFeatures) {
+		templid = 1000*MI.supplychains.length+Number(i);
+		var j = i-1;
+		if (typeof(d.tempFeatures[i]) != 'undefined') {
+			d.features[j] = {"type": "Feature"};			
+			d.features[j].properties = {};	
+			d.features[j].properties.title = d.tempFeatures[i].Name;
+			d.features[j].properties.description = d.tempFeatures[i].Description;
+			d.features[j].properties.placename = d.tempFeatures[i].Location;
+			d.features[j].lat = Number(d.tempFeatures[i].Geocode.split(",")[0]);
+			d.features[j].lng = Number(d.tempFeatures[i].Geocode.split(",")[1]);
+			var ptitle = d.features[j].properties.title;
+			var pdesc = "<p class='description'>" + d.features[j].properties.description + "</p>";
+			var pplace = "<p class='placename'>" + d.features[j].properties.placename + "</p>";
+
+		
+			// Setup Measures
+			/*
+			d.features[j].properties.measures = {};
+			d.features[j].properties.measures.percent = d.tempFeatures[i].shipments_percents_company;
+			d.details.measures.percent = {"max":100,"min":0};
+			pdesc += "<p class='measures'>"+d.features[j].properties.measures.percent+"% of shipments.</p>";
+			*/
+			d.features[j].properties.scid = scid-1;
+			
+			// Set Style
+			d.features[j].properties.style=d.details.style;
+			
+			var li = $(						
+				"<li id='local_" + templid + "'>"+
+					"<div class='dot' style='background:"+d.details.style.fillColor+"; border-color:"+d.details.style.color+";'></div>"+
+				"<h5 class='mdetail_title'>" + ptitle + "</h5> " + pplace + Autolinker.link(pdesc) + 
+				"</li>"						
+			);
+			li.delegate( li, "click", MI.scview.focus);
+			$("#mlist-"+d.details.id).append(li);
+			
+			d.features[j].properties.lid = templid;
+
+			d.features[j].geometry = {"type":"Point","coordinates":[d.features[j].lng, d.features[j].lat]};
+		}
+	}
+	
+	//ui_measurelist();
+	
+	delete d.tempFeatures;
+
+	var points = {
+		"type":"FeatureCollection",
+		"details": d.details,
+		"features": d.features,
+		"properties": {}
+	};
+
+	// Setup Pointlayer
+	var pointLayer = new L.geoJSON(points, { onEachFeature: MI.scview.pointrender, pointToLayer: function (feature, latlng) { 
+		return L.circleMarker(latlng, MI.scview.styles.points); 
+	} });	
+	pointLayer.on('click', function(e){	ui_pointclick(e); });
+
+	// Prepare to add layers
+	maplayergroup = L.layerGroup();
+	
+	MI.scview.detailstyle = "points";
+	
+	// Set Pointlayer or Clusterview		
+	MI.scview.clustergroup = new L.MarkerClusterGroup({ 
+    	iconCreateFunction: function (cluster) {
+        	var markers = cluster.getAllChildMarkers();
+        	var html = '<div style="background:'+markers[0].options.fillColor+'; color:'+markers[0].options.color+'"><span>' + markers.length + '</span></div>';
+        	return L.divIcon({ html: html, className: 'marker-cluster marker-cluster-small', iconSize: L.point(40, 40) });
+    	},
+    	spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true 
+	});
+	if(MI.attributes.clustering) {
+		MI.scview.clustergroup.addLayer(pointLayer);
+		d.details.layers.push(maplayergroup.addLayer(MI.scview.clustergroup));		
+	} else {
+		d.details.layers.push(maplayergroup.addLayer(pointLayer));
+	}
+		
+	// Final Layer Setup
+	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
+	pointLayer.bringToFront();
+	
+	// Finalize Map
+	$('.sidepanel').scrollTo( $(".mheader").last(),  500, { offset: -1* moffset } );
+	
+	//MI.functions.graph("YetiGraph", d, {"id": d.details.id});
 }
 
 /* Graph Builders */
@@ -535,7 +694,6 @@ function SourcemapGraph(d, options) {
 			sc.graph.nodes[d.supplychain.hops[m].from_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[m].to_stop_id - 1].place);
 		}
 	}
-	viz_resize();
 	//buildMatrix();
 }
 
@@ -580,7 +738,7 @@ function YetiGraph(d, options) {
 /* Miscellaneous Functions */
 function Cleanup() { 
 	console.log(MI); 
-	
+	MI.attributes.initialized = true;	
 	$("#load-samples").change(function() {
 		if($("#load-samples option:selected").val() == "other") {
 			$("#load-samples").css("width","20%");
@@ -607,6 +765,7 @@ function Cleanup() {
 				$.getJSON(loadurl, function(d) { MI.functions.process("SourcemapAPI", d, {"id": sample[1]});});
 			}		
 		}
+		ui_hamburger();
 	});
 	
 	$("#viz-choices").change(function() {
@@ -622,9 +781,8 @@ function Cleanup() {
 			viz_resize();
 		}			
 	});
-	
-	MI.functions.center(); 
-	$("#loader").remove(); 
+	setTimeout(function() {$("#loader").remove();}, 500);
+	 
 }
 
 function CenterView() { MI.scview.map.setView(new L.LatLng(40, -60), 3);}
@@ -639,6 +797,9 @@ function Colorize(array) {
 	};
 }
 function InterestView() {
+	MI.scview.focus($(".mlist li").first().attr('id').split("_")[1]);
+	
+	/*
 	map = MI.scview.map;
 
 	for (var i in map._layers) {
@@ -658,6 +819,7 @@ function InterestView() {
 		}
 	}
 	map.locate({setView : true, maxZoom: map.getZoom()});
+	*/
 }
 
 /*
@@ -713,6 +875,9 @@ function SimpleSearch() {
 				if (typeof(childmarkers[j].feature) != 'undefined') {
 					for (var l in childmarkers[j].feature.properties) {
 						if (String(childmarkers[j].feature.properties[l]) .toLowerCase() .indexOf(s) != -1) { found = true; }
+						if (!(found)) { 
+							childmarkers[j].options.opacity = 0.1; childmarkers[j].options.fillOpacity = 0.1; } 
+						else { childmarkers[j].options.opacity = 1; childmarkers[j].options.fillOpacity = 1; }						
 					}
 				}
 			}
@@ -722,32 +887,28 @@ function SimpleSearch() {
 } // SimpleSearch
 
 /* UI Functions */
-function ui_mheader(id) {
-	$("#mdetails-"+id).toggleClass("closed");
+function ui_mheader(id, open) {
+	$("#mheader-"+id).toggleClass("collapsed");
 	$("#mlist-"+id).toggleClass("closed");
-	if(!($("#mdetails").hasClass("closed"))) { $('.sidepanel').scrollTo(0,  50); }
+	$("#mdetails-"+id).toggleClass("closed");
+	
+	if(open) {
+		$("#mheader-"+id).removeClass("collapsed");
+		$("#mlist-"+id).removeClass("closed");
+		$("#mdetails-"+id).removeClass("closed");
+	}
+	var offset = 0;
+	$("#mheader-"+id).prevAll(".mheader").each(function(i) {
+		offset += $(this).outerHeight();
+	});
+	if(!($("#mdetails").hasClass("closed"))) { 
+		$('.sidepanel').scrollTo($("#mheader-"+id),  50, { offset: -1*offset }); 
+	}
+	// TODO - If the user was "on" this in the sidepanel, we should scroll to the top of the previous supply chain (if there is one)
+	
 }
 
 function ui_fullscreen() {
-	/*var canvas = $("canvas")[0];
-	console.log(canvas);
-	var ctx = canvas.getContext("2d");
-	var ox = canvas.width / 2;
-	var oy = canvas.height / 2;
-
-	  var image = canvas.toDataURL("image/jpg");
-
-	  
-	    var link = document.createElement("a");
-	    link.download = "map.png";
-	    link.href = image;
-	    document.body.appendChild(link);
-	    link.click();
-	    document.body.removeChild(link);
-	    delete link;
-*/
-	 
-	
 	if(!($("body").hasClass("fullscreen"))) {
 		$("body").addClass("fullscreen");
 
@@ -787,10 +948,18 @@ function ui_mclose(id) {
 			for(var i in MI.supplychains[s].details.layers) {
 				MI.scview.map.removeLayer(MI.supplychains[s].details.layers[i]);
 			}
-
-			delete MI.supplychains[s];
+			
+			MI.supplychains.splice(s, 1);
+			// DEP delete MI.supplychains[s];
 		}
 	}
+	
+	// TODO - If the user was "on" this in the sidepanel, we should scroll to the top of the remaining previous supply chain (if there is one)
+	if(MI.supplychains.length == 1) {
+		ui_mheader($(".mheader")[0].id.split("-")[1], true);
+	}
+	if(MI.supplychains.length == 0 && $("#minfodetail").hasClass("closed")) { ui_hamburger(); }
+	MI.scview.map.fitBounds(MI.scview.map.getBounds());
 	
 	ui_measurelist();
 	viz_resize();
@@ -872,7 +1041,7 @@ function ui_pointclick(e, slid) {
 	$("#mdetails-"+gid).removeClass("closed");
 	$("#mlist-"+gid).removeClass("closed");	
 
-	offset = 0;
+	var offset = 0;
 	$("li#local_"+slid).parent().prevAll(".mheader").each(function(i) {
 		offset += $(this).outerHeight();
 	});

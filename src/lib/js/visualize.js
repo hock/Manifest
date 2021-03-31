@@ -1,11 +1,11 @@
 function visualize(type) {
 	switch(type) {
 		case "map":
-			viz_cleanup();
 			MI.visualization = "map";
 			$(".map").removeClass("closed");
-			MI.scview.map.invalidateSize(true);
 			$(".vizwrap").addClass("closed");
+			MI.scview.map.invalidateSize();
+			viz_cleanup();
 			break;
 		case "forcegraph":
 			MI.visualization = "forcegraph";		
@@ -26,7 +26,7 @@ function visualize(type) {
 function viz_cleanup() {
 	$(".vizwrap .viz").remove();
 	if($(window).width() <= 920) {
-		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+600);
+		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).width());
 	} else {
 		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).height());
 	}
@@ -44,17 +44,20 @@ function viz_forcegraph(graph, id) {
 	    height = $(window).height(),
 	    radius = 12;
 	
+		var adj = 0;
 	if(width > 920) {
 		if(!($("body").hasClass("fullscreen"))) {
-			width = width + $(".sidepanel").width();
+			adj = $(".sidepanel").width();
+		} else {
+			adj = 0;
 		}
 	}  else {
-		height = 600;
+		height = $(window).width();
 	}
 	//Math.ceil(Math.random() * 300) * (Math.round(Math.random()) ? 1 : -1)
 	var simulation = d3.forceSimulation()
 	    .velocityDecay(0.5)
-	    .force("x", d3.forceX(width / 2).strength(0.1))
+	    .force("x", d3.forceX((width+adj) / 2).strength(0.1))
 	    .force("y", d3.forceY(height / 2).strength(0.1))
 	    .force("charge", d3.forceManyBody().strength( function(d) { 
 			var measure_sort = $("#measure-choices").val();
@@ -121,10 +124,12 @@ function viz_forcegraph(graph, id) {
 		height = $(window).height();
 		if(width > 920) {
 			if(!($("body").hasClass("fullscreen"))) {
-				width = width + $(".sidepanel").width();
+				adj = $(".sidepanel").width();
+			} else {
+				adj = 0;
 			}
 		}  else {
-			height = 600;
+			height = $(window).width();
 		}
 	}
   
