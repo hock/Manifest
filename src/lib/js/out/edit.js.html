@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: edit.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: edit.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+
+$( document ).ready(function() {	
+	EditorInit();
+}); // End document.ready
+	
+/** Setup Manifest JSON editor **/
+function EditorInit() {		
+	// Configure JSONEditor
+	JSONEditor.defaults.iconlib = 'fontawesome5';
+	JSONEditor.defaults.callbacks.template = {
+	  "indexCount": function (jseditor,e) {
+		  return Number(jseditor.parent.key+1);
+	  }
+	};
+	JSONEditor.defaults.resolvers.unshift(function(schema) {
+	  if(schema.type === "object" &amp;&amp; schema.format === "") {
+	 
+	  }
+	});
+	
+	// UI Setup
+	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
+	$.getJSON("lib/json/samples.json", function(d) { 
+		for(var s in d) { 
+			$("#load-samples").append('&lt;option value="'+s+'">'+d[s]+'&lt;/option>'); 
+		} 
+	});
+	$("#load-samples-btn").click(function() {
+		var id = $("#load-samples").val();
+		window.location.href = "./#"+id;
+	});
+    $("#save-manifest-btn").click(function() {
+      // Get the value from the editor
+		console.log(editor.getValue());
+		var manifestjson = editor.getValue();
+		var name = manifestjson.attributes.name == "" ? "untitled" : manifestjson.attributes.name.toLowerCase().replace(/\s/g, '-');
+		SaveManifest( JSON.stringify(manifestjson), name+".json" );
+	  
+    });
+	
+	// Map setup
+	var mapCenter = [40.730610,-73.935242];
+	var map = L.map('map_chooser', {center : mapCenter, zoom : 3});
+	L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+	    maxZoom: 12,
+	    attribution: 'Terrain, Stamen',
+	    worldCopyJump: false
+	}).addTo(map);
+	
+	var marker = L.marker( mapCenter, {
+		icon: L.divIcon({
+			className: 'map_chooser-marker',
+			html: "&lt;div class='dot' style='background:#4d34db; border-color:#ffffff;'> &lt;/div>",
+		})
+	}).addTo(map);
+
+	map.on('click', function(e) {
+	   	$(editor.geoinput).val(e.latlng.lat+","+e.latlng.lng);
+	    UpdateChooserMarker(e.latlng.lat, e.latlng.lng, marker);
+	});
+	
+	// Editor setup
+    var editor = new JSONEditor(document.getElementById('editor_holder'),{
+		ajax: true,
+		geoinput: null,
+		disable_edit_json: true,
+		disable_properties: true,
+		schema: {
+			$ref: "lib/json/supplychain.json"
+		}
+	});
+
+	editor.on('change', function() {
+		$("input").focus(function() {
+			if(!($(this).hasClass("geocoderinput"))) {
+				CloseMap();
+			}
+		});
+		$("textarea").focus(function() {
+			CloseMap();
+		});
+		$(".geocoderinput").click(function() {
+			editor.geoinput = this;
+			$("#chooser_arrow").css("top",$(this).offset().top);
+			OpenMap(map, marker, editor.geoinput);
+		});
+		$(".geocoderinput").keydown(function() {
+			var inputvalue = $(this).val();
+			
+			if(inputvalue != "") {
+				if(inputvalue.split(",")[1] != undefined) {
+					UpdateChooserMarker(inputvalue.split(",")[0], inputvalue.split(",")[1], marker);
+				}
+			}
+		});					
+	});
+}
+
+/** Open the map chooser for manual geocoding **/
+function OpenMap(map, marker, input) {
+	$("#map_chooser_wrap").removeClass("closed");
+	
+	var mapCenter = [40.730610,-73.935242];
+	var inputvalue = $(input).val();
+	
+	if(inputvalue != "") {
+		if(inputvalue.split(",")[1] != undefined) {
+			map.setView(new L.LatLng(inputvalue.split(",")[0], inputvalue.split(",")[1]), 3, {"animate": false});
+			UpdateChooserMarker(inputvalue.split(",")[0], inputvalue.split(",")[1], marker);			
+		} else { 
+			map.setView(new L.LatLng(mapCenter[0], mapCenter[1]), 3, {"animate": false});
+			UpdateChooserMarker(mapCenter[0], mapCenter[1], marker); 
+		}
+	} else { 
+		$(input).val(mapCenter.toString());
+		map.setView(new L.LatLng(mapCenter[0], mapCenter[1]), 3, {"animate": false});
+		UpdateChooserMarker(mapCenter[0], mapCenter[1], marker); 
+	}
+	map.invalidateSize();			
+}
+
+/** Close the map chooser after manual geocoding **/
+function CloseMap() {
+	$("#map_chooser_wrap").addClass("closed");						
+}
+
+/** Update the chooser marker position (either because the user clicked, or because there was a value set in the input field) **/
+function UpdateChooserMarker(lat, lng, marker) {
+    marker
+        .setLatLng([lat, lng])
+        .bindPopup(marker.getLatLng().toString()+"&lt;div class='confirm-loc-btn' onclick='CloseMap()'>Select&lt;/div>")
+        .openPopup();
+    return false;
+}
+
+/** Save a local JSON file representing the Manifest supply chain **/
+function SaveManifest(text, filename){
+	var a = document.createElement('a');
+	a.setAttribute('href', 'data:text/plain;charset=utf-8,'+encodeURIComponent(text));
+	a.setAttribute('download', filename);
+	a.click();
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CenterView">CenterView</a></li><li><a href="global.html#Cleanup">Cleanup</a></li><li><a href="global.html#CloseMap">CloseMap</a></li><li><a href="global.html#Colorize">Colorize</a></li><li><a href="global.html#EditorInit">EditorInit</a></li><li><a href="global.html#FormatSMAP">FormatSMAP</a></li><li><a href="global.html#FormatYETI">FormatYETI</a></li><li><a href="global.html#InterestView">InterestView</a></li><li><a href="global.html#Manifest">Manifest</a></li><li><a href="global.html#MapSC">MapSC</a></li><li><a href="global.html#MeasureSort">MeasureSort</a></li><li><a href="global.html#OpenMap">OpenMap</a></li><li><a href="global.html#PointFocus">PointFocus</a></li><li><a href="global.html#RenderLine">RenderLine</a></li><li><a href="global.html#RenderPoint">RenderPoint</a></li><li><a href="global.html#SaveManifest">SaveManifest</a></li><li><a href="global.html#SCProcessor">SCProcessor</a></li><li><a href="global.html#SetupSC">SetupSC</a></li><li><a href="global.html#SimpleSearch">SimpleSearch</a></li><li><a href="global.html#SmapDataTableInit">SmapDataTableInit</a></li><li><a href="global.html#SMAPGraph">SMAPGraph</a></li><li><a href="global.html#SpatialSupplyChain">SpatialSupplyChain</a></li><li><a href="global.html#StaticInit">StaticInit</a></li><li><a href="global.html#ui_collide">ui_collide</a></li><li><a href="global.html#ui_fullscreen">ui_fullscreen</a></li><li><a href="global.html#ui_hamburger">ui_hamburger</a></li><li><a href="global.html#ui_mclose">ui_mclose</a></li><li><a href="global.html#ui_measurelist">ui_measurelist</a></li><li><a href="global.html#ui_mheader">ui_mheader</a></li><li><a href="global.html#ui_mmenu">ui_mmenu</a></li><li><a href="global.html#ui_pointclick">ui_pointclick</a></li><li><a href="global.html#UpdateChooserMarker">UpdateChooserMarker</a></li><li><a href="global.html#YETIGraph">YETIGraph</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Apr 07 2021 11:24:08 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -18,7 +18,7 @@ $( document ).ready(function() {
 		var starter_id = starters[Math.floor(Math.random() * starters.length)];
 		
 		$.getJSON(smapurl + starter_id + ".geojson", function(d) { MI.functions.process("SourcemapAPI", d, {"id": starter_id});});
-		//MI.functions.process("YetiAPI", yeti, {"id": "yeti"});
+		MI.functions.process("YetiAPI", yeti, {"id": ("casper sleep").hashCode()});
 		//MI.functions.process("GoogleSheets","1IsJ6_GEFXzPBWbMilEN--Ft20ryO88XynMoNVtFTUa4")
 		
 		/* Google Sheet Test */
@@ -73,7 +73,7 @@ $( document ).ready(function() {
 			
 		});*/
 	}			
-	$.getJSON("data/samples.json", function(d) { 
+	$.getJSON("lib/json/samples.json", function(d) { 
 		for(var s in d) { 
 			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>');	
 		} 
@@ -81,12 +81,13 @@ $( document ).ready(function() {
 	});
 	
 	$(document).ajaxStop(function() {
+		console.log(MI.scview.active_point);
 		MI.scview.map.fitBounds(MI.scview.map.getBounds());
 		MI.scview.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 		
 		viz_resize();
 		
-		if(MI.supplychains.length == 1) { MI.functions.center(); }
+		if(MI.scview.active_point == null) { console.log("trying center"); MI.functions.center(); }
 		if(!(MI.attributes.initialized)) { MI.functions.cleanup(); }   
 	});
 	

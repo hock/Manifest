@@ -1,0 +1,17 @@
+$( document ).ready(function() { 
+	StaticInit();
+});
+
+/** Initializes the user interface for (mostly) static pages. **/
+function StaticInit() {
+	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
+	$.getJSON("../lib/json/samples.json", function(d) { 
+		for(var s in d) { 
+			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>'); 
+		} 
+	});
+	$("#load-samples-btn").click(function() {
+		var id = $("#load-samples").val();
+		window.location.href = "../#"+id;
+	});
+}

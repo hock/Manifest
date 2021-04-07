@@ -4,7 +4,8 @@
 	<title>Manifest</title>
 	<meta name="description" content="A simple viewer for supply chain data.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	
+	<link rel="stylesheet" href="lib/css/fonts.css" /> 
 	<link rel="stylesheet" href="lib/css/leaflet.css" /> 
 	<link rel="stylesheet" href="lib/css/visualize.css" />
 	<link rel="stylesheet" href="lib/css/manifest.css" /> 
@@ -28,16 +29,16 @@
 		<div id="minfodetail" class="closed">
 			<p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
 			<nav id="minfomenu">
-				<a href="./info/about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
-				<a href="./info/data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
-				<a href="./info/curriculum/" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
+				<a href="./about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
+				<a href="./data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
+				<a href="./curriculum/" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
 				<div class="spacer"></div>
 				<a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
 				<a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
 			</nav>
 			
 			
-			<p>You can start with data from our <a href="./info/data/">repositories</a>, or load a URL in one of the <a href="">file formats</a> we support.</p>
+			<p>You can start with data from our <a href="./data/">repositories</a>, or load a URL in one of the <a href="">file formats</a> we support.</p>
 			<div id="loadlistpanel">
 				<select name="load-samples" id="load-samples"></select>
 				<input type="text" id="load-samples-input" class="closed" />
@@ -91,17 +92,15 @@
 	</div>
 	
 	<!-- Load Scripts ------------------------------------------------------------------------------------------------ -->
-	<script src="lib/js/jquery.js"></script> <script src="lib/js/fontawesome.js"></script>
-	<script src="lib/js/waypoints.js"></script> <script src="lib/js/scrollto.js"></script> <script src="lib/js/autolinker.js"></script>
+	<script src="lib/js/inc/jquery.js"></script> <script src="lib/js/inc/fontawesome.js"></script> <script src="lib/js/inc/jsondrop.js"></script>
+	<script src="lib/js/inc/waypoints.js"></script> <script src="lib/js/inc/scrollto.js"></script> <script src="lib/js/inc/autolinker.js"></script>
 	<script src="lib/js/leaflet/leaflet.js"></script> <script src="lib/js/leaflet/markercluster.js"></script>
 	<script src="lib/js/grate.js"></script> <script src="lib/js/manifest.js"></script>	
-	<script src="https://d3js.org/d3.v4.min.js"></script> <script src="lib/js/visualize.js"></script>
+	<script src="lib/js/inc/d3.v4.js"></script> <script src="lib/js/visualize.js"></script>
 	
-	<script src="lib/js/test.js"></script>
-	
-	<script src="data/casper.json"></script>
+	<script src="lib/json/casper.json"></script>
 
-	<script src="lib/js/main.js"></script>
+	<script src="lib/js/test.js"></script> <script src="lib/js/main.js"></script>
 
 </body>
 </html>

@@ -10,6 +10,9 @@ function visualize(type) {
 		case "forcegraph":
 			MI.visualization = "forcegraph";		
 			viz_cleanup();
+			for(var c in MI.clusters) {
+				MI.clusters[c].unspiderfy();
+			}
 			$(".map").addClass("closed");
 			$(".vizwrap").removeClass("closed");
 			for(var i in MI.supplychains) {

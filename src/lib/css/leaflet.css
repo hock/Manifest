@@ -478,13 +478,17 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	}
 .leaflet-popup-content {
 	margin: 13px 19px;
-	line-height: 1.4;
+	line-height: 1.2rem;
 	}
 .leaflet-popup-content h2 {
 	margin: 0 0 0.5rem 0;
+	font-size:1rem;
+	line-height:1.2rem;
 	}
 .leaflet-popup-content p {
 	margin: 0;
+	font-size: 0.8rem;
+	line-height: initial;
 	}
 .leaflet-popup-tip-container {
 	width: 40px;
@@ -674,6 +678,35 @@ svg.leaflet-image-layer.leaflet-interactive path {
 /* Fix for 1px border bug */
 .leaflet-tile {
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Location Picker */
+#map_chooser {
+		position: fixed;
+		right:1rem;
+		top:  0; bottom:0;
+		margin:4rem 0 0 0;
+		border-radius:0 0 0.25rem 0;
+		border-left:1px solid #4d34db;
+		width: calc(40% + 1rem);
+		height: calc(100% - 4rem);
+		z-index:2000;
+		box-shadow: -0.1rem 0.1rem 0.1rem rgba(0,0,0,0.2);
+}
+#chooser_arrow {
+	position:absolute;
+	top:100px;
+	right:calc(40% + 2rem + 1px);
+  width: 0; 
+  height: 0; 
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent; 
+  border-right:20px solid #4d34db;   
+	z-index:2100
+}
+
+body.editor .leaflet-left .leaflet-control {
+	margin-left:1rem;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 2) {
      .fullscreenwidget div { background-image: url("images/fullscreen@2x.png"); }

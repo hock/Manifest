@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manifest - About</title>
+	<meta name="description" content="A simple viewer for supply chain data.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="../lib/css/leaflet.css" /> 
+	<link rel="stylesheet" href="../lib/css/manifest.css" /> 
+	<link rel="stylesheet" href="../lib/css/fa.css" /> 
+
+	<link rel="icon" href="../lib/images/favicons/icon.png">	
+	<link rel="apple-touch-icon" href="../lib/images/favicons/apple-touch-icon.png">
+</head>
+
+<body class="textpage">
+	<div id="infoborder"></div>
+	<div id="infowrap">
+		<div id="textbar">			
+			<i id="minfo-hamburger" class="fas fa-bars"></i> 
+			<span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
+			<div id="minfodetail" class="closed">
+				<p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
+				<nav id="minfomenu">
+					<a href="../about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
+					<a href="../data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
+					<a href="../curriculum/" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
+					<div class="spacer"></div>
+					<a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
+					<a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
+				</nav>
+				<p>You can start with data from our <a href="../data/">repositories</a>, or load a URL in one of the <a href="">file formats</a> we support.</p>
+				<div id="loadlistpanel">
+					<select name="load-samples" id="load-samples"></select>
+					<button id="load-samples-btn">Load</button>
+				</div>
+				
+			</div>
+			<nav role="navigation" class="text-menu dropdown">
+			  <ul>
+			    <li><a href="../about/">About</a></li> 
+			    <li><a href="https://supplystudies.com/syllabus/">Curriculum</a></li> 
+			    <li><a href="../data/">Datasets</a>
+					<ul class="dropdown">
+				        <li><a href="../data/">Sourcemap Data</a></li>
+				      </ul>
+				  </li>
+			    <li><a href="https://github.com/hock/Manifest">Documentation</a></li>
+			  </ul>
+			</nav>
+			<div class="clear"></div>
+		</div>
+	
+		<h1>About the Project</h1>
+		<a href="" class="splash-link"><img class="splash-image" src="../lib/images/about-splash-cut.png" /></a>
+		
+		<p class="callout">Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks. </p>
+		
+		<p>Professional logistics platforms developed by companies like SAP, Oracle, and IBM are incredibly complex, suited to global networks with hundreds of suppliers in dozens of countries. These systems interface with numerous data sources, offering powerful capabilities for controlling the world's material distribution in the name of "supply chain management." Manifest is not one of these. Similarly, there are many more powerful tools available for detailed statistical evaluation, graph analysis, and geospatial modeling. And while Manifest can work in concert with these tools, it is not capable of this level of analysis on its own. Rather, this project's primary purpose is to: 
+			<ul>
+				<li>Provide common data standards for describing and sharing supply chains or similar material networks.</li>
+				<li>Develop a flexible viewer for supply chain data that is transparent, interactive, and simple to understand.</li>										
+			</ul>
+			It also means that Manifest is more flexible--someone using Manifest might find it valuable to map very high level connection, or to include materials that would not normally be present in an industrial logistics platform.		
+		</p>
+		
+		<p>Supported by the <a href="http://steinhardt.nyu.edu/mcc/">Media, Culture, and Communication</a> department of <a href="http://www.nyu.edu/">New York University, Manifest is based on technologies originally developed as part of the <a href="http://supplystudies.com/sourcemap-org/">Sourcemap project</a>. Created at the MIT Media Lab in 2007 as a collaboration between the MIT Center for Civic Media and the Tangible Media Group, Sourcemap was designed to enable the dissemination of open supply chains and support the evaluation of their social and environmental impacts.</p>
+
+		<p class="callout">Necessary data sets and code repositories for Manifest, as well as <a href="https://github.com/supplychainstudies">supporting tools</a>, are made available under open source licenses and released on <a href="https://github.com/hock/Manifest">Github</a>. </p>
+
+		<p>A demo of a sample Manifest view is <a href="https://rawcdn.githack.com/hock/Manifest/c89d3dc5fdf782eec173ac5563a279a74ec28ed4/index.html">available</a> which highlights its capabilities to view multiple supply chains. Manifest is also useful for viewing the repository of Sourcemap's user generated content. </p>
+	
+	</div>
+	<script src="../lib/js/inc/jquery.js"></script> <script src="../lib/js/inc/fontawesome.js"></script> 
+	<script src="../lib/js/inc/jsondrop.js"></script> <script src="../lib/js/static.js"></script>
+</body>
+</html>
