@@ -48,7 +48,9 @@ module.exports = function(grunt) {
 				'dist/js/<%= pkg.name %>-main.min.js' : 'dist/js/<%= pkg.name %>-main.js',
 				'dist/js/<%= pkg.name %>-static.min.js' : 'dist/js/<%= pkg.name %>-static.js',
 				'dist/js/<%= pkg.name %>-data.min.js' : 'dist/js/<%= pkg.name %>-data.js',
-				'dist/js/<%= pkg.name %>-edit.min.js' : 'dist/js/<%= pkg.name %>-edit.js'
+				'dist/js/<%= pkg.name %>-edit.min.js' : 'dist/js/<%= pkg.name %>-edit.js',
+				'dist/services/manifester.min.js' : 'dist/services/manifester.js'
+					
 				}
 			}
 		},
@@ -77,6 +79,10 @@ module.exports = function(grunt) {
 				src: ['src/lib/js/inc/jsoneditor.js','src/lib/js/edit.js'],
 				dest: 'dist/js/<%= pkg.name %>-edit.js'
 			},
+			js_services: {
+				src: ['src/services/manifester.js'],
+				dest: 'dist/services/manifester.js'
+			},
 			css_main: {
 				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/manifest.css'],
 				dest: 'dist/css/<%= pkg.name %>-main.css'
@@ -95,6 +101,10 @@ module.exports = function(grunt) {
 		  js: {
 		    files: ['src/lib/**/*.js'],
 		    tasks: ['jshint', 'concat']
+		  },
+		  srv: {
+		    files: ['src/services/manifester.js'],
+		    tasks: ['concat']
 		  },
 		  css: {
 		    files: ['src/lib/**/*.css'],

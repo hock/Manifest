@@ -1,0 +1,115 @@
+const http = require('http');
+const hostname = 'localhost';
+const port = 3000;
+const url = require('url');
+
+const server = http.createServer((req, res) => {
+	var request = require('request-promise');
+
+	var Manifester = {
+		g: null,
+		r: null,
+		getSmapGeo: function(id) {
+			return request({
+				"method":"GET", 
+				"uri": "https://raw.githubusercontent.com/hock/smapdata/master/data/"+id+".geojson",
+				"json": true
+			});
+		},
+		getSmapGraph: function(id) {
+			return request({
+				"method":"GET", 
+				"uri": "https://raw.githubusercontent.com/hock/smapdata/master/data/"+id+".json",
+				"json": true
+			});
+		},
+		getGoogleOverview: function(id) {
+			return request({
+				"method":"GET", 
+				"uri": "https://spreadsheets.google.com/feeds/cells/"+id+"/"+"1"+"/public/full?alt=json",
+				"json": true
+			});
+		},
+		getGoogleList: function(id) {
+			return request({
+				"method":"GET", 
+				"uri": "https://spreadsheets.google.com/feeds/cells/"+id+"/"+"2"+"/public/full?alt=json",
+				"json": true
+			});
+		},
+		
+		getMarineTrafficOverview: function() {
+			return request({
+				"method":"GET", 
+				"uri": "http://services.marinetraffic.com/api/exportvessels/cc503f48eb2c8e49549cc56de3c7059c4b042931/timespan:4/protocol:json",
+				"json": true
+			});
+		}
+	};
+	
+	var url_parts = url.parse(req.url, true);
+	var query = url_parts.query;
+	
+	if(query.type == "smap" || query.type == "gsheet") {
+		var gprocessor = null;
+		var rprocessor = null;
+	
+		if(query.type == "smap") { gprocessor = Manifester.getSmapGeo; rprocessor = Manifester.getSmapGraph; }	
+		if(query.type == "gsheet") { gprocessor = Manifester.getGoogleOverview; rprocessor = Manifester.getGoogleList; }
+
+		gprocessor(query.id).then(function(result) {
+		  	Manifester.g = result; 
+			rprocessor(query.id).then(function(result) {
+				Manifester.r = result;
+				res.statusCode = 200;
+
+				res.setHeader('Access-Control-Allow-Origin', '*');
+				res.setHeader( "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept" );
+				res.setHeader('Access-Control-Allow-Methods', 'GET');
+				res.setHeader('Content-Type', 'application/json');
+			
+				console.log("process success!");
+				res.end('{"g": '+JSON.stringify(Manifester.g)+', "r": '+JSON.stringify(Manifester.r)+'}');
+			});
+		}).catch(function(err) {
+			console.log("failure!");
+		
+			res.statusCode = 404;
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			res.setHeader( "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept" );
+			res.setHeader('Access-Control-Allow-Methods', 'GET');
+			res.setHeader('Content-Type', 'application/json');
+			res.end('{"error: "RESOURCE NOT FOUND"}');
+		});
+	}
+	if(query.type == "proxy") {
+		if(query.id == "marinetraffic-overview") {
+			console.log("in marine");
+			Manifester.getMarineTrafficOverview().then(function(result) {
+				console.log(result);
+					res.statusCode = 200;
+
+					res.setHeader('Access-Control-Allow-Origin', '*');
+					res.setHeader( "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept" );
+					res.setHeader('Access-Control-Allow-Methods', 'GET');
+					res.setHeader('Content-Type', 'application/json');
+			
+					console.log("proxy success!");
+					console.log(result);
+					res.end(JSON.stringify(result));
+			}).catch(function(err) {
+				console.log("failure!");
+		
+				res.statusCode = 404;
+				res.setHeader('Access-Control-Allow-Origin', '*');
+				res.setHeader( "Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept" );
+				res.setHeader('Access-Control-Allow-Methods', 'GET');
+				res.setHeader('Content-Type', 'application/json');
+				res.end('{"error: "RESOURCE NOT FOUND"}');
+			});
+		}
+	}
+});
+server.listen(port, hostname, () => {
+	console.log(`Server running at http://${hostname}:${port}/`);
+});
