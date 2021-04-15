@@ -1,6 +1,6 @@
 $( document ).ready(function() {
 	MI = new Manifest();
-	MI.serviceurl = "http://hockbook.local/Manifest/src/services/";
+	MI.serviceurl = "https://supplystudies.com/manifest/services/";
 	MI.jsoncollection = "json/samples.json";
 	
 	if(typeof(location.hash) != 'undefined' && location.hash != "") { 
