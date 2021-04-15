@@ -4708,7 +4708,7 @@ readers do not read off random characters that represent icons */
 
 	#manifestbar.open {}
 	#minfoheader {}
-	#minfoheader #minfo { cursor:pointer; margin-left:1rem; width:calc(100% - 4rem); display:inline-block; vertical-align:baseline; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;}
+	#minfoheader #minfo { cursor:pointer; margin-left:1rem; width:calc(100% - 4rem); display:inline-block; vertical-align:bottom; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;}
 	#minfoheader #minfo:hover { text-decoration: underline; }
 
 	#logotype { letter-spacing:-0.05rem;}
