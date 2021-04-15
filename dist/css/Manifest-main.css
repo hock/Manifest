@@ -5582,7 +5582,6 @@ body.editor .leaflet-left .leaflet-control {
 	#mapmenu i { 
 		padding: 0 .375rem;
 		font-size: 1.5rem;
-		font-weight: 400;
 		line-height: 1.5;
 		cursor:pointer; opacity:0.6;
 		display:inline-block;
@@ -5690,7 +5689,6 @@ body.editor .leaflet-left .leaflet-control {
 	#fullscreen-menu i { 
 		padding: 0 .375rem;
 		font-size: 1.5rem;
-		font-weight: 400;
 		line-height: 1.5;
 		cursor:pointer; opacity:0.6;
 		display:inline-block;
