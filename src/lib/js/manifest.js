@@ -11,6 +11,7 @@ function Manifest() {
 		'initialized': false,
 		'clustering':true,
 		'scrollpos': 0,
+		'prevsearch': "",
 		'linetype': LINETYPES.GREATCIRCLE,
 		'tiletypes': TILETYPES,
 		'measures': MEASURES,
@@ -33,15 +34,22 @@ function SpatialSupplyChain() {
 	this.clustergroup = this.active_point = null;
 	
 	/* Define Layers */
-	var layerdefs = {
+	this.layerdefs = {
+		'google': new L.TileLayer(TILETYPES.GOOGLE, 
+			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),
+		
+		'light': new L.TileLayer(TILETYPES.LIGHT, { maxZoom: 20, detectRetina: true, attribution: 'Light, Stadia' }),
+		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { maxZoom: 18, detectRetina: true, attribution: 'Terrain, Stamen' }),
+		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { maxZoom: 16, detectRetina: true, attribution: 'Satellite, ESRI' }),
 	 	'dark': new L.TileLayer(TILETYPES.DARK, { maxZoom: 18, detectRetina: true, attribution: 'Dark, MapBox' }),
-		'light': new L.TileLayer(TILETYPES.LIGHT, { maxZoom: 18, detectRetina: true, attribution: 'Light, Mapbox' }),
-		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { maxZoom: 12, detectRetina: true, attribution: 'Terrain, Stamen' }),
-		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { maxZoom: 16, detectRetina: true, attribution: 'Satellite, ESRI' })
+		
+		'shipping': new L.TileLayer(TILETYPES.SHIPPING, 
+			{ maxNativeZoom: 4, detectRetina: true, className: "shippinglayer", bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
+		'marine': new L.TileLayer(TILETYPES.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: "marinelayer", attribution: '[Marinetraffic Data]' }),
+		'rail': new L.TileLayer(TILETYPES.RAIL, { maxZoom: 19, className: "raillayer", attribution: '[OpenStreetMap Data]' })		
 	};
-
-	var layerlist = { "Dark Tiles": layerdefs.dark, "Light Tiles": layerdefs.light, "Terrain": layerdefs.terrain, "Satellite": layerdefs.setellite };
-
+	
+					  
 	/* Renderers */
 	this.pointrender = RenderPoint;	
 	this.linerender = RenderLine;
@@ -60,16 +68,25 @@ function SpatialSupplyChain() {
 	// Map configuration
 	this.map.attributionControl.setPrefix('');
 	this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
-	this.map.on("popupclose", function(e) { console.log("popupclose"); MI.scview.active_point = null; });
+	this.map.on("popupopen", function(e) {
+			MI.scview.map.setView(e.popup._latlng, MI.scview.map.getZoom());	
+			MI.scview.active_point = e.sourceTarget;
+			ui_pointclick(MI.scview.active_point); 
+			
+	});
+	this.map.on("popupclose", function(e) { MI.scview.active_point = null; } );
+
 	
 	if($("body").hasClass("light")) {
-		this.map.addLayer(layerdefs.terrain);
+		this.map.addLayer(this.layerdefs.google);
+		this.map.addLayer(this.layerdefs.shipping);
 	} else if($("body").hasClass("dark")) { 
-		this.map.addLayer(layerdefs.dark);		
+		this.map.addLayer(this.layerdefs.dark);		
+		this.map.addLayer(this.layerdefs.shipping);
 	}
 	
 	// General UI
-	$(".fullscreen-menu").click(function() { ui_fullscreen(); });	
+	$("#fullscreen-menu").click(function() { ui_fullscreen(); });	
 	$("#minfo, #minfo-hamburger").click(function() { ui_hamburger(); });			
 	$("#searchbar").bind('keyup mouseup', function() { MI.functions.search(); });
 	$(".searchclear").click(function() { $("#searchbar").val(""); MI.functions.search(); });
@@ -88,9 +105,7 @@ function RenderPoint(feature, layer) {
 		layer.bindPopup(popupContent);
 		layer.bindTooltip(title);	
 	
-		layer.on("click", function(e) {  
-			if($(window).width() <= 920) { return; }
-		
+		layer.on("click", function(e) {  		
 			var toolTip = layer.getTooltip();
         	if (toolTip) { layer.closeTooltip(toolTip);}
 		});
@@ -148,14 +163,13 @@ function RenderLine(feature, layer) {
 }
 
 /** Focus on a point on the map and open its popup. **/
-function PointFocus(pid) {
+function PointFocus(pid) {	
 	var id = (typeof(pid) != 'object' ? pid : $(this).attr("id").substring(6));		
 	for (var i in MI.scview.map._layers) {
-		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {
-			if (MI.scview.map._layers[i].feature.properties.lid == id) {
+		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {			
+			if (MI.scview.map._layers[i].feature.properties.lid == id) {				
 				MI.scview.active_point = MI.scview.map._layers[i];
 				MI.scview.map._layers[i].openPopup();
-				MI.scview.map.setView(MI.scview.map._layers[i]._latlng, MI.scview.map.getZoom());
 			}
 		} else if (typeof(MI.scview.map._layers[i].getAllChildMarkers) != 'undefined') {				
 			var childmarkers = MI.scview.map._layers[i].getAllChildMarkers();
@@ -165,7 +179,6 @@ function PointFocus(pid) {
 						MI.scview.map._layers[i].spiderfy();
 						MI.scview.active_point = childmarkers[j];
 						childmarkers[j].openPopup();
-						MI.scview.map.setView(childmarkers[j]._latlng, MI.scview.map.getZoom());
 						MI.functions.search();
 					}
 				} // Get Childmarker feature
@@ -179,26 +192,28 @@ function PointFocus(pid) {
 /** SupplyChain processor main wrapper function. **/
 function SCProcessor(type, d, options) {
 	for(var s in MI.supplychains) { if(MI.supplychains[s].details.id == options.id) {return;}}
-	
 	var scid = null;
-	if(type == "SourcemapAPI") { 
-		d = FormatSMAP(d, options); 
+	if(type == "smap") { 
+		var geo = d.g;
+		var graph = d.r;
+		d = FormatSMAP(geo, options); 
 		scid = SetupSC(d, options); 
 		MapSC(d, scid);
-	
-		// GraphSC
-		var smapurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/"; var smapid = d.details.id;
-		$.getJSON(smapurl + smapid + ".json", function(d) { SMAPGraph(d, {"id": smapid});});
+		SMAPGraph(graph, options);
 	} 
-	else if(type == "YetiAPI") { 
+	else if(type == "yeti") { 
 		//YetiAPI(d, options);
 		d = FormatYETI(d, options); 
 		scid = SetupSC(d, options); 
 		MapSC(d, scid);
-	
 		YETIGraph(d, {"id": d.details.id});		
 	}
-	else if(type == "GoogleSheets") { GoogleSheets(d, options);}
+	else if(type == "gsheet") { 
+		d = FormatGSHEET(d, options); 
+		scid = SetupSC(d, options); 
+		MapSC(d, scid);
+		GSHEETGraph(d, options);		
+	}
 	
 }
 
@@ -206,7 +221,6 @@ function SCProcessor(type, d, options) {
 function SetupSC(d, options) {	
 	var scid = MI.supplychains.push(d);
 	MI.attributes.scrollpos = $(".sidepanel").scrollTop();
-	console.log(MI.attributes.scrollpos);
 	$("#manifestlist").append(
 		'<div class="mheader" id="mheader-'+d.details.id+'">'+
 			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
@@ -232,6 +246,36 @@ function SetupSC(d, options) {
 	);}
 	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
 		
+	$("#mapmenu").click(function() {
+		$("#mapmenu-window").removeClass("closed");
+	});
+	$("#mapmenu-window").mouseleave(function() {
+		$("#mapmenu-window").addClass("closed");
+	});
+	
+	$("#basemap-chooser li").click(function() {
+		var tile = $(this).attr("class");
+		var previoustiles = $("#basemap-preview").attr("class");
+		$("#basemap-preview").removeClass();
+		$("#basemap-preview").addClass(tile);
+		MI.scview.map.removeLayer(MI.scview.layerdefs[previoustiles]);
+		MI.scview.map.addLayer(MI.scview.layerdefs[tile]);	
+		$('#datalayers input').each(function() { 
+			MI.scview.map.removeLayer(MI.scview.layerdefs[$(this).val()]);
+			if($(this).prop("checked")) {
+				MI.scview.map.addLayer(MI.scview.layerdefs[$(this).val()]);		
+			} 
+		});
+	});	
+
+	$('#datalayers input').click(function() {
+		if($(this).prop("checked")) {
+			MI.scview.map.addLayer(MI.scview.layerdefs[$(this).val()]);		
+		} else {
+			MI.scview.map.removeLayer(MI.scview.layerdefs[$(this).val()]);
+		}	
+	});
+	
 	// Finalize UI
 	var moffset = 0; $('.mheader').each(function(i) { $(this).css("top", moffset); moffset += $(this).outerHeight(); });
 	var roffset = 0; $('.mheader').reverse().each(function(i) { $(this).css("bottom", roffset); roffset += $(this).outerHeight(); });
@@ -327,14 +371,12 @@ function MapSC(d, scid) {
 	var pointLayer = new L.geoJSON(points, { onEachFeature: MI.scview.pointrender, pointToLayer: function (feature, latlng) { 
 		return L.circleMarker(latlng, MI.scview.styles.points); 
 	} });	
-	pointLayer.on('click', function(e){	
+	pointLayer.on('mouseup', function(e){	
 		if(!(e.sourceTarget._preSpiderfyLatlng)){		
 			for(var c in MI.clusters) {
 				MI.clusters[c].unspiderfy();
 			}
-		}
-		
-		ui_pointclick(e); 
+		}		
 	});
 
 	// Prepare to add layers
@@ -370,9 +412,7 @@ function MapSC(d, scid) {
 	
 	// Final Layer Setup
 	if(MI.supplychains.length > 1 && $(".leaflet-popup").length > 0 && MI.scview.active_point) {		
-		// TODO Change the ui_pointclick method so this is not needed
-		var fevent = {sourceTarget: MI.scview.active_point, layer: {options:{fillOpacity:MI.scview.active_point.feature.properties.style.fillOpacity}, _popup: {_source: {feature: {properties: {lid: MI.scview.active_point.feature.properties.lid}}}}}};
-		ui_pointclick(fevent, MI.scview.active_point.feature.properties.lid, 0);
+		ui_pointclick(MI.scview.active_point, 0);
 	}
 	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
 	pointLayer.bringToFront();	
@@ -399,6 +439,69 @@ function FormatSMAP(d, options) {
 	if (typeof(d.properties.description) == 'undefined') { d.properties.description = ""; } 
 	
 	return d;
+}
+
+/** Format a google sheet file so Manifest can understand it */
+function FormatGSHEET(d, options) {
+	var sheetoverview = d.g;
+	var sheetpoints = d.r;
+	var so_offset = 6;
+	var sp_offset = 8;
+	var sheetid = options.id;
+	
+	var sheetsc = {"type":"FeatureCollection"};
+	sheetsc.properties = {
+		title: sheetoverview.feed.entry[so_offset].gs$cell.$t,
+		description: sheetoverview.feed.entry[so_offset+1].gs$cell.$t,
+		address: sheetoverview.feed.entry[so_offset+2].gs$cell.$t,
+		geocode: sheetoverview.feed.entry[so_offset+3].gs$cell.$t,
+		measure: sheetoverview.feed.entry[so_offset+4].gs$cell.$t
+	};
+	sheetsc.tempFeatures = {};
+	
+	for(var s in sheetpoints.feed.entry) {		
+		if(Number(sheetpoints.feed.entry[s].gs$cell.row) > 1) {
+			if(sheetsc.tempFeatures[Number(sheetpoints.feed.entry[s].gs$cell.row)-1] == undefined) { 
+				sheetsc.tempFeatures[Number(sheetpoints.feed.entry[s].gs$cell.row)-1] = {};
+			}
+			var position = (Number(sheetpoints.feed.entry[s].gs$cell.row)-1)*sp_offset-1+(Number(sheetpoints.feed.entry[s].gs$cell.col)+1);
+			var header = position - (sp_offset*(Number(sheetpoints.feed.entry[s].gs$cell.row)-1));
+		
+			var point = sheetsc.tempFeatures[Number(sheetpoints.feed.entry[s].gs$cell.row)-1];
+			point[sheetpoints.feed.entry[header-1].gs$cell.$t] = sheetpoints.feed.entry[s].gs$cell.$t;	
+		}				
+	}		
+	sheetsc.details = options; sheetsc.details.layers = []; sheetsc.details.measures = {};
+	sheetsc.details.globe = GLOBES[Math.floor(Math.random() * GLOBES.length)];
+	sheetsc.details.colorchoice = MI.scview.colorchoice();
+
+	sheetsc.mapper = {}; // Try to map to graph
+	
+	// Set default layerstyle
+	if(!sheetsc.details.style) { 
+		sheetsc.details.style = Object.assign({}, MI.scview.styles.point); 
+		sheetsc.details.style.fillColor = sheetsc.details.colorchoice[0];
+		sheetsc.details.style.color = sheetsc.details.colorchoice[1];
+	}
+
+	sheetsc.features = [];
+	
+	for (var i in sheetsc.tempFeatures) {
+		// TODO This templid should be based off of a numeric id, which Google doesn't have right 
+		var j = i-1;
+		if (typeof(sheetsc.tempFeatures[i]) != 'undefined') {
+			sheetsc.features[j] = {"type": "Feature"};			
+			sheetsc.features[j].properties = {};	
+			sheetsc.features[j].properties.title = sheetsc.tempFeatures[i].Name;
+			sheetsc.features[j].properties.description = sheetsc.tempFeatures[i].Description;
+			sheetsc.features[j].properties.placename = sheetsc.tempFeatures[i].Location;
+			sheetsc.features[j].properties.measures = {};
+			sheetsc.features[j].geometry = {"type":"Point","coordinates":[Number(sheetsc.tempFeatures[i].Geocode.split(",")[1]), Number(sheetsc.tempFeatures[i].Geocode.split(",")[0])]};
+		}
+	}
+		
+	delete sheetsc.tempFeatures;
+	return sheetsc;
 }
 
 /** Format a Yeti file so Manifest can understand it */
@@ -440,147 +543,6 @@ function FormatYETI(yeti, options) {
 	
 	delete d.tempFeatures;
 	return d;
-}
-
-function GoogleSheets(gsheet, options) {
-	var d = {"type":"FeatureCollection"};
-	d.details = options; d.details.layers = []; d.details.measures = {}; d.features = {};
-	d.properties = {"title": gsheet.name, "description": gsheet.description};	
-	for(var item in gsheet){ d.properties[item] = gsheet[item]; }	
-
-	d.tempFeatures = gsheet.points;
-	
-	var scid = MI.supplychains.push(d);
-
-	var globe = GLOBES[Math.floor(Math.random() * GLOBES.length)];
-	var moffset = 0;
-	$('.mheader').each(function(i) { moffset += $(this).outerHeight(); });
-		
-	// Set default layerstyle
-	if(!options.style) { 
-		options.style = Object.assign({}, MI.scview.styles.point); 
-		var color = MI.scview.colorchoice();
-		options.style.fillColor = color[0];
-		options.style.color = color[1];
-	}
-		
-	$("#manifestlist").append(
-		'<div class="mheader" id="mheader-'+d.details.id+'"style="top:'+moffset+'px;">'+
-			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
-				'<i class="menu-map fas fa-globe-'+globe+'"></i><a>' + d.properties.title + '</a>' +
-				'<i class="fas fa-times-circle close-map"></i>'+
-			'</div>'+
-		'</div>'				
-	);
-	
-	// UI Setup
-	$("#mheader-"+d.details.id).click(function() { ui_mheader(d.details.id);});	
-	$("#mheader-"+d.details.id+" .close-map").click(function() { ui_mclose(d.details.id);});	
-	$("#mheader-"+d.details.id+" .menu-map").click(function() { ui_mmenu(d.details.id);});	
-	
-	temptitle = "";
-	$( ".mtitle").text(function(i, t){ temptitle += i == 0 ? t : ' + ' + t; });
-	document.title = temptitle + " - Manifest";
-	
-	$("#manifestlist").append('<div class="mdetails" id="mdetails-'+d.details.id+'"></div>');	
-	if (typeof(d.properties.description) != 'undefined' && d.properties.description != "") { $("#mdetails-"+d.details.id).append(
-		'<p class="mdescription">'+Autolinker.link(d.properties.description)+'</p>'
-	);}
-	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
-	
-	// Setup Layer
-	d.features = [];
-	
-	for (var i in d.tempFeatures) {
-		// TODO This templid should be based off of a numeric id, which Google doesn't have right 
-		templid = 1000*MI.supplychains.length+Number(i);
-		var j = i-1;
-		if (typeof(d.tempFeatures[i]) != 'undefined') {
-			d.features[j] = {"type": "Feature"};			
-			d.features[j].properties = {};	
-			d.features[j].properties.title = d.tempFeatures[i].Name;
-			d.features[j].properties.description = d.tempFeatures[i].Description;
-			d.features[j].properties.placename = d.tempFeatures[i].Location;
-			d.features[j].lat = Number(d.tempFeatures[i].Geocode.split(",")[0]);
-			d.features[j].lng = Number(d.tempFeatures[i].Geocode.split(",")[1]);
-			var ptitle = d.features[j].properties.title;
-			var pdesc = "<p class='description'>" + d.features[j].properties.description + "</p>";
-			var pplace = "<p class='placename'>" + d.features[j].properties.placename + "</p>";
-
-		
-			// Setup Measures
-			/*
-			d.features[j].properties.measures = {};
-			d.features[j].properties.measures.percent = d.tempFeatures[i].shipments_percents_company;
-			d.details.measures.percent = {"max":100,"min":0};
-			pdesc += "<p class='measures'>"+d.features[j].properties.measures.percent+"% of shipments.</p>";
-			*/
-			d.features[j].properties.scid = scid-1;
-			
-			// Set Style
-			d.features[j].properties.style=d.details.style;
-			
-			var li = $(						
-				"<li id='local_" + templid + "'>"+
-					"<div class='dot' style='background:"+d.details.style.fillColor+"; border-color:"+d.details.style.color+";'></div>"+
-				"<h5 class='mdetail_title'>" + ptitle + "</h5> " + pplace + Autolinker.link(pdesc) + 
-				"</li>"						
-			);
-			li.delegate( li, "click", MI.scview.focus);
-			$("#mlist-"+d.details.id).append(li);
-			
-			d.features[j].properties.lid = templid;
-
-			d.features[j].geometry = {"type":"Point","coordinates":[d.features[j].lng, d.features[j].lat]};
-		}
-	}
-	
-	//ui_measurelist();
-	
-	delete d.tempFeatures;
-
-	var points = {
-		"type":"FeatureCollection",
-		"details": d.details,
-		"features": d.features,
-		"properties": {}
-	};
-
-	// Setup Pointlayer
-	var pointLayer = new L.geoJSON(points, { onEachFeature: MI.scview.pointrender, pointToLayer: function (feature, latlng) { 
-		return L.circleMarker(latlng, MI.scview.styles.points); 
-	} });	
-	pointLayer.on('click', function(e){	ui_pointclick(e); });
-
-	// Prepare to add layers
-	maplayergroup = L.layerGroup();
-	
-	MI.scview.detailstyle = "points";
-	
-	// Set Pointlayer or Clusterview		
-	MI.scview.clustergroup = new L.MarkerClusterGroup({ 
-    	iconCreateFunction: function (cluster) {
-        	var markers = cluster.getAllChildMarkers();
-        	var html = '<div style="background:'+markers[0].options.fillColor+'; color:'+markers[0].options.color+'"><span>' + markers.length + '</span></div>';
-        	return L.divIcon({ html: html, className: 'marker-cluster marker-cluster-small', iconSize: L.point(40, 40) });
-    	},
-    	spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true 
-	});
-	if(MI.attributes.clustering) {
-		MI.scview.clustergroup.addLayer(pointLayer);
-		d.details.layers.push(maplayergroup.addLayer(MI.scview.clustergroup));		
-	} else {
-		d.details.layers.push(maplayergroup.addLayer(pointLayer));
-	}
-		
-	// Final Layer Setup
-	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
-	pointLayer.bringToFront();
-	
-	// Finalize Map
-	//$('.sidepanel').scrollTo( $(".mdetails").last(),  50, { offset: -1* moffset } );
-	
-	//MI.functions.graph("GoogleGraph", d, {"id": d.details.id});
 }
 
 /** Setup the graph relationships for legacy Sourcemap files **/
@@ -683,6 +645,9 @@ function YETIGraph(d, options) {
 	sc.graph.type = "directed";
 }
 
+function GSHEETGraph(d, options) {
+
+}
 /* Miscellaneous functions /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /** Called after Manifest has been initialized and the first supply chain loaded **/ 
@@ -699,6 +664,7 @@ function Cleanup() {
 		}
 	});
 
+	// @TODO Move this to a more general function
 	$("#load-samples-btn").click(function() {
 		var loadurl = "";
 		var loaded = false;
@@ -707,20 +673,32 @@ function Cleanup() {
 		
 		if($("#load-samples").val() == "other") {
 			loadurl = $("#load-samples-input").val();
+			
 			if (loadurl.toLowerCase().indexOf("https://raw.githubusercontent.com/hock/smapdata/master/data/") >= 0) {
+				type = "smap";
 				id = loadurl.substring(60).split(".")[0];
+				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+			} else if(loadurl.toLowerCase().indexOf("https://spreadsheets.google.com/feeds/cells/") >= 0) {
+				type = "gsheet";
+				id = loadurl.substring(44).split("/")[0];
+				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+				id = id.hashCode();
 			}
+			
+			
 		} else {
-			type = $("#load-samples").val().split("-")[0];		
-			id = $("#load-samples").val().split("-")[1];
-			if(type == "smap") {
-				loadurl = "https://raw.githubusercontent.com/hock/smapdata/master/data/" + id + ".geojson";				
+			var option = $("#load-samples").val().split("-");
+			type = option[0];	
+			option = [option.shift(), option.join('-')];
+			id = option[1];
+			if(type == "smap") {				
+				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;				
 			}		
 		}
 		for(var s in MI.supplychains) { if(MI.supplychains[s].details.id == id) { loaded = true; }}
 				
-		if(!loaded) {
-			$.getJSON(loadurl, function(d) { MI.functions.process("SourcemapAPI", d, {"id": id});});					
+		if(!loaded && id != null) {
+			$.getJSON(loadurl, function(d) { MI.functions.process(type, d, {"id": id});});					
 			ui_hamburger();
 		} else {
 			$("#manifestbar").shake(50,10,3);			
@@ -766,7 +744,6 @@ function CenterView() { MI.scview.map.setView(new L.LatLng(40.730610,-73.935242)
 
 /** A slightly smarter centering function that focuses on the first point of a supply chain **/
 function InterestView() {
-	console.log("interest");
 	if(MI.visualization == "map") {
 		for(var c in MI.clusters) {
 			MI.clusters[c].unspiderfy();
@@ -791,7 +768,11 @@ function Colorize(array) {
 
 /** A simple text match search **/
 function SimpleSearch() {
-	s = $("#searchbar").val().toLowerCase();
+	var s = $("#searchbar").val().toLowerCase();
+	// Only do something if the search has changed.
+	if(s == MI.attributes.prevsearch) { return; }
+	else { MI.attributes.prevsearch = s; }
+	
     $(".mlist li").each(function () {
         var $this = $(this);
         if ($(this).text().toLowerCase().indexOf(s) !== -1)  { $this.show();
@@ -808,7 +789,10 @@ function SimpleSearch() {
 				}
 				if (!(found)) { 
 					MI.scview.map._layers[i].setStyle({ fillOpacity: 0.1, opacity: 0.1 }); 
-					if(MI.scview.active_point == MI.scview.map._layers[i]) { MI.scview.active_point.closePopup(); MI.scview.active_point = null; }
+					
+					if(MI.scview.active_point) {
+						if(MI.scview.active_point._popup._source._leaflet_id == MI.scview.map._layers[i]._leaflet_id) { MI.scview.active_point.closePopup(); }
+					}
 				} else { MI.scview.map._layers[i].setStyle({ fillOpacity: 1, opacity: 1 }); MI.scview.map._layers[i].bringToFront();}
 			} else {
 				// Do something with lines
@@ -832,6 +816,9 @@ function SimpleSearch() {
 			if (!(clusterfound)) { MI.scview.map._layers[i].setOpacity(0.1); } else { MI.scview.map._layers[i].setOpacity(1); }
 		}
 	} // Search map layers	
+	if(MI.visualization != "map") {
+		visualize(MI.visualization);
+	}
 } // SimpleSearch
 
 /** Scales the map based on selected measure **/
@@ -872,25 +859,13 @@ function ui_mheader(id) {
 /** Sets interface to full screen mode **/
 function ui_fullscreen() {
 	if(!($("body").hasClass("fullscreen"))) {
-		$("body").addClass("fullscreen");
-
-		if($(".leaflet-popup").length > 0 && MI.scview.active_point) {
-			MI.scview.map.panTo(new L.LatLng(MI.scview.active_point._latlng.lat, MI.scview.active_point._latlng.lng));
-		} else if(MI.scview.map.getZoom() == 3) { 
-			MI.scview.map.panTo(new L.LatLng(40.730610, 0)); 
-		}
-			
+		$("body").addClass("fullscreen");			
 	} else {
 		$("body").removeClass("fullscreen");	
 
-		if($(".leaflet-popup").length > 0 && MI.scview.active_point) {
-			MI.scview.map.panTo(new L.LatLng(MI.scview.active_point._latlng.lat, MI.scview.active_point._latlng.lng));
-
-			var fevent = {sourceTarget: MI.scview.active_point, layer: {options:{fillOpacity:MI.scview.active_point.feature.properties.style.fillOpacity}, _popup: {_source: {feature: {properties: {lid: MI.scview.active_point.feature.properties.lid}}}}}};
-			ui_pointclick(fevent, MI.scview.active_point.feature.properties.lid);				
-		} else if(MI.scview.map.getZoom() == 3) { 
-			MI.scview.map.panTo(new L.LatLng(40.730610,-73.935242)); 
-		}		
+		if($(".leaflet-popup").length > 0 && MI.scview.active_point != null) {
+			ui_pointclick(MI.scview.active_point);				
+		} 		
 	}
 	viz_resize();
 }
@@ -936,13 +911,11 @@ function ui_mclose(id) {
 	
 	if(MI.supplychains.length != 0) {
 		if($(".leaflet-popup").length > 0 && MI.scview.active_point) {
-			var fevent = {sourceTarget: MI.scview.active_point, layer: {options:{fillOpacity:MI.scview.active_point.feature.properties.style.fillOpacity}, _popup: {_source: {feature: {properties: {lid: MI.scview.active_point.feature.properties.lid}}}}}};
-			ui_pointclick(fevent, MI.scview.active_point.feature.properties.lid, 0);		
-		} else {		
+			ui_pointclick(MI.scview.active_point, 0);		
+		} else {					
 			$('.sidepanel').scrollTo($("#mdetails-"+target_id),  0, { offset: -1*offset}); 	
 		}
 	} else {
-		MI.scview.active_point = null; 
 		if($("#minfodetail").hasClass("closed")) { ui_hamburger(); }
 	}
 	MI.scview.map.fitBounds(MI.scview.map.getBounds());
@@ -997,46 +970,31 @@ function ui_measurelist() {
 }
 
 /** The UI side of the focus function, scrolls the user interface to a point based on map (or functional) action **/
-function ui_pointclick(e, slid, speed) {
+function ui_pointclick(e, speed, slid) {
 	if($(window).width() <= 920) { return; }
-	
-	if(e) {MI.scview.active_point = e.sourceTarget;}
-	
+		
 	if(speed == undefined) { speed = 500; }
-	if(e != undefined) {
-		slid = e.layer._popup._source.feature.properties.lid;
-		if(e.layer.options.fillOpacity == 0.1) { return; }
-	}
-	if($("li#local_"+slid).parent().length > 0) {
-		gid = $("li#local_"+slid).parent().attr("id").split("-")[1];
+	if(slid == undefined) {
+		if(e != undefined && e._popup) {
+			slid = e._popup._source.feature.properties.lid;
+			if(e._popup._source.options.fillOpacity == 0.1) { return; }
+		} else { return; }
+	} 
+	if($("li#local_"+slid).parent().length > 0 && !($("body").hasClass("fullscreen"))) {
+		var offset = 0;
+		$("li#local_"+slid).parent().prevAll(".mheader").each(function(i) {
+			offset += $(this).outerHeight();
+		});
 
-		if(!($("body").hasClass("fullscreen"))) {
-			var offset = 0;
-			$("li#local_"+slid).parent().prevAll(".mheader").each(function(i) {
-				offset += $(this).outerHeight();
-			});
-	
-			// Scroll to point
-			$('.sidepanel').scrollTo(
-				$("li#local_"+slid),  speed, {
-					offset: -1*offset
-				}
-			);
-	
-			if(e != undefined) {
-				if(e.sourceTarget._popup._container != undefined) {
-					if(ui_collide($(e.sourceTarget._popup._container), $(".sidepanel"))) {
-						e.layer._map.setView(e.layer._latlng, e.layer._map.getZoom());
-						
-						/* TODO would be nice to handle edge case where popup is slighty out of frame */
-						/*if(ui_collide($(e.sourceTarget._popup._container), $(".sidepanel"))) {
-							e.layer._map.setView(e.layer._latlng, e.layer._map.getZoom()+1);
-							e.layer.openPopup();												
-						} */
-					}
-				}
+		// Scroll to point
+		$('.sidepanel').scrollTo(
+			$("li#local_"+slid),  speed, {
+				offset: -1*offset
 			}
-		}
+		);		
+	}
+	if(e == undefined && $("li#local_"+slid).length > 0) {
+		$("li#local_"+slid).click();
 	}
 }
 
@@ -1107,10 +1065,15 @@ MEASURES = [{measure: "weight", unit: "kg"}, {measure: "co2e", unit: "kg"}, {mea
 COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],["#ff6500","#f6d0ca"],["#4d34db","#dfdbf9"]];
 
 TILETYPES = {
+	'GOOGLE': 'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
 	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'LIGHT': 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
+	'LIGHT': 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png',
 	'TERRAIN': 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
-	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+	
+	'SHIPPING': 'https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/ShipRoutes/MapServer/WMTS/tile/1.0.0/ShipRoutes/default/default028mm/{z}/{y}/{x}.png',
+	'MARINE': 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=512&legends=1&zoom={z}&X={x}&Y={y}',
+	'RAIL': 'https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png'
 };
 
 GLOBES = ["americas","asia","europe","africa"];

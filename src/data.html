@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Manifest - Datasets</title>
+	<meta name="description" content="A simple viewer for supply chain data.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- build:process -->
+	<base href="<%= baseurl %>" />	
+	<link rel="stylesheet" href="css/Manifest-static<%= minify %>.css" /> 
+    <!-- /build -->
+
+	<link rel="icon" href="images/favicons/icon.png">	
+	<link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
+</head>
+
+<body class="textpage">
+	<div id="infoborder"></div>
+	<div id="infowrap">
+		<div id="textbar">			
+			<!-- build:section layout.launcher --><!-- /build -->
+	    	<!-- build:section layout.navigation --><!-- /build -->
+		</div>
+		<h1>Datasets</h1>
+		<p class="callout">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
+		
+		<h3><a name="manifest">Manifest File Format</a></h3>
+		<p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you can use the <a href="">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
+		
+		<h3><a name="smap">Sourcemap Dataset</a></h3>
+		<p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+		
+		<div id="dataviewer">
+			<input type="text" placeholder="Search this dataset..." id="searchField" />
+			<div id="table-sortable"></div>
+		</div>
+		
+	</div>
+    <!-- build:process -->	
+	<script src="js/Manifest-lib<%= minify %>.js"></script>
+	<script src="js/Manifest-data<%= minify %>.js"></script>
+    <!-- /build -->
+</body>
+</html>

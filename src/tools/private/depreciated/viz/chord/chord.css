@@ -1,0 +1,10 @@
+html {overflow:hidden;}
+body{ color: #eee; margin: 0; padding:0; border:none;}
+
+#chord #circle circle{fill:none;pointer-events:all;}
+#chord .group path{stroke:#000;stroke-width:1px;}
+#chord path.chord{stroke:#000;stroke-width:1px;}
+#chord #circle path.fade{fill-opacity:.8;}
+#chord #circle:hover path.fade{fill-opacity:.1;}
+#chord .littlelabel{font-size:10px;}
+#chord svg {margin:auto auto;padding:0px;}

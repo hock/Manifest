@@ -4,7 +4,7 @@ $( document ).ready(function() {
 
 /** Load the local smap index and populate a tablesorter view of it. **/
 function SmapDataTableInit() {
-	$.getJSON("../lib/json/smapindex.json", function(d) {
+	$.getJSON("json/smapindex.json", function(d) {
 		var data = JSON.parse(d);
 		$.each(data, function( index, value ) {
 		  data[index].json = "<a href='https://raw.githubusercontent.com/hock/smapdata/master/data/"+value.id+".json'>json</a>";
@@ -25,10 +25,20 @@ function SmapDataTableInit() {
 				
 				}
 		        if (key === 'nm') {
-		            return $('<span></span>').append("<a href='https://supplystudies.com/manifest/#smap-"+row.id+"'>"+row[key]+"</a>");
+		            return $('<span></span>').append("<a href='#smap-"+row.id+"'>"+row[key]+"</a>");
 		        }
 		        return row[key];
 		    },
+		    responsive: {
+				// It works for 571 - 1100 viewport width; (max-width: 1100px and min-width: 571px);
+				1226: {
+				// Other options
+					columns: {
+						id: 'ID',
+						nm: 'Name'
+					},
+				}				
+			}
 		});			
 	}); 
 }

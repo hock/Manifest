@@ -4,7 +4,7 @@ Grate.great_circle_route = function(pt1, pt2, ttl, bounds) {
     var gc = new arc.GreatCircle(new arc.Coord(pt1[0], pt1[1]), new arc.Coord(pt2[0], pt2[1]));	    
 	var line = gc.Arc(200);	   
 	return [bezier(line.geometries[0].coords)];
-}
+};
 
 function bezier(pts) {
     function curve(points) {
@@ -15,14 +15,14 @@ function bezier(pts) {
             var t = i / steps;
 
             var pt = [
-                Math.pow(1 - t, 3) * points[0][0]
-                 + 3 * t * Math.pow(1 - t, 2) * points[1][0]
-                 + 3 * (1 - t) * Math.pow(t, 2) * points[2][0]
-                 + Math.pow(t, 3) * points[3][0],
-                Math.pow(1 - t, 3) * points[0][1]
-                 + 3 * t * Math.pow(1-t,2) * points[1][1]
-                 + 3 * (1-t) * Math.pow(t,2) * points[2][1]
-                 + Math.pow(t, 3) * points[3][1]
+                Math.pow(1 - t, 3) * points[0][0] + 
+				3 * t * Math.pow(1 - t, 2) * points[1][0] + 
+				3 * (1 - t) * Math.pow(t, 2) * points[2][0] + 
+				Math.pow(t, 3) * points[3][0],
+				Math.pow(1 - t, 3) * points[0][1] + 
+				3 * t * Math.pow(1-t,2) * points[1][1] + 
+				3 * (1-t) * Math.pow(t,2) * points[2][1] + 
+				Math.pow(t, 3) * points[3][1]
             ];
             c.push(pt);
         }
@@ -68,7 +68,7 @@ Grate.bezier_route = function(from, to) {
 		
 	}
     return [pts];
-}
+};
 
 // Arc.js Compatible Code
 var D2R = Math.PI / 180;
@@ -88,10 +88,11 @@ Coord.prototype.view = function() {
 Coord.prototype.antipode = function() {
 
     var anti_lat = -1 * this.lat;
+	var anti_lon = null;
     if (this.lon < 0) {
-        var anti_lon = 180 + this.lon;
+        anti_lon = 180 + this.lon;
     } else {
-        var anti_lon = (180 - this.lon) * -1;
+        anti_lon = (180 - this.lon) * -1;
     }
     return new Coord(anti_lon, anti_lat);
 };
@@ -108,7 +109,7 @@ LineString.prototype.move_to = function(coord) {
 
 var Arc = function(properties) {
     this.properties = properties || {};
-    this.geometries = []
+    this.geometries = [];
 };
 
 Arc.prototype.json = function() {
@@ -121,7 +122,7 @@ Arc.prototype.json = function() {
                 'type': 'Feature', 'properties': this.properties
                };
     } else {
-        var multiline = []
+        var multiline = [];
         for (i = 0; i < this.geometries.length; i++) {
             multiline.push(this.geometries[i].coords);
         }
@@ -137,14 +138,14 @@ Arc.prototype.wkt = function() {
         if (this.geometries[i].coords.length === 0) {
             return 'LINESTRING(empty)';
         } else {
-            var wkt = 'LINESTRING(';
+            this.wkt = 'LINESTRING(';
             this.geometries[i].coords.forEach(function(c,idx) {
-                wkt += c[0] + ' ' + c[1] + ',';
-            });
-            wkt_string += wkt.substring(0, wkt.length - 1) + ')';
+                this.wkt += c[0] + ' ' + c[1] + ',';
+            }, this);
+            wkt_string += this.wkt.substring(0, this.wkt.length - 1) + ')';
         }
     }
-    return wkt_string;
+    return wkt_string; 
 };
 
 /*
@@ -215,11 +216,12 @@ GreatCircle.prototype.Arc = function(npoints,options) {
     */
     var bHasBigDiff = false;
     var dfMaxSmallDiffLong = 0;
-    for (var i = 1; i < first_pass.length; i++) {
+	var dfX = null;
+    for (var j = 1; j < first_pass.length; j++) {
         //if (minx > 170 && maxx > 180) {
         // }
-        var dfPrevX = first_pass[i-1][0];
-        var dfX = first_pass[i][0];
+        var dfPrevX = first_pass[j-1][0];
+        dfX = first_pass[j][0];
         var dfDiffLong = Math.abs(dfX - dfPrevX);
         if (dfDiffLong > 350 &&
             ((dfX > 170 && dfPrevX < -170) || (dfPrevX > 170 && dfX < -170))) {
@@ -229,33 +231,33 @@ GreatCircle.prototype.Arc = function(npoints,options) {
         }
     }
 
-    var poMulti = []
-
+    var poMulti = [];
+	var poNewLS = null;
     if (bHasBigDiff && dfMaxSmallDiffLong < 10) {
-        var poNewLS = []
+        poNewLS = [];
         poMulti.push(poNewLS);
-        for (var i = 0; i < first_pass.length; i++) {
-            var dfX = parseFloat(first_pass[i][0]);
-            if (i > 0 &&  Math.abs(dfX - first_pass[i-1][0]) > 350) {
-                var dfX1 = parseFloat(first_pass[i-1][0]);
-                var dfY1 = parseFloat(first_pass[i-1][1]);
-                var dfX2 = parseFloat(first_pass[i][0]);
-                var dfY2 = parseFloat(first_pass[i][1]);
+        for (var k = 0; k < first_pass.length; k++) {
+            dfX = parseFloat(first_pass[k][0]);
+            if (k > 0 &&  Math.abs(dfX - first_pass[k-1][0]) > 350) {
+                var dfX1 = parseFloat(first_pass[k-1][0]);
+                var dfY1 = parseFloat(first_pass[k-1][1]);
+                var dfX2 = parseFloat(first_pass[k][0]);
+                var dfY2 = parseFloat(first_pass[k][1]);
                 if (dfX1 > -180 && dfX1 < -170 && dfX2 == 180 &&
-                    i+1 < first_pass.length &&
-                   first_pass[i-1][0] > -180 && first_pass[i-1][0] < -170)
+                    k+1 < first_pass.length &&
+                   first_pass[k-1][0] > -180 && first_pass[k-1][0] < -170)
                 {
-                     poNewLS.push([-180, first_pass[i][1]]);
-                     i++;
-                     poNewLS.push([first_pass[i][0], first_pass[i][1]]);
+                     poNewLS.push([-180, first_pass[k][1]]);
+                     k++;
+                     poNewLS.push([first_pass[k][0], first_pass[k][1]]);
                      continue;
                 } else if (dfX1 > 170 && dfX1 < 180 && dfX2 == -180 &&
-                     i+1 < first_pass.length &&
-                     first_pass[i-1][0] > 170 && first_pass[i-1][0] < 180)
+                     k+1 < first_pass.length &&
+                     first_pass[k-1][0] > 170 && first_pass[k-1][0] < 180)
                 {
-                     poNewLS.push([180, first_pass[i][1]]);
-                     i++;
-                     poNewLS.push([first_pass[i][0], first_pass[i][1]]);
+                     poNewLS.push([180, first_pass[k][1]]);
+                     k++;
+                     poNewLS.push([first_pass[k][0], first_pass[k][1]]);
                      continue;
                 }
 
@@ -278,9 +280,9 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                 {
                     var dfRatio = (180 - dfX1) / (dfX2 - dfX1);
                     var dfY = dfRatio * dfY2 + (1 - dfRatio) * dfY1;
-                    poNewLS.push([first_pass[i-1][0] > 170 ? 180 : -180, dfY]);
+                    poNewLS.push([first_pass[k-1][0] > 170 ? 180 : -180, dfY]);
                     poNewLS = [];
-                    poNewLS.push([first_pass[i-1][0] > 170 ? -180 : 180, dfY]);
+                    poNewLS.push([first_pass[k-1][0] > 170 ? -180 : 180, dfY]);
                     poMulti.push(poNewLS);
                 }
                 else
@@ -288,27 +290,27 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                     poNewLS = [];
                     poMulti.push(poNewLS);
                 }
-                poNewLS.push([dfX, first_pass[i][1]]);
+                poNewLS.push([dfX, first_pass[k][1]]);
             } else {
-                poNewLS.push([first_pass[i][0], first_pass[i][1]]);
+                poNewLS.push([first_pass[k][0], first_pass[k][1]]);
             }
         }
     } else {
        // add normally
-        var poNewLS = []
+        poNewLS = [];
         poMulti.push(poNewLS);
-        for (var i = 0; i < first_pass.length; i++) {
-            poNewLS.push([first_pass[i][0],first_pass[i][1]]);
+        for (var l = 0; l < first_pass.length; l++) {
+            poNewLS.push([first_pass[l][0],first_pass[l][1]]);
         }
     }
 
     var arc = new Arc(this.properties);
-    for (var i = 0; i < poMulti.length; i++) {
+    for (var m = 0; m < poMulti.length; m++) {
         var line = new LineString();
         arc.geometries.push(line);
-        var points = poMulti[i];
-        for (var j = 0; j < points.length; j++) {
-            line.move_to(points[j]);
+        var points = poMulti[m];
+        for (var n = 0; n < points.length; n++) {
+            line.move_to(points[n]);
         }
     }
     return arc;

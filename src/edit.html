@@ -5,77 +5,39 @@
 	<meta name="description" content="A simple viewer for supply chain data.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" href="./lib/css/leaflet.css" /> 
-	<link rel="stylesheet" href="./lib/css/manifest.css" /> 
-	<link rel="stylesheet" href="./lib/css/leaflet.css" /> 
-	<link rel="stylesheet" href="./lib/css/fa.css" /> 
+    <!-- build:process -->
+	<base href="<%= baseurl %>" />	
+	<link rel="stylesheet" href="css/Manifest-main<%= minify %>.css" /> 
+    <!-- /build -->
 	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 	<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 	
-	<link rel="icon" href="./lib/images/favicons/icon.png">	
-	<link rel="apple-touch-icon" href="./lib/images/favicons/apple-touch-icon.png">
+	<link rel="icon" href="images/favicons/icon.png">	
+	<link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
 </head>
 
 <body class="editor textpage">
 	<div id="infoborder"></div>
 	<div id="infowrap">
 		<div id="textbar">			
-			<i id="minfo-hamburger" class="fas fa-bars"></i> 
-			<span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
-			<div id="minfodetail" class="closed">
-				<p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
-				<nav id="minfomenu">
-					<a href="../about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
-					<a href="../data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
-					<a href="../curriculum/" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
-					<div class="spacer"></div>
-					<a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
-					<a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
-				</nav>
-				<p>You can start with data from our <a href="../data/">repositories</a>, or load a URL in one of the <a href="">file formats</a> we support.</p>
-				<div id="loadlistpanel">
-					<select name="load-samples" id="load-samples"></select>
-					<button id="load-samples-btn">Load</button>
-				</div>
-				
-			</div>
-			<nav role="navigation" class="text-menu dropdown">
-			  <ul>
-			    <li><a href="../about/">About</a></li> 
-			    <li><a href="https://supplystudies.com/syllabus/">Curriculum</a></li> 
-			    <li><a href="../data/">Datasets</a>
-					<ul class="dropdown">
-				        <li><a href="../data/">Sourcemap Data</a></li>
-				      </ul>
-				  </li>
-			    <li><a href="https://github.com/hock/Manifest">Documentation</a></li>
-			  </ul>
-			</nav>
-			<div class="clear"></div>
+		    <!-- build:section layout.launcher --><!-- /build -->				
+		    <!-- build:section layout.navigation --><!-- /build -->
 		</div>
-		
+
+	    <div id='editor_holder'></div>
 		<div id="editor_overview">
 			<p class="callout">This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains going forward, but this format is still in development. it isn't the only option. Manifest also supports <a href="">data that was originally created for the <a href="">Sourcemap project</a>, and a simple <a href="">Google Spreadsheet template</a>.</p>
-	    <button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
+	    	<button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
 		
 		</div>
 		
-	    <div id='editor_holder'>
-	    </div>
 		<div class="clear"></div>
 		<div id="map_chooser_wrap" class="closed"><div id="map_chooser"></div><div id="chooser_arrow"></div></div>
 	</div>
-	
-	<script src="./lib/js/inc/jquery.js"></script> <script src="./lib/js/inc/fontawesome.js"></script> 
-	 <script src="./lib/js/leaflet/leaflet.js"></script>
- <script src="./lib/js/inc/jsoneditor.js"></script> <script src="./lib/js/edit.js"></script>
-
-	
-	
-	
-	<script>		
-
-	</script>
+    <!-- build:process -->	
+	<script src="js/Manifest-lib<%= minify %>.js"></script>
+	<script src="js/Manifest-edit<%= minify %>.js"></script>
+    <!-- /build -->
 </body>
 </html>

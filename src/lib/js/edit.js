@@ -21,14 +21,15 @@ function EditorInit() {
 	
 	// UI Setup
 	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
-	$.getJSON("lib/json/samples.json", function(d) { 
-		for(var s in d) { 
-			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>'); 
+	$.getJSON("json/samples.json", function(d) { 
+		$("#collection-description").html(d.description);
+		for(var s in d.collection) { 
+			$("#load-samples").append('<option value="'+s+'">'+d.collection[s]+'</option>');	
 		} 
 	});
 	$("#load-samples-btn").click(function() {
 		var id = $("#load-samples").val();
-		window.location.href = "./#"+id;
+		window.location.href = "#"+id;
 	});
     $("#save-manifest-btn").click(function() {
       // Get the value from the editor
@@ -67,7 +68,7 @@ function EditorInit() {
 		disable_edit_json: true,
 		disable_properties: true,
 		schema: {
-			$ref: "lib/json/supplychain.json"
+			$ref: $("base").attr("href")+"json/schema/supplychain.json"
 		}
 	});
 

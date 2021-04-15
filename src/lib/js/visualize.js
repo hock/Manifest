@@ -33,7 +33,10 @@ function viz_cleanup() {
 	} else {
 		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).height());
 	}
-	if(MI.scview.active_point && MI.visualization != "map") { MI.scview.active_point.closePopup(); MI.scview.active_point = null; }
+	if(MI.scview.active_point) {
+		if(MI.visualization != "map") { }
+		else { ui_pointclick(null, null, MI.scview.active_point._popup._source.feature.properties.lid); } 	
+	}
 }
 
 function viz_resize() {
@@ -113,8 +116,9 @@ function viz_forcegraph(graph, id) {
   
 	function tick() {
 		node.attr("cx", function(d) { d.x = Math.max(radius, Math.min(width - radius, d.x)); return d.x; })
-		.attr("cy", function(d) { d.y = Math.max(radius, Math.min(height - radius, d.y)); return d.y; });
-
+		.attr("cy", function(d) { d.y = Math.max(radius, Math.min(height - radius, d.y)); return d.y; })
+		.attr("opacity", function(d) { if(d.ref != undefined) { if($("li#local_"+d.ref.properties.lid).css("display") == "none") {return 0.1; } else { return 1;} }});
+		
 		link.attr("x1", function(d) { return d.source.x; })
 		    .attr("y1", function(d) { return d.source.y; })
 		    .attr("x2", function(d) { return d.target.x; })
@@ -140,7 +144,7 @@ function viz_forcegraph(graph, id) {
 
 	function dragstarted(d) {
 		if(d.ref != undefined) {
-			ui_pointclick(undefined, d.ref.properties.lid);
+			ui_pointclick(null, null, d.ref.properties.lid);
 		}
 		if (!d3.event.active) simulation.alphaTarget(0.3).restart();
 		d.fx = d.x;

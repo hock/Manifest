@@ -5,13 +5,14 @@ $( document ).ready(function() {
 /** Initializes the user interface for (mostly) static pages. **/
 function StaticInit() {
 	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
-	$.getJSON("../lib/json/samples.json", function(d) { 
-		for(var s in d) { 
-			$("#load-samples").append('<option value="'+s+'">'+d[s]+'</option>'); 
+	$.getJSON("json/samples.json", function(d) { 
+		$("#collection-description").html(d.description);
+		for(var s in d.collection) { 
+			$("#load-samples").append('<option value="'+s+'">'+d.collection[s]+'</option>');	
 		} 
 	});
 	$("#load-samples-btn").click(function() {
 		var id = $("#load-samples").val();
-		window.location.href = "../#"+id;
+		window.location.href = "#"+id;
 	});
 }
