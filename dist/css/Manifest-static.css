@@ -4857,7 +4857,7 @@ readers do not read off random characters that represent icons */
 	}
 
 	#mapmenu-window .google {
-		background:url("http://mt0.google.com/vt/lyrs=m&x=0&y=0&z=1") no-repeat center bottom;
+		background:url("https://mt0.google.com/vt/lyrs=m&x=0&y=0&z=1") no-repeat center bottom;
 		background-size:cover;
 	}
 	#mapmenu-window .light {
