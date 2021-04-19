@@ -24,7 +24,7 @@ function EditorInit() {
 	$.getJSON("json/samples.json", function(d) { 
 		$("#collection-description").html(d.description);
 		for(var s in d.collection) { 
-			$("#load-samples").append('<option value="'+s+'">'+d.collection[s]+'</option>');	
+			$("#load-samples").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
 		} 
 	});
 	$("#load-samples-btn").click(function() {
