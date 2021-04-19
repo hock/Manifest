@@ -5013,13 +5013,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 /* zoom control */
 
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
+.leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-control-zoomhome-in, .leaflet-control-zoomhome-out {
 	font: bold 18px 'Roboto', Monaco, monospace;
 	text-indent: 1px;
 	}
 
-.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out, .leaflet-touch .leaflet-control-zoomhome-in, .leaflet-touch .leaflet-control-zoomhome-out  {
 	font-size: 22px;
 	}
 
@@ -5502,7 +5501,7 @@ body.editor .leaflet-left .leaflet-control {
 
 	#manifestbar.open {}
 	#minfoheader {}
-	#minfoheader #minfo { cursor:pointer; margin-left:1rem; width:calc(100% - 4rem); display:inline-block; vertical-align:bottom; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;}
+	#minfoheader #minfo { cursor:pointer; margin-left:0.25rem; width:calc(100% - 4rem); display:inline-block; vertical-align:bottom; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;}
 	#minfoheader #minfo:hover { text-decoration: underline; }
 
 	#logotype { letter-spacing:-0.05rem;}
@@ -5654,7 +5653,7 @@ body.editor .leaflet-left .leaflet-control {
 		background-size:cover;
 	}
 	#mapmenu-window .light {
-		background:url("https://tiles.stadiamaps.com/tiles/osm_bright/1/0/0.png") no-repeat center bottom;
+		background:url("https://stamen-tiles-a.a.ssl.fastly.net/toner-lite/1/0/0.png") no-repeat center bottom;
 		background-size:cover;
 	}
 	#mapmenu-window .terrain {
@@ -5662,8 +5661,7 @@ body.editor .leaflet-left .leaflet-control {
 		background-size:cover;
 	}
 	#mapmenu-window .dark {
-		background:url("https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/1/0/0?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A");
-		background: no-repeat center bottom;
+		background:url("https://a.basemaps.cartocdn.com/dark_all/1/0/0.png") no-repeat center bottom;
 		background-size:cover;
 	}
 	#mapmenu-window .satellite {
@@ -5703,7 +5701,9 @@ body.editor .leaflet-left .leaflet-control {
 	.marinelayer img { filter: brightness(0.5) sepia(1) saturate(300%) hue-rotate(200deg); }
 	.raillayer img { filter: brightness(0.1) sepia(1) saturate(5000%) hue-rotate(190deg) opacity(40%); }
 	.googlebase img {  }
-
+	
+	.fa-tag { cursor:pointer; }
+	.fa-tag:hover { filter: brightness(120%); }
 	/* General classes */
 	.closed { display:none; }
 	.clear { clear:both;}
@@ -5711,7 +5711,7 @@ body.editor .leaflet-left .leaflet-control {
 	/* Fullscreen */
 	body.fullscreen .sidepanel {visibility: hidden; overflow:hidden;}
 	body.fullscreen .leaflet-left .leaflet-control {margin-left: 1rem; }
-	body.fullscreen .leaflet-control-zoom {margin-top:6rem; }
+	body.fullscreen .leaflet-control-zoomhome {margin-top:6rem; }
 	body.fullscreen .searchwidget { left:1rem;}
 
 	/* Color Themes */

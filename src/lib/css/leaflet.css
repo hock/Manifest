@@ -332,13 +332,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 /* zoom control */
 
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
+.leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-control-zoomhome-in, .leaflet-control-zoomhome-out {
 	font: bold 18px 'Roboto', Monaco, monospace;
 	text-indent: 1px;
 	}
 
-.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out, .leaflet-touch .leaflet-control-zoomhome-in, .leaflet-touch .leaflet-control-zoomhome-out  {
 	font-size: 22px;
 	}
 

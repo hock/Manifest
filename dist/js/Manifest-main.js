@@ -7871,7 +7871,100 @@ L.Marker.include({
 exports.MarkerClusterGroup = MarkerClusterGroup;
 exports.MarkerCluster = MarkerCluster;
 
-}))); /* Native Grate Code */
+}))); /*
+ * Leaflet zoom control with a home button for resetting the view.
+ *
+ * Distributed under the CC-BY-SA-3.0 license. See the file "LICENSE"
+ * for details.
+ *
+ * Based on code by toms (https://gis.stackexchange.com/a/127383/48264).
+ */
+(function () {
+    "use strict";
+
+    L.Control.ZoomHome = L.Control.Zoom.extend({
+        options: {
+            position: 'topleft',
+            zoomInText: '+',
+            zoomInTitle: 'Zoom in',
+            zoomOutText: '-',
+            zoomOutTitle: 'Zoom out',
+            zoomHomeIcon: 'window-maximize',
+            zoomHomeTitle: 'Home',
+            homeCoordinates: null,
+            homeZoom: null
+        },
+
+        onAdd: function (map) {
+            var controlName = 'leaflet-control-zoomhome',
+                container = L.DomUtil.create('div', controlName + ' leaflet-bar'),
+                options = this.options;
+
+            if (options.homeCoordinates === null) {
+                options.homeCoordinates = map.getCenter();
+            }
+            if (options.homeZoom === null) {
+                options.homeZoom = map.getZoom();
+            }
+
+            this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle,
+                controlName + '-in', container, this._zoomIn.bind(this));
+            this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle,
+                controlName + '-out', container, this._zoomOut.bind(this));
+            var zoomHomeText = '<i class="fa fa-' + options.zoomHomeIcon + '" style="line-height:1.65;"></i>';
+            this._zoomHomeButton = this._createButton(zoomHomeText, options.zoomHomeTitle,
+                controlName + '-home', container, this._zoomHome.bind(this));
+
+            this._updateDisabled();
+            map.on('zoomend zoomlevelschange', this._updateDisabled, this);
+
+            return container;
+        },
+
+        setHomeBounds: function (bounds) {
+            if (bounds === undefined) {
+                bounds = this._map.getBounds();
+            } else {
+                if (typeof bounds.getCenter !== 'function') {
+                    bounds = L.latLngBounds(bounds);
+                }
+            }
+            this.options.homeZoom = this._map.getBoundsZoom(bounds);
+            this.options.homeCoordinates = bounds.getCenter();
+        },
+
+        setHomeCoordinates: function (coordinates) {
+            if (coordinates === undefined) {
+                coordinates = this._map.getCenter();
+            }
+            this.options.homeCoordinates = coordinates;
+        },
+
+        setHomeZoom: function (zoom) {
+            if (zoom === undefined) {
+                zoom = this._map.getZoom();
+            }
+            this.options.homeZoom = zoom;
+        },
+
+        getHomeZoom: function () {
+            return this.options.homeZoom;
+        },
+
+        getHomeCoordinates: function () {
+            return this.options.homeCoordinates;
+        },
+
+        _zoomHome: function (e) {
+            //jshint unused:false
+            this._map.setView(this.options.homeCoordinates, this.options.homeZoom);
+        }
+    });
+
+    L.Control.zoomHome = function (options) {
+        return new L.Control.ZoomHome(options);
+    };
+}()); /* Native Grate Code */
 Grate = {};
 Grate.great_circle_route = function(pt1, pt2, ttl, bounds) {
     var gc = new arc.GreatCircle(new arc.Coord(pt1[0], pt1[1]), new arc.Coord(pt2[0], pt2[1]));	    
@@ -8233,19 +8326,18 @@ function Manifest() {
 
 /** Initialize a Spatial Supply Chain **/
 function SpatialSupplyChain() {
-	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, scrollWheelZoom: false });
+	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, scrollWheelZoom: false });
 	this.clustergroup = this.active_point = null;
 	
 	/* Define Layers */
 	this.layerdefs = {
 		'google': new L.TileLayer(TILETYPES.GOOGLE, 
-			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),
-		
-		'light': new L.TileLayer(TILETYPES.LIGHT, { maxZoom: 20, detectRetina: true, attribution: 'Light, Stadia' }),
-		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { maxZoom: 18, detectRetina: true, attribution: 'Terrain, Stamen' }),
-		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { maxZoom: 16, detectRetina: true, attribution: 'Satellite, ESRI' }),
-	 	'dark': new L.TileLayer(TILETYPES.DARK, { maxZoom: 18, detectRetina: true, attribution: 'Dark, MapBox' }),
-		
+			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
+		'light': new L.TileLayer(TILETYPES.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
+		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
+		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { detectRetina: true, attribution: 'Satellite, ESRI' }),
+	 	'dark': new L.TileLayer(TILETYPES.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+
 		'shipping': new L.TileLayer(TILETYPES.SHIPPING, 
 			{ maxNativeZoom: 4, detectRetina: true, className: "shippinglayer", bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
 		'marine': new L.TileLayer(TILETYPES.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: "marinelayer", attribution: '[Marinetraffic Data]' }),
@@ -8270,11 +8362,21 @@ function SpatialSupplyChain() {
 	
 	// Map configuration
 	this.map.attributionControl.setPrefix('');
+	L.Control.zoomHome().addTo(this.map);
 	this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 	this.map.on("popupopen", function(e) {
 			MI.scview.map.setView(e.popup._latlng, MI.scview.map.getZoom());	
 			MI.scview.active_point = e.sourceTarget;
 			ui_pointclick(MI.scview.active_point); 
+			$(".fa-tag").click(function() {
+				if(e.target._popup._source._preSpiderfyLatlng) {
+					MI.scview.map.setView(e.popup._source.__parent._latlng, 16);
+					
+				} else {
+					MI.scview.map.setView(e.popup._latlng, 16);
+					
+				}
+			});
 			
 	});
 	this.map.on("popupclose", function(e) { MI.scview.active_point = null; } );
@@ -8304,7 +8406,7 @@ function RenderPoint(feature, layer) {
 		var fid = feature.properties.lid;
 		var popupContent = "<h2 id='popup-"+fid+"'><i class='fas fa-tag'></i> " + title + "</h2><p>" + Autolinker.link(description) + "</p>";
 		if (feature.properties && feature.properties.popupContent) { popupContent += feature.properties.popupContent;}
-	
+		
 		layer.bindPopup(popupContent);
 		layer.bindTooltip(title);	
 	
@@ -8855,7 +8957,10 @@ function GSHEETGraph(d, options) {
 
 /** Called after Manifest has been initialized and the first supply chain loaded **/ 
 function Cleanup() { 
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
 	console.log(MI); 
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
+	
 	MI.attributes.initialized = true;	
 	$("#load-samples").change(function() {
 		if($("#load-samples option:selected").val() == "other") {
@@ -8880,11 +8985,11 @@ function Cleanup() {
 			if (loadurl.toLowerCase().indexOf("https://raw.githubusercontent.com/hock/smapdata/master/data/") >= 0) {
 				type = "smap";
 				id = loadurl.substring(60).split(".")[0];
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;								
 			} else if(loadurl.toLowerCase().indexOf("https://spreadsheets.google.com/feeds/cells/") >= 0) {
 				type = "gsheet";
 				id = loadurl.substring(44).split("/")[0];
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;								
 				id = id.hashCode();
 			}
 			
@@ -8895,8 +9000,11 @@ function Cleanup() {
 			option = [option.shift(), option.join('-')];
 			id = option[1];
 			if(type == "smap") {				
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;				
-			}		
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;				
+			} else if(type == "gsheet")	{
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;				
+				id = id.hashCode();
+			}	
 		}
 		for(var s in MI.supplychains) { if(MI.supplychains[s].details.id == id) { loaded = true; }}
 				
@@ -8951,7 +9059,10 @@ function InterestView() {
 		for(var c in MI.clusters) {
 			MI.clusters[c].unspiderfy();
 		}
-		ui_mheader($(".mlist").last().attr("id").split("-")[1]);
+		var idname = $(".mlist").last().attr("id").split("-");
+		idname = [idname.shift(), idname.join('-')];
+		var id = idname[1];
+		ui_mheader(id);
 		MI.scview.focus($(".mlist").last().children("li").first().attr('id').split("_")[1]);	
 	}	
 	//map.locate({setView : true, maxZoom: map.getZoom()});
@@ -9269,9 +9380,9 @@ COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],[
 
 TILETYPES = {
 	'GOOGLE': 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'LIGHT': 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png',
-	'TERRAIN': 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
+	'DARK': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',	
+	'LIGHT': 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}',	
+	'TERRAIN': 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}',
 	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 	
 	'SHIPPING': 'https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/ShipRoutes/MapServer/WMTS/tile/1.0.0/ShipRoutes/default/default028mm/{z}/{y}/{x}.png',
@@ -9470,44 +9581,76 @@ function viz_forcegraph(graph, id) {
 	MI.serviceurl = "https://supplystudies.com/manifest/services/";
 	MI.jsoncollection = "json/samples.json";
 	
+	var hash = "";
+	var hashtype = "";
+	var hashid = "";
+	
+	var initialmap = false;
 	if(typeof(location.hash) != 'undefined' && location.hash != "") { 
 		// TODO handle bad hashes gracefully and still load the page.
-		
-		var hash =  location.hash.substr(1).split("-");
-		var hashtype = hash[0]; 
+		hash =  location.hash.substr(1).split("-");
+		hashtype = hash[0]; 
 		hash = [hash.shift(), hash.join('-')];
-		var hashid = hash[1]; 
+		hashid = hash[1]; 
 		
 		if(typeof(hashtype) == 'undefined' || typeof(hashid) == 'undefined') {
 			$("#loader h2").text("[BAD REQUEST]");
 		}
-		
-		if(hashtype == "smap") { 
-			$.getJSON(MI.serviceurl + "?type=smap&id=" + hashid, function(d) { MI.functions.process("smap", d, {"id": hashid});}).fail(function() {
-				$("#loader h2").text("[SMAP ID NOT FOUND]");
-			}); 
-		} else 	if(hashtype == "gsheet") { 
-			$.getJSON(MI.serviceurl + "?type=gsheet&id=" + hashid, function(d) { MI.functions.process("gsheet", d, {"id": hashid.hashCode()});}).fail(function() {
-				$("#loader h2").text("[GOOGLE SHEET NOT FOUND]");
-			}); 
+		switch(hashtype) {
+			case "smap":
+				initialmap = true;
+				$.getJSON(MI.serviceurl + "?type=smap&id=" + hashid, function(d) { MI.functions.process("smap", d, {"id": hashid});}).fail(function() {
+					$("#loader h2").text("[SMAP ID NOT FOUND]");
+				});
+				break;
+			case "gsheet":
+				initialmap = true;
+				$.getJSON(MI.serviceurl + "?type=gsheet&id=" + hashid, function(d) { MI.functions.process("gsheet", d, {"id": hashid.hashCode()});}).fail(function() {
+					$("#loader h2").text("[GOOGLE SHEET NOT FOUND]");
+				}); 
+		    	break;
+			case "manifest":
+				initialmap = true;
+				console.log("Load manifest...");
+				break;
+			case "collection":
+				initialmap = false;			
+				MI.jsoncollection = hashid;
+				break;
+		  	default:
+				console.log("Option not supported...");
 		}
-	} else {
-		var starters = [5333,2239,602,5228,4532,2737,5228];
-		var starter_id = starters[Math.floor(Math.random() * starters.length)];
-		 
-		$.getJSON(MI.serviceurl + "?type=smap&id=" + starter_id, function(d) { MI.functions.process("smap", d, {"id": starter_id});});
-		//$.getJSON(MI.serviceurl + "?type=gsheet&id=" + "1IsJ6_GEFXzPBWbMilEN--Ft20ryO88XynMoNVtFTUa4", function(d) { MI.functions.process("gsheet", d, {"id": ("1IsJ6_GEFXzPBWbMilEN--Ft20ryO88XynMoNVtFTUa4").hashCode()});});
-		
-		//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
-		
-	}		
+	} 
+	
+
+	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
+	//	var starters = [5333,2239,602,5228,4532,2737,5228]; ... if(d.featured)
+
 		
 	$.getJSON(MI.jsoncollection, function(d) { 
 		$("#collection-description").html(d.description);
 		for(var s in d.collection) { 
-			$("#load-samples").append('<option value="'+s+'">'+d.collection[s]+'</option>');	
+			$("#load-samples").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
 		} 
-		$("#load-samples").append('<option value="other">Other...</option>');			
+		$("#load-samples").append('<option value="other">Other...</option>');	
+		
+		if(hashtype != "" && hashtype != "collection") { return; } // If a specific hash is passed, we're done--otherwise load a starter map.
+			
+		var option = $("#load-samples").val().split("-");
+		type = option[0];	
+		option = [option.shift(), option.join('-')];
+		id = option[1];
+		
+		var starter = d.collection[Math.floor(Math.random() * d.collection.length)];
+		var starterstring = starter.id.split("-"); 
+		var startertype = starterstring[0];
+		starterstring = [starterstring.shift(), starterstring.join('-')];
+		var starterid = starterstring[1]; 
+		
+		if(startertype == "gsheet" || startertype == "yeti") {
+			starterid = starterid.hashCode();
+		}
+		$.getJSON(MI.serviceurl + "?type="+startertype+"&id=" + starterstring[1], function(d) { MI.functions.process(startertype, d, {"id": starterid});});	
 	});
 	
 	$(document).ajaxStop(function() {

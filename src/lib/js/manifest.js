@@ -30,19 +30,18 @@ function Manifest() {
 
 /** Initialize a Spatial Supply Chain **/
 function SpatialSupplyChain() {
-	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, scrollWheelZoom: false });
+	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, scrollWheelZoom: false });
 	this.clustergroup = this.active_point = null;
 	
 	/* Define Layers */
 	this.layerdefs = {
 		'google': new L.TileLayer(TILETYPES.GOOGLE, 
-			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),
-		
-		'light': new L.TileLayer(TILETYPES.LIGHT, { maxZoom: 20, detectRetina: true, attribution: 'Light, Stadia' }),
-		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { maxZoom: 18, detectRetina: true, attribution: 'Terrain, Stamen' }),
-		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { maxZoom: 16, detectRetina: true, attribution: 'Satellite, ESRI' }),
-	 	'dark': new L.TileLayer(TILETYPES.DARK, { maxZoom: 18, detectRetina: true, attribution: 'Dark, MapBox' }),
-		
+			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
+		'light': new L.TileLayer(TILETYPES.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
+		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
+		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { detectRetina: true, attribution: 'Satellite, ESRI' }),
+	 	'dark': new L.TileLayer(TILETYPES.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+
 		'shipping': new L.TileLayer(TILETYPES.SHIPPING, 
 			{ maxNativeZoom: 4, detectRetina: true, className: "shippinglayer", bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
 		'marine': new L.TileLayer(TILETYPES.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: "marinelayer", attribution: '[Marinetraffic Data]' }),
@@ -67,11 +66,21 @@ function SpatialSupplyChain() {
 	
 	// Map configuration
 	this.map.attributionControl.setPrefix('');
+	L.Control.zoomHome().addTo(this.map);
 	this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 	this.map.on("popupopen", function(e) {
 			MI.scview.map.setView(e.popup._latlng, MI.scview.map.getZoom());	
 			MI.scview.active_point = e.sourceTarget;
 			ui_pointclick(MI.scview.active_point); 
+			$(".fa-tag").click(function() {
+				if(e.target._popup._source._preSpiderfyLatlng) {
+					MI.scview.map.setView(e.popup._source.__parent._latlng, 16);
+					
+				} else {
+					MI.scview.map.setView(e.popup._latlng, 16);
+					
+				}
+			});
 			
 	});
 	this.map.on("popupclose", function(e) { MI.scview.active_point = null; } );
@@ -101,7 +110,7 @@ function RenderPoint(feature, layer) {
 		var fid = feature.properties.lid;
 		var popupContent = "<h2 id='popup-"+fid+"'><i class='fas fa-tag'></i> " + title + "</h2><p>" + Autolinker.link(description) + "</p>";
 		if (feature.properties && feature.properties.popupContent) { popupContent += feature.properties.popupContent;}
-	
+		
 		layer.bindPopup(popupContent);
 		layer.bindTooltip(title);	
 	
@@ -652,7 +661,10 @@ function GSHEETGraph(d, options) {
 
 /** Called after Manifest has been initialized and the first supply chain loaded **/ 
 function Cleanup() { 
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
 	console.log(MI); 
+	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
+	
 	MI.attributes.initialized = true;	
 	$("#load-samples").change(function() {
 		if($("#load-samples option:selected").val() == "other") {
@@ -677,11 +689,11 @@ function Cleanup() {
 			if (loadurl.toLowerCase().indexOf("https://raw.githubusercontent.com/hock/smapdata/master/data/") >= 0) {
 				type = "smap";
 				id = loadurl.substring(60).split(".")[0];
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;								
 			} else if(loadurl.toLowerCase().indexOf("https://spreadsheets.google.com/feeds/cells/") >= 0) {
 				type = "gsheet";
 				id = loadurl.substring(44).split("/")[0];
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;								
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;								
 				id = id.hashCode();
 			}
 			
@@ -692,8 +704,11 @@ function Cleanup() {
 			option = [option.shift(), option.join('-')];
 			id = option[1];
 			if(type == "smap") {				
-				loadurl = "http://hockbook.local/Manifest/src/services/?type="+type+"&id=" + id;				
-			}		
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;				
+			} else if(type == "gsheet")	{
+				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;				
+				id = id.hashCode();
+			}	
 		}
 		for(var s in MI.supplychains) { if(MI.supplychains[s].details.id == id) { loaded = true; }}
 				
@@ -748,7 +763,10 @@ function InterestView() {
 		for(var c in MI.clusters) {
 			MI.clusters[c].unspiderfy();
 		}
-		ui_mheader($(".mlist").last().attr("id").split("-")[1]);
+		var idname = $(".mlist").last().attr("id").split("-");
+		idname = [idname.shift(), idname.join('-')];
+		var id = idname[1];
+		ui_mheader(id);
 		MI.scview.focus($(".mlist").last().children("li").first().attr('id').split("_")[1]);	
 	}	
 	//map.locate({setView : true, maxZoom: map.getZoom()});
@@ -1066,9 +1084,9 @@ COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],[
 
 TILETYPES = {
 	'GOOGLE': 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-	'DARK': 'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaG9jayIsImEiOiJXcDZvWTFVIn0.DDAXuVl0361Bfsb9chrH-A',
-	'LIGHT': 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png',
-	'TERRAIN': 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
+	'DARK': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',	
+	'LIGHT': 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}',	
+	'TERRAIN': 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}',
 	'SATELLITE': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 	
 	'SHIPPING': 'https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/ShipRoutes/MapServer/WMTS/tile/1.0.0/ShipRoutes/default/default028mm/{z}/{y}/{x}.png',
