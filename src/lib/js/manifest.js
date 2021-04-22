@@ -302,9 +302,22 @@ function MapSC(d, scid) {
 		if (typeof(d.features[i].properties) != 'undefined') {
 			if (typeof(d.features[i].properties.title) != 'undefined' && d.features[i].geometry.type != "LineString") {
 				var ptitle = d.features[i].properties.title ? d.features[i].properties.title : "Untitled Point";
-				var pdesc = d.features[i].properties.description ? "<p class='description'>" + d.features[i].properties.description + "</p>" : "";
-				d.features[i].properties.placename = d.features[i].properties.placename ? d.features[i].properties.placename : (d.features[i].properties.address ? d.features[i].properties.address : ""); 
-				var pplace = d.features[i].properties.placename;
+				var pdesc = (d.features[i].properties.description && d.features[i].properties.description != "...") ? 
+					"<p class='description'>" + d.features[i].properties.description + "</p>" : "";
+				
+				d.features[i].properties.placename = d.features[i].properties.placename ? 
+					d.features[i].properties.placename : (d.features[i].properties.address ? d.features[i].properties.address : ""); 
+				var pplace = d.features[i].properties.placename ? "<p class='placename'>" + d.features[i].properties.placename + "</p>" : "";
+				
+				var pcategory = (d.features[i].properties.category && d.features[i].properties.category != "...") ? 
+					"<p class='category'><a href='javascript:MI.functions.search(\"" + d.features[i].properties.category + "\");'>#" + d.features[i].properties.category + "</a></p>" : "";
+				var pnotes = (d.features[i].properties.notes && d.features[i].properties.notes != "") ? 
+					"<li>" + d.features[i].properties.notes + "</li>" : "";
+				var psources = (d.features[i].properties.sources && d.features[i].properties.sources != "") ? 
+					"<details class='sources'><summary>Notes</summary><ul>" + pnotes + "<li>" + 
+					d.features[i].properties.sources.replace(/,/g, "</li><li>") + "</li></ul></details>" : "";
+	
+				
 				
 				// Try to map to graph
 				if(d.mapper) {
@@ -343,7 +356,7 @@ function MapSC(d, scid) {
 				var li = $(						
 					"<li id='local_" + templid + "'>"+
 						"<div class='dot' style='background:"+d.details.style.fillColor+"; border-color:"+d.details.style.color+";'></div>"+
-					"<h5 class='mdetail_title'>" + ptitle + "</h5> " + "<p class='placename'>"+pplace + "</p>" + Autolinker.link(pdesc) + 
+					"<h5 class='mdetail_title'>" + ptitle + "</h5> " + pplace + pcategory + Autolinker.link(pdesc) + Autolinker.link(psources) + 
 					"</li>"						
 				);
 				li.delegate( li, "click", MI.scview.focus);
@@ -504,6 +517,10 @@ function FormatGSHEET(d, options) {
 			sheetsc.features[j].properties.title = sheetsc.tempFeatures[i].Name;
 			sheetsc.features[j].properties.description = sheetsc.tempFeatures[i].Description;
 			sheetsc.features[j].properties.placename = sheetsc.tempFeatures[i].Location;
+			sheetsc.features[j].properties.category = sheetsc.tempFeatures[i].Category;
+			sheetsc.features[j].properties.sources = sheetsc.tempFeatures[i].Sources;
+			sheetsc.features[j].properties.notes = sheetsc.tempFeatures[i].Notes;
+			
 			sheetsc.features[j].properties.measures = {};
 			sheetsc.features[j].geometry = {"type":"Point","coordinates":[Number(sheetsc.tempFeatures[i].Geocode.split(",")[1]), Number(sheetsc.tempFeatures[i].Geocode.split(",")[0])]};
 		}
@@ -785,7 +802,8 @@ function Colorize(array) {
 }
 
 /** A simple text match search **/
-function SimpleSearch() {
+function SimpleSearch(term) {
+	if(term) { $("#searchbar").val(term); }
 	var s = $("#searchbar").val().toLowerCase();
 	// Only do something if the search has changed.
 	if(s == MI.attributes.prevsearch) { return; }

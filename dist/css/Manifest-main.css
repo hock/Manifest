@@ -5539,6 +5539,11 @@ body.editor .leaflet-left .leaflet-control {
 	#manifestlist li div.dot { cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; }
 	#manifestlist li div.dot:hover { }
 
+	#manifestlist ul.mlist p.description { }
+	#manifestlist ul.mlist details.sources ul { list-style:square inside; margin:0.5rem 0 0 0; padding:0.2rem; font-size:0.9rem;}
+	#manifestlist ul.mlist details.sources ul li { margin:0; padding:0; border:none; }
+	#manifestlist ul.mlist summary { font-size:0.9rem; cursor:pointer; outline: none; }
+
 	#manifestlist li p { font-size:0.9em; padding:0.2rem 0; margin:0;}
 	#manifestlist li p:first-of-type { padding:0.4rem 0 0 0; }
 
