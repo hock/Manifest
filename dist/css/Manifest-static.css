@@ -4698,8 +4698,8 @@ readers do not read off random characters that represent icons */
 	.view-wrapper { overflow:hidden;  position: absolute; top: 0; right: 0; bottom: 0; width: 100%; *height:100%; }
 	.map { position: absolute; top: 0; right: 0; bottom: 0; width: 100%; *height:100%; }
 
-	#manifestbar { border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 28rem; height:auto; padding:1rem 1rem 1rem 1rem; background:0.5rem center no-repeat; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); transition: height .25s ease-in-out;} 
-	.sidepanel { border-radius:0.25rem; position: absolute; top: 4rem; left: 0; bottom: 0; z-index:12500; margin:1rem; width: 30rem; *height: 100%; overflow: auto; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); } 
+	#manifestbar { border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; background:0.5rem center no-repeat; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); transition: height .25s ease-in-out;} 
+	.sidepanel { border-radius:0.25rem; position: absolute; top: 4rem; left: 0; bottom: 0; z-index:12500; margin:1rem; width: 27rem; *height: 100%; overflow: auto; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); } 
 
 
 	#loader { position:absolute; z-index:50000; height:100%; width:100%; text-align:center; }
@@ -4747,15 +4747,14 @@ readers do not read off random characters that represent icons */
 	#manifestlist li div.dot:hover { }
 
 	#manifestlist ul.mlist p.description { }
-	#manifestlist ul.mlist details.sources ul { list-style:square inside; margin:0.5rem 0 0 0; padding:0.2rem; font-size:0.9rem;}
+	#manifestlist ul.mlist details.sources ul { list-style:square; margin:0 0 0 1rem; padding:0 0.2rem; font-size:0.9rem;}
 	#manifestlist ul.mlist details.sources ul li { margin:0; padding:0; border:none; }
-	#manifestlist ul.mlist summary { font-size:0.9rem; cursor:pointer; outline: none; }
+	#manifestlist ul.mlist summary { font-size:0.9rem; cursor:pointer; outline: none; padding:0.2rem 0;}
 
 	#manifestlist li p { font-size:0.9em; padding:0.2rem 0; margin:0;}
-	#manifestlist li p:first-of-type { padding:0.4rem 0 0 0; }
-
+	
 	#manifestlist h5.mdetail_title { display:inline; font-size:1rem; line-height:1.5rem;}
-	#manifestlist p.placename { }
+	#manifestlist p.placename, #manifestlist p.category { display:inline-block; margin-right:0.2rem;}
 	#manifestlist li:hover img { opacity:0.9; }
 	#manifestlist li img, #manifestlist .mdescription img { width:100%; margin:10px 0; opacity:0.2; transition: opacity .25s ease-in-out; -moz-transition: opacity .25s ease-in-out; -webkit-transition: opacity .25s ease-in-out; }
 
@@ -4772,7 +4771,7 @@ readers do not read off random characters that represent icons */
 
 	.searchwidget { 
 		position:absolute;
-		bottom:1rem; left: 32rem;
+		bottom:1rem; left: 29rem;
 		box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); border-radius:.25rem; padding: .375rem .55rem .375rem .55rem;
 		z-index:11000;
 		font-size:1rem; 
@@ -4913,7 +4912,13 @@ readers do not read off random characters that represent icons */
 	.marinelayer img { filter: brightness(0.5) sepia(1) saturate(300%) hue-rotate(200deg); }
 	.raillayer img { filter: brightness(0.1) sepia(1) saturate(5000%) hue-rotate(190deg) opacity(40%); }
 	.googlebase img {  }
-	
+	.leaflet-popup-content h2 {
+		color:#fff;
+		background: #eee;
+		margin: -13px -19px 13px -19px;
+		padding: 13px 19px;
+		border-radius: 12px 12px 0 0;
+	}
 	.fa-tag { cursor:pointer; }
 	.fa-tag:hover { filter: brightness(120%); }
 	/* General classes */
@@ -4940,9 +4945,8 @@ readers do not read off random characters that represent icons */
 	body.light #manifestlist p.mdescription { color:#333; background:#fff; border-color:#eee; }
 	body.light .sidepanel { background: rgba(255,255,255,0.9); }
 	body.light #manifestlist li p { color:#333; } 
-	body.light #manifestlist p.placename { color:#999; }
 	body.light #manifestlist .mtitle { border-color: #eee; }
-	body.light #manifestlist li { border-color: #eee; }
+	body.light #manifestlist li { border-color: #ddd; }
 	body.light #manifestlist #mmenu { color:#333; background:#999; border-color: #eee; }
 	body.light #load-samples {color: #222; background-color: #fff; border-color: #ccc; } 
 	body.light #load-samples-input { color: #222; background-color: #fff; border-color: #ccc; } 
@@ -5049,7 +5053,7 @@ readers do not read off random characters that represent icons */
 	body.textpage #minfoheader { display:inline; }
 
 	body.textpage #minfodetail {
-		background: #fff; color: #333; width: 28rem; position: absolute;
+		background: #fff; color: #333; width: 25rem; position: absolute;
 		padding: 0.1rem 1rem 1rem 1rem;
 		margin: 1rem -1rem -1.5rem -1rem;
 		border-radius: 0 0 0.25rem 0.25rem;

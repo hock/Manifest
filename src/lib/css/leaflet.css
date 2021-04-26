@@ -160,7 +160,7 @@
 	margin-bottom: 1rem;
 	}
 .leaflet-left .leaflet-control {
-	margin-left: 32rem;
+	margin-left: 29rem;
 	}
 .leaflet-right .leaflet-control {
 	margin-right: 10px;
@@ -526,13 +526,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	width: 18px;
 	height: 14px;
 	font: 16px/14px Tahoma, Verdana, sans-serif;
-	color: #c3c3c3;
+	color: #fff;
+	opacity:0.8;
 	text-decoration: none;
 	font-weight: bold;
 	background: transparent;
 	}
 .leaflet-container a.leaflet-popup-close-button:hover {
-	color: #999;
+	opacity:1;
 	}
 .leaflet-popup-scrolled {
 	overflow: auto;
@@ -665,15 +666,25 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in;
 }
 
-.marker-cluster-small{background-color:#eee;}
-.marker-cluster-medium{background-color:#eee;}
-.marker-cluster-large{background-color:#eee;}
 
 .marker-cluster{background-clip:padding-box;border-radius:20px;}
-.marker-cluster div{width:30px;height:30px;margin-left:5px;margin-top:5px;text-align:center;border-radius:15px;font:12px sans-serif;color:#fff;}
+.marker-cluster div{width:30px;height:30px;margin-left:5px;margin-top:5px;text-align:center;border-radius:30px;font:12px sans-serif;color:#fff; border:4px solid;}
+.marker-cluster div:hover { background-color:#fff !important;}
 .marker-cluster span{line-height:30px;}	
 .leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{-webkit-transition:-webkit-transform 0.25s ease-out,opacity 0.25s ease-in;-moz-transition:-moz-transform 0.25s ease-out,opacity 0.25s ease-in;-o-transition:-o-transform 0.25s ease-out,opacity 0.25s ease-in;transition:transform 0.25s ease-out,opacity 0.25s ease-in;}
 	
+.leaflet-popup.color-dbedf9 .leaflet-popup-close-button { color: #dbedf9;} 
+.leaflet-popup.color-f9dbde .leaflet-popup-close-button { color: #f9dbde;} 
+.leaflet-popup.color-dbf9e7 .leaflet-popup-close-button { color: #dbf9e7;} 
+.leaflet-popup.color-f6d0ca .leaflet-popup-close-button { color: #f6d0ca;} 
+.leaflet-popup.color-dfdbf9 .leaflet-popup-close-button { color: #dfdbf9;} 
+.leaflet-popup.color-E0D6FF .leaflet-popup-close-button { color: #E0D6FF;} 
+.leaflet-popup.color-FAC7D2 .leaflet-popup-close-button { color: #FAC7D2;} 
+.leaflet-popup.color-CEF3EA .leaflet-popup-close-button { color: #CEF3EA;} 
+.leaflet-popup.color-C2EFFF .leaflet-popup-close-button { color: #C2EFFF;} 
+.leaflet-popup.color-FEDDD8 .leaflet-popup-close-button { color: #FEDDD8;} 
+
+
 /* Fix for 1px border bug */
 .leaflet-tile {
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);

@@ -106,12 +106,12 @@ function SpatialSupplyChain() {
 /** Render points by setting up a GeoJSON feature for display **/
 function RenderPoint(feature, layer) {
 		var title = (typeof(feature.properties.title) != 'undefined') ? feature.properties.title : "Unnamed.";
-		var description = (typeof(feature.properties.description) != 'undefined') ? feature.properties.description : "";
+		var description = (typeof(feature.properties.description) != 'undefined' && feature.properties.description != "...") ? feature.properties.description : "";
 		var fid = feature.properties.lid;
-		var popupContent = "<h2 id='popup-"+fid+"'><i class='fas fa-tag'></i> " + title + "</h2><p>" + Autolinker.link(description) + "</p>";
+		var popupContent = "<h2 id='popup-"+fid+"' style='background:"+feature.properties.style.fillColor+"; color:"+feature.properties.style.textcolor+"'><i class='fas fa-tag'></i> " + title + "</h2><p>" + Autolinker.link(description) + "</p>";
 		if (feature.properties && feature.properties.popupContent) { popupContent += feature.properties.popupContent;}
 		
-		layer.bindPopup(popupContent);
+		layer.bindPopup(popupContent, {className: "color-"+feature.properties.style.textcolor.substring(1)});
 		layer.bindTooltip(title);	
 	
 		layer.on("click", function(e) {  		
@@ -232,9 +232,9 @@ function SetupSC(d, options) {
 	MI.attributes.scrollpos = $(".sidepanel").scrollTop();
 	$("#manifestlist").append(
 		'<div class="mheader" id="mheader-'+d.details.id+'">'+
-			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
+			'<div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.textcolor+';">'+
 				'<i class="menu-map fas fa-globe-'+d.details.globe+'"></i><a>' + d.properties.title + '</a>' +
-				'<i class="fas fa-times-circle close-map"></i>'+
+				'<i class="fas fa-times-circle close-map" style="color:'+d.details.style.textcolor+';"></i>'+
 			'</div>'+
 		'</div>'				
 	);
@@ -356,7 +356,7 @@ function MapSC(d, scid) {
 				var li = $(						
 					"<li id='local_" + templid + "'>"+
 						"<div class='dot' style='background:"+d.details.style.fillColor+"; border-color:"+d.details.style.color+";'></div>"+
-					"<h5 class='mdetail_title'>" + ptitle + "</h5> " + pplace + pcategory + Autolinker.link(pdesc) + Autolinker.link(psources) + 
+					"<h5 class='mdetail_title'>" + ptitle + "</h5><div class='pdetails'>" + pplace + pcategory + "</div>" + Autolinker.link(pdesc) + Autolinker.link(psources) + 
 					"</li>"						
 				);
 				li.delegate( li, "click", MI.scview.focus);
@@ -416,7 +416,8 @@ function MapSC(d, scid) {
 	MI.scview.clustergroup = new L.MarkerClusterGroup({ 
     	iconCreateFunction: function (cluster) {
         	var markers = cluster.getAllChildMarkers();
-        	var html = '<div style="background:'+markers[0].options.fillColor+'; color:'+markers[0].options.color+'"><span>' + markers.length + '</span></div>';
+        	var html = '<div style="background:'+markers[0].options.fillColor+'; border-color:'+markers[0].options.color+'; color:'+markers[0].options.textcolor+';">' +
+					   '<span>' + markers.length + '</span></div>';
         	return L.divIcon({ html: html, className: 'marker-cluster marker-cluster-small', iconSize: L.point(40, 40) });
     	},
     	spiderfyOnMaxZoom: true, showCoverageOnHover: false, zoomToBoundsOnClick: true 
@@ -455,6 +456,7 @@ function FormatSMAP(d, options) {
 		d.details.style = Object.assign({}, MI.scview.styles.point); 
 		d.details.style.fillColor = d.details.colorchoice[0];
 		d.details.style.color = d.details.colorchoice[1];
+		d.details.style.textcolor = d.details.colorchoice[2];
 	}
 	
 	// Error Checking
@@ -504,6 +506,8 @@ function FormatGSHEET(d, options) {
 		sheetsc.details.style = Object.assign({}, MI.scview.styles.point); 
 		sheetsc.details.style.fillColor = sheetsc.details.colorchoice[0];
 		sheetsc.details.style.color = sheetsc.details.colorchoice[1];
+		sheetsc.details.style.textcolor = sheetsc.details.colorchoice[2];
+		
 	}
 
 	sheetsc.features = [];
@@ -545,6 +549,7 @@ function FormatYETI(yeti, options) {
 		d.details.style = Object.assign({}, MI.scview.styles.point); 
 		d.details.style.fillColor = d.details.colorchoice[0];
 		d.details.style.color = d.details.colorchoice[1];
+		d.details.style.textcolor = d.details.colorchoice[2];
 	}
 		
 	// Format Layer
@@ -1098,7 +1103,7 @@ GEOMTYPES = {
 MEASURES = [{measure: "weight", unit: "kg"}, {measure: "co2e", unit: "kg"}, {measure: "water", unit: "kl"},
 {measure: "energy", unit: "kj"}, {measure: "cost", unit: "dollars"}, {measure: "percent", unit: "%"}];
 
-COLORSETS = [["#3498DB","#dbedf9"],["#FF0080","#f9dbde"],["#34db77","#dbf9e7"],["#ff6500","#f6d0ca"],["#4d34db","#dfdbf9"]];
+COLORSETS = [["#3498DB","#dbedf9", "#dbedf9"],["#FF0080","#f9dbde","#f9dbde"],["#34db77","#dbf9e7","#dbf9e7"],["#ff6500","#f6d0ca","#f6d0ca"],["#4d34db","#dfdbf9","#dfdbf9"],  ["#5E2BFF","#E0D6FF","#E0D6FF"],["#EE4266","#FAC7D2","#FAC7D2"],["#3BCEAC","#CEF3EA","#CEF3EA"],["#00ABE7","#C2EFFF","#C2EFFF"],["#F85A3E","#FEDDD8","#FEDDD8"]];
 
 TILETYPES = {
 	'GOOGLE': 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
