@@ -7,15 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-    <base href="https://supplystudies.com/manifest/" />
-    <link rel="stylesheet" href="css/Manifest-static.min.css" />
+    <base href="http://hockbook.local/Manifest/dist/" />
+    <link rel="stylesheet" href="css/Manifest-static.css" />
 
 
     <link rel="icon" href="images/favicons/icon.png">
     <link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
 </head>
 
-<body class="textpage">
+<body class="textpage datapage">
     <div id="infoborder"></div>
     <div id="infowrap">
         <div id="textbar">
@@ -58,20 +58,49 @@
         <p class="callout">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
 
         <h3><a name="manifest">Manifest File Format</a></h3>
-        <p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you can use the <a href="">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
+        <p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
 
-        <h3><a name="smap">Sourcemap Dataset</a></h3>
-        <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+        <h3><a name="smap">Case Studies and Deployments</a></h3>
+        <p>This is a collection of deployments and case studies for Manifest, including courses where Manifest was used as a class assignment. </p>
 
-        <div id="dataviewer">
-            <input type="text" placeholder="Search this dataset..." id="searchField" />
-            <div id="table-sortable"></div>
+        <div class="dataviewer caseviewer">
+            <div class="gs-table-container">
+                <table class="table gs-table">
+                    <thead class="gs-table-head"></thead>
+                    <tbody class="gs-table-body">
+                        <tr>
+                            <td><span>
+                                    <div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div>
+                                </span></td>
+                            <td><span><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></span></td>
+                            <td>Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</td>
+                        </tr>
+                        <tr>
+                            <td><span>
+                                    <div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div>
+                                </span></td>
+                            <td><span><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></span></td>
+                            <td>Introduction to Media Industries (Fordham University, Spring 2021)</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <h3><a name="smap">Sourcemap Dataset</a></h3>
+            <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+
+            <div class="dataviewer smapviewer">
+                <input type="text" placeholder="Search this dataset..." id="searchField" />
+                <div id="table-sortable"></div>
+            </div>
+
+            <div class="footer">Manifest</div>
+
         </div>
 
-    </div>
-
-    <script src="js/Manifest-lib.min.js"></script>
-    <script src="js/Manifest-data.min.js"></script>
+        <script src="js/Manifest-lib.js"></script>
+        <script src="js/Manifest-data.js"></script>
 
 </body>
 
