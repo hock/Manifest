@@ -1,4 +1,5 @@
-Gruntfile.js
+
 .DS_Store
 node_modules/
 tools/private
+Gruntfile.js
