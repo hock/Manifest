@@ -3,3 +3,4 @@
 node_modules/
 tools/private
 Gruntfile.js
+package-lock.json
