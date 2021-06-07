@@ -22414,7 +22414,7 @@ var AbstractTheme = /*#__PURE__*/function () {
     key: "getInfoButton",
     value: function getInfoButton(text) {
       var icon = document.createElement('span');
-      icon.innerText = '\u24D8';
+      icon.innerHTML = "&#9432;";
       icon.classList.add('je-infobutton-icon');
       var tooltip = document.createElement('span');
       tooltip.classList.add('je-infobutton-tooltip');
