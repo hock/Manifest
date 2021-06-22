@@ -21,19 +21,27 @@ $( document ).ready(function() {
 		switch(hashtype) {
 			case "smap":
 				initialmap = true;
+				// TODO service should handle full urls to smap also.
+				
 				$.getJSON(MI.serviceurl + "?type=smap&id=" + hashid, function(d) { MI.functions.process("smap", d, {"id": hashid});}).fail(function() {
 					$("#loader h2").text("[SMAP ID NOT FOUND]");
 				});
 				break;
 			case "gsheet":
 				initialmap = true;
+				// TODO service should handle full urls to gsheet also.
+				
 				$.getJSON(MI.serviceurl + "?type=gsheet&id=" + hashid, function(d) { MI.functions.process("gsheet", d, {"id": hashid.hashCode()});}).fail(function() {
 					$("#loader h2").text("[GOOGLE SHEET NOT FOUND]");
 				}); 
 		    	break;
 			case "manifest":
 				initialmap = true;
-				console.log("Load manifest...");
+				// TODO Should add a service for this, service handles urls--should handle ids in a github repo also.
+				
+				$.getJSON(hashid, function(d) { MI.functions.process("manifest", d, {"id": (d.summary.name).hashCode()});}).fail(function() {
+					$("#loader h2").text("[MANIFEST NOT FOUND]");
+				});
 				break;
 			case "collection":
 				initialmap = false;			
@@ -52,9 +60,11 @@ $( document ).ready(function() {
 	$.getJSON(MI.jsoncollection, function(d) { 
 		$("#collection-description").html(d.description);
 		for(var s in d.collection) { 
-			$("#load-samples").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
+			$("#load-samples-group").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
 		} 
-		$("#load-samples").append('<option value="other">Other...</option>');	
+		$("#load-samples-custom").append('<option value="url">URL</option>');	
+		$("#load-samples-custom").append('<option value="file">FILE</option>');	
+		
 		
 		if(hashtype != "" && hashtype != "collection") { return; } // If a specific hash is passed, we're done--otherwise load a starter map.
 			

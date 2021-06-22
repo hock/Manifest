@@ -12,10 +12,17 @@
 		<a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
 		<a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
 	</nav>
-	<p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
+	<p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
 	<div id="loadlistpanel">
-		<select name="load-samples" id="load-samples"></select>
+		<select name="load-samples" id="load-samples">
+		    <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
+		    <optgroup id="load-samples-custom" label="Custom Manifest"></optgroup>		
+		</select>
+		
 		<input type="text" id="load-samples-input" class="closed" />
+		<input type="file" name="file-input[]" id="file-input" class="closed inputfile file-input" data-multiple-caption="{count} files selected" multiple />
+		<label for="file-input" id="file-input-label" class="closed"><i class="fas fa-upload"></i> <span>Upload Manifest File</span></label>
+		
 		<button id="load-samples-btn">Load</button>
 	</div>
 </div>

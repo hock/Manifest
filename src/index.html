@@ -30,14 +30,14 @@
 	
 	<div class="vizmenu">
 		<div class="vizmenu-entry">
-			<div class="vizmenu-label">Visualization Type</div>
+			<div id="viz-choice-label" class="vizmenu-label">Visualize</div>
 			<select name="viz-choice" id="viz-choices">
-				<option value="map">Map Visualization</option>
-				<option value="forcegraph">Force Graph</option>
+				<option id="map-viz-choice" value="map">Map</option>
+				<option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
 			</select>
 		</div>
 		<div class="vizmenu-entry">
-			<div class="vizmenu-label">Scale</div>	
+			<div id="measure-choice-label" class="vizmenu-label">Scale</div>	
 			<select name="measure-choice" id="measure-choices">
 				<option value="none">None</option>
 			</select>
@@ -96,6 +96,8 @@
 		</div>
 		<div class="map" id="map"></div>
 	</div>
+
+	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	
 	<script src="js/Manifest-lib<%= minify %>.js"></script>

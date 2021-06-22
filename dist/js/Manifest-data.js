@@ -40,7 +40,7 @@ function SmapDataTableInit() {
 		var columns = { 'id': 'ID', 'nm': 'Name', 'dc': 'Description', 'json': 'json', 'geojson': 'geo', };
 		
 		var table = $('#table-sortable').tableSortable({
-		    data: data, columns: columns, rowsPerPage: 100, pagination: true, searchField: $('#searchField'),
+		    data: data, columns: columns, rowsPerPage: 40, pagination: true, searchField: $('#searchField'),
 			tableDidMount: function() { this.sortData("id"); },
 		    formatCell: function(row, key) {
 		        if (key === 'id') {

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-    <base href="http://localhost/Manifest/dist/" />
+    <base href="http://hockbook.local/Manifest/dist/" />
     <link rel="stylesheet" href="css/Manifest-static.css" />
 
 
@@ -33,10 +33,17 @@
                     <a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
                     <a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
                 </nav>
-                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
+                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
                 <div id="loadlistpanel">
-                    <select name="load-samples" id="load-samples"></select>
+                    <select name="load-samples" id="load-samples">
+                        <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
+                        <optgroup id="load-samples-custom" label="Custom Manifest"></optgroup>
+                    </select>
+
                     <input type="text" id="load-samples-input" class="closed" />
+                    <input type="file" name="file-input[]" id="file-input" class="closed inputfile file-input" data-multiple-caption="{count} files selected" multiple />
+                    <label for="file-input" id="file-input-label" class="closed"><i class="fas fa-upload"></i> <span>Upload Manifest File</span></label>
+
                     <button id="load-samples-btn">Load</button>
                 </div>
             </div>
@@ -55,7 +62,9 @@
 
         </div>
         <h1>Datasets</h1>
-        <p class="callout">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
+        <a href="edit/" class="splash-link"><img class="splash-image small" src="images/data-splash-cut.png" /></a>
+
+        <p class="callout biggertext">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
 
         <h3><a name="manifest">Manifest File Format</a></h3>
         <p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
@@ -95,12 +104,26 @@
                 <div id="table-sortable"></div>
             </div>
 
-            <div class="footer">Manifest</div>
+            <div class="footer">
+                <div class="footer-wrap-left">
 
-        </div>
+                </div>
 
-        <script src="js/Manifest-lib.js"></script>
-        <script src="js/Manifest-data.js"></script>
+                <div class="footer-wrap-right">
+                    <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+                    <div class="license">
+                        <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<br />
+                            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+                        </p>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="clear"></div>
+
+
+            <script src="js/Manifest-lib.js"></script>
+            <script src="js/Manifest-data.js"></script>
 
 </body>
 

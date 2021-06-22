@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <base href="http://localhost/Manifest/dist/" />
+    <base href="http://hockbook.local/Manifest/dist/" />
     <link rel="stylesheet" href="css/Manifest-main.css" />
 
 
@@ -36,10 +36,17 @@
                 <a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
                 <a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
             </nav>
-            <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
+            <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
             <div id="loadlistpanel">
-                <select name="load-samples" id="load-samples"></select>
+                <select name="load-samples" id="load-samples">
+                    <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
+                    <optgroup id="load-samples-custom" label="Custom Manifest"></optgroup>
+                </select>
+
                 <input type="text" id="load-samples-input" class="closed" />
+                <input type="file" name="file-input[]" id="file-input" class="closed inputfile file-input" data-multiple-caption="{count} files selected" multiple />
+                <label for="file-input" id="file-input-label" class="closed"><i class="fas fa-upload"></i> <span>Upload Manifest File</span></label>
+
                 <button id="load-samples-btn">Load</button>
             </div>
         </div>
@@ -52,14 +59,14 @@
 
     <div class="vizmenu">
         <div class="vizmenu-entry">
-            <div class="vizmenu-label">Visualization Type</div>
+            <div id="viz-choice-label" class="vizmenu-label">Visualize</div>
             <select name="viz-choice" id="viz-choices">
-                <option value="map">Map Visualization</option>
-                <option value="forcegraph">Force Graph</option>
+                <option id="map-viz-choice" value="map">Map</option>
+                <option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
             </select>
         </div>
         <div class="vizmenu-entry">
-            <div class="vizmenu-label">Scale</div>
+            <div id="measure-choice-label" class="vizmenu-label">Scale</div>
             <select name="measure-choice" id="measure-choices">
                 <option value="none">None</option>
             </select>
@@ -118,6 +125,23 @@
         </div>
         <div class="map" id="map"></div>
     </div>
+
+    <div class="footer">
+        <div class="footer-wrap-left">
+
+        </div>
+
+        <div class="footer-wrap-right">
+            <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+            <div class="license">
+                <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<br />
+                    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+                </p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
 
 
     <script src="js/Manifest-lib.js"></script>

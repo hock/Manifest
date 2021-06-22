@@ -10,7 +10,7 @@ function EditorInit() {
 	JSONEditor.defaults.iconlib = 'fontawesome5';
 	JSONEditor.defaults.callbacks.template = {
 	  "indexCount": function (jseditor,e) {
-		  return Number(jseditor.parent.key+1);
+		  return Number(jseditor.parent.parent.key)+1;
 	  }
 	};
 	JSONEditor.defaults.resolvers.unshift(function(schema) {
@@ -34,12 +34,29 @@ function EditorInit() {
     $("#save-manifest-btn").click(function() {
       // Get the value from the editor
 		console.log(editor.getValue());
+
 		var manifestjson = editor.getValue();
-		var name = manifestjson.attributes.name == "" ? "untitled" : manifestjson.attributes.name.toLowerCase().replace(/\s/g, '-');
+		var name = manifestjson.summary.name == "" ? "untitled" : manifestjson.summary.name.toLowerCase().replace(/\s/g, '-');
 		SaveManifest( JSON.stringify(manifestjson), name+".json" );
 	  
     });
-	
+	$("#file-input").change(function(e) {
+	    var file = e.target.files[0];
+	    if (!file) {
+	      return;
+	    }
+		var fileName = e.target.value.split( '\\' ).pop();
+		console.log(fileName);
+		$("#file-input-label span").text(fileName);
+		
+	    var reader = new FileReader();
+	    reader.onload = function(e) {
+	      var contents = e.target.result;
+	      editor.setValue(JSON.parse(contents));	
+	    };
+	    reader.readAsText(file);
+	});
+ 	
 	// Map setup
 	var mapCenter = [40.730610,-73.935242];
 	var map = L.map('map_chooser', {center : mapCenter, zoom : 3});
@@ -57,7 +74,13 @@ function EditorInit() {
 	}).addTo(map);
 
 	map.on('click', function(e) {
-	   	$(editor.geoinput).val(e.latlng.lat+","+e.latlng.lng);
+		var nm =  $(editor.geoinput).attr("name").replace(/\[/g, ".").replace(/\]/g, "");
+		console.log(nm);
+		var geoed = editor.getEditor(nm);
+		console.log(geoed);
+		console.log($(editor.geoinput));
+		geoed.setValue(e.latlng.lat+","+e.latlng.lng);
+	   //$(editor.geoinput).val(e.latlng.lat+","+e.latlng.lng);
 	    UpdateChooserMarker(e.latlng.lat, e.latlng.lng, marker);
 	});
 	
@@ -142,3 +165,5 @@ function SaveManifest(text, filename){
 	a.setAttribute('download', filename);
 	a.click();
 }
+
+

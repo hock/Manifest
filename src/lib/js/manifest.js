@@ -39,7 +39,7 @@ function SpatialSupplyChain() {
 			{ maxZoom: 20, className: "googlebase", detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
 		'light': new L.TileLayer(TILETYPES.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
 		'terrain': new L.TileLayer(TILETYPES.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
-		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { detectRetina: true, attribution: 'Satellite, ESRI' }),
+		'satellite': new L.TileLayer(TILETYPES.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
 	 	'dark': new L.TileLayer(TILETYPES.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
 
 		'shipping': new L.TileLayer(TILETYPES.SHIPPING, 
@@ -72,6 +72,9 @@ function SpatialSupplyChain() {
 			MI.scview.map.setView(e.popup._latlng, MI.scview.map.getZoom());	
 			MI.scview.active_point = e.sourceTarget;
 			ui_pointclick(MI.scview.active_point); 
+			e.popup._source.feature.properties.style = MI.scview.styles.highlight;
+			e.popup._source.setStyle(MI.scview.styles.highlight);
+		
 			$(".fa-tag").click(function() {
 				if(e.target._popup._source._preSpiderfyLatlng) {
 					MI.scview.map.setView(e.popup._source.__parent._latlng, 16);
@@ -83,7 +86,11 @@ function SpatialSupplyChain() {
 			});
 			
 	});
-	this.map.on("popupclose", function(e) { MI.scview.active_point = null; } );
+	this.map.on("popupclose", function(e) { 
+		MI.scview.active_point = null; 		
+		e.popup._source.feature.properties.style = e.popup._source.feature.properties.basestyle;
+		e.popup._source.setStyle(e.popup._source.feature.properties.basestyle);
+	});
 
 	
 	if($("body").hasClass("light")) {
@@ -173,9 +180,9 @@ function RenderLine(feature, layer) {
 
 /** Focus on a point on the map and open its popup. **/
 function PointFocus(pid) {	
-	var id = (typeof(pid) != 'object' ? pid : $(this).attr("id").substring(6));		
-	for (var i in MI.scview.map._layers) {
-		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {			
+	var id = (typeof(pid) != 'object' ? pid : $(this).attr("id").substring(6));	var sc = null;	
+	for (var i in MI.scview.map._layers) {		
+		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {								
 			if (MI.scview.map._layers[i].feature.properties.lid == id) {				
 				MI.scview.active_point = MI.scview.map._layers[i];
 				MI.scview.map._layers[i].openPopup();
@@ -223,6 +230,14 @@ function SCProcessor(type, d, options) {
 		MapSC(d, scid);
 		GSHEETGraph(d, options);		
 	}
+	else if(type == "manifest") { 
+		d = FormatMANIFEST(d, options); 
+		scid = SetupSC(d, options); 
+		MapSC(d, scid);
+		SMAPGraph({"supplychain":{"stops":d.stops,"hops":d.hops}}, options);
+		
+		//MANIFESTGraph(d, options);		
+	}
 	
 }
 
@@ -250,8 +265,9 @@ function SetupSC(d, options) {
 	$("#mheader-"+d.details.id+" .menu-map").click(function() { ui_mmenu(d.details.id);});	
 	
 	$("#manifestlist").append('<div class="mdetails" id="mdetails-'+d.details.id+'"></div>');	
+
 	if (d.properties.description != "") { $("#mdetails-"+d.details.id).append(
-		'<p class="mdescription">'+Autolinker.link(d.properties.description)+'</p>'
+		'<div class="mdescription">'+Autolinker.link(d.properties.description)+'</div>'
 	);}
 	$("#manifestlist").append('<ul class="mlist" id="mlist-'+d.details.id+'"></ul>');
 		
@@ -307,17 +323,29 @@ function MapSC(d, scid) {
 				
 				d.features[i].properties.placename = d.features[i].properties.placename ? 
 					d.features[i].properties.placename : (d.features[i].properties.address ? d.features[i].properties.address : ""); 
-				var pplace = d.features[i].properties.placename ? "<p class='placename'>" + d.features[i].properties.placename + "</p>" : "";
+				var pplace = d.features[i].properties.placename ? "<p class='placename' style='color:"+tinycolor(d.details.style.fillColor).darken(30).toString()+";'>" + d.features[i].properties.placename + "</p>" : "";
 				
-				var pcategory = (d.features[i].properties.category && d.features[i].properties.category != "...") ? 
-					"<p class='category'><a href='javascript:MI.functions.search(\"" + d.features[i].properties.category + "\");'>#" + d.features[i].properties.category + "</a></p>" : "";
+				var pcategory = ""; var pcategories = null;
+				if(d.features[i].properties.category && d.features[i].properties.category != "...") {
+					pcategory = "<p class='category'>";
+					pcategories = d.features[i].properties.category.split(",");
+					for(var cat in pcategories) {
+						pcategory += "<a href='javascript:MI.functions.search(\"" + pcategories[cat] + "\");'>" + pcategories[cat] + "</a> ";
+					}
+					pcategory += "</p>";
+				}
+				
+				var pimages = (d.features[i].properties.images && d.features[i].properties.images != "") ? 
+					"<div class='featuredimages'><img src='" + d.features[i].properties.images.replace(/,/g, "' /><img src='") + "' /></div>" : "";
+				
+				var pdetailsopen = ((d.features[i].properties.sources && d.features[i].properties.sources != "") || (d.features[i].properties.notes && d.features[i].properties.notes != "")) ? "<details class='sources' style='background:"+tinycolor(d.details.style.fillColor).setAlpha(0.1).toString() + ";'><summary>Notes</summary><ol>" : "";
+				var pdetailsclose = ((d.features[i].properties.sources && d.features[i].properties.sources != "") || (d.features[i].properties.notes && d.features[i].properties.notes != "")) ? "</ol></details>" : "";
+				
 				var pnotes = (d.features[i].properties.notes && d.features[i].properties.notes != "") ? 
 					"<li>" + d.features[i].properties.notes + "</li>" : "";
-				var psources = (d.features[i].properties.sources && d.features[i].properties.sources != "") ? 
-					"<details class='sources'><summary>Notes</summary><ul>" + pnotes + "<li>" + 
-					d.features[i].properties.sources.replace(/,/g, "</li><li>") + "</li></ul></details>" : "";
+				var psources = (d.features[i].properties.sources && d.features[i].properties.sources != "") ? "<li>" +  d.features[i].properties.sources.replace(/,/g, "</li><li>") + "</li>" : "";
 	
-				
+				var pdetails = pdetailsopen + pnotes + psources + pdetailsclose;
 				
 				// Try to map to graph
 				if(d.mapper) {
@@ -332,6 +360,44 @@ function MapSC(d, scid) {
 				pdesc += "<p class='measures'>";
 				var measuredesc = [];
 				
+				var mtype, mvalue, munit;
+				var measurecheck = false;
+				
+				if(d.features[i].properties.measures != undefined) {
+					console.log("custom measure");
+					for(var e in d.features[i].properties.measures) {
+						if(d.features[i].properties.measures[e].mtype != "") {
+							mtype = d.features[i].properties.measures[e].mtype;
+							mvalue = d.features[i].properties.measures[e].mvalue;
+							munit = d.features[i].properties.measures[e].munit;
+
+							console.log(mtype);
+							
+							measurecheck = false;
+							for(var l in measure_list) {
+								if(l.measure == mtype) {
+									measurecheck = true;
+								}
+							}
+							if(measurecheck == false) {
+								measure_list.push({"measure":mtype, "unit":munit});
+							}
+							
+							if(d.details.measures[mtype] == undefined) {
+								d.details.measures[mtype] = {"max":1,"min":0}; 
+							}
+							d.details.measures[mtype] = {
+								"max": Number(d.details.measures[mtype].max) +
+									   Number(mvalue),
+								"min": 0
+							};	
+							d.features[i].properties.measures[mtype] = mvalue;
+							measuredesc.push(mtype + ": " + mvalue + munit);	
+						}
+					}
+				}
+				
+				//----
 				for(var m in measure_list) {		
 					if(d.features[i].properties[measure_list[m].measure] != undefined) { 
 						if(d.details.measures[measure_list[m].measure] == undefined) {
@@ -353,16 +419,18 @@ function MapSC(d, scid) {
 				
 				// Set Style
 				d.features[i].properties.style=d.details.style;
+				d.features[i].properties.basestyle=d.details.style;
+				
 				var li = $(						
 					"<li id='local_" + templid + "'>"+
 						"<div class='dot' style='background:"+d.details.style.fillColor+"; border-color:"+d.details.style.color+";'></div>"+
-					"<h5 class='mdetail_title'>" + ptitle + "</h5><div class='pdetails'>" + pplace + pcategory + "</div>" + Autolinker.link(pdesc) + Autolinker.link(psources) + 
+					"<h5 class='mdetail_title'>" + ptitle + "</h5><div class='pdetails'>" + pplace + pcategory + "</div>" + pimages + Autolinker.link(pdesc) + Autolinker.link(pdetails) + 
 					"</li>"						
 				);
 				li.delegate( li, "click", MI.scview.focus);
 				$("#mlist-"+d.details.id).append(li);
 			}
-			d.features[i].properties.lid = templid;
+			d.features[i].properties.lid = templid;			
 		}
 	}
 	
@@ -506,8 +574,7 @@ function FormatGSHEET(d, options) {
 		sheetsc.details.style = Object.assign({}, MI.scview.styles.point); 
 		sheetsc.details.style.fillColor = sheetsc.details.colorchoice[0];
 		sheetsc.details.style.color = sheetsc.details.colorchoice[1];
-		sheetsc.details.style.textcolor = sheetsc.details.colorchoice[2];
-		
+		sheetsc.details.style.textcolor = sheetsc.details.colorchoice[2];		
 	}
 
 	sheetsc.features = [];
@@ -576,6 +643,71 @@ function FormatYETI(yeti, options) {
 	return d;
 }
 
+/** Format a Manifest file so Manifest can understand it */
+function FormatMANIFEST(manifest, options) {	
+	console.log(manifest);
+	var d = {"type":"FeatureCollection"};
+	
+	var converter = new showdown.Converter();
+
+	d.details = options; d.details.layers = []; d.details.measures = {};
+	d.properties = {"title": manifest.summary.name, "description": converter.makeHtml(manifest.summary.description)};
+	d.details.colorchoice = MI.scview.colorchoice();
+	d.details.globe = GLOBES[Math.floor(Math.random() * GLOBES.length)];	
+	d.mapper = {}; 
+			
+	// Set default layerstyle
+	if(!d.details.style) { 
+		d.details.style = Object.assign({}, MI.scview.styles.point); 
+		d.details.style.fillColor = d.details.colorchoice[0];
+		d.details.style.color = d.details.colorchoice[1];
+		d.details.style.textcolor = d.details.colorchoice[2];
+	}
+	// Format Layer
+	d.features = [];
+	d.stops = [];
+	d.hops = [];
+	
+	for (var i in manifest.nodes) {
+		if (typeof(manifest.nodes[i]) != 'undefined') {
+			d.features[i] = {"type": "Feature"};			
+			d.features[i].properties = {};	
+			//for(var attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
+			d.features[i].properties.title = manifest.nodes[i].overview.name;
+			d.features[i].properties.description = converter.makeHtml(manifest.nodes[i].overview.description);
+			d.features[i].properties.placename = manifest.nodes[i].location.address;
+			d.features[i].properties.category = manifest.nodes[i].attributes.category;		
+			d.features[i].properties.images = manifest.nodes[i].attributes.image.map(function(s) { return s.URL;}).join(",");		
+			d.features[i].properties.measures = manifest.nodes[i].measures.measures;	
+			d.features[i].properties.sources = manifest.nodes[i].attributes.sources.map(function(s) { return s.URL;}).join(",");
+			d.features[i].properties.notes = converter.makeHtml(manifest.nodes[i].notes.markdown);
+
+			d.features[i].geometry = {"type":"Point","coordinates":[
+				manifest.nodes[i].location.geocode.split(",")[1], 
+				manifest.nodes[i].location.geocode.split(",")[0]
+			]};
+			
+			d.stops.push({
+				"local_stop_id":Math.max(1,manifest.nodes[i].overview.index),
+				"id":Math.max(1,manifest.nodes[i].overview.index),
+				"attributes":d.features[i].properties
+			});
+			if(manifest.nodes[i].attributes.destinationindex != "") {
+				var connections = manifest.nodes[i].attributes.destinationindex.split(",");
+
+				for(var c in connections) {
+					d.hops.push({
+						"from_stop_id":manifest.nodes[i].overview.index,
+						"to_stop_id":connections[c],
+						"attributes":d.features[i].properties
+					});
+				}
+			}
+		}
+	}
+	return d;
+}
+
 /** Setup the graph relationships for legacy Sourcemap files **/
 function SMAPGraph(d, options) {
 	var sc = null;
@@ -585,6 +717,7 @@ function SMAPGraph(d, options) {
 			sc = MI.supplychains[s]; 
 		} 
 	}
+
 	var digits = null;
 	if (typeof(d.supplychain.stops) != 'undefined') {
 		for (var i = 0; i < d.supplychain.stops.length; ++i) {
@@ -683,18 +816,29 @@ function GSHEETGraph(d, options) {
 
 /** Called after Manifest has been initialized and the first supply chain loaded **/ 
 function Cleanup() { 
-	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
 	console.log(MI); 
-	console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"); 
 	
 	MI.attributes.initialized = true;	
 	$("#load-samples").change(function() {
-		if($("#load-samples option:selected").val() == "other") {
+		if($("#load-samples option:selected").val() == "url") {
 			$("#load-samples").css("width","20%");
 			$("#load-samples-input").removeClass("closed");
+			$("#file-input").addClass("closed");
+			$("#file-input-label").addClass("closed");
+			$("#load-samples-btn").removeClass("closed");		
+		} else if($("#load-samples option:selected").val() == "file") {
+			$("#load-samples-input").addClass("closed");
+			$("#load-samples").css("width","20%");			
+			$("#file-input-label").css("width","80%");						
+			$("#file-input").removeClass("closed");
+			$("#file-input-label").removeClass("closed");
+			$("#load-samples-btn").addClass("closed");			
 		} else {
 			$("#load-samples").css("width","100%");
 			$("#load-samples-input").addClass("closed");
+			$("#load-samples-btn").removeClass("closed");
+			$("#file-input").addClass("closed");
+			$("#file-input-label").addClass("closed");
 		}
 	});
 
@@ -705,7 +849,7 @@ function Cleanup() {
 		var id = null;
 		var type = null;
 		
-		if($("#load-samples").val() == "other") {
+		if($("#load-samples").val() == "url") {
 			loadurl = $("#load-samples-input").val();
 			
 			if (loadurl.toLowerCase().indexOf("https://raw.githubusercontent.com/hock/smapdata/master/data/") >= 0) {
@@ -718,8 +862,7 @@ function Cleanup() {
 				loadurl = MI.serviceurl + "?type="+type+"&id=" + id;								
 				id = id.hashCode();
 			}
-			
-			
+					
 		} else {
 			var option = $("#load-samples").val().split("-");
 			type = option[0];	
@@ -752,10 +895,26 @@ function Cleanup() {
 	
 	var dropArea = new jsondrop('minfodetail', {
 	    onEachFile: function(file) {
-	        console.log(file);
-	        // and other stuff ...
+			MI.functions.process("manifest", file.data, {"id": file.name.hashCode()});	
 	    }
 	});
+	$("#file-input").change(function(e) {
+	    var file = e.target.files[0];
+	    if (!file) {
+	      return;
+	    }
+		var fileName = e.target.value.split( '\\' ).pop();
+		$("#file-input-label span").text(fileName);
+		
+	    var reader = new FileReader();
+		reader.filename = fileName;
+	    reader.onload = function(e) {
+			MI.functions.process("manifest", JSON.parse(e.target.result), {"id": e.target.filename.hashCode()});	
+	      
+	    };
+	    reader.readAsText(file);
+	});
+	
 	$("#minfodetail").on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
@@ -772,6 +931,7 @@ function Cleanup() {
 			viz_resize();
 		}			
 	});
+
 	setTimeout(function() {$("#loader").remove();}, 250);
 	 
 }
@@ -866,6 +1026,7 @@ function SimpleSearch(term) {
 function MeasureSort() {
 	var measure_sort = $("#measure-choices").val();
 	
+	console.log(measure_sort);
 	for (var i in MI.scview.map._layers) {
 		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {
 			if (MI.scview.map._layers[i].feature.geometry.type != "MultiLineString") {
@@ -994,8 +1155,10 @@ function ui_hamburger() {
 	$("#minfodetail").toggleClass("closed");
 	$("#manifestbar").toggleClass("open");
 	
-	if($("#manifestbar").hasClass("open")) { $(".sidepanel").css("top", $("#manifestbar").outerHeight() + $("#manifestbar").outerHeight() / 20); } 
-	else { $(".sidepanel").css("top", "4rem"); }
+	if($(window).width() > 920) {
+		if($("#manifestbar").hasClass("open")) { $(".sidepanel").css("top", $("#manifestbar").outerHeight() + $("#manifestbar").outerHeight() / 20); } 
+		else { $(".sidepanel").css("top", "4rem"); }
+	}
 }
 
 /** Handles the measure sorting interface **/
@@ -1011,9 +1174,7 @@ function ui_measurelist() {
 }
 
 /** The UI side of the focus function, scrolls the user interface to a point based on map (or functional) action **/
-function ui_pointclick(e, speed, slid) {
-	if($(window).width() <= 920) { return; }
-		
+function ui_pointclick(e, speed, slid) {		
 	if(speed == undefined) { speed = 500; }
 	if(slid == undefined) {
 		if(e != undefined && e._popup) {
