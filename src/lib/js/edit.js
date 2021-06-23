@@ -21,16 +21,7 @@ function EditorInit() {
 	
 	// UI Setup
 	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
-	$.getJSON("json/samples.json", function(d) { 
-		$("#collection-description").html(d.description);
-		for(var s in d.collection) { 
-			$("#load-samples").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
-		} 
-	});
-	$("#load-samples-btn").click(function() {
-		var id = $("#load-samples").val();
-		window.location.href = "#"+id;
-	});
+	
     $("#save-manifest-btn").click(function() {
       // Get the value from the editor
 		console.log(editor.getValue());

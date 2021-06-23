@@ -29,7 +29,7 @@ function visualize(type) {
 function viz_cleanup() {
 	$(".vizwrap .viz").remove();
 	if($(window).width() <= 920) {
-		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).width());
+		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).height()*0.6);
 	} else {
 		$(".vizwrap svg").attr("viewBox","0 0 "+$(window).width()+" "+$(window).height());
 	}
@@ -58,7 +58,7 @@ function viz_forcegraph(graph, id) {
 			adj = 0;
 		}
 	}  else {
-		height = $(window).width();
+		height = $(window).height()*0.6;
 	}
 	//Math.ceil(Math.random() * 300) * (Math.round(Math.random()) ? 1 : -1)
 	var simulation = d3.forceSimulation()
@@ -136,7 +136,7 @@ function viz_forcegraph(graph, id) {
 				adj = 0;
 			}
 		}  else {
-			height = $(window).width();
+			height = $(window).height()*0.6;
 		}
 	}
   

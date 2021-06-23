@@ -80,3 +80,15 @@
 .forcegraph text {
   font-size: 0.8rem;
 }
+
+@media only screen and (max-width: 920px) and (orientation: portrait) { 
+
+	.vizwrap {
+			 position: relative; top:3.5rem; height: 60%; width: 100%; display: block; 
+	}
+	.vizwrap.closed { display:none; }
+	.vizsvg {
+		 position: relative; height: 100%; width: 100%; display: block; 
+	}
+
+}

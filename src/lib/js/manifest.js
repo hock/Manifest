@@ -30,7 +30,7 @@ function Manifest() {
 
 /** Initialize a Spatial Supply Chain **/
 function SpatialSupplyChain() {
-	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, scrollWheelZoom: false });
+	this.map = new L.Map('map', { preferCanvas: true, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, scrollWheelZoom: false, closePopupOnClick: false });
 	this.clustergroup = this.active_point = null;
 	
 	/* Define Layers */
@@ -72,8 +72,6 @@ function SpatialSupplyChain() {
 			MI.scview.map.setView(e.popup._latlng, MI.scview.map.getZoom());	
 			MI.scview.active_point = e.sourceTarget;
 			ui_pointclick(MI.scview.active_point); 
-			e.popup._source.feature.properties.style = MI.scview.styles.highlight;
-			e.popup._source.setStyle(MI.scview.styles.highlight);
 		
 			$(".fa-tag").click(function() {
 				if(e.target._popup._source._preSpiderfyLatlng) {
@@ -84,21 +82,24 @@ function SpatialSupplyChain() {
 					
 				}
 			});
+			e.popup._source.setStyle(MI.scview.styles.highlight);
+			
 			
 	});
 	this.map.on("popupclose", function(e) { 
 		MI.scview.active_point = null; 		
-		e.popup._source.feature.properties.style = e.popup._source.feature.properties.basestyle;
-		e.popup._source.setStyle(e.popup._source.feature.properties.basestyle);
+		if(e.popup._source != undefined) {
+			if(e.popup._source.feature.geometry.type != "MultiLineString") {
+				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.basestyle.fillColor});		
+			}
+		}
 	});
 
 	
 	if($("body").hasClass("light")) {
 		this.map.addLayer(this.layerdefs.google);
-		this.map.addLayer(this.layerdefs.shipping);
 	} else if($("body").hasClass("dark")) { 
 		this.map.addLayer(this.layerdefs.dark);		
-		this.map.addLayer(this.layerdefs.shipping);
 	}
 	
 	// General UI
@@ -123,12 +124,13 @@ function RenderPoint(feature, layer) {
 	
 		layer.on("click", function(e) {  		
 			var toolTip = layer.getTooltip();
-        	if (toolTip) { layer.closeTooltip(toolTip);}
+	        if (toolTip) { layer.closeTooltip(toolTip);}
 		});
-		layer.on("mouseover", function (e) { if(layer.options.fillOpacity != 0.1) { layer.setStyle(MI.scview.styles.highlight); } });
+		layer.on("mouseover", function (e) { if(layer.options.fillOpacity != 0.1) { layer.setStyle(MI.scview.styles.highlight); } 
+	});
 		layer.on("mouseout", function (e) {
 
-			if (layer.feature.properties && layer.feature.properties.style) {
+			if (layer.feature.properties && layer.feature.properties.style && layer.options.fillOpacity != 0.1) {
 				layer.setStyle(layer.feature.properties.style);
 				var measure_sort = $("#measure-choices").val();
 				var radius = 8;
@@ -143,6 +145,12 @@ function RenderPoint(feature, layer) {
 			
 				// Not Great!
 				if($("#searchbar").val() != "") { MI.functions.search();}
+			
+			} 
+			if(MI.scview.active_point != undefined) {
+				if(MI.scview.active_point._popup._source._leaflet_id == e.sourceTarget._leaflet_id) {
+					if(layer.options.fillOpacity != 0.1) { layer.setStyle(MI.scview.styles.highlight); }
+				}
 			}
 		});	
 
@@ -349,7 +357,8 @@ function MapSC(d, scid) {
 				
 				// Try to map to graph
 				if(d.mapper) {
-					d.mapper["map"+d.features[i].properties.placename.replace(/[^a-zA-Z0-9]/g, '')+d.features[i].properties.title.replace(/[^a-zA-Z0-9]/g, '')] = d.features[i]; 
+					d.mapper["map"+d.features[i].properties.placename.replace(/[^a-zA-Z0-9]/g, '') +
+					d.features[i].properties.title.replace(/[^a-zA-Z0-9]/g, '')] = d.features[i]; 
 				}
 				
 				// Setup Measures
@@ -364,40 +373,25 @@ function MapSC(d, scid) {
 				var measurecheck = false;
 				
 				if(d.features[i].properties.measures != undefined) {
-					console.log("custom measure");
 					for(var e in d.features[i].properties.measures) {
 						if(d.features[i].properties.measures[e].mtype != "") {
 							mtype = d.features[i].properties.measures[e].mtype;
 							mvalue = d.features[i].properties.measures[e].mvalue;
 							munit = d.features[i].properties.measures[e].munit;
-
-							console.log(mtype);
 							
 							measurecheck = false;
-							for(var l in measure_list) {
-								if(l.measure == mtype) {
-									measurecheck = true;
-								}
-							}
-							if(measurecheck == false) {
-								measure_list.push({"measure":mtype, "unit":munit});
-							}
+							for(var l in measure_list) { if(l.measure == mtype) { measurecheck = true; } }
+							if(measurecheck == false) { measure_list.push({"measure":mtype, "unit":munit}); }
 							
-							if(d.details.measures[mtype] == undefined) {
-								d.details.measures[mtype] = {"max":1,"min":0}; 
-							}
-							d.details.measures[mtype] = {
-								"max": Number(d.details.measures[mtype].max) +
-									   Number(mvalue),
-								"min": 0
-							};	
+							if(d.details.measures[mtype] == undefined) { d.details.measures[mtype] = {"max":1,"min":0}; }
+							d.details.measures[mtype] = { "max": Number(d.details.measures[mtype].max) + Number(mvalue), "min": 0 };
+
 							d.features[i].properties.measures[mtype] = mvalue;
 							measuredesc.push(mtype + ": " + mvalue + munit);	
 						}
 					}
 				}
 				
-				//----
 				for(var m in measure_list) {		
 					if(d.features[i].properties[measure_list[m].measure] != undefined) { 
 						if(d.details.measures[measure_list[m].measure] == undefined) {
@@ -1026,7 +1020,6 @@ function SimpleSearch(term) {
 function MeasureSort() {
 	var measure_sort = $("#measure-choices").val();
 	
-	console.log(measure_sort);
 	for (var i in MI.scview.map._layers) {
 		if (typeof(MI.scview.map._layers[i].feature) != 'undefined') {
 			if (MI.scview.map._layers[i].feature.geometry.type != "MultiLineString") {
