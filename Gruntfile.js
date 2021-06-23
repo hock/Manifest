@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 						}
 					},
 					data: {
-						baseurl: "http://hockbook.local/Manifest/dist/",
+						baseurl: "http://localhost/Manifest/dist/",
 						minify: "", // or .min
 						version: "0.1.1"
 					}
