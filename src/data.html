@@ -22,9 +22,10 @@
 	    	<!-- build:section layout.navigation --><!-- /build -->
 		</div>
 		<h1>Datasets</h1>
+		<a href="edit/" class="splash-link"><img class="splash-image small" src="images/data-splash-cut.png" /></a>
 		<p class="callout">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public 
 		access.</p>
-		
+				
 		<h3><a name="manifest">Manifest File Format</a></h3>
 		<p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you 
 		can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
@@ -37,8 +38,8 @@
 			<table class="table gs-table">
 				<thead class="gs-table-head"></thead>
 					<tbody class="gs-table-body">
-						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></span></td><td>Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</td></tr>
-						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></span></td><td>Introduction to Media Industries (Fordham University, Spring 2021)</td></tr>
+						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></span></td><td class="fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</td></tr>
+						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></span></td><td class="fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</td></tr>
 						
 					</tbody>
 			</table>
@@ -56,9 +57,8 @@
 			<div id="table-sortable"></div>
 		</div>
 		
-	<div class="footer">Manifest</div>
+	<!-- build:section layout.footer --><!-- /build -->
 	
-	</div>
     <!-- build:process -->	
 	<script src="js/Manifest-lib<%= minify %>.js"></script>
 	<script src="js/Manifest-data<%= minify %>.js"></script>
