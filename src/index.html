@@ -3,7 +3,7 @@
   <head>
 	<title>Manifest: Supply Chain Platform</title>
 	<meta name="description" content="A simple viewer for supply chain data.">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	
     <!-- build:process -->
 	<base href="<%= baseurl %>" />	
@@ -33,7 +33,7 @@
 	
 	<div class="vizmenu">
 		<div class="vizmenu-entry">
-			<div class="vizmenu-label">Visualization Type</div>
+			<div id="viz-choice-label" class="vizmenu-label">Visualize</div>
 			<select name="viz-choice" id="viz-choices">
 				<option id="map-viz-choice" value="map">Map</option>
 				<option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
@@ -82,6 +82,8 @@
 		<div class="map" id="map"></div>
 		<div class="textview closed" id="textview"></div>
 	</div>
+
+	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	
 	<script src="js/Manifest-lib<%= minify %>.js"></script>

@@ -24,11 +24,15 @@
         <div id="textbar">
             <div id="minfoheader">
                 <i id="minfo-hamburger" class="fas fa-bars"></i>
-                <span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
+                <span id="minfo"><span id="logotype">MANIFEST</span><span class="fulltext">: Supply Chain Platform</span></span>
             </div>
             <div id="minfodetail" class="closed">
                 <p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
                 <nav id="minfomenu">
+                    <a href="" class="hb-menu-item"><i class="fas fa-tablet"></i>Manifest Application</a>
+                    <a href="edit/" class="hb-menu-item"><i class="fas fa-edit"></i>Supply Chain Editor</a>
+                    <div class="spacer"></div>
+
                     <a href="about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
                     <a href="data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
                     <a href="https://supplystudies.com/syllabus/#reversesourcing" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
@@ -36,7 +40,7 @@
                     <a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
                     <a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
                 </nav>
-                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
+                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
                 <div id="loadlistpanel">
                     <select name="load-samples" id="load-samples">
                         <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
@@ -86,14 +90,14 @@
         </div>
 
         <div class="footer">
-            <div style="float:left;">
-                Manifest.
+            <div class="footer-wrap-left">
+
             </div>
 
-            <div style="float:right;">
-                <div style="float:left;"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
-                <div style="float:right;">
-                    <p class="smalltext" style="padding-top:0; margin-top:0;">Except where otherwise noted, Manifest data is made available under a<br />
+            <div class="footer-wrap-right">
+                <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+                <div class="license">
+                    <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<span class="fulltext"><br /></span>
                         <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
                     </p>
                 </div>

@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 	//	var starters = [5333,2239,602,5228,4532,2737,5228]; ... if(d.featured)
 
+
 	function LoadSample(d) {
 		document.getElementById('collection-description').innerHTML = d.description;
 		for (var s in d.collection) { 

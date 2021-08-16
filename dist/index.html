@@ -4,7 +4,7 @@
 <head>
     <title>Manifest: Supply Chain Platform</title>
     <meta name="description" content="A simple viewer for supply chain data.">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 
     <base href="http://hockbook.local/Manifest/dist/" />
@@ -38,11 +38,15 @@
     <div id="manifestbar">
         <div id="minfoheader">
             <i id="minfo-hamburger" class="fas fa-bars"></i>
-            <span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
+            <span id="minfo"><span id="logotype">MANIFEST</span><span class="fulltext">: Supply Chain Platform</span></span>
         </div>
         <div id="minfodetail" class="closed">
             <p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
             <nav id="minfomenu">
+                <a href="" class="hb-menu-item"><i class="fas fa-tablet"></i>Manifest Application</a>
+                <a href="edit/" class="hb-menu-item"><i class="fas fa-edit"></i>Supply Chain Editor</a>
+                <div class="spacer"></div>
+
                 <a href="about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
                 <a href="data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
                 <a href="https://supplystudies.com/syllabus/#reversesourcing" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
@@ -50,7 +54,7 @@
                 <a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
                 <a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
             </nav>
-            <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
+            <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
             <div id="loadlistpanel">
                 <select name="load-samples" id="load-samples">
                     <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
@@ -73,7 +77,7 @@
 
     <div class="vizmenu">
         <div class="vizmenu-entry">
-            <div class="vizmenu-label">Visualization Type</div>
+            <div id="viz-choice-label" class="vizmenu-label">Visualize</div>
             <select name="viz-choice" id="viz-choices">
                 <option id="map-viz-choice" value="map">Map</option>
                 <option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
@@ -129,6 +133,23 @@
         <div class="map" id="map"></div>
         <div class="textview closed" id="textview"></div>
     </div>
+
+    <div class="footer">
+        <div class="footer-wrap-left">
+
+        </div>
+
+        <div class="footer-wrap-right">
+            <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+            <div class="license">
+                <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<span class="fulltext"><br /></span>
+                    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+                </p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
 
 
     <script src="js/Manifest-lib.js"></script>
