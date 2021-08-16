@@ -150,7 +150,6 @@ class Manifest {
 		if (typeof d.supplychain.stops !== 'undefined') {
 			//d.supplychain.stops = d.supplychain.stops.reverse();
 			for (let i = 0; i < d.supplychain.stops.length; ++i) {
-			
 				let title = (d.supplychain.stops[i].attributes.title) ? d.supplychain.stops[i].attributes.title : 'Node';
 				let place = (d.supplychain.stops[i].attributes.placename) ? d.supplychain.stops[i].attributes.placename : 
 							((d.supplychain.stops[i].attributes.address) ? d.supplychain.stops[i].attributes.address : '');
@@ -327,8 +326,7 @@ class ManifestMessenger {
 	
 	Add(url, data, callback) {
 		
-	}
-	
+	}	
 }
 
 /* Manifest Utility Class */

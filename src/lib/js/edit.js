@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(event) { Start(); });
 
-	
 /** Setup Manifest JSON editor **/
 function Start() {		
 	// Configure JSONEditor
@@ -109,5 +108,3 @@ function SaveManifest(text, filename){
 	let a = document.createElement('a');
 	a.setAttribute('href', 'data:text/json;charset=utf-8,'+encodeURIComponent(text)); a.setAttribute('download', filename+'.json'); a.click();
 }
-
-

@@ -21,15 +21,11 @@
         <div id="textbar">
             <div id="minfoheader">
                 <i id="minfo-hamburger" class="fas fa-bars"></i>
-                <span id="minfo"><span id="logotype">MANIFEST</span><span class="fulltext">: Supply Chain Platform</span></span>
+                <span id="minfo"><span id="logotype">MANIFEST</span>: Supply Chain Platform</span>
             </div>
             <div id="minfodetail" class="closed">
                 <p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
                 <nav id="minfomenu">
-                    <a href="" class="hb-menu-item"><i class="fas fa-tablet"></i>Manifest Application</a>
-                    <a href="edit/" class="hb-menu-item"><i class="fas fa-edit"></i>Supply Chain Editor</a>
-                    <div class="spacer"></div>
-
                     <a href="about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
                     <a href="data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
                     <a href="https://supplystudies.com/syllabus/#reversesourcing" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
@@ -37,7 +33,7 @@
                     <a href="https://supplystudies.com/manifestinfo/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
                     <a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
                 </nav>
-                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
+                <p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a URL in one of the <a href="edit/">file formats</a> we support.</p>
                 <div id="loadlistpanel">
                     <select name="load-samples" id="load-samples">
                         <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
@@ -67,11 +63,12 @@
         </div>
         <h1>Datasets</h1>
         <a href="edit/" class="splash-link"><img class="splash-image small" src="images/data-splash-cut.png" /></a>
-
-        <p class="callout biggertext">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
+        <p class="callout">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public
+            access.</p>
 
         <h3><a name="manifest">Manifest File Format</a></h3>
-        <p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
+        <p>One of the goals of Manifest is to develop a standard file format for the critical analysis of supply chains. The format is still under development, but you
+            can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
 
         <h3><a name="smap">Case Studies and Deployments</a></h3>
         <p>This is a collection of deployments and case studies for Manifest, including courses where Manifest was used as a class assignment. </p>
@@ -93,7 +90,11 @@
         </div>
 
         <h3><a name="smap">Sourcemap Dataset</a></h3>
-        <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+        <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>.
+            Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects,
+            it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006.
+            And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below,
+            only a subset of more or less standard information is directly viewable in Manfest.</p>
 
         <div id="datalist" class="dataviewer smapviewer">
             <div id="datasort">Sort by: <span class='sort' data-sort='id'>ID</span> <span class='sort' data-sort='nm'>Name</span> or </div>
@@ -103,14 +104,14 @@
         </div>
 
         <div class="footer">
-            <div class="footer-wrap-left">
-
+            <div style="float:left;">
+                Manifest.
             </div>
 
-            <div class="footer-wrap-right">
-                <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
-                <div class="license">
-                    <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<span class="fulltext"><br /></span>
+            <div style="float:right;">
+                <div style="float:left;"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+                <div style="float:right;">
+                    <p class="smalltext" style="padding-top:0; margin-top:0;">Except where otherwise noted, Manifest data is made available under a<br />
                         <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
                     </p>
                 </div>

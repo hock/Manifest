@@ -698,14 +698,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		margin:4rem 0 0 0;
 		border-radius:0 0 0.25rem 0;
 		border-left:1px solid #4d34db;
-		width: calc(30% + 3.7rem);
+		width: calc(40% + 1rem);
 		height: calc(100% - 4rem);
 		z-index:2000;
+		box-shadow: -0.1rem 0.1rem 0.1rem rgba(0,0,0,0.2);
 }
 #chooser_arrow {
 	position:absolute;
 	top:100px;
-	right:calc(30% + 4.7rem + 1px);
+	right:calc(40% + 2rem + 1px);
   width: 0; 
   height: 0; 
   border-top: 20px solid transparent;

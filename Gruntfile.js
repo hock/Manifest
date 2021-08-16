@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 		  target: {
 		    files: [{
 		      expand: true,
-		      src: ['dist/css/Manifest-main.css','dist/css/Manifest-edit.css','dist/css/Manifest-static.css'],
+		      src: ['dist/css/Manifest-main.css','dist/css/Manifest-static.css'],
 		      ext: '.min.css'
 		    }]
 		  }
@@ -90,12 +90,8 @@ module.exports = function(grunt) {
 				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/manifest.css'],
 				dest: 'dist/css/<%= pkg.name %>-main.css'
 			},
-			css_edit: {
-				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/editor.css'],
-				dest: 'dist/css/<%= pkg.name %>-edit.css'
-			},
 			css_static: {
-				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/editor.css'],
+				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/manifest.css'],
 				dest: 'dist/css/<%= pkg.name %>-static.css'
 			}
 		},
