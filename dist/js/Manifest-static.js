@@ -1,8 +1,7 @@
-$( document ).ready(function() { 
-	StaticInit();
-});
+document.addEventListener("DOMContentLoaded", function(event) { Start(); });
 
 /** Initializes the user interface for (mostly) static pages. **/
-function StaticInit() {
-	$("#minfo-hamburger, #minfo").click(function() { $("#minfodetail").toggleClass("closed");  });				
+function Start() {
+	document.querySelectorAll('#minfo-hamburger, #minfo').forEach(el => { 
+		el.addEventListener('click', (e) => { document.getElementById('minfodetail').classList.toggle('closed'); }); });	
 }

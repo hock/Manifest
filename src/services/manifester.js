@@ -2,6 +2,7 @@ const http = require('http');
 const hostname = 'localhost';
 const port = 3000;
 const url = require('url');
+const gsheetkey = 'AIzaSyDbKq9njfiQa3UDGzRaaG0YaQOT0kYNoFQ';
 
 const server = http.createServer((req, res) => {
 	var request = require('request-promise');
@@ -25,15 +26,14 @@ const server = http.createServer((req, res) => {
 		},
 		getGoogleOverview: function(id) {
 			return request({
-				"method":"GET", 
-				"uri": "https://spreadsheets.google.com/feeds/cells/"+id+"/"+"1"+"/public/full?alt=json",
+				"uri": "https://sheets.googleapis.com/v4/spreadsheets/" + id + "/values/Overview?key=" + gsheetkey,
 				"json": true
 			});
 		},
 		getGoogleList: function(id) {
 			return request({
 				"method":"GET", 
-				"uri": "https://spreadsheets.google.com/feeds/cells/"+id+"/"+"2"+"/public/full?alt=json",
+				"uri": "https://sheets.googleapis.com/v4/spreadsheets/" + id + "/values/List?key=" + gsheetkey,
 				"json": true
 			});
 		},
@@ -84,9 +84,7 @@ const server = http.createServer((req, res) => {
 	}
 	if(query.type == "proxy") {
 		if(query.id == "marinetraffic-overview") {
-			console.log("in marine");
 			Manifester.getMarineTrafficOverview().then(function(result) {
-				console.log(result);
 					res.statusCode = 200;
 
 					res.setHeader('Access-Control-Allow-Origin', '*');
@@ -95,7 +93,6 @@ const server = http.createServer((req, res) => {
 					res.setHeader('Content-Type', 'application/json');
 			
 					console.log("proxy success!");
-					console.log(result);
 					res.end(JSON.stringify(result));
 			}).catch(function(err) {
 				console.log("failure!");

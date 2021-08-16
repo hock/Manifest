@@ -44,9 +44,9 @@
                         <optgroup id="load-samples-custom" label="Custom Manifest"></optgroup>
                     </select>
 
-                    <input type="text" id="load-samples-input" class="closed" />
-                    <input type="file" name="file-input[]" id="file-input" class="closed inputfile file-input" data-multiple-caption="{count} files selected" multiple />
-                    <label for="file-input" id="file-input-label" class="closed"><i class="fas fa-upload"></i> <span>Upload Manifest File</span></label>
+                    <input type="text" id="load-samples-input" />
+                    <input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
+                    <label for="file-input" id="file-input-label"><i class="fas fa-upload"></i> <span id="file-input-label-text">Upload Manifest File</span></label>
 
                     <button id="load-samples-btn">Load</button>
                 </div>
@@ -76,58 +76,52 @@
         <h3><a name="smap">Case Studies and Deployments</a></h3>
         <p>This is a collection of deployments and case studies for Manifest, including courses where Manifest was used as a class assignment. </p>
 
-        <div class="dataviewer caseviewer">
-            <div class="gs-table-container">
-                <table class="table gs-table">
-                    <thead class="gs-table-head"></thead>
-                    <tbody class="gs-table-body">
-                        <tr>
-                            <td><span>
-                                    <div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div>
-                                </span></td>
-                            <td><span><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></span></td>
-                            <td class="fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</td>
-                        </tr>
-                        <tr>
-                            <td><span>
-                                    <div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div>
-                                </span></td>
-                            <td><span><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></span></td>
-                            <td class="fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</td>
-                        </tr>
-
-                    </tbody>
-                </table>
-            </div>
-
-            <h3><a name="smap">Sourcemap Dataset</a></h3>
-            <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
-
-            <div class="dataviewer smapviewer">
-                <input type="text" placeholder="Search this dataset..." id="searchField" />
-                <div id="table-sortable"></div>
-            </div>
-
-            <div class="footer">
-                <div class="footer-wrap-left">
-
-                </div>
-
-                <div class="footer-wrap-right">
-                    <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
-                    <div class="license">
-                        <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<span class="fulltext"><br /></span>
-                            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-                        </p>
-                    </div>
+        <div id="manifestlist" class="dataviewer smapviewer">
+            <ul class="list">
+                <li class="entry">
+                    <div class="id dot">20211</div>
+                    <div class="name"><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></div>
+                    <div class="description fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</div>
                     <div class="clear"></div>
-                </div>
+                </li>
+                <li class="entry">
+                    <div class="id dot">20212</div>
+                    <div class="name"><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></div>
+                    <div class="description fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</div>
+                </li>
+            </ul>
+        </div>
+
+        <h3><a name="smap">Sourcemap Dataset</a></h3>
+        <p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+
+        <div id="datalist" class="dataviewer smapviewer">
+            <div id="datasort">Sort by: <span class='sort' data-sort='id'>ID</span> <span class='sort' data-sort='nm'>Name</span> or </div>
+            <input type="search" id="datasearch" class="search" placeholder="search this dataset..." />
+            <ul class=list></ul>
+            <ul class="pagination"></ul>
+        </div>
+
+        <div class="footer">
+            <div class="footer-wrap-left">
+
             </div>
-            <div class="clear"></div>
+
+            <div class="footer-wrap-right">
+                <div class="license-icons"><i class="fab fa-creative-commons"></i> <i class="fab fa-creative-commons-by"></i></div>
+                <div class="license">
+                    <p class="smalltext">Except where otherwise noted, Manifest data is made available under a<span class="fulltext"><br /></span>
+                        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+                    </p>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="clear"></div>
 
 
-            <script src="js/Manifest-lib.js"></script>
-            <script src="js/Manifest-data.js"></script>
+        <script src="js/Manifest-lib.js"></script>
+        <script src="js/Manifest-data.js"></script>
 
 </body>
 

@@ -233,12 +233,12 @@ function SCProcessor(type, d, options) {
 /** Setup the supply chain rendering by adding it to the user interface */
 function SetupSC(d, options) {	
 	var scid = MI.supplychains.push(d);
-	MI.attributes.scrollpos = $(".sidepanel").scrollTop();
+	MI.attributes.scrollpos = $("#sidepanel").scrollTop();
 	console.log(MI.attributes.scrollpos);
 	$("#manifestlist").append(
 		'&lt;div class="mheader" id="mheader-'+d.details.id+'">'+
 			'&lt;div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
-				'&lt;i class="menu-map fas fa-globe-'+d.details.globe+'">&lt;/i>&lt;a>' + d.properties.title + '&lt;/a>' +
+				'&lt;i class="menumap fas fa-globe-'+d.details.globe+'">&lt;/i>&lt;a>' + d.properties.title + '&lt;/a>' +
 				'&lt;i class="fas fa-times-circle close-map">&lt;/i>'+
 			'&lt;/div>'+
 		'&lt;/div>'				
@@ -252,7 +252,7 @@ function SetupSC(d, options) {
 	// UI Setup
 	$("#mheader-"+d.details.id).click(function() { ui_mheader(d.details.id);});	
 	$("#mheader-"+d.details.id+" .close-map").click(function() { ui_mclose(d.details.id);});	
-	$("#mheader-"+d.details.id+" .menu-map").click(function() { ui_mmenu(d.details.id);});	
+	$("#mheader-"+d.details.id+" .menumap").click(function() { ui_mmenu(d.details.id);});	
 	
 	$("#manifestlist").append('&lt;div class="mdetails" id="mdetails-'+d.details.id+'">&lt;/div>');	
 	if (d.properties.description != "") { $("#mdetails-"+d.details.id).append(
@@ -405,7 +405,7 @@ function MapSC(d, scid) {
 	d.details.layers.push(MI.scview.map.addLayer(maplayergroup));
 	pointLayer.bringToFront();	
 
-	$('.sidepanel').scrollTo( MI.attributes.scrollpos,  0, {  } );	
+	$('#sidepanel').scrollTo( MI.attributes.scrollpos,  0, {  } );	
 }
 
 /** Format a legacy Sourcemap file so Manifest can understand it */
@@ -495,7 +495,7 @@ function GoogleSheets(gsheet, options) {
 	$("#manifestlist").append(
 		'&lt;div class="mheader" id="mheader-'+d.details.id+'"style="top:'+moffset+'px;">'+
 			'&lt;div class="mtitle" style="background:'+d.details.style.fillColor+'; color:'+d.details.style.color+';">'+
-				'&lt;i class="menu-map fas fa-globe-'+globe+'">&lt;/i>&lt;a>' + d.properties.title + '&lt;/a>' +
+				'&lt;i class="menumap fas fa-globe-'+globe+'">&lt;/i>&lt;a>' + d.properties.title + '&lt;/a>' +
 				'&lt;i class="fas fa-times-circle close-map">&lt;/i>'+
 			'&lt;/div>'+
 		'&lt;/div>'				
@@ -504,7 +504,7 @@ function GoogleSheets(gsheet, options) {
 	// UI Setup
 	$("#mheader-"+d.details.id).click(function() { ui_mheader(d.details.id);});	
 	$("#mheader-"+d.details.id+" .close-map").click(function() { ui_mclose(d.details.id);});	
-	$("#mheader-"+d.details.id+" .menu-map").click(function() { ui_mmenu(d.details.id);});	
+	$("#mheader-"+d.details.id+" .menumap").click(function() { ui_mmenu(d.details.id);});	
 	
 	temptitle = "";
 	$( ".mtitle").text(function(i, t){ temptitle += i == 0 ? t : ' + ' + t; });
@@ -606,7 +606,7 @@ function GoogleSheets(gsheet, options) {
 	pointLayer.bringToFront();
 	
 	// Finalize Map
-	//$('.sidepanel').scrollTo( $(".mdetails").last(),  50, { offset: -1* moffset } );
+	//$('#sidepanel').scrollTo( $(".mdetails").last(),  50, { offset: -1* moffset } );
 	
 	//MI.functions.graph("GoogleGraph", d, {"id": d.details.id});
 }
@@ -894,7 +894,7 @@ function ui_mheader(id) {
 	$("#mheader-"+id).prevAll(".mheader").each(function(i) {
 		offset += $(this).outerHeight();
 	});
-	$('.sidepanel').scrollTo($("#mdetails-"+id),  50, { offset: -1*offset}); 	
+	$('#sidepanel').scrollTo($("#mdetails-"+id),  50, { offset: -1*offset}); 	
 }
 
 /** Sets interface to full screen mode **/
@@ -967,7 +967,7 @@ function ui_mclose(id) {
 			var fevent = {sourceTarget: MI.scview.active_point, layer: {options:{fillOpacity:MI.scview.active_point.feature.properties.style.fillOpacity}, _popup: {_source: {feature: {properties: {lid: MI.scview.active_point.feature.properties.lid}}}}}};
 			ui_pointclick(fevent, MI.scview.active_point.feature.properties.lid, 0);		
 		} else {		
-			$('.sidepanel').scrollTo($("#mdetails-"+target_id),  0, { offset: -1*offset}); 	
+			$('#sidepanel').scrollTo($("#mdetails-"+target_id),  0, { offset: -1*offset}); 	
 		}
 	} else {
 		MI.scview.active_point = null; 
@@ -1008,8 +1008,8 @@ function ui_hamburger() {
 	$("#minfodetail").toggleClass("closed");
 	$("#manifestbar").toggleClass("open");
 	
-	if($("#manifestbar").hasClass("open")) { $(".sidepanel").css("top", $("#manifestbar").outerHeight() + $("#manifestbar").outerHeight() / 20); } 
-	else { $(".sidepanel").css("top", "4rem"); }
+	if($("#manifestbar").hasClass("open")) { $("#sidepanel").css("top", $("#manifestbar").outerHeight() + $("#manifestbar").outerHeight() / 20); } 
+	else { $("#sidepanel").css("top", "4rem"); }
 }
 
 /** Handles the measure sorting interface **/
@@ -1045,7 +1045,7 @@ function ui_pointclick(e, slid, speed) {
 			});
 	
 			// Scroll to point
-			$('.sidepanel').scrollTo(
+			$('#sidepanel').scrollTo(
 				$("li#local_"+slid),  speed, {
 					offset: -1*offset
 				}
@@ -1053,11 +1053,11 @@ function ui_pointclick(e, slid, speed) {
 	
 			if(e != undefined) {
 				if(e.sourceTarget._popup._container != undefined) {
-					if(ui_collide($(e.sourceTarget._popup._container), $(".sidepanel"))) {
+					if(ui_collide($(e.sourceTarget._popup._container), $("#sidepanel"))) {
 						e.layer._map.setView(e.layer._latlng, e.layer._map.getZoom());
 						
 						/* TODO would be nice to handle edge case where popup is slighty out of frame */
-						/*if(ui_collide($(e.sourceTarget._popup._container), $(".sidepanel"))) {
+						/*if(ui_collide($(e.sourceTarget._popup._container), $("#sidepanel"))) {
 							e.layer._map.setView(e.layer._latlng, e.layer._map.getZoom()+1);
 							e.layer.openPopup();												
 						} */

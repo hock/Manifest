@@ -5350,15 +5350,7 @@
 
   	_zoomIn: function (e) {
   		if (!this._disabled && this._map._zoom < this._map.getMaxZoom()) {
-			if(typeof(MI) != 'undefined') {
-				if(typeof(MI.scview.active_point) != 'undefined') {
-		  		//	this._map.setView(MI.scview.active_point._latlng, this._map.getZoom(), {});
-					
-				} 
-			
-			} 
-	  		this._map.zoomIn(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));
-				
+	  		this._map.zoomIn(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));			
 		}
   	},
 
@@ -10070,7 +10062,7 @@
   	// @method openPopup(latlng?: LatLng): this
   	// Opens the bound popup at the specified `latlng` or at the default popup anchor if no `latlng` is passed.
   	openPopup: function (layer, latlng) {
-  		if (this._popup && this._map && this.options.fillOpacity != 0.1) {
+  		if (this._popup && this._map) {
   			latlng = this._popup._prepareOpen(this, layer, latlng);
 
   			// open the popup on the map
@@ -10482,7 +10474,7 @@
   	// @method openTooltip(latlng?: LatLng): this
   	// Opens the bound tooltip at the specified `latlng` or at the default tooltip anchor if no `latlng` is passed.
   	openTooltip: function (layer, latlng) {
-  		if (this._tooltip && this._map && this.options.fillOpacity != 0.1) {
+  		if (this._tooltip && this._map) {
   			latlng = this._tooltip._prepareOpen(this, layer, latlng);
 
   			// open the tooltip on the map
@@ -14067,3 +14059,5 @@
   window.L = exports;
 
 })));
+
+L.Canvas.prototype._updateTriangle=function(layer){var p,ctx;if(!this._drawing||layer._empty())return null;p=layer._point;ctx=this._ctx;wh=layer._width/2;hh=layer._height/2;r=0!==layer._rotation?layer._rotation*(2*Math.PI)/360:0;this._layers[layer._leaflet_id]=layer;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(r);ctx.beginPath();ctx.moveTo(0,-hh);ctx.lineTo(wh,2*hh);ctx.lineTo(-wh,2*hh);ctx.closePath();ctx.restore();this._fillStroke(ctx,layer)},L.TriangleMarker=L.Path.extend({options:{fill:!0,width:12,height:12,rotation:0},initialize:function(latlng,options){L.setOptions(this,options);this._latlng=L.latLng(latlng);this._width=this.options.width;this._height=this.options.height;this._rotation=this.options.rotation;this._renderer=this.options.renderer},setLatLng:function(latlng){this._latlng=L.latLng(latlng);this.redraw();return this.fire("move",{latlng:this._latlng})},getLatLng:function(){return this._latlng},setWidth:function(width){this.options.width=this._width=width;return this.redraw()},setHeight:function(height){this.options.height=this._height=height;return this.redraw()},setRotation:function(deg){this.options.rotation=this._rotation=deg;return this.redraw()},getWidth:function(){return this._width},getHeight:function(){return this._height},getRotation:function(){return this._rotation},setStyle:function(options){var width=options&&options.width||this._width,height=options&&options.height||this._height;L.Path.prototype.setStyle.call(this,options);this.setWidth(width);this.setHeight(height);return this},_project:function(){this._point=this._map.latLngToLayerPoint(this._latlng);this._updateBounds()},_updateBounds:function(){var w=this._width/2,h=this._height/2,b=this._clickTolerance(),p=[w+b,h+b];this._pxBounds=new L.Bounds(this._point.subtract(p),this._point.add(p))},_update:function(){if(this._map)this._updatePath()},_updatePath:function(){this._renderer._updateTriangle(this)},_empty:function(){return this._width&&this._height&&!this._renderer._bounds.intersects(this._pxBounds)},_containsPoint:function(p){return this._pxBounds&&this._pxBounds.contains(p)}});L.triangleMarker=function(latlng,options){return new L.TriangleMarker(latlng,options)};

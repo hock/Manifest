@@ -23,6 +23,9 @@
 	#minfodetail #minfomenu .spacer { height:1rem; }
 	#minfodetail #minfomenu i {display:inline-block; width:1rem;}
 	
+	#minfo { margin-left:0.25rem;}
+	#logotype { letter-spacing:-0.05rem;}
+	
 	#loadlistpanel { display:none;}
 	
 	#load-samples { width:100%; padding: .375rem .25rem .375rem .25rem; font-size: 1rem; font-weight: 400; line-height: 1.5; vertical-align: middle; border: 1px solid; border-radius: .25rem; margin-right:0.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; outline: none; } 
@@ -180,6 +183,40 @@
 	body.textpage .splash-image.small { float:right; margin:-2rem -9rem 1rem 1rem; width:34rem; height:auto; }
 
 	body.textpage .splash-image:hover { filter: brightness(110%); }
+	
+	.dataviewer div.dot { 
+		cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; text-align:center; font-size:0.8rem;
+		background:#4d34db; border-color:#efecfa; color:#efecfa;
+	}
+	.dataviewer ul {list-style:none; margin:0.5rem 0; padding:0;}
+	.dataviewer ul li.entry { padding:0.5rem 0.5rem 0.5rem 4.5rem;}
+	.dataviewer ul li.entry:nth-child(odd) { background:#efecfa; } 
+	
+	.dataviewer ul li.entry span { display:inline-block;}
+	.dataviewer ul li.entry div.id { margin-left:-4rem; width:3rem; padding:0.25rem 0;}
+
+	.dataviewer ul li.entry div.name { }
+	.dataviewer ul li.entry div.description { font-size:1rem; color:#999;}
+	.dataviewer ul li.entry div.actions { float:right;}
+	.dataviewer ul li.entry div.actions a {color:#4d34db; font-size:1.5rem;}	
+	.dataviewer ul li.entry div.actions a:hover { color:#000;}
+	
+	.dataviewer ul.pagination { display:block; float:right;}
+	.dataviewer ul.pagination li { display:inline; cursor:pointer; padding:0.25rem;}
+	
+	#datasort { display:inline;}
+	#datasort .sort { cursor:pointer; }
+	#datasort .sort.asc, #datasort .sort.desc { background:#efecfa;}
+	#datasort .sort.asc::after{content:"\025B2";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:middle;}
+	#datasort .sort.desc::after{content:"\0025BC";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:middle;}
+	
+	#datasort .sort, #datasearch { padding:0.25rem; display:inline-block; border:1px solid #ccc; border-radius:0.25rem; }
+	#datalist ul.pagination li { padding:0.25rem; display:inline-block; border-radius:0.25rem; margin:0 0.25rem;}
+	#datalist ul.pagination li.active { background:#efecfa; }
+	
+	#datasearch {margin:0;}
+	#datasearch::placeholder { color:#000;}
+	
 	body.textpage .dataviewer table { font-size:1.1rem; width:100%;   table-layout: fixed;}
 	body.textpage .dataviewer table .gs-button {cursor:pointer}
 	body.textpage .dataviewer table tr td { padding:0.5rem 1rem; overflow:hidden;}
@@ -210,9 +247,7 @@
 	body.textpage .dataviewer table thead tr:nth-child(odd) { background:transparent; }
 
 	body.textpage .dataviewer img { display:none; }
-	body.textpage .dataviewer div.dot { 
-		cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; 
-	}
+
 	body.textpage .dataviewer div.dot:hover { }
 	body.datapage h3 {padding-top:2rem; }
 
@@ -276,6 +311,5 @@
 	body.editor .inputfile + label { margin:0 auto 0.5rem auto; width: calc(90% - 2px - 0.75rem); display:block;}
 	body.editor .je-tab--top { width:calc(100% - 1rem);}
 	
-	body.textpage .dataviewer #searchField {margin:0 1rem;}
 	
  }

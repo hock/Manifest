@@ -32,24 +32,30 @@
 		<h3><a name="smap">Case Studies and Deployments</a></h3>
 		<p>This is a collection of deployments and case studies for Manifest, including courses where Manifest was used as a class assignment. </p>
 		
-		<div class="dataviewer caseviewer">			
-		<div class="gs-table-container">				
-			<table class="table gs-table">
-				<thead class="gs-table-head"></thead>
-					<tbody class="gs-table-body">
-						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></span></td><td class="fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</td></tr>
-						<tr><td><span><div class="dot" style="background:#4d34db; border-color:#f5f5f5;"></div></span></td><td><span><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></span></td><td class="fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</td></tr>
-						
-					</tbody>
-			</table>
+		<div id="manifestlist" class="dataviewer smapviewer">
+			<ul class="list">
+				<li class="entry">
+					<div class="id dot">20211</div>
+					<div class="name"><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></div>
+					<div class="description fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</div>
+					<div class="clear"></div>
+				</li>
+				<li class="entry">
+					<div class="id dot">20212</div>
+					<div class="name"><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></div>
+					<div class="description fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</div>
+				</li>
+			</ul>
 		</div>
-					
+
 		<h3><a name="smap">Sourcemap Dataset</a></h3>
 		<p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
 		
-		<div class="dataviewer smapviewer">
-			<input type="text" placeholder="Search this dataset..." id="searchField" />
-			<div id="table-sortable"></div>
+		<div id="datalist" class="dataviewer smapviewer">
+			<div id="datasort">Sort by: <span class='sort' data-sort='id'>ID</span> <span class='sort' data-sort='nm'>Name</span> or </div>
+			<input type="search" id="datasearch" class="search" placeholder="search this dataset..."  />			
+			<ul class=list></ul>
+		    <ul class="pagination"></ul>	
 		</div>
 		
 	<!-- build:section layout.footer --><!-- /build -->

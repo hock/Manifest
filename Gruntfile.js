@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 						}
 					},
 					data: {
-						baseurl: "http://localhost/Manifest/dist/",
+						baseurl: "http://hockbook.local/Manifest/dist/",
 						minify: "", // or .min
 						version: "0.1.1"
 					}
@@ -36,7 +36,9 @@ module.exports = function(grunt) {
 		},
 		
 		jshint: {
-			js: ['src/lib/js/*.js']                             
+			js: ['src/lib/js/*.js'],
+			options: { 'esversion': 6 }
+                      
 		},
 
 		uglify: {
@@ -61,11 +63,11 @@ module.exports = function(grunt) {
 				separator: ' ',
 			},
 			js_lib: {
-				src: ['src/lib/js/inc/jquery.js', 'src/lib/js/leaflet/leaflet.js', 'src/lib/js/inc/d3.v4.js','src/lib/js/inc/jsondrop.js'],
+				src: ['src/lib/js/leaflet/leaflet.js', 'src/lib/js/inc/d3.v4.js', 'src/lib/js/inc/d3.sankey.js', 'src/lib/js/inc/jsondrop.js'],
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/waypoints.js', 'src/lib/js/inc/scrollto.js', 'src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/inc/autolinker.js', 'src/lib/js/leaflet/markercluster.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/grate.js', 'src/lib/js/manifest.js', 'src/lib/js/visualize.js', "src/lib/js/main.js"],
+				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/grate.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js', 'src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {
@@ -73,7 +75,7 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-static.js'				
 			},
 			js_data: {
-				src: ['src/lib/js/inc/tablesortable.js','src/lib/js/static.js','src/lib/js/datatable.js'],
+				src: ['src/lib/js/inc/list.js','src/lib/js/static.js','src/lib/js/datatable.js'],
 				dest: 'dist/js/<%= pkg.name %>-data.js'
 			},
 			js_edit: {

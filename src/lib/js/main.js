@@ -1,101 +1,66 @@
-$( document ).ready(function() {
+document.addEventListener("DOMContentLoaded", function(event) {
 	MI = new Manifest();
 	MI.serviceurl = "https://supplystudies.com/manifest/services/";
-	MI.jsoncollection = "json/samples.json";
-	
-	var hash = "";
-	var hashtype = "";
-	var hashid = "";
-	
-	var initialmap = false;
-	if(typeof(location.hash) != 'undefined' && location.hash != "") { 
-		// TODO handle bad hashes gracefully and still load the page.
-		hash =  location.hash.substr(1).split("-");
-		hashtype = hash[0]; 
-		hash = [hash.shift(), hash.join('-')];
-		hashid = hash[1]; 
 		
-		if(typeof(hashtype) == 'undefined' || typeof(hashid) == 'undefined') {
-			$("#loader h2").text("[BAD REQUEST]");
+	if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
+		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
+		if (hashtype === "collection") { LoadCollection(hashid, true); }
+		else { 
+			switch (hashtype) {
+				case "smap": fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid})).then(r => Start()).catch(e => LoadError(e)); break;
+				case "gsheet": fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+				case "manifest": fetch(hashid).then(r => r.json())
+					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+				default: LoadError('Option not supported');
+			}  LoadCollection("json/samples.json", false);
 		}
-		switch(hashtype) {
-			case "smap":
-				initialmap = true;
-				// TODO service should handle full urls to smap also.
-				
-				$.getJSON(MI.serviceurl + "?type=smap&id=" + hashid, function(d) { MI.functions.process("smap", d, {"id": hashid});}).fail(function() {
-					$("#loader h2").text("[SMAP ID NOT FOUND]");
-				});
-				break;
-			case "gsheet":
-				initialmap = true;
-				// TODO service should handle full urls to gsheet also.
-				
-				$.getJSON(MI.serviceurl + "?type=gsheet&id=" + hashid, function(d) { MI.functions.process("gsheet", d, {"id": hashid.hashCode()});}).fail(function() {
-					$("#loader h2").text("[GOOGLE SHEET NOT FOUND]");
-				}); 
-		    	break;
-			case "manifest":
-				initialmap = true;
-				// TODO Should add a service for this, service handles urls--should handle ids in a github repo also.
-				
-				$.getJSON(hashid, function(d) { MI.functions.process("manifest", d, {"id": (d.summary.name).hashCode()});}).fail(function() {
-					$("#loader h2").text("[MANIFEST NOT FOUND]");
-				});
-				break;
-			case "collection":
-				initialmap = false;			
-				MI.jsoncollection = hashid;
-				break;
-		  	default:
-				console.log("Option not supported...");
-		}
-	} 
-	
+	} else { LoadCollection("json/samples.json", true); }
 
+	function LoadError(msg) { 
+		document.getElementById('loadermessage').innerHTML = '['+msg+']'; 
+		document.getElementById('loadermessage').style.color = 'red';
+		document.getElementById('loaderspinner').remove();
+	}
+	
+	function LoadCollection(collection, start) {
+		if (start) { 
+			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) ).then(starter => fetch(starter.url)
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+		} else {
+			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
+		}		
+	}
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 	//	var starters = [5333,2239,602,5228,4532,2737,5228]; ... if(d.featured)
 
-		
-	$.getJSON(MI.jsoncollection, function(d) { 
-		$("#collection-description").html(d.description);
-		for(var s in d.collection) { 
-			$("#load-samples-group").append('<option value="'+d.collection[s].id+'">'+d.collection[s].title+'</option>');	
+
+	function LoadSample(d) {
+		document.getElementById('collection-description').innerHTML = d.description;
+		for (var s in d.collection) { 
+			let option = document.createElement('option');
+			option.value = d.collection[s].id; option.innerHTML = d.collection[s].title;
+			document.getElementById('load-samples-group').appendChild(option);
 		} 
-		$("#load-samples-custom").append('<option value="url">URL</option>');	
-		$("#load-samples-custom").append('<option value="file">FILE</option>');	
-		
-		
-		if(hashtype != "" && hashtype != "collection") { return; } // If a specific hash is passed, we're done--otherwise load a starter map.
-			
-		var option = $("#load-samples").val().split("-");
-		type = option[0];	
-		option = [option.shift(), option.join('-')];
-		id = option[1];
-		
-		var starter = d.collection[Math.floor(Math.random() * d.collection.length)];
-		var starterstring = starter.id.split("-"); 
-		var startertype = starterstring[0];
-		starterstring = [starterstring.shift(), starterstring.join('-')];
-		var starterid = starterstring[1]; 
-		
-		if(startertype == "gsheet" || startertype == "yeti") {
-			starterid = starterid.hashCode();
-		}
-		$.getJSON(MI.serviceurl + "?type="+startertype+"&id=" + starterstring[1], function(d) { MI.functions.process(startertype, d, {"id": starterid});});	
-	});
+		let urloption =  document.createElement('option'), fileoption = document.createElement('option');
+		urloption.value = 'url'; urloption.innerHTML = 'URL'; fileoption.value = 'file'; fileoption.innerHTML = 'FILE';
+		document.getElementById('load-samples-custom').appendChild(urloption); document.getElementById('load-samples-custom').appendChild(fileoption);
+
+		let starterstring =  d.collection[Math.floor(Math.random() * d.collection.length)].id.split("-"); 
+		let startertype = starterstring[0], starterid = [starterstring.shift(), starterstring.join('-')][1];		
+		return {url: (startertype === 'manifest') ? starterid : MI.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
+	}	
 	
-	$(document).ajaxStop(function() {
-		MI.scview.map.fitBounds(MI.scview.map.getBounds());
-		MI.scview.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
-		
-		viz_resize();
-		
-		if(MI.supplychains.length > 0) {
-			if(MI.scview.active_point == null) { MI.functions.center(); }
-			if(!(MI.attributes.initialized)) { MI.functions.cleanup(); }   
+	function Start() {
+		MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
+		MI.Atlas.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
+				
+		if (MI.supplychains.length > 0) {
+			if (MI.Atlas.active_point === null) { MI.Atlas.SetView(); }
+			if (!(MI.initialized)) { MI.Interface.CleanupInterface(); }   
 		}
-	});
+	}
 	
 	// Do Testing
 	// ManifestTests();

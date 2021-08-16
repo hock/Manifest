@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-	<title>Manifest</title>
+	<title>Manifest: Supply Chain Platform</title>
 	<meta name="description" content="A simple viewer for supply chain data.">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	
@@ -16,15 +16,18 @@
 
 <body class="light">
 	<div id="loader">
-		<h1>Manifest</h1>
-		<h2>Supply Chain Platform</h2>
+		<h1 id="loadertitle">Manifest</h1>
+		<h2 id="loadermessage">Supply Chain Platform</h2>
+		<div id="loaderspinner" class="lds-spinner">
+			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+		</div>
 	</div>
 	
 	<div id="manifestbar">
 	    <!-- build:section layout.launcher --><!-- /build -->
 	</div>
 	
-	<div class="sidepanel">
+	<div id="sidepanel">
 		<div id="manifestlist"></div>
 	</div>
 	
@@ -34,70 +37,50 @@
 			<select name="viz-choice" id="viz-choices">
 				<option id="map-viz-choice" value="map">Map</option>
 				<option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
+				<option id="flow-viz-choice" value="flow">Flow</option>
+				<option id="chord-viz-choice" value="chord">Chord</option>
+				<option id="textview-viz-choice" value="textview">Raw</option>
 			</select>
 		</div>
 		<div class="vizmenu-entry">
 			<div id="measure-choice-label" class="vizmenu-label">Scale</div>	
-			<select name="measure-choice" id="measure-choices">
-				<option value="none">None</option>
-			</select>
+			<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
 		</div>
 		<div class="clear"></div>
 	</div>
 	
 	<div class="view-wrapper">
-		<div class="vizwrap">
-			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet">
-			     <pattern id="pattern-chevron" x="0" y="0" patternUnits="userSpaceOnUse" width="100" height="180" viewBox="0 0 10 18">      
-			       <g id="chevron">
-			         <path class="left" d="M0 0l5 3v5l-5 -3z"></path>
-			         <path class="right" d="M10 0l-5 3v5l5 -3"></path>
-			       </g>
-			       <use x="0" y="9" xlink:href="#chevron"></use>
-			     </pattern>
-			     <rect x="0" y="0" width="100%" height="100%" fill="url(#pattern-chevron)"></rect>
-			</svg>
+		<div id="vizwrap" class="vizwrap closed">
+			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill="#21222c"></rect></svg>
+			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();" />		
 		</div>
 		
 		<div class="searchwidget">
 			<i class="fas fa-search"></i> 
 			<input type="text" placeholder="Filter by..." id="searchbar" /> 
-			<i class="fas fa-times-circle searchclear"></i>
+			<i id="searchclear" class="fas fa-times-circle searchclear"></i>
 		</div>
 		<div id="mapmenu"><i class="fas fa-layer-group"></i></div>
 		<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
-		
+		<div id="messages" class="closed"></div>
+		<div id="mapcapture"><i class="fas fa-camera"></i></div>
+
 		<div id="mapmenu-window" class="closed">
 			<h3>Map Baselayer</h3>
 			<ul id="basemap-chooser">
-				<li class="satellite"></li>
-				<li class="terrain"></li>
-				<li class="light"></li>		
-				<li class="google"></li>								
+				<li class="satellite"></li> <li class="terrain"></li> <li class="light"></li> <li class="google"></li>
 				<div id="basemap-preview" class="google"></div>		
 				<div class="clear"></div>		
 			</ul>
 			<div id="datalayers">
 				<h3>Data Layers</h3> 
-
-				<label class="layercontainer">Shipping Lanes
-				  <input type="checkbox" value="shipping" checked="true">
-				  <span class="layercheckmark"></span>
-				</label> 
-
-				<label class="layercontainer">Marine Traffic
-				  <input type="checkbox" value="marine">
-				  <span class="layercheckmark"></span>
-				</label> 
-
-				<label class="layercontainer">Rail Connections
-				  <input type="checkbox" value="rail">
-				  <span class="layercheckmark"></span>
-				</label>
+				<label class="layercontainer">Shipping Lanes <input type="checkbox" value="shipping"> <span class="layercheckmark"></span> </label>
+				<label class="layercontainer">Marine Traffic <input type="checkbox" value="marine"> <span class="layercheckmark"></span> </label>
+				<label class="layercontainer">Rail Connections <input type="checkbox" value="rail"> <span class="layercheckmark"></span> </label>
 			</div>
-			
 		</div>
 		<div class="map" id="map"></div>
+		<div class="textview closed" id="textview"></div>
 	</div>
 
 	<!-- build:section layout.footer --><!-- /build -->
