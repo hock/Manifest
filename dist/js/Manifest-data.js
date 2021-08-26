@@ -2026,7 +2026,12 @@ function Start() {
 }
  document.addEventListener("DOMContentLoaded", function(event) { Start(); });
 
-function Start() { fetch('json/smapindex.json').then(r => r.json()).then(d => SetTable(JSON.parse(d))); }
+function Start() { 	
+	fetch('json/smapindex.json').then(r => r.json()).then(d => SetTable(JSON.parse(d))); 
+	
+	document.querySelectorAll('#minfo-hamburger, #minfo').forEach(el => { 
+		el.addEventListener('click', (e) => { document.getElementById('minfodetail').classList.toggle('closed'); }); });	
+}
 
 function SetTable(data) {	
 	var options = {

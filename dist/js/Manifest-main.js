@@ -7077,8 +7077,8 @@ module.exports = function leafletImage(map, callback) {
 }()); /* Native Grate Code */
 Grate = {};
 Grate.great_circle_route = function(pt1, pt2, ttl, bounds) {
-    var gc = new arc.GreatCircle(new arc.Coord(pt1[0], pt1[1]), new arc.Coord(pt2[0], pt2[1]));	    
-	var line = gc.Arc(200);	   
+    var gc = new arc.GreatCircle({x: pt1[0], y: pt1[1]}, {x: pt2[0], y: pt2[1]});	    
+	var line = gc.Arc(100);	   
 	return [bezier(line.geometries[0].coords)];
 };
 
@@ -7162,14 +7162,8 @@ Coord.prototype.view = function() {
 };
 
 Coord.prototype.antipode = function() {
-
     var anti_lat = -1 * this.lat;
-	var anti_lon = null;
-    if (this.lon < 0) {
-        anti_lon = 180 + this.lon;
-    } else {
-        anti_lon = (180 - this.lon) * -1;
-    }
+    var anti_lon = (this.lon < 0) ? 180 + this.lon : (180 - this.lon) * -1;
     return new Coord(anti_lon, anti_lat);
 };
 
@@ -7199,7 +7193,7 @@ Arc.prototype.json = function() {
                };
     } else {
         var multiline = [];
-        for (i = 0; i < this.geometries.length; i++) {
+        for (var i = 0; i < this.geometries.length; i++) {
             multiline.push(this.geometries[i].coords);
         }
         return {'geometry': { 'type': 'MultiLineString', 'coordinates': multiline },
@@ -7208,30 +7202,33 @@ Arc.prototype.json = function() {
     }
 };
 
+// TODO - output proper multilinestring
 Arc.prototype.wkt = function() {
     var wkt_string = '';
-    for (i = 0; i < this.geometries.length; i++) {
+    var wkt = 'LINESTRING(';
+    var collect = function(c) { wkt += c[0] + ' ' + c[1] + ','; };
+    for (var i = 0; i < this.geometries.length; i++) {
         if (this.geometries[i].coords.length === 0) {
             return 'LINESTRING(empty)';
         } else {
-            this.wkt = 'LINESTRING(';
-            this.geometries[i].coords.forEach(function(c,idx) {
-                this.wkt += c[0] + ' ' + c[1] + ',';
-            }, this);
-            wkt_string += this.wkt.substring(0, this.wkt.length - 1) + ')';
+            var coords = this.geometries[i].coords;
+            coords.forEach(collect);
+            wkt_string += wkt.substring(0, wkt.length - 1) + ')';
         }
     }
-    return wkt_string; 
+    return wkt_string;
 };
 
-/*
- * http://en.wikipedia.org/wiki/Great-circle_distance
- *
- */
-var GreatCircle = function(start,end,properties) {
 
-    this.start = start;
-    this.end = end;
+var GreatCircle = function(start,end,properties) {
+    if (!start || start.x === undefined || start.y === undefined) {
+        throw new Error("GreatCircle constructor expects two args: start and end objects with x and y properties");
+    }
+    if (!end || end.x === undefined || end.y === undefined) {
+        throw new Error("GreatCircle constructor expects two args: start and end objects with x and y properties");
+    }
+    this.start = new Coord(start.x,start.y);
+    this.end = new Coord(end.x,end.y);
     this.properties = properties || {};
 
     var w = this.start.x - this.end.x;
@@ -7249,9 +7246,6 @@ var GreatCircle = function(start,end,properties) {
     }
 };
 
-/*
- * http://williams.best.vwh.net/avform.htm#Intermediate
- */
 GreatCircle.prototype.interpolate = function(f) {
     var A = Math.sin((1 - f) * this.g) / Math.sin(this.g);
     var B = Math.sin(f * this.g) / Math.sin(this.g);
@@ -7265,23 +7259,16 @@ GreatCircle.prototype.interpolate = function(f) {
 
 
 
-/*
- * Generate points along the great circle
- */
 GreatCircle.prototype.Arc = function(npoints,options) {
     var first_pass = [];
-    //var minx = 0;
-    //var maxx = 0;
-    if (npoints <= 2) {
+    if (!npoints || npoints <= 2) {
         first_pass.push([this.start.lon, this.start.lat]);
         first_pass.push([this.end.lon, this.end.lat]);
     } else {
         var delta = 1.0 / (npoints - 1);
-        for (var i = 0; i < npoints; i++) {
+        for (var i = 0; i < npoints; ++i) {
             var step = delta * i;
             var pair = this.interpolate(step);
-            //minx = Math.min(minx,pair[0]);
-            //maxx = Math.max(maxx,pair[0]);
             first_pass.push(pair);
         }
     }
@@ -7292,15 +7279,21 @@ GreatCircle.prototype.Arc = function(npoints,options) {
     */
     var bHasBigDiff = false;
     var dfMaxSmallDiffLong = 0;
-	var dfX = null;
-    for (var j = 1; j < first_pass.length; j++) {
-        //if (minx > 170 && maxx > 180) {
-        // }
+    // from http://www.gdal.org/ogr2ogr.html
+    // -datelineoffset:
+    // (starting with GDAL 1.10) offset from dateline in degrees (default long. = +/- 10deg, geometries within 170deg to -170deg will be splited)
+    var dfDateLineOffset = options && options.offset ? options.offset : 0;
+    var dfLeftBorderX = 180 - dfDateLineOffset;
+    var dfRightBorderX = -180 + dfDateLineOffset;
+    var dfDiffSpace = 360 - dfDateLineOffset;
+
+    // https://github.com/OSGeo/gdal/blob/7bfb9c452a59aac958bff0c8386b891edf8154ca/gdal/ogr/ogrgeometryfactory.cpp#L2342
+    for (var j = 1; j < first_pass.length; ++j) {
         var dfPrevX = first_pass[j-1][0];
-        dfX = first_pass[j][0];
+        var dfX = first_pass[j][0];
         var dfDiffLong = Math.abs(dfX - dfPrevX);
-        if (dfDiffLong > 350 &&
-            ((dfX > 170 && dfPrevX < -170) || (dfPrevX > 170 && dfX < -170))) {
+        if (dfDiffLong > dfDiffSpace &&
+            ((dfX > dfLeftBorderX && dfPrevX < dfRightBorderX) || (dfPrevX > dfLeftBorderX && dfX < dfRightBorderX))) {
             bHasBigDiff = true;
         } else if (dfDiffLong > dfMaxSmallDiffLong) {
             dfMaxSmallDiffLong = dfDiffLong;
@@ -7308,28 +7301,27 @@ GreatCircle.prototype.Arc = function(npoints,options) {
     }
 
     var poMulti = [];
-	var poNewLS = null;
-    if (bHasBigDiff && dfMaxSmallDiffLong < 10) {
-        poNewLS = [];
+    if (bHasBigDiff && dfMaxSmallDiffLong < dfDateLineOffset) {
+        var poNewLS = [];
         poMulti.push(poNewLS);
-        for (var k = 0; k < first_pass.length; k++) {
-            dfX = parseFloat(first_pass[k][0]);
-            if (k > 0 &&  Math.abs(dfX - first_pass[k-1][0]) > 350) {
+        for (var k = 0; k < first_pass.length; ++k) {
+            var dfX0 = parseFloat(first_pass[k][0]);
+            if (k > 0 &&  Math.abs(dfX0 - first_pass[k-1][0]) > dfDiffSpace) {
                 var dfX1 = parseFloat(first_pass[k-1][0]);
                 var dfY1 = parseFloat(first_pass[k-1][1]);
                 var dfX2 = parseFloat(first_pass[k][0]);
                 var dfY2 = parseFloat(first_pass[k][1]);
-                if (dfX1 > -180 && dfX1 < -170 && dfX2 == 180 &&
+                if (dfX1 > -180 && dfX1 < dfRightBorderX && dfX2 == 180 &&
                     k+1 < first_pass.length &&
-                   first_pass[k-1][0] > -180 && first_pass[k-1][0] < -170)
+                   first_pass[k-1][0] > -180 && first_pass[k-1][0] < dfRightBorderX)
                 {
                      poNewLS.push([-180, first_pass[k][1]]);
                      k++;
                      poNewLS.push([first_pass[k][0], first_pass[k][1]]);
                      continue;
-                } else if (dfX1 > 170 && dfX1 < 180 && dfX2 == -180 &&
+                } else if (dfX1 > dfLeftBorderX && dfX1 < 180 && dfX2 == -180 &&
                      k+1 < first_pass.length &&
-                     first_pass[k-1][0] > 170 && first_pass[k-1][0] < 180)
+                     first_pass[k-1][0] > dfLeftBorderX && first_pass[k-1][0] < 180)
                 {
                      poNewLS.push([180, first_pass[k][1]]);
                      k++;
@@ -7337,7 +7329,7 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                      continue;
                 }
 
-                if (dfX1 < -170 && dfX2 > 170)
+                if (dfX1 < dfRightBorderX && dfX2 > dfLeftBorderX)
                 {
                     // swap dfX1, dfX2
                     var tmpX = dfX1;
@@ -7348,7 +7340,7 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                     dfY1 = dfY2;
                     dfY2 = tmpY;
                 }
-                if (dfX1 > 170 && dfX2 < -170) {
+                if (dfX1 > dfLeftBorderX && dfX2 < dfRightBorderX) {
                     dfX2 += 360;
                 }
 
@@ -7356,9 +7348,9 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                 {
                     var dfRatio = (180 - dfX1) / (dfX2 - dfX1);
                     var dfY = dfRatio * dfY2 + (1 - dfRatio) * dfY1;
-                    poNewLS.push([first_pass[k-1][0] > 170 ? 180 : -180, dfY]);
+                    poNewLS.push([first_pass[k-1][0] > dfLeftBorderX ? 180 : -180, dfY]);
                     poNewLS = [];
-                    poNewLS.push([first_pass[k-1][0] > 170 ? -180 : 180, dfY]);
+                    poNewLS.push([first_pass[k-1][0] > dfLeftBorderX ? -180 : 180, dfY]);
                     poMulti.push(poNewLS);
                 }
                 else
@@ -7366,33 +7358,33 @@ GreatCircle.prototype.Arc = function(npoints,options) {
                     poNewLS = [];
                     poMulti.push(poNewLS);
                 }
-                poNewLS.push([dfX, first_pass[k][1]]);
+                poNewLS.push([dfX0, first_pass[k][1]]);
             } else {
                 poNewLS.push([first_pass[k][0], first_pass[k][1]]);
             }
         }
     } else {
-       // add normally
-        poNewLS = [];
-        poMulti.push(poNewLS);
-        for (var l = 0; l < first_pass.length; l++) {
-            poNewLS.push([first_pass[l][0],first_pass[l][1]]);
+        // add normally
+        var poNewLS0 = [];
+        poMulti.push(poNewLS0);
+        for (var l = 0; l < first_pass.length; ++l) {
+            poNewLS0.push([first_pass[l][0],first_pass[l][1]]);
         }
     }
 
     var arc = new Arc(this.properties);
-    for (var m = 0; m < poMulti.length; m++) {
+    for (var m = 0; m < poMulti.length; ++m) {
         var line = new LineString();
         arc.geometries.push(line);
         var points = poMulti[m];
-        for (var n = 0; n < points.length; n++) {
-            line.move_to(points[n]);
+        for (var j0 = 0; j0 < points.length; ++j0) {
+            line.move_to(points[j0]);
         }
     }
     return arc;
 };
 
-if (typeof window === 'undefined') {
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   // nodejs
   module.exports.Coord = Coord;
   module.exports.Arc = Arc;
@@ -7404,7 +7396,22 @@ if (typeof window === 'undefined') {
   arc.Coord = Coord;
   arc.Arc = Arc;
   arc.GreatCircle = GreatCircle;
-} /* Manifest =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+} /*! Leaflet.Geodesic 2.5.5-0 - (c) Henry Thasler - https://github.com/henrythasler/Leaflet.Geodesic */
+!function(t,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports,require("leaflet")):"function"==typeof define&&define.amd?define(["exports","leaflet"],n):n(((t=t||self).L=t.L||{},t.L.geodesic={}),t.L)}(this,(function(t,n){"use strict";
+/*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */var e=function(t,n){return(e=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,n){t.__proto__=n}||function(t,n){for(var e in n)n.hasOwnProperty(e)&&(t[e]=n[e])})(t,n)};function i(t,n){function i(){this.constructor=t}e(t,n),t.prototype=null===n?Object.create(n):(i.prototype=n.prototype,new i)}var a=function(){return(a=Object.assign||function(t){for(var n,e=1,i=arguments.length;e<i;e++)for(var a in n=arguments[e])Object.prototype.hasOwnProperty.call(n,a)&&(t[a]=n[a]);return t}).apply(this,arguments)};function s(){for(var t=0,n=0,e=arguments.length;n<e;n++)t+=arguments[n].length;var i=Array(t),a=0;for(n=0;n<e;n++)for(var s=arguments[n],o=0,r=s.length;o<r;o++,a++)i[a]=s[o];return i}var o=function(){function t(t){this.options={wrap:!0,steps:3},this.ellipsoid={a:6378137,b:6356752.3142,f:1/298.257223563},this.options=a(a({},this.options),t)}return t.prototype.toRadians=function(t){return t*Math.PI/180},t.prototype.toDegrees=function(t){return 180*t/Math.PI},t.prototype.mod=function(t,n){var e=t%n;return e<0?e+n:e},t.prototype.wrap360=function(t){return 0<=t&&t<360?t:this.mod(t,360)},t.prototype.wrap=function(t,n){return void 0===n&&(n=360),-n<=t&&t<=n?t:this.mod(t+n,2*n)-n},t.prototype.direct=function(t,n,e,i){void 0===i&&(i=100);var a=this.toRadians(t.lat),s=this.toRadians(t.lng),o=this.toRadians(n),r=e,h=1e3*Number.EPSILON,l=this.ellipsoid,c=l.a,p=l.b,u=l.f,g=Math.sin(o),f=Math.cos(o),d=(1-u)*Math.tan(a),M=1/Math.sqrt(1+d*d),L=d*M,y=Math.atan2(d,f),v=M*g,w=1-v*v,m=w*(c*c-p*p)/(p*p),b=1+m/16384*(4096+m*(m*(320-175*m)-768)),E=m/1024*(256+m*(m*(74-47*m)-128)),S=r/(p*b),O=null,P=null,R=null,x=null,D=0;do{R=Math.cos(2*y+S),x=S,S=r/(p*b)+E*(O=Math.sin(S))*(R+E/4*((P=Math.cos(S))*(2*R*R-1)-E/6*R*(4*O*O-3)*(4*R*R-3)))}while(Math.abs(S-x)>h&&++D<i);if(D>=i)throw new EvalError("Direct vincenty formula failed to converge after "+i+" iterations \n                (start="+t.lat+"/"+t.lng+"; bearing="+n+"; distance="+e+")");var G=L*O-M*P*f,N=Math.atan2(L*P+M*O*f,(1-u)*Math.sqrt(v*v+G*G)),j=u/16*w*(4+u*(4-3*w)),k=s+(Math.atan2(O*g,M*P-L*O*f)-(1-j)*u*v*(S+j*O*(R+j*P*(2*R*R-1)))),_=Math.atan2(v,-G);return{lat:this.toDegrees(N),lng:this.toDegrees(k),bearing:this.wrap360(this.toDegrees(_))}},t.prototype.inverse=function(t,e,i,a){void 0===i&&(i=100),void 0===a&&(a=!0);var s=t,o=e,r=this.toRadians(s.lat),h=this.toRadians(s.lng),l=this.toRadians(o.lat),c=this.toRadians(o.lng),p=Math.PI,u=Number.EPSILON,g=this.ellipsoid,f=g.a,d=g.b,M=g.f,L=c-h,y=(1-M)*Math.tan(r),v=1/Math.sqrt(1+y*y),w=y*v,m=(1-M)*Math.tan(l),b=1/Math.sqrt(1+m*m),E=m*b,S=Math.abs(L)>p/2||Math.abs(l-r)>p/2,O=L,P=null,R=null,x=S?p:0,D=0,G=S?-1:1,N=null,j=1,k=null,_=1,q=null,I=null,C=0;do{if(N=b*(P=Math.sin(O))*(b*P)+(v*E-w*b*(R=Math.cos(O)))*(v*E-w*b*R),Math.abs(N)<u)break;if(G=w*E+v*b*R,I=O,O=L+(1-(q=M/16*(_=1-(k=v*b*P/(D=Math.sqrt(N)))*k)*(4+M*(4-3*_))))*M*k*((x=Math.atan2(D,G))+q*D*((j=0!==_?G-2*w*E/_:0)+q*G*(2*j*j-1))),(S?Math.abs(O)-p:Math.abs(O))>p)throw new EvalError("λ > π")}while(Math.abs(O-I)>1e-12&&++C<i);if(C>=i){if(a)return this.inverse(t,new n.LatLng(e.lat,e.lng-.01),i,a);throw new EvalError("Inverse vincenty formula failed to converge after "+i+" iterations \n                    (start="+t.lat+"/"+t.lng+"; dest="+e.lat+"/"+e.lng+")")}var A=_*(f*f-d*d)/(d*d),B=A/1024*(256+A*(A*(74-47*A)-128)),J=d*(1+A/16384*(4096+A*(A*(320-175*A)-768)))*(x-B*D*(j+B/4*(G*(2*j*j-1)-B/6*j*(4*D*D-3)*(4*j*j-3)))),T=Math.abs(N)<u?0:Math.atan2(b*P,v*E-w*b*R),U=Math.abs(N)<u?p:Math.atan2(v*P,-w*b+v*E*R);return{distance:J,initialBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(T)),finalBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(U))}},t.prototype.intersection=function(t,e,i,a){var s=this.toRadians(t.lat),o=this.toRadians(t.lng),r=this.toRadians(i.lat),h=this.toRadians(i.lng),l=this.toRadians(e),c=this.toRadians(a),p=r-s,u=h-o,g=Math.PI,f=Number.EPSILON,d=2*Math.asin(Math.sqrt(Math.sin(p/2)*Math.sin(p/2)+Math.cos(s)*Math.cos(r)*Math.sin(u/2)*Math.sin(u/2)));if(Math.abs(d)<f)return t;var M=(Math.sin(r)-Math.sin(s)*Math.cos(d))/(Math.sin(d)*Math.cos(s)),L=(Math.sin(s)-Math.sin(r)*Math.cos(d))/(Math.sin(d)*Math.cos(r)),y=Math.acos(Math.min(Math.max(M,-1),1)),v=Math.acos(Math.min(Math.max(L,-1),1)),w=l-(Math.sin(h-o)>0?y:2*g-y),m=(Math.sin(h-o)>0?2*g-v:v)-c;if(0===Math.sin(w)&&0===Math.sin(m))return null;if(Math.sin(w)*Math.sin(m)<0)return null;var b=-Math.cos(w)*Math.cos(m)+Math.sin(w)*Math.sin(m)*Math.cos(d),E=Math.atan2(Math.sin(d)*Math.sin(w)*Math.sin(m),Math.cos(m)+Math.cos(w)*b),S=Math.asin(Math.min(Math.max(Math.sin(s)*Math.cos(E)+Math.cos(s)*Math.sin(E)*Math.cos(l),-1),1)),O=o+Math.atan2(Math.sin(l)*Math.sin(E)*Math.cos(s),Math.cos(E)-Math.sin(s)*Math.sin(S));return new n.LatLng(this.toDegrees(S),this.toDegrees(O))},t.prototype.midpoint=function(t,e){var i=this.toRadians(t.lat),a=this.toRadians(t.lng),s=this.toRadians(e.lat),o=this.toRadians(e.lng-t.lng),r=Math.cos(i),h=0,l=Math.sin(i),c={x:r+Math.cos(s)*Math.cos(o),y:h+Math.cos(s)*Math.sin(o),z:l+Math.sin(s)},p=Math.atan2(c.z,Math.sqrt(c.x*c.x+c.y*c.y)),u=a+Math.atan2(c.y,c.x);return new n.LatLng(this.toDegrees(p),this.toDegrees(u))},t}(),r=function(){function t(t){this.geodesic=new o,this.steps=t&&void 0!==t.steps?t.steps:3}return t.prototype.recursiveMidpoint=function(t,n,e){var i=[t,n],a=this.geodesic.midpoint(t,n);return e>0?(i.splice.apply(i,s([0,1],this.recursiveMidpoint(t,a,e-1))),i.splice.apply(i,s([i.length-2,2],this.recursiveMidpoint(a,n,e-1)))):i.splice(1,0,a),i},t.prototype.line=function(t,n){return this.recursiveMidpoint(t,n,Math.min(8,this.steps))},t.prototype.multiLineString=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=[],a=1;a<t.length;a++)i.splice.apply(i,s([i.length-1,1],n.line(t[a-1],t[a])));e.push(i)})),e},t.prototype.lineString=function(t){return this.multiLineString([t])[0]},t.prototype.splitLine=function(t,e){var i={point:new n.LatLng(89.9,-180.0000001),bearing:180},a={point:new n.LatLng(89.9,180.0000001),bearing:180},s=new n.LatLng(t.lat,t.lng),o=new n.LatLng(e.lat,e.lng);s.lng=this.geodesic.wrap(s.lng,360),o.lng=this.geodesic.wrap(o.lng,360),o.lng-s.lng>180?o.lng=o.lng-360:o.lng-s.lng<-180&&(o.lng=o.lng+360);var r=[[new n.LatLng(s.lat,this.geodesic.wrap(s.lng,180)),new n.LatLng(o.lat,this.geodesic.wrap(o.lng,180))]];if(s.lng>=-180&&s.lng<=180){if(o.lng<-180){var h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng+360),new n.LatLng(o.lat,o.lng+360)]])}else if(o.lng>180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,a.point,a.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng-360),new n.LatLng(o.lat,o.lng-360)]])}}else if(o.lng>=-180&&o.lng<=180)if(s.lng<-180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng+360),new n.LatLng(l.lat,l.lng+360)],[l,o]])}else if(s.lng>180){var l;h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng-360),new n.LatLng(l.lat,l.lng-360)],[l,o]])}return r},t.prototype.splitMultiLineString=function(t){var n=this,e=[];return t.forEach((function(t){if(1===t.length)e.push(t);else{for(var i=[],a=1;a<t.length;a++){var s=n.splitLine(t[a-1],t[a]);i.pop(),i=i.concat(s[0]),s.length>1&&(e.push(i),i=s[1])}e.push(i)}})),e},t.prototype.wrapMultiLineString=function(t){var e=[];return t.forEach((function(t){var i=[],a=null;t.forEach((function(t){if(null===a)i.push(t),a=t;else{var e=t.lng-a.lng,s=Math.sign(e/180)*Math.ceil(Math.abs(e/180));Math.abs(e)>180?i.push(new n.LatLng(t.lat,t.lng-180*s)):i.push(new n.LatLng(t.lat,t.lng))}})),e.push(i)})),e},t.prototype.circle=function(t,e){for(var i=[],a=0;a<this.steps;a++){var s=this.geodesic.direct(t,360/this.steps*a,e);i.push(new n.LatLng(s.lat,s.lng))}return i.push(new n.LatLng(i[0].lat,i[0].lng)),i},t.prototype.splitCircle=function(t){var n=[];return 3===(n=this.splitMultiLineString([t])).length&&(n[2]=s(n[2],n[0]),n.shift()),n},t.prototype.distance=function(t,e){return this.geodesic.inverse(new n.LatLng(t.lat,this.geodesic.wrap(t.lng,180)),new n.LatLng(e.lat,this.geodesic.wrap(e.lng,180))).distance},t.prototype.multilineDistance=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=0,a=1;a<t.length;a++)i+=n.distance(t[a-1],t[a]);e.push(i)})),e},t.prototype.updateStatistics=function(t,n){var e={};return e.distanceArray=this.multilineDistance(t),e.totalDistance=e.distanceArray.reduce((function(t,n){return t+n}),0),e.points=0,t.forEach((function(t){e.points+=t.reduce((function(t){return t+1}),0)})),e.vertices=0,n.forEach((function(t){e.vertices+=t.reduce((function(t){return t+1}),0)})),e},t}();function h(t){return"object"==typeof t&&null!==t&&"lat"in t&&"lng"in t&&"number"==typeof t.lat&&"number"==typeof t.lng}function l(t){return t instanceof Array&&"number"==typeof t[0]&&"number"==typeof t[1]}function c(t){return t instanceof n.LatLng||(!!l(t)||!!h(t))}function p(t){if(t instanceof n.LatLng)return t;if(l(t))return new n.LatLng(t[0],t[1]);if(h(t))return new n.LatLng(t.lat,t.lng);throw new Error("L.LatLngExpression expected. Unknown object found.")}var u=function(t){function e(e,i){var s=t.call(this,[],i)||this;return s.defaultOptions={wrap:!0,steps:3},s.statistics={},s.points=[],n.Util.setOptions(s,a(a({},s.defaultOptions),i)),s.geom=new r(s.options),void 0!==e&&s.setLatLngs(e),s}return i(e,t),e.prototype.updateGeometry=function(){var n;if(n=this.geom.multiLineString(this.points),this.statistics=this.geom.updateStatistics(this.points,n),this.options.wrap){var e=this.geom.splitMultiLineString(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,this.geom.wrapMultiLineString(n))},e.prototype.setLatLngs=function(t){return this.points=function(t){for(var n=[],e=function(e){if(c(e)){var i=[];return t.forEach((function(t){i.push(p(t))})),n.push(i),"break"}if(!(e instanceof Array))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");if(!c(e[0]))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");var a=[];e.forEach((function(t){a.push(p(t))})),n.push(a)},i=0,a=t;i<a.length;i++){if("break"===e(a[i]))break}return n}(t),this.updateGeometry(),this},e.prototype.addLatLng=function(t,n){var e=p(t);return 0===this.points.length?this.points.push([e]):void 0===n?this.points[this.points.length-1].push(e):n.push(e),this.updateGeometry(),this},e.prototype.fromGeoJson=function(t){var e=[],i=[];return"FeatureCollection"===t.type?i=t.features:"Feature"===t.type?i=[t]:["MultiPoint","LineString","MultiLineString","Polygon","MultiPolygon"].includes(t.type)?i=[{type:"Feature",geometry:t,properties:{}}]:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.type+'" not supported.'),i.forEach((function(t){switch(t.geometry.type){case"MultiPoint":case"LineString":e=s(e,[n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,0)]);break;case"MultiLineString":case"Polygon":e=s(e,n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,1));break;case"MultiPolygon":t.geometry.coordinates.forEach((function(t){e=s(e,n.GeoJSON.coordsToLatLngs(t,1))}));break;default:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.geometry.type+'" not supported.')}})),e.length&&this.setLatLngs(e),this},e.prototype.distance=function(t,n){return this.geom.distance(p(t),p(n))},e}(n.Polyline),g=function(t){function e(e,i){var s=t.call(this,[],i)||this;s.defaultOptions={wrap:!0,steps:24,fill:!0,noClip:!0},s.statistics={},n.Util.setOptions(s,a(a({},s.defaultOptions),i));var o=s.options;return s.radius=void 0===o.radius?1e6:o.radius,s.center=void 0===e?new n.LatLng(0,0):p(e),s.geom=new r(s.options),s.update(),s}return i(e,t),e.prototype.update=function(){var n=this.geom.circle(this.center,this.radius);if(this.statistics=this.geom.updateStatistics([[this.center]],[n]),this.statistics.totalDistance=this.geom.multilineDistance([n]).reduce((function(t,n){return t+n}),0),this.options.wrap){var e=this.geom.splitCircle(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,n)},e.prototype.distanceTo=function(t){var n=p(t);return this.geom.distance(this.center,n)},e.prototype.setLatLng=function(t,n){this.center=p(t),this.radius=n||this.radius,this.update()},e.prototype.setRadius=function(t,n){this.radius=t,this.center=n?p(n):this.center,this.update()},e}(n.Polyline);void 0!==window.L&&(window.L.Geodesic=u,window.L.geodesic=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(u.bind.apply(u,s([void 0],t)))},window.L.GeodesicCircle=g,window.L.geodesiccircle=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(g.bind.apply(g,s([void 0],t)))}),t.GeodesicCircleClass=g,t.GeodesicLine=u,Object.defineProperty(t,"__esModule",{value:!0})})); /* Manifest =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
 /* Manifest Base Classes /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
@@ -7421,6 +7428,7 @@ class Manifest {
 		this.Interface = new ManifestUI();
 		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
 		this.Visualization = new ManifestVisualization();		
+		this.Messenger = new ManifestMessenger(this.Atlas);
 	}
 
 	/** SupplyChain processor main wrapper function. **/
@@ -7726,20 +7734,44 @@ class Manifest {
 }
 
 class ManifestMessenger {
-	constructor() {
+	constructor(atlas) {
 		this.interval = null;
-		this.services = [];
+		this.objects = [];
+		
+		atlas.livelayer = new L.layerGroup();
+		atlas.map.addLayer(atlas.livelayer);		
+	}
+
+
+	Add(url, callback) {
+		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects.push(obj); console.log(this.objects);}); 
 	}
 	
-	Add(url, data, callback) {
+	AddObject(oid) {
+		let call = 'https://supplystudies.com/manifest/services/?type=aprsfi&id='+oid;
+		this.Add(call, function(d) {
+			console.log(d);
+			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
+			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
+			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #FF0080;">The vessel ${vessel.name}</div>`;
+			vessel.service = call;
+			vessel.mapref = MI.Atlas.livelayer.addLayer(new L.triangleMarker(vessel.latlng, vessel.style).bindTooltip(tooltipContent));
+			return vessel;
+		});
+	}
+	
+	Update() {
 		
 	}
-	
+	UpdateList() {
+		
+	}
 }
 
 /* Manifest Utility Class */
 class ManifestUtilities {
-	constructor() { this.URLMatch = /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }	
+	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
+	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((manifest?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }
 }
 
@@ -7778,7 +7810,7 @@ String.prototype.hashCode = function() {
 						
 		let mdetails = document.createElement('div');
 		mdetails.id = 'mdetails-'+id; mdetails.classList.add('mdetails');
-		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch, '<a href=\"$1\">$1</a>')}</div>`;
+		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>')}</div>`;
 	
 		let mlist = document.createElement('ul');
 		mlist.id = 'mlist-'+id; mlist.classList.add('mlist');
@@ -7811,7 +7843,7 @@ String.prototype.hashCode = function() {
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), title: 'Node', description: '', placename: '', category: '', images: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -7821,7 +7853,7 @@ String.prototype.hashCode = function() {
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
-			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch, '<a href="$1">$1</a>');
+			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>');
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			if (d.mapper) { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; }
 				
@@ -7833,6 +7865,7 @@ String.prototype.hashCode = function() {
 			}	
 		}
 		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
+		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href); e.preventDefault(); }); });	
 		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
 	
 		// Prepare to add layers
@@ -7847,7 +7880,7 @@ String.prototype.hashCode = function() {
 			return L.triangleMarker(latlng, MI.Atlas.styles.arrow);
 		} });
 		d.details.layers.push(maplayergroup.addLayer(arrowLayer));	
-
+		
 		// Setup Pointlayer
 		for (let i in points.features) { 
 			for (let j in points.features) { 	
@@ -7888,7 +7921,7 @@ String.prototype.hashCode = function() {
 	}
 	
 	SetupStyle(d) {
-		let styling = {color: MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
+		let styling = {color: d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
@@ -7898,9 +7931,9 @@ String.prototype.hashCode = function() {
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid;
-		
+
 		li.innerHTML = `
-		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};"></div>
+		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
@@ -7909,18 +7942,19 @@ String.prototype.hashCode = function() {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" />' : "").join("")}</div>
-		<p class="description">${ft.properties.description}</p>
+		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+src+'</li>' : "").join("").replace(ManifestUtilities.URLMatch, '<a href="$1">$1</a>')}
+				${ft.properties.sources.map(src => src ? '<li>'+src.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>').replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>')+'</li>' : "").join("")}
 				${ft.properties.notes}
 			</ol>
 		</details>`;
 		
 		document.getElementById('mlist-'+d.details.id).append(li);			
-		document.querySelectorAll('#local_'+ft.properties.lid+' .pdetails').forEach(el => { if (!el.textContent.replace(/\s/g, '').length) {
-			el.style.display = 'none';
+		document.querySelectorAll('#local_'+ft.properties.lid+' .pdetails p, #local_'+ft.properties.lid+' div.featuredimages', '#local_'+ft.properties.lid+' p.description')
+			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
+				el.remove();
 	  	} }); 
 		
 		return ft;
@@ -7930,7 +7964,7 @@ String.prototype.hashCode = function() {
 		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
 		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
 		if (fromx === tox && fromy === toy) { fromx = tox = fromy = toy = 0; }
-	
+		
 		ft.geometry.type = 'MultiLineString';
 		ft.properties.type = 'line';
 		ft.properties.clustered = null;
@@ -7939,8 +7973,34 @@ String.prototype.hashCode = function() {
 		let selectedlinetype = this.linetypes.greatcircle;
 		if (selectedlinetype  === this.linetypes.greatcircle) { multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); } 
 		else if (selectedlinetype === this.linetypes.bezier) { multipass = Grate.bezier_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); }
-	
-		ft.geometry.coordinates = multipass;
+		
+		let sign = Number(Math.sign(multipass[0][0][0] - multipass[0][1][0])), breakstart = 0, breakend = multipass.length, checksign = 0;
+        for (let i = 0; i < multipass[0].length-1; i++) {		
+			checksign = Math.sign(multipass[0][i][0] - multipass[0][i+1][0]);	
+			if (checksign != sign && multipass[0][i][0] != multipass[0][i+1][0]) {
+				if (breakstart === 0) { breakstart = i;} breakend = i;
+			}  
+		}
+		
+		if ( breakstart !== 0 && !isNaN(sign)) { 
+			if (sign === 1) {
+				let part1 = multipass[0].slice(0, breakstart); part1.push([-180, part1[part1.length-1][1]]);
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([180, part1[part1.length-1][1]]);
+				//let extend1 = part1.map(x => [x[0]+360,x[1]]), extend2 = part2.map(x => [x[0]-360,x[1]]);
+				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
+				ft.geometry.coordinates = [part1, part2];
+				
+			} else if (sign === -1) {
+				let part1 = multipass[0].slice(0, breakstart); part1.push([180, part1[part1.length-1][1]]); 
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([-180, part1[part1.length-1][1]]);
+				//let extend1 = part1.map(x => [x[0]-360,x[1]]), extend2 = part2.map(x => [x[0]+360,x[1]]);
+				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
+				ft.geometry.coordinates = [part1, part2];
+			}
+		} 
+		else { ft.geometry.coordinates = multipass; }
+		
+		ft.geometry.raw = multipass;
 		ft.properties.style = Object.assign(MI.Atlas.styles.line, {color: d.details.style.darkColor});
 		ft.properties.basestyle = MI.Atlas.styles.line;
 				
@@ -7962,19 +8022,18 @@ String.prototype.hashCode = function() {
 	}
 
 	SetupArrow(ft, d, index) {	
-		let midindex = Math.floor((ft.geometry.coordinates[0].length-1)*0.8);
-		let middle = ft.geometry.coordinates[0][midindex];		
-		let angle = Math.atan2(ft.geometry.coordinates[0][midindex+5][0] - ft.geometry.coordinates[0][midindex-5][0], ft.geometry.coordinates[0][midindex+5][1] - ft.geometry.coordinates[0][midindex-5][1]) * 180 / Math.PI;
+		let midindex = Math.floor((ft.geometry.raw[0].length-1)*0.8);
+		let middle = ft.geometry.raw[0][midindex];		
+		let angle = Math.atan2(ft.geometry.raw[0][midindex+5][0] - ft.geometry.raw[0][midindex-5][0], ft.geometry.raw[0][midindex+5][1] - ft.geometry.raw[0][midindex-5][1]) * 180 / Math.PI;
 
 		let arrow = {
 			type: 'Feature',
 			properties: ft.properties,
-			geometry: { type: 'Point', coordinates:  ft.geometry.coordinates[0][midindex] }
+			geometry: { type: 'Point', coordinates:  ft.geometry.raw[0][midindex] }
 		};
 		Object.assign(arrow.properties, { type: 'arrow', angle: angle, 
 			style: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}),
 			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
-					
 		return arrow;
 	}	
 
@@ -8084,7 +8143,7 @@ class ManifestAtlas {
 	constructor(options) {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
-			preferCanvas: true, minZoom: 2, worldCopyJump: true, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
+			preferCanvas: true, minZoom: 2, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
 			scrollWheelZoom: false, closePopupOnClick: pop 
 		});
 		this.maplayer = null;
@@ -8107,25 +8166,26 @@ class ManifestAtlas {
 		
 		/* Define Layers */
 		this.layerdefs = {
-			'google': new L.TileLayer(this.tiletypes.GOOGLE, 
+			google: new L.TileLayer(this.tiletypes.GOOGLE, 
 				{ maxZoom: 20, className: 'googlebase', detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
-			'light': new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
-			'terrain': new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
-			'satellite': new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
-		 	'dark': new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+			light: new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
+			terrain: new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
+			satellite: new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
+		 	dark: new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
 
-			'shipping': new L.TileLayer(this.tiletypes.SHIPPING, 
+			shipping: new L.TileLayer(this.tiletypes.SHIPPING, 
 				{ maxNativeZoom: 4, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
-			'marine': new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
-			'rail': new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
+			marine: new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
+			rail: new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
 		};
 						  
 		/* Styles */
 		this.styles = {
 			'point': { fillColor: '#eeeeee', color: '#999999', radius: 8, weight: 4, opacity: 1, fillOpacity: 1 },
 			'highlight': { fillColor: '#ffffff' },
-			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 0 },
-			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 }	
+			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 3, opacity: 0.2, smoothFactor: 1 },
+			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 },
+			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
 		};
 	
 		// Map configuration
@@ -8136,6 +8196,9 @@ class ManifestAtlas {
 
 		if (document.body.classList.contains('light')) { this.map.addLayer(this.layerdefs.google); } 
 		else if (document.body.classList.contains('dark')) { this.map.addLayer(this.layerdefs.dark); }	
+		
+		// Add Shipping Layer
+		this.map.addLayer(this.layerdefs.shipping);		
 	}
 	
 	Refresh() { this.map._renderer._redraw(); }
@@ -8154,6 +8217,11 @@ class ManifestAtlas {
 
 			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		}
+		
+		document.querySelectorAll('.leaflet-popup-content .manifest-link').forEach(el => { el.addEventListener('click', (e) => {  
+			MI.Interface.Link(el.href); e.preventDefault(); 
+		}); });	
+		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
@@ -8185,7 +8253,7 @@ class ManifestAtlas {
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
-		<p>${feature.properties.description}</p>`;
+		<p>${feature.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>`;
 
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
@@ -8203,7 +8271,7 @@ class ManifestAtlas {
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
-					<p>${ft.properties.description}</p>
+					<p>${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 				</div>`;
 			}
 		} 	
@@ -8371,9 +8439,9 @@ class ManifestAtlas {
 	
 	DisplayLayers(show=true) {
 		if (show) {   
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.style.display = 'block'; }); }
+			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.remove('closed'); }); }
 		else { if (this.active_point !== null && this.active_point.closePopup) { this.active_point.closePopup(); } 
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.style.display = 'none'; }); }	
+			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.add('closed'); }); }	
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {
@@ -8483,7 +8551,7 @@ class ManifestAtlas {
 		}
 	}
 
-	LoadFromLauncher(value) {
+	LoadFromLauncher(value, close=true) {
 		let unloaded = false, loadurl, id, type;
 	
 		if (value === 'url') {
@@ -8500,7 +8568,8 @@ class ManifestAtlas {
 			}
 				
 		} else {
-			let option = document.getElementById('load-samples').value.split('-');
+			let val = value ? value : document.getElementById('load-samples').value;
+			let option = val.split('-');
 			type = option[0];	
 			option = [option.shift(), option.join('-')];
 			id = option[1];
@@ -8515,8 +8584,8 @@ class ManifestAtlas {
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
 			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, start:MI.supplychains.length === 0}));
-			//$.getJSON(loadurl, function(d) { });					
-			MI.Interface.ShowLauncher();
+			//$.getJSON(loadurl, function(d) { });				
+			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
 	}
 	
@@ -8572,6 +8641,11 @@ class ManifestAtlas {
 		MI.Interface.prevsearch = null;
 	}
 	
+	Link(link) {
+		console.log("manifest-http://"+link.substr(7));
+		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
+	}
+	
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');
@@ -8613,10 +8687,10 @@ class ManifestAtlas {
 	
 	SetDocumentTitle() {
 		let scTitles = [];
-		for (let sc of MI.supplychains) {
-			scTitles.push(sc.properties.title);
-		}
-		document.title = scTitles.join(' + ') + ' - Manifest';
+		for (let sc of MI.supplychains) { scTitles.push(sc.properties.title); }
+		
+		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { document.title = 'Manifest'; } 
+		else { document.title = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
 	}
 	
 	ManifestResize() { MI.Visualization.Resize(); }
@@ -8753,7 +8827,7 @@ class ManifestAtlas {
 					graph.nodes = graph.nodes.concat(ngraph.nodes);
 					graph.links = graph.links.concat(ngraph.links);
 				} else {
-					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an undirected graph).');
+					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an unconnected graph).');
 				}} 
 			}
 			if (type === 'forcegraph') { this.forcegraph = new ForceGraph(graph);  this.forcegraph.Run(); 
@@ -8838,9 +8912,12 @@ class ManifestAtlas {
 	}
 	
 	Resize() {
+		this.width = window.innerWidth; 
+		this.height = window.innerHeight;
+		if (MI.Interface.IsMobile()) { this.height = document.getElementById('vizshell').clientHeight; }	
+		
 		let svg = document.getElementById('vizshell');
-		svg.setAttribute('viewBox','0 0 '+window.innerWidth+' '+window.innerHeight);
-		svg.setAttribute('width',window.innerWidth); svg.setAttribute('height',window.innerHeight); 
+		svg.setAttribute('width',this.width); svg.setAttribute('height',this.height); 
 		this.Update();
 	}
 	Clear() {
@@ -8930,17 +9007,19 @@ class ForceGraph {
 		this.valueline = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCatmullRomClosed);	
 	}
 	
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return document.getElementById('sidepanel').clientWidth; }
-			else { return 0; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return document.getElementById('sidepanel').clientWidth; }
+			else { return 0; }} 
+		else { return 0; }
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	
@@ -9156,7 +9235,7 @@ class SankeyDiagram {
 			
 		this.nodes.attr('opacity', d => { if (d.ref.properties.hidden) {return 0.1; } else { return 1;} });
 	}
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
 			return document.getElementById('sidepanel').clientWidth; }
@@ -9166,13 +9245,14 @@ class SankeyDiagram {
 		let off = 0;
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { off = document.getElementById('sidepanel').clientWidth; } }
 		return {top: ManifestUtilities.RemToPixels(5.5), right: ManifestUtilities.RemToPixels(1), 
-			bottom: ManifestUtilities.RemToPixels(4), left: (ManifestUtilities.RemToPixels(4.2)+off)};
+			bottom: ManifestUtilities.RemToPixels(5.5), left: (ManifestUtilities.RemToPixels(4.2)+off)};
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	
@@ -9269,17 +9349,18 @@ class ChordDiagram {
 	get outerRadius() { return Math.min(this.width, this.height/1.4) * 0.5 - 40; }
     get innerRadius() { return this.outerRadius - 10; }
 	
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
 			return document.getElementById('sidepanel').clientWidth; }
 			else { return 0; }}
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	
@@ -9307,7 +9388,8 @@ class ChordDiagram {
 				default: LoadError('Option not supported');
 			}  LoadCollection("json/samples.json", false);
 		}
-	} else { LoadCollection("json/samples.json", true); }
+	} else { 
+		LoadIntroduction();  }
 
 	function LoadError(msg) { 
 		document.getElementById('loadermessage').innerHTML = '['+msg+']'; 
@@ -9322,6 +9404,18 @@ class ChordDiagram {
 		} else {
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
+	}
+	
+	function LoadIntroduction() {
+		if (!MI.Interface.IsMobile()) {
+			fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id})).then(r => Start())).then(fetch("json/manifest.json")
+				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), start:true})).then(r => Start()))
+				.catch(e => LoadError(e));
+		} else {
+		fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
+			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+		}
 	}
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 	//	var starters = [5333,2239,602,5228,4532,2737,5228]; ... if(d.featured)
@@ -9344,13 +9438,16 @@ class ChordDiagram {
 	}	
 	
 	function Start() {
-		MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
+	//	MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
 		MI.Atlas.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 				
 		if (MI.supplychains.length > 0) {
 			if (MI.Atlas.active_point === null) { MI.Atlas.SetView(); }
 			if (!(MI.initialized)) { MI.Interface.CleanupInterface(); }   
 		}
+		
+		//MI.Messenger.AddObject(353136000);
+		
 	}
 	
 	// Do Testing

@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				default: LoadError('Option not supported');
 			}  LoadCollection("json/samples.json", false);
 		}
-	} else { LoadCollection("json/samples.json", true); }
+	} else { 
+		LoadIntroduction();  }
 
 	function LoadError(msg) { 
 		document.getElementById('loadermessage').innerHTML = '['+msg+']'; 
@@ -31,6 +32,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		} else {
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
+	}
+	
+	function LoadIntroduction() {
+		if (!MI.Interface.IsMobile()) {
+			fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id})).then(r => Start())).then(fetch("json/manifest.json")
+				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), start:true})).then(r => Start()))
+				.catch(e => LoadError(e));
+		} else {
+		fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
+			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+		}
 	}
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 	//	var starters = [5333,2239,602,5228,4532,2737,5228]; ... if(d.featured)
@@ -53,13 +66,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}	
 	
 	function Start() {
-		MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
+	//	MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
 		MI.Atlas.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 				
 		if (MI.supplychains.length > 0) {
 			if (MI.Atlas.active_point === null) { MI.Atlas.SetView(); }
 			if (!(MI.initialized)) { MI.Interface.CleanupInterface(); }   
 		}
+		
+		//MI.Messenger.AddObject(353136000);
+		
 	}
 	
 	// Do Testing

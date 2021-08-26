@@ -4992,5 +4992,15 @@ readers do not read off random characters that represent icons */
 	body.editor .inputfile + label { margin:0 auto 0.5rem auto; width: calc(90% - 2px - 0.75rem); display:block;}
 	body.editor .je-tab--top { width:calc(100% - 1rem);}
 	
+	body.datapage #datawrap { width:100%;}
+	body.datapage #datawrap p {font-size:1rem; padding:0 1rem;}
+	body.datapage #datawrap h3 { margin:0.5rem 0 0 0; padding:0 1rem;}
+	body.datapage #datawrap .name { padding:0.45rem 0;}
 	
+	body.datapage .dataviewer, body.datapage .dataviewer .list { width:100%; overflow:hidden;}
+	body.datapage .dataviewer .list { padding:0;}
+	body.datapage .dataviewer .list li { margin:0; font-size:1rem;}
+	body.datapage #manifestlist li { border:0; padding-left:5rem; padding-right:1rem; width:auto;}
+	body.datapage #datasort { display:none;}
+	body.datapage #datasearch { display:inline; width:calc(100% - 2rem); margin-left: 1rem; margin-right:1rem;}
  }

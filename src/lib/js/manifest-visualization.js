@@ -59,7 +59,7 @@ class ManifestVisualization {
 					graph.nodes = graph.nodes.concat(ngraph.nodes);
 					graph.links = graph.links.concat(ngraph.links);
 				} else {
-					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an undirected graph).');
+					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an unconnected graph).');
 				}} 
 			}
 			if (type === 'forcegraph') { this.forcegraph = new ForceGraph(graph);  this.forcegraph.Run(); 
@@ -144,9 +144,12 @@ class ManifestVisualization {
 	}
 	
 	Resize() {
+		this.width = window.innerWidth; 
+		this.height = window.innerHeight;
+		if (MI.Interface.IsMobile()) { this.height = document.getElementById('vizshell').clientHeight; }	
+		
 		let svg = document.getElementById('vizshell');
-		svg.setAttribute('viewBox','0 0 '+window.innerWidth+' '+window.innerHeight);
-		svg.setAttribute('width',window.innerWidth); svg.setAttribute('height',window.innerHeight); 
+		svg.setAttribute('width',this.width); svg.setAttribute('height',this.height); 
 		this.Update();
 	}
 	Clear() {
@@ -236,17 +239,19 @@ class ForceGraph {
 		this.valueline = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCatmullRomClosed);	
 	}
 	
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return document.getElementById('sidepanel').clientWidth; }
-			else { return 0; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return document.getElementById('sidepanel').clientWidth; }
+			else { return 0; }} 
+		else { return 0; }
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	
@@ -462,7 +467,7 @@ class SankeyDiagram {
 			
 		this.nodes.attr('opacity', d => { if (d.ref.properties.hidden) {return 0.1; } else { return 1;} });
 	}
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
 			return document.getElementById('sidepanel').clientWidth; }
@@ -472,13 +477,14 @@ class SankeyDiagram {
 		let off = 0;
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { off = document.getElementById('sidepanel').clientWidth; } }
 		return {top: ManifestUtilities.RemToPixels(5.5), right: ManifestUtilities.RemToPixels(1), 
-			bottom: ManifestUtilities.RemToPixels(4), left: (ManifestUtilities.RemToPixels(4.2)+off)};
+			bottom: ManifestUtilities.RemToPixels(5.5), left: (ManifestUtilities.RemToPixels(4.2)+off)};
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	
@@ -575,17 +581,18 @@ class ChordDiagram {
 	get outerRadius() { return Math.min(this.width, this.height/1.4) * 0.5 - 40; }
     get innerRadius() { return this.outerRadius - 10; }
 	
-	get width() { return window.innerWidth; }
+	get width() { return MI.Visualization.width; }
 	get xoffset() {
 		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
 			return document.getElementById('sidepanel').clientWidth; }
 			else { return 0; }}
 	}
-	get height() { if (MI.Interface.IsMobile()) { return document.getElementById('vizwrap').clientHeight; } else { return window.innerHeight; } }
+	get height() { return MI.Visualization.height; }
 	get xpos() {
-		if (!(MI.Interface.IsMobile())) { if (!document.body.classList.contains('fullscreen')) { 
-			return (this.width + document.getElementById('sidepanel').clientWidth) / 2; } 
-		else { return this.width / 2; }}
+		if (!(MI.Interface.IsMobile())) { 
+			if (!document.body.classList.contains('fullscreen')) { return (this.width + document.getElementById('sidepanel').clientWidth) / 2; }
+			else { return this.width / 2; }} 
+		else { return this.width / 2; }
 	}
 	get ypos() { return this.height / 2; }
 	

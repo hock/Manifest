@@ -26,7 +26,7 @@ class ManifestSupplyChain {
 						
 		let mdetails = document.createElement('div');
 		mdetails.id = 'mdetails-'+id; mdetails.classList.add('mdetails');
-		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch, '<a href=\"$1\">$1</a>')}</div>`;
+		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>')}</div>`;
 	
 		let mlist = document.createElement('ul');
 		mlist.id = 'mlist-'+id; mlist.classList.add('mlist');
@@ -59,7 +59,7 @@ class ManifestSupplyChain {
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), title: 'Node', description: '', placename: '', category: '', images: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -69,7 +69,7 @@ class ManifestSupplyChain {
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
-			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch, '<a href="$1">$1</a>');
+			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>');
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			if (d.mapper) { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; }
 				
@@ -81,6 +81,7 @@ class ManifestSupplyChain {
 			}	
 		}
 		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
+		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href); e.preventDefault(); }); });	
 		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
 	
 		// Prepare to add layers
@@ -95,7 +96,7 @@ class ManifestSupplyChain {
 			return L.triangleMarker(latlng, MI.Atlas.styles.arrow);
 		} });
 		d.details.layers.push(maplayergroup.addLayer(arrowLayer));	
-
+		
 		// Setup Pointlayer
 		for (let i in points.features) { 
 			for (let j in points.features) { 	
@@ -136,7 +137,7 @@ class ManifestSupplyChain {
 	}
 	
 	SetupStyle(d) {
-		let styling = {color: MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
+		let styling = {color: d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
@@ -146,9 +147,9 @@ class ManifestSupplyChain {
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid;
-		
+
 		li.innerHTML = `
-		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};"></div>
+		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
@@ -157,18 +158,19 @@ class ManifestSupplyChain {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" />' : "").join("")}</div>
-		<p class="description">${ft.properties.description}</p>
+		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+src+'</li>' : "").join("").replace(ManifestUtilities.URLMatch, '<a href="$1">$1</a>')}
+				${ft.properties.sources.map(src => src ? '<li>'+src.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>').replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>')+'</li>' : "").join("")}
 				${ft.properties.notes}
 			</ol>
 		</details>`;
 		
 		document.getElementById('mlist-'+d.details.id).append(li);			
-		document.querySelectorAll('#local_'+ft.properties.lid+' .pdetails').forEach(el => { if (!el.textContent.replace(/\s/g, '').length) {
-			el.style.display = 'none';
+		document.querySelectorAll('#local_'+ft.properties.lid+' .pdetails p, #local_'+ft.properties.lid+' div.featuredimages', '#local_'+ft.properties.lid+' p.description')
+			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
+				el.remove();
 	  	} }); 
 		
 		return ft;
@@ -178,7 +180,7 @@ class ManifestSupplyChain {
 		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
 		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
 		if (fromx === tox && fromy === toy) { fromx = tox = fromy = toy = 0; }
-	
+		
 		ft.geometry.type = 'MultiLineString';
 		ft.properties.type = 'line';
 		ft.properties.clustered = null;
@@ -187,8 +189,34 @@ class ManifestSupplyChain {
 		let selectedlinetype = this.linetypes.greatcircle;
 		if (selectedlinetype  === this.linetypes.greatcircle) { multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); } 
 		else if (selectedlinetype === this.linetypes.bezier) { multipass = Grate.bezier_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); }
-	
-		ft.geometry.coordinates = multipass;
+		
+		let sign = Number(Math.sign(multipass[0][0][0] - multipass[0][1][0])), breakstart = 0, breakend = multipass.length, checksign = 0;
+        for (let i = 0; i < multipass[0].length-1; i++) {		
+			checksign = Math.sign(multipass[0][i][0] - multipass[0][i+1][0]);	
+			if (checksign != sign && multipass[0][i][0] != multipass[0][i+1][0]) {
+				if (breakstart === 0) { breakstart = i;} breakend = i;
+			}  
+		}
+		
+		if ( breakstart !== 0 && !isNaN(sign)) { 
+			if (sign === 1) {
+				let part1 = multipass[0].slice(0, breakstart); part1.push([-180, part1[part1.length-1][1]]);
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([180, part1[part1.length-1][1]]);
+				//let extend1 = part1.map(x => [x[0]+360,x[1]]), extend2 = part2.map(x => [x[0]-360,x[1]]);
+				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
+				ft.geometry.coordinates = [part1, part2];
+				
+			} else if (sign === -1) {
+				let part1 = multipass[0].slice(0, breakstart); part1.push([180, part1[part1.length-1][1]]); 
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([-180, part1[part1.length-1][1]]);
+				//let extend1 = part1.map(x => [x[0]-360,x[1]]), extend2 = part2.map(x => [x[0]+360,x[1]]);
+				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
+				ft.geometry.coordinates = [part1, part2];
+			}
+		} 
+		else { ft.geometry.coordinates = multipass; }
+		
+		ft.geometry.raw = multipass;
 		ft.properties.style = Object.assign(MI.Atlas.styles.line, {color: d.details.style.darkColor});
 		ft.properties.basestyle = MI.Atlas.styles.line;
 				
@@ -210,19 +238,18 @@ class ManifestSupplyChain {
 	}
 
 	SetupArrow(ft, d, index) {	
-		let midindex = Math.floor((ft.geometry.coordinates[0].length-1)*0.8);
-		let middle = ft.geometry.coordinates[0][midindex];		
-		let angle = Math.atan2(ft.geometry.coordinates[0][midindex+5][0] - ft.geometry.coordinates[0][midindex-5][0], ft.geometry.coordinates[0][midindex+5][1] - ft.geometry.coordinates[0][midindex-5][1]) * 180 / Math.PI;
+		let midindex = Math.floor((ft.geometry.raw[0].length-1)*0.8);
+		let middle = ft.geometry.raw[0][midindex];		
+		let angle = Math.atan2(ft.geometry.raw[0][midindex+5][0] - ft.geometry.raw[0][midindex-5][0], ft.geometry.raw[0][midindex+5][1] - ft.geometry.raw[0][midindex-5][1]) * 180 / Math.PI;
 
 		let arrow = {
 			type: 'Feature',
 			properties: ft.properties,
-			geometry: { type: 'Point', coordinates:  ft.geometry.coordinates[0][midindex] }
+			geometry: { type: 'Point', coordinates:  ft.geometry.raw[0][midindex] }
 		};
 		Object.assign(arrow.properties, { type: 'arrow', angle: angle, 
 			style: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}),
 			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
-					
 		return arrow;
 	}	
 

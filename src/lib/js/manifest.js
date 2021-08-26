@@ -15,6 +15,7 @@ class Manifest {
 		this.Interface = new ManifestUI();
 		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
 		this.Visualization = new ManifestVisualization();		
+		this.Messenger = new ManifestMessenger(this.Atlas);
 	}
 
 	/** SupplyChain processor main wrapper function. **/
@@ -320,20 +321,44 @@ class Manifest {
 }
 
 class ManifestMessenger {
-	constructor() {
+	constructor(atlas) {
 		this.interval = null;
-		this.services = [];
+		this.objects = [];
+		
+		atlas.livelayer = new L.layerGroup();
+		atlas.map.addLayer(atlas.livelayer);		
+	}
+
+
+	Add(url, callback) {
+		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects.push(obj); console.log(this.objects);}); 
 	}
 	
-	Add(url, data, callback) {
+	AddObject(oid) {
+		let call = 'https://supplystudies.com/manifest/services/?type=aprsfi&id='+oid;
+		this.Add(call, function(d) {
+			console.log(d);
+			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
+			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
+			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #FF0080;">The vessel ${vessel.name}</div>`;
+			vessel.service = call;
+			vessel.mapref = MI.Atlas.livelayer.addLayer(new L.triangleMarker(vessel.latlng, vessel.style).bindTooltip(tooltipContent));
+			return vessel;
+		});
+	}
+	
+	Update() {
 		
 	}
-	
+	UpdateList() {
+		
+	}
 }
 
 /* Manifest Utility Class */
 class ManifestUtilities {
-	constructor() { this.URLMatch = /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }	
+	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
+	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((manifest?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }
 }
 

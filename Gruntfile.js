@@ -17,9 +17,9 @@ module.exports = function(grunt) {
 						}
 					},
 					data: {
-						baseurl: "http://hockbook.local/Manifest/dist/",
-						minify: "", // or .min
-						version: "0.1.1"
+						baseurl: "https://supplystudies.com/manifest/",
+						minify: ".min", // or .min
+						version: "0.2"
 					}
 				}
 			}
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/grate.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js', 'src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
+				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/grate.js', 'src/lib/js/leaflet/geodesic.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js', 'src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {
@@ -75,11 +75,11 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-static.js'				
 			},
 			js_data: {
-				src: ['src/lib/js/inc/list.js','src/lib/js/static.js','src/lib/js/datatable.js'],
+				src: ['src/lib/js/inc/list.js','src/lib/js/static.js','src/lib/js/data.js'],
 				dest: 'dist/js/<%= pkg.name %>-data.js'
 			},
 			js_edit: {
-				src: ['src/lib/js/inc/jsoneditor.js','src/lib/js/edit.js'],
+				src: ['src/lib/js/inc/simplemde.js','src/lib/js/inc/jsoneditor.js','src/lib/js/edit.js'],
 				dest: 'dist/js/<%= pkg.name %>-edit.js'
 			},
 			js_services: {
@@ -91,7 +91,7 @@ module.exports = function(grunt) {
 				dest: 'dist/css/<%= pkg.name %>-main.css'
 			},
 			css_edit: {
-				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/editor.css'],
+				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/simplemde.css','src/lib/css/editor.css'],
 				dest: 'dist/css/<%= pkg.name %>-edit.css'
 			},
 			css_static: {

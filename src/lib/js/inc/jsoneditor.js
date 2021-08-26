@@ -17771,10 +17771,11 @@ var SimplemdeEditor = /*#__PURE__*/function (_StringEditor) {
 
         /* single property options from schema "options.simplemde" */
         options = this.expandCallbacks('simplemde', Object(_utilities_js__WEBPACK_IMPORTED_MODULE_18__["extend"])({}, {
-          height: 300
+			height: 300, spellChecker: false, hideIcons: ['side-by-side','fullscreen'], styleSelectedText: false
         }, this.defaults.options.simplemde || {}, this.options.simplemde || {}, {
           element: this.input
         }));
+
         this.simplemde_instance = new window.SimpleMDE(options);
 
         if (this.schema.readOnly || this.schema.readonly || this.schema.template) {

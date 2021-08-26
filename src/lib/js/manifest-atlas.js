@@ -3,7 +3,7 @@ class ManifestAtlas {
 	constructor(options) {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
-			preferCanvas: true, minZoom: 2, worldCopyJump: true, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
+			preferCanvas: true, minZoom: 2, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
 			scrollWheelZoom: false, closePopupOnClick: pop 
 		});
 		this.maplayer = null;
@@ -26,25 +26,26 @@ class ManifestAtlas {
 		
 		/* Define Layers */
 		this.layerdefs = {
-			'google': new L.TileLayer(this.tiletypes.GOOGLE, 
+			google: new L.TileLayer(this.tiletypes.GOOGLE, 
 				{ maxZoom: 20, className: 'googlebase', detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
-			'light': new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
-			'terrain': new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
-			'satellite': new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
-		 	'dark': new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+			light: new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
+			terrain: new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
+			satellite: new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
+		 	dark: new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
 
-			'shipping': new L.TileLayer(this.tiletypes.SHIPPING, 
+			shipping: new L.TileLayer(this.tiletypes.SHIPPING, 
 				{ maxNativeZoom: 4, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
-			'marine': new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
-			'rail': new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
+			marine: new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
+			rail: new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
 		};
 						  
 		/* Styles */
 		this.styles = {
 			'point': { fillColor: '#eeeeee', color: '#999999', radius: 8, weight: 4, opacity: 1, fillOpacity: 1 },
 			'highlight': { fillColor: '#ffffff' },
-			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 0 },
-			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 }	
+			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 3, opacity: 0.2, smoothFactor: 1 },
+			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 },
+			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
 		};
 	
 		// Map configuration
@@ -55,6 +56,9 @@ class ManifestAtlas {
 
 		if (document.body.classList.contains('light')) { this.map.addLayer(this.layerdefs.google); } 
 		else if (document.body.classList.contains('dark')) { this.map.addLayer(this.layerdefs.dark); }	
+		
+		// Add Shipping Layer
+		this.map.addLayer(this.layerdefs.shipping);		
 	}
 	
 	Refresh() { this.map._renderer._redraw(); }
@@ -73,6 +77,11 @@ class ManifestAtlas {
 
 			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		}
+		
+		document.querySelectorAll('.leaflet-popup-content .manifest-link').forEach(el => { el.addEventListener('click', (e) => {  
+			MI.Interface.Link(el.href); e.preventDefault(); 
+		}); });	
+		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
@@ -104,7 +113,7 @@ class ManifestAtlas {
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
-		<p>${feature.properties.description}</p>`;
+		<p>${feature.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>`;
 
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
@@ -122,7 +131,7 @@ class ManifestAtlas {
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
-					<p>${ft.properties.description}</p>
+					<p>${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 				</div>`;
 			}
 		} 	
@@ -290,9 +299,9 @@ class ManifestAtlas {
 	
 	DisplayLayers(show=true) {
 		if (show) {   
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.style.display = 'block'; }); }
+			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.remove('closed'); }); }
 		else { if (this.active_point !== null && this.active_point.closePopup) { this.active_point.closePopup(); } 
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.style.display = 'none'; }); }	
+			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.add('closed'); }); }	
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {

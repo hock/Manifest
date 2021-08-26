@@ -75,7 +75,7 @@ class ManifestUI {
 		}
 	}
 
-	LoadFromLauncher(value) {
+	LoadFromLauncher(value, close=true) {
 		let unloaded = false, loadurl, id, type;
 	
 		if (value === 'url') {
@@ -92,7 +92,8 @@ class ManifestUI {
 			}
 				
 		} else {
-			let option = document.getElementById('load-samples').value.split('-');
+			let val = value ? value : document.getElementById('load-samples').value;
+			let option = val.split('-');
 			type = option[0];	
 			option = [option.shift(), option.join('-')];
 			id = option[1];
@@ -107,8 +108,8 @@ class ManifestUI {
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
 			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, start:MI.supplychains.length === 0}));
-			//$.getJSON(loadurl, function(d) { });					
-			MI.Interface.ShowLauncher();
+			//$.getJSON(loadurl, function(d) { });				
+			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
 	}
 	
@@ -164,6 +165,11 @@ class ManifestUI {
 		MI.Interface.prevsearch = null;
 	}
 	
+	Link(link) {
+		console.log("manifest-http://"+link.substr(7));
+		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
+	}
+	
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');
@@ -205,10 +211,10 @@ class ManifestUI {
 	
 	SetDocumentTitle() {
 		let scTitles = [];
-		for (let sc of MI.supplychains) {
-			scTitles.push(sc.properties.title);
-		}
-		document.title = scTitles.join(' + ') + ' - Manifest';
+		for (let sc of MI.supplychains) { scTitles.push(sc.properties.title); }
+		
+		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { document.title = 'Manifest'; } 
+		else { document.title = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
 	}
 	
 	ManifestResize() { MI.Visualization.Resize(); }
