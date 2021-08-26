@@ -7,7 +7,6 @@ class ManifestSupplyChain {
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
 	Setup(d) {	
-		console.log(d);
 		const index = MI.supplychains.push(d)-1, id = d.details.id;
 		const defs = 	{ 
 							type: 'FeatureCollection', 
