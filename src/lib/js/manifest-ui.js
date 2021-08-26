@@ -166,7 +166,6 @@ class ManifestUI {
 	}
 	
 	Link(link) {
-		console.log("manifest-http://"+link.substr(7));
 		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
 	}
 	

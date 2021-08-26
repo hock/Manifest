@@ -71,7 +71,6 @@ function Start() {
 
 /** Open the map chooser for manual geocoding **/
 function OpenMap(map, marker, input) {
-	console.log("openmap");
 	document.getElementById('map_chooser_wrap').classList.remove('closed');
 	let mapCenter = [40.730610,-73.935242], inputvalue = input.value;
 	
@@ -97,9 +96,6 @@ function CloseMap() { document.getElementById('map_chooser_wrap').classList.add(
 
 /** Update the chooser marker position (either because the user clicked, or because there was a value set in the input field) **/
 function UpdateChooserMarker(lat, lng, marker) {
-	console.log("update chooser marker");
-	console.log(lat);
-	
     marker.setLatLng([lat, lng]).bindPopup(marker.getLatLng().toString()+'<div class="confirm-loc-btn" onclick="CloseMap()">Select</div>').openPopup();
     return false;
 }

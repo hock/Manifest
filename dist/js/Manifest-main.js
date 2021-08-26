@@ -7792,7 +7792,6 @@ String.prototype.hashCode = function() {
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
 	Setup(d) {	
-		console.log(d);
 		const index = MI.supplychains.push(d)-1, id = d.details.id;
 		const defs = 	{ 
 							type: 'FeatureCollection', 
@@ -8644,7 +8643,6 @@ class ManifestAtlas {
 	}
 	
 	Link(link) {
-		console.log("manifest-http://"+link.substr(7));
 		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
 	}
 	
