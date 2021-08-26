@@ -338,7 +338,6 @@ class ManifestMessenger {
 	AddObject(oid) {
 		let call = 'https://supplystudies.com/manifest/services/?type=aprsfi&id='+oid;
 		this.Add(call, function(d) {
-			console.log(d);
 			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
 			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
 			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #FF0080;">The vessel ${vessel.name}</div>`;
