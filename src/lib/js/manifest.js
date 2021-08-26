@@ -38,8 +38,8 @@ class Manifest {
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
 		let converter = new showdown.Converter();	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
-		
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		if (d.details.url === '#manifest-') { d.details.url = ''; }
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {title: n.overview.name, description: converter.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: converter.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
@@ -62,7 +62,8 @@ class Manifest {
 	/** Format a legacy Sourcemap file so Manifest can understand it */
 	FormatSMAP(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
-		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {};
+		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
+		d.details.url = '#smap-'+d.details.url.split('&id=')[1];
 		return d;
 	}
 
@@ -75,7 +76,7 @@ class Manifest {
 
 		let sheetsc = {type:'FeatureCollection', mtype: 'gsheet', features: [], properties: { title: sheetoverview.name, description: sheetoverview.description, address: sheetoverview.rootaddress, geocode: sheetoverview.rootgeocode, measure: sheetoverview.measure }, details: options, mapper: {}, raw: d.raw, stops: [], hops: []};
 		sheetsc.details.layers = []; sheetsc.details.measures = {};
-	
+		sheetsc.details.url = '#gsheet-'+sheetsc.details.url.split('&id=')[1];
 		for (let point of sheetpoints) {
 			let j = sheetsc.features.length;
 			sheetsc.features[j] = {type: 'Feature'};			
@@ -234,7 +235,7 @@ class Manifest {
 	    let reader = new FileReader();
 		document.getElementById('file-input-label-text').textContent = reader.filename = filename;
 	
-	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), start:MI.supplychains.length === 0}); };
+	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), url: '', start:MI.supplychains.length === 0}); };
 	    reader.readAsText(filedata);
 	}
 	

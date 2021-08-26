@@ -7451,8 +7451,8 @@ class Manifest {
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
 		let converter = new showdown.Converter();	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
-		
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		if (d.details.url === '#manifest-') { d.details.url = ''; }
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {title: n.overview.name, description: converter.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: converter.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
@@ -7475,7 +7475,8 @@ class Manifest {
 	/** Format a legacy Sourcemap file so Manifest can understand it */
 	FormatSMAP(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
-		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {};
+		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
+		d.details.url = '#smap-'+d.details.url.split('&id=')[1];
 		return d;
 	}
 
@@ -7488,7 +7489,7 @@ class Manifest {
 
 		let sheetsc = {type:'FeatureCollection', mtype: 'gsheet', features: [], properties: { title: sheetoverview.name, description: sheetoverview.description, address: sheetoverview.rootaddress, geocode: sheetoverview.rootgeocode, measure: sheetoverview.measure }, details: options, mapper: {}, raw: d.raw, stops: [], hops: []};
 		sheetsc.details.layers = []; sheetsc.details.measures = {};
-	
+		sheetsc.details.url = '#gsheet-'+sheetsc.details.url.split('&id=')[1];
 		for (let point of sheetpoints) {
 			let j = sheetsc.features.length;
 			sheetsc.features[j] = {type: 'Feature'};			
@@ -7647,7 +7648,7 @@ class Manifest {
 	    let reader = new FileReader();
 		document.getElementById('file-input-label-text').textContent = reader.filename = filename;
 	
-	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), start:MI.supplychains.length === 0}); };
+	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), url: '', start:MI.supplychains.length === 0}); };
 	    reader.readAsText(filedata);
 	}
 	
@@ -7791,6 +7792,7 @@ String.prototype.hashCode = function() {
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
 	Setup(d) {	
+		console.log(d);
 		const index = MI.supplychains.push(d)-1, id = d.details.id;
 		const defs = 	{ 
 							type: 'FeatureCollection', 
@@ -7804,7 +7806,7 @@ String.prototype.hashCode = function() {
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader');
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
-			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a>${d.properties.title}</a>
+			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
 			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
 		</div>`;
 						
@@ -7941,7 +7943,7 @@ String.prototype.hashCode = function() {
 			<p class="measures"> ${ft.properties.measures.map(m => m ? '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit : "").join(", ")}</p>
 
 		</div> 
-		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" />' : "").join("")}</div>
+		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
 		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
@@ -8510,7 +8512,7 @@ class ManifestAtlas {
 
 		let dropElement = document.getElementById('minfodetail');
 		let dropArea = new jsondrop('minfodetail', { 
-			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), start:MI.supplychains.length === 0}); } 
+			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), url: '', start:MI.supplychains.length === 0}); } 
 		});	
 		document.getElementById('file-input').addEventListener('change', (e) => { MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop()); });
 	
@@ -8583,7 +8585,7 @@ class ManifestAtlas {
 			
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
-			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, start:MI.supplychains.length === 0}));
+			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, url:loadurl, start:MI.supplychains.length === 0}));
 			//$.getJSON(loadurl, function(d) { });				
 			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
@@ -9380,11 +9382,14 @@ class ChordDiagram {
 		else { 
 			switch (hashtype) {
 				case "smap": fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('smap', data, {id: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				case "gsheet": fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				case "manifest": fetch(hashid).then(r => r.json())
-					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				default: LoadError('Option not supported');
 			}  LoadCollection("json/samples.json", false);
 		}
@@ -9400,7 +9405,7 @@ class ChordDiagram {
 	function LoadCollection(collection, start) {
 		if (start) { 
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		} else {
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
@@ -9409,12 +9414,13 @@ class ChordDiagram {
 	function LoadIntroduction() {
 		if (!MI.Interface.IsMobile()) {
 			fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id})).then(r => Start())).then(fetch("json/manifest.json")
-				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), start:true})).then(r => Start()))
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url})).then(r => Start())).then(fetch("json/manifest.json")
+				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), url: "json/manifest.json", start:true}))
+				.then(r => Start()))
 				.catch(e => LoadError(e));
 		} else {
 		fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		}
 	}
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});

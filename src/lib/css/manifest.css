@@ -55,7 +55,7 @@
 		
 	#manifestlist .mtitle { padding:1rem; font-size:1rem; z-index:12000; border-bottom:1px solid; font-weight:bold;} 
 	#manifestlist .mtitle a { text-decoration:none; width: calc(100% - 3.5rem); display: inline-block; white-space: nowrap; 
-		vertical-align:middle; overflow:hidden; text-overflow:ellipsis;}
+		vertical-align:middle; overflow:hidden; text-overflow:ellipsis; color:inherit;}
 	#manifestlist .mtitle a:hover { text-decoration:underline; cursor:pointer;}
 	#manifestlist .mtitle i { vertical-align:middle; width:1rem;}
 	#manifestlist .mdescription { border-bottom:1px solid; padding:1rem; margin:0; }

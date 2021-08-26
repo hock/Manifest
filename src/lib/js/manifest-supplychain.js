@@ -7,6 +7,7 @@ class ManifestSupplyChain {
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
 	Setup(d) {	
+		console.log(d);
 		const index = MI.supplychains.push(d)-1, id = d.details.id;
 		const defs = 	{ 
 							type: 'FeatureCollection', 
@@ -20,7 +21,7 @@ class ManifestSupplyChain {
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader');
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
-			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a>${d.properties.title}</a>
+			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
 			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
 		</div>`;
 						
@@ -157,7 +158,7 @@ class ManifestSupplyChain {
 			<p class="measures"> ${ft.properties.measures.map(m => m ? '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit : "").join(", ")}</p>
 
 		</div> 
-		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" />' : "").join("")}</div>
+		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
 		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>

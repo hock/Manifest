@@ -8,11 +8,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		else { 
 			switch (hashtype) {
 				case "smap": fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('smap', data, {id: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				case "gsheet": fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				case "manifest": fetch(hashid).then(r => r.json())
-					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode()})).then(r => Start()).catch(e => LoadError(e)); break;
+					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
+					.then(r => Start()).catch(e => LoadError(e)); break;
 				default: LoadError('Option not supported');
 			}  LoadCollection("json/samples.json", false);
 		}
@@ -28,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	function LoadCollection(collection, start) {
 		if (start) { 
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		} else {
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
@@ -37,12 +40,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	function LoadIntroduction() {
 		if (!MI.Interface.IsMobile()) {
 			fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id})).then(r => Start())).then(fetch("json/manifest.json")
-				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), start:true})).then(r => Start()))
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url})).then(r => Start())).then(fetch("json/manifest.json")
+				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), url: "json/manifest.json", start:true}))
+				.then(r => Start()))
 				.catch(e => LoadError(e));
 		} else {
 		fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, start:true})).then(r => Start())).catch(e => LoadError(e));
+			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		}
 	}
 	//MI.functions.process("yeti", yeti, {"id": ("casper sleep").hashCode()});

@@ -34,7 +34,7 @@ class ManifestUI {
 
 		let dropElement = document.getElementById('minfodetail');
 		let dropArea = new jsondrop('minfodetail', { 
-			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), start:MI.supplychains.length === 0}); } 
+			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), url: '', start:MI.supplychains.length === 0}); } 
 		});	
 		document.getElementById('file-input').addEventListener('change', (e) => { MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop()); });
 	
@@ -107,7 +107,7 @@ class ManifestUI {
 			
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
-			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, start:MI.supplychains.length === 0}));
+			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, url:loadurl, start:MI.supplychains.length === 0}));
 			//$.getJSON(loadurl, function(d) { });				
 			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
