@@ -16,6 +16,7 @@ class Manifest {
 		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
+		this.Util = new ManifestUtilities();
 	}
 
 	/** SupplyChain processor main wrapper function. **/
@@ -37,11 +38,10 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		let converter = new showdown.Converter();	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = ''; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {title: n.overview.name, description: converter.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: converter.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -357,6 +357,21 @@ class ManifestMessenger {
 
 /* Manifest Utility Class */
 class ManifestUtilities {
+	constructor() {
+		this.markdowner = new showdown.Converter();	
+		
+		let customClassExt = {
+		    type: 'output',
+		    filter: function (text) {
+		        return text
+		            .replace(/<p>\[\.([a-z0-9A-Z\s]+)\]<\/p>[\n]?<(.+)>/g, `<$2 class="$1">`)
+		            .replace(/<(.+)>\[\.([a-z0-9A-Z\s]+)\]/g, `<$1 class="$2">`)            
+					.replace(/class="(.+)"/g, function (str) { if (str.indexOf("<em>") !== -1) { return str.replace(/<[/]?em>/g, '_'); } return str; });
+		    }
+		};
+		this.markdowner.addExtension(customClassExt);
+	}
+	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
 	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((manifest?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }

@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 					data: {
 						baseurl: "https://supplystudies.com/manifest/",
 						minify: ".min", // or .min
-						version: "0.2"
+						version: "0.2.1"
 					}
 				}
 			}

@@ -78,10 +78,6 @@ class ManifestAtlas {
 			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		}
 		
-		document.querySelectorAll('.leaflet-popup-content .manifest-link').forEach(el => { el.addEventListener('click', (e) => {  
-			MI.Interface.Link(el.href); e.preventDefault(); 
-		}); });	
-		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
@@ -108,12 +104,13 @@ class ManifestAtlas {
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
-		<p>${feature.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>`;
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
 
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
@@ -131,7 +128,7 @@ class ManifestAtlas {
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
-					<p>${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
+					<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(ft.properties.description))}</p>
 				</div>`;
 			}
 		} 	
@@ -149,6 +146,7 @@ class ManifestAtlas {
 		layer.setStyle(feature.properties.style); 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
+	PopMLink(str) { return str.replaceAll('class="manifest-link"','class="manifest-link" onclick="MI.Interface.Link(event.target.href, event);"'); }
 
 	/** Render lines by setting up a GeoJSON feature for display **/
 	RenderLine(feature, layer) {		

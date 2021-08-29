@@ -7429,6 +7429,7 @@ class Manifest {
 		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
+		this.Util = new ManifestUtilities();
 	}
 
 	/** SupplyChain processor main wrapper function. **/
@@ -7450,11 +7451,10 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		let converter = new showdown.Converter();	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: converter.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = ''; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {title: n.overview.name, description: converter.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: converter.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -7770,6 +7770,21 @@ class ManifestMessenger {
 
 /* Manifest Utility Class */
 class ManifestUtilities {
+	constructor() {
+		this.markdowner = new showdown.Converter();	
+		
+		let customClassExt = {
+		    type: 'output',
+		    filter: function (text) {
+		        return text
+		            .replace(/<p>\[\.([a-z0-9A-Z\s]+)\]<\/p>[\n]?<(.+)>/g, `<$2 class="$1">`)
+		            .replace(/<(.+)>\[\.([a-z0-9A-Z\s]+)\]/g, `<$1 class="$2">`)            
+					.replace(/class="(.+)"/g, function (str) { if (str.indexOf("<em>") !== -1) { return str.replace(/<[/]?em>/g, '_'); } return str; });
+		    }
+		};
+		this.markdowner.addExtension(customClassExt);
+	}
+	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
 	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((manifest?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
 	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }
@@ -7797,7 +7812,7 @@ String.prototype.hashCode = function() {
 							properties: { title: 'Supply Chain', description: ''}, 
 							graph: { links: [], nodes: [] } 
 						};	
-		d.properties = Object.assign(defs.properties, d.properties); 	d.graph = Object.assign(defs.graph, d.graph);
+		d.properties = Object.assign(defs.properties, d.properties); d.graph = Object.assign(defs.graph, d.graph);
 		this.SetupStyle(d);
 		
 		let mheader = document.createElement('div');
@@ -7810,7 +7825,7 @@ String.prototype.hashCode = function() {
 						
 		let mdetails = document.createElement('div');
 		mdetails.id = 'mdetails-'+id; mdetails.classList.add('mdetails');
-		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>')}</div>`;
+		mdetails.innerHTML = `<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>`;
 	
 		let mlist = document.createElement('ul');
 		mlist.id = 'mlist-'+id; mlist.classList.add('mlist');
@@ -7853,7 +7868,6 @@ String.prototype.hashCode = function() {
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
-			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>');
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			if (d.mapper) { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; }
 				
@@ -7865,8 +7879,8 @@ String.prototype.hashCode = function() {
 			}	
 		}
 		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
-		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href); e.preventDefault(); }); });	
 		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
+		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
 	
 		// Prepare to add layers
 		let maplayergroup = null;
@@ -7942,12 +7956,12 @@ String.prototype.hashCode = function() {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
-		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
+		<p class="description">${ManifestUtilities.Linkify(ft.properties.description)}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+src.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>').replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>')+'</li>' : "").join("")}
-				${ft.properties.notes}
+				${ft.properties.sources.map(src => src ? '<li>'+ManifestUtilities.Linkify(src)+'</li>' : "").join("")}
+				${ManifestUtilities.Linkify(ft.properties.notes)}
 			</ol>
 		</details>`;
 		
@@ -8218,10 +8232,6 @@ class ManifestAtlas {
 			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		}
 		
-		document.querySelectorAll('.leaflet-popup-content .manifest-link').forEach(el => { el.addEventListener('click', (e) => {  
-			MI.Interface.Link(el.href); e.preventDefault(); 
-		}); });	
-		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
@@ -8248,12 +8258,13 @@ class ManifestAtlas {
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
-		<p>${feature.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>`;
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
 
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
@@ -8271,7 +8282,7 @@ class ManifestAtlas {
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
-					<p>${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
+					<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(ft.properties.description))}</p>
 				</div>`;
 			}
 		} 	
@@ -8289,6 +8300,7 @@ class ManifestAtlas {
 		layer.setStyle(feature.properties.style); 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
+	PopMLink(str) { return str.replaceAll('class="manifest-link"','class="manifest-link" onclick="MI.Interface.Link(event.target.href, event);"'); }
 
 	/** Render lines by setting up a GeoJSON feature for display **/
 	RenderLine(feature, layer) {		
@@ -8641,8 +8653,9 @@ class ManifestAtlas {
 		MI.Interface.prevsearch = null;
 	}
 	
-	Link(link) {
-		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
+	Link(link, event) {
+		event.preventDefault(); event.stopPropagation();
+		this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
 	}
 	
 	/** Handles the measure sorting interface **/

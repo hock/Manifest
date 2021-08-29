@@ -13,7 +13,7 @@ class ManifestSupplyChain {
 							properties: { title: 'Supply Chain', description: ''}, 
 							graph: { links: [], nodes: [] } 
 						};	
-		d.properties = Object.assign(defs.properties, d.properties); 	d.graph = Object.assign(defs.graph, d.graph);
+		d.properties = Object.assign(defs.properties, d.properties); d.graph = Object.assign(defs.graph, d.graph);
 		this.SetupStyle(d);
 		
 		let mheader = document.createElement('div');
@@ -26,7 +26,7 @@ class ManifestSupplyChain {
 						
 		let mdetails = document.createElement('div');
 		mdetails.id = 'mdetails-'+id; mdetails.classList.add('mdetails');
-		mdetails.innerHTML = `<div class="mdescription">${d.properties.description.replace(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>')}</div>`;
+		mdetails.innerHTML = `<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>`;
 	
 		let mlist = document.createElement('ul');
 		mlist.id = 'mlist-'+id; mlist.classList.add('mlist');
@@ -69,7 +69,6 @@ class ManifestSupplyChain {
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
-			ft.properties.description = ft.properties.description.replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>');
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			if (d.mapper) { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; }
 				
@@ -81,8 +80,8 @@ class ManifestSupplyChain {
 			}	
 		}
 		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
-		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href); e.preventDefault(); }); });	
 		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
+		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
 	
 		// Prepare to add layers
 		let maplayergroup = null;
@@ -158,12 +157,12 @@ class ManifestSupplyChain {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
-		<p class="description">${ft.properties.description.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>')}</p>
+		<p class="description">${ManifestUtilities.Linkify(ft.properties.description)}</p>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+src.replace(ManifestUtilities.ManifestMatch(), '<a class="manifest-link">$1</a>').replace(ManifestUtilities.URLMatch(), '<a href="$1">$1</a>')+'</li>' : "").join("")}
-				${ft.properties.notes}
+				${ft.properties.sources.map(src => src ? '<li>'+ManifestUtilities.Linkify(src)+'</li>' : "").join("")}
+				${ManifestUtilities.Linkify(ft.properties.notes)}
 			</ol>
 		</details>`;
 		

@@ -165,8 +165,9 @@ class ManifestUI {
 		MI.Interface.prevsearch = null;
 	}
 	
-	Link(link) {
-		this.LoadFromLauncher("manifest-http://"+link.substr(7), false);
+	Link(link, event) {
+		event.preventDefault(); event.stopPropagation();
+		this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
 	}
 	
 	/** Handles the measure sorting interface **/
