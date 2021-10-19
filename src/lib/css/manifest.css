@@ -67,7 +67,9 @@
 	#manifestlist li { padding:0.5rem 0; border-bottom:1px solid; width:94%; margin:0 auto;}
 	#manifestlist li div.dot { cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; text-align:center; font-size:0.5rem; color:#fff; line-height:1rem;}
 	#manifestlist li div.dot:hover { }
-	#manifestlist ul.mlist p.description { }
+	#manifestlist ul.mlist .description, #manifestlist ul.mlist .pdetails, #manifestlist ul.mlist .featuredimages { margin:0.25rem 0;}
+	
+	#manifestlist li .pdetails p { display:inline;}
 	#manifestlist li .pdetails .measures .mtype:after { content: ": ";}
 	
 	#manifestlist ul.mlist li ul { font-size:0.8rem; padding-left:0.5rem; list-style:disc;}
@@ -88,7 +90,8 @@
 	#manifestlist li p, #manifestlist li .mdescription { font-size:0.9em; padding:0.2rem 0; margin:0;}	
 	#manifestlist h5.mdetail_title { display:inline; font-size:1rem; line-height:1.5rem;}
 	#manifestlist p.placename, #manifestlist p.category { display:inline-block; margin-right:0.2rem;}
-	#manifestlist li img, #manifestlist .mdescription img { width:100%; margin:0.25rem 0; }
+	#manifestlist li img, #manifestlist .mdescription img { width:100%; }
+	 #manifestlist .mdescription img + img { margin-top:0.25rem;}
 	#manifestlist li .pdetails .cat-link {text-decoration:underline;cursor:pointer;}
 	#manifestlist li .manifest-link {text-decoration:underline;cursor:pointer;}
 
@@ -200,7 +203,7 @@
 		background: rgba(255,255,255,0.95);
 		padding:0;
 		overflow-y: auto;
-		max-height: 20rem;
+		max-height: 25rem;
 	}
 	.leaflet-popup-content .popuplink, .leaflet-popup-content .popupselect { padding:0 0 1rem 0;}
 	.leaflet-popup-content .popuplink h2 span, .leaflet-popup-content .popupselect h2 span {cursor:pointer;}
@@ -208,6 +211,25 @@
 	
 	.leaflet-tooltip { border-radius: 0; border:none;}
 	.leaflet-tooltip div.mtooltip { border-radius: 0.25rem; border:2px solid #fff;line-height:0.8rem; margin: -7px; padding: 0.5rem; text-align:center;}
+	
+	/* Manifest Splash */
+	.leaflet-popup.pop-intro .leaflet-popup-content-wrapper {background: #fff;color: #333; padding:1rem;}
+	.leaflet-popup.pop-intro .leaflet-popup-content { }
+	.leaflet-popup.pop-intro .leaflet-popup-tip{background: #fff;}
+	.leaflet-popup.pop-intro .poptitle { border-bottom: 1px solid #ccc; background:none; color: #4d34db; font-size:1.4rem;}
+	
+	.leaflet-popup.pop-intro .leaflet-popup-content-wrapper a {color: #4d34db;}
+	#mlist-1029261216 #local_10292612160000 p, #mlist-1029261216 #local_10292612160000 ul, #mlist-1029261216 #local_10292612160000 img { 
+		display:none;
+	}
+	
+	#mlist-1029261216 #local_10292612160000 .description:after { content:"Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.";}
+	#mlist-1029261216 #local_10292612160000 .description {
+	font-size: 0.9em;
+	padding: 0.2rem 0;
+	margin: 0;
+	color:#333;}
+	#mlist-1029261216 #local_10292612160000 .pdetails p.placename, #mlist-1029261216 #local_10292612160000 .pdetails p.measures { display:initial;}
 	
 	.fa-tag { cursor:pointer; }
 	.fa-tag:hover { filter: brightness(120%); }

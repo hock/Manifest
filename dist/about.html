@@ -1,19 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 
 <head>
-    <title>Manifest - About</title>
-    <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Manifest - About</title>
+    <meta property="og:title" content="Manifest - About">
 
 
-    <base href="https://supplystudies.com/manifest/" />
-    <link rel="stylesheet" href="css/Manifest-static.min.css" />
+    <base href="http://hockbook.local/Manifest/dist/" />
+    <link rel="stylesheet" href="css/Manifest-static.css" />
 
 
-    <link rel="icon" href="images/favicons/icon.png">
-    <link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
+    <meta property="og:url" content="https://supplystudies.com/manifest/about/">
+    <link rel="canonical" href="https://supplystudies.com/manifest/about/">
+    <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+    <meta property="og:description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+    <meta property="og:image" content="/images/card.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="theme-color" content="#4d34db">
+    <link rel="icon" href="/images/favicons/icon.ico">
+    <link rel="icon" href="/images/favicons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/images/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <script type="module">
+        document.documentElement.classList.remove('no-js');
+        document.documentElement.classList.add('js');
+    </script>
 
     <script>
         var _paq = window._paq = window._paq || [];
@@ -35,9 +52,8 @@
 
 <body class="textpage">
     <div id="infoborder"></div>
-    <div id="infowrap">
-
-        <div id="textbar">
+    <section id="infowrap">
+        <section id="textbar">
             <div id="minfoheader">
                 <i id="minfo-hamburger" class="fas fa-bars"></i>
                 <span id="minfo"><span id="logotype">MANIFEST</span><span class="fulltext">: Supply Chain Platform</span></span>
@@ -83,43 +99,44 @@
             </nav>
             <div class="clear"></div>
 
-        </div>
+        </section>
         <h1>About Manifest</h1>
-        <a class="splash-link"><img class="splash-image" src="images/about-splash-cut.png" width="640" height="765" alt="Image preview of the Manifest interface" /></a>
+        <section id="aboutwrap">
+            <a class="splash-link"><img class="splash-image" src="images/about-splash-cut.png" width="640" height="765" alt="Image preview of the Manifest interface" /></a>
 
-        <p class="callout biggertext">Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
+            <p class="callout biggertext">Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
 
-        <p class="bigtext">Professional logistics platforms developed by companies like SAP, Oracle, and IBM are incredibly complex, suited to global networks with hundreds of suppliers in dozens of countries. These systems interface with numerous data sources, with powerful capabilities for controlling the world's material distribution in the name of "supply chain management." Manifest is not one of these. Similarly, there are many tools available for detailed statistical evaluation, graph analysis, and geospatial modeling. And while Manifest can work in concert with these tools, its primary purpose is to:</p>
-        <ul class="dotlist">
-            <li>
-                <div class="listdot"></div>Provide common data standards for describing and sharing supply chains or similar material networks, along with a simple editor modeled on these standards.
-            </li>
-            <li>
-                <div class="listdot"></div>Develop a flexible geospatial viewer for supply chain data that is transparent, interactive, and simple to understand, with support for specialized data views (graph relationships, etc.).
-            </li>
-            <li>
-                <div class="listdot"></div>Support basic analytic tools for evaluating and comparing critical supply chain measures.
-            </li>
-        </ul>
-        <p class="bigtext">The result is (hopefully) a system that is more flexible--someone using Manifest might find it valuable to map very high level connection, or to include "materials" not normally present in an industrial logistics platform. In pursuit of these goals, Manifest has been developed with a number of core design principles:</p>
-        <ul class="dotlist">
-            <li>
-                <div class="listdot"></div>Manifest is not a database. While we can host datasets, the primary workflow for creating and viewing data happens in the browser, where the system neither sees nor stores the data.
-            </li>
-            <li>
-                <div class="listdot"></div>Supply chains in Manifest were not designed to be discrete "documents." The interface was developed for multiple supply chains (or partial supply chains) in order to understand relationships between them.
-            </li>
-            <li>
-                <div class="listdot"></div>Manifest data tends to be descriptive, rather than rigidly structured. The Manifest format is designed to be open and general enough to contain information across a range of different contexts, irrespective of the rendering for a particular supply chain or single piece of data.
-            </li>
-        </ul>
-        <p class="bigtext">For updates on Manifest, signup for the Supply Studies <a href="https://supplystudies.com/updates/">mailing list</a>. Manifest is provided free for noncommercial use, if you'd like to talk about something else, please don't hesitate to <a href="mailto:mhockenberry@fordham.edu">get in touch</a>. </p>
+            <p class="bigtext">Professional logistics platforms developed by companies like SAP, Oracle, and IBM are incredibly complex, suited to global networks with hundreds of suppliers in dozens of countries. These systems interface with numerous data sources, with powerful capabilities for controlling the world's material distribution in the name of "supply chain management." Manifest is not one of these. Similarly, there are many tools available for detailed statistical evaluation, graph analysis, and geospatial modeling. And while Manifest can work in concert with these tools, its primary purpose is to:</p>
+            <ul class="dotlist">
+                <li>
+                    <div class="listdot"></div>Provide common data standards for describing and sharing supply chains or similar material networks, along with a simple editor modeled on these standards.
+                </li>
+                <li>
+                    <div class="listdot"></div>Develop a flexible geospatial viewer for supply chain data that is transparent, interactive, and simple to understand, with support for specialized data views (graph relationships, etc.).
+                </li>
+                <li>
+                    <div class="listdot"></div>Support basic analytic tools for evaluating and comparing critical supply chain measures.
+                </li>
+            </ul>
+            <p class="bigtext">The result is (hopefully) a system that is more flexible--someone using Manifest might find it valuable to map very high level connection, or to include "materials" not normally present in an industrial logistics platform. In pursuit of these goals, Manifest has been developed with a number of core design principles:</p>
+            <ul class="dotlist">
+                <li>
+                    <div class="listdot"></div>Manifest is not a database. While we can host datasets, the primary workflow for creating and viewing data happens in the browser, where the system neither sees nor stores the data.
+                </li>
+                <li>
+                    <div class="listdot"></div>Supply chains in Manifest were not designed to be discrete "documents." The interface was developed for multiple supply chains (or partial supply chains) in order to understand relationships between them.
+                </li>
+                <li>
+                    <div class="listdot"></div>Manifest data tends to be descriptive, rather than rigidly structured. The Manifest format is designed to be open and general enough to contain information across a range of different contexts, irrespective of the rendering for a particular supply chain or single piece of data.
+                </li>
+            </ul>
+            <p class="bigtext">For updates on Manifest, signup for the Supply Studies <a href="https://supplystudies.com/updates/">mailing list</a>. Manifest is provided free for noncommercial use, if you'd like to talk about something else, please don't hesitate to <a href="mailto:mhockenberry@fordham.edu">get in touch</a>. </p>
 
-        <p class="callin">
-            The project is supported by Fordham University's Office of Research and Department of Communication and Media Studies. It was previously supported by the <a href="http://steinhardt.nyu.edu/mcc/">Media, Culture, and Communication</a> department of <a href="http://www.nyu.edu/">New York University</a>. It is based on technologies originally developed as part of the <a href="http://supplystudies.com/sourcemap-org/">Sourcemap project</a>, which was created at the MIT Media Lab in 2007 as a collaboration between the MIT Center for Civic Media and the Tangible Media Group. <br /><br />
-            Contributors: Matthew Hockenberry, Christian Kyle Madlansacay, Kimberly Ternan.
-        </p>
-
+            <p class="callin">
+                The project is supported by Fordham University's Office of Research and Department of Communication and Media Studies. It was previously supported by the <a href="http://steinhardt.nyu.edu/mcc/">Media, Culture, and Communication</a> department of <a href="http://www.nyu.edu/">New York University</a>. It is based on technologies originally developed as part of the <a href="http://supplystudies.com/sourcemap-org/">Sourcemap project</a>, which was created at the MIT Media Lab in 2007 as a collaboration between the MIT Center for Civic Media and the Tangible Media Group. <br /><br />
+                Contributors: Matthew Hockenberry, Christian Kyle Madlansacay, Kimberly Ternan.
+            </p>
+        </section>
         <div class="footer">
             <div class="footer-wrap-left">
 
@@ -136,11 +153,11 @@
             </div>
         </div>
         <div class="clear"></div>
+    </section>
 
-    </div>
 
-    <script src="js/Manifest-lib.min.js"></script>
-    <script src="js/Manifest-static.min.js"></script>
+    <script src="js/Manifest-lib.js"></script>
+    <script src="js/Manifest-static.js"></script>
 
 
 </body>

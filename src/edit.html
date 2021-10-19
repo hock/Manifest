@@ -1,62 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-	<title>Manifest - Editor</title>
-	<meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <!-- build:process -->
+	<title>Manifest - About</title>
+	<meta property="og:title" content="Manifest - Edit">
+
+	<!-- build:process -->
 	<base href="<%= baseurl %>" />	
 	<link rel="stylesheet" href="css/Manifest-edit<%= minify %>.css" /> 
-    <!-- /build -->
-	
-	<link rel="icon" href="images/favicons/icon.png">	
-	<link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
-	
-	<script>
-	  var _paq = window._paq = window._paq || [];
-	  _paq.push(['trackPageView']);
-	  _paq.push(['enableLinkTracking']);
-	  (function() {
-	    var u="//supplystudies.com/matomo/";
-	    _paq.push(['setTrackerUrl', u+'matomo.php']);
-	    _paq.push(['setSiteId', '1']);
-	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-	    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-	  })();
-	</script>
-  </head>
+	<!-- /build -->
 
-  <body class="editor textpage">
-	<div id="infoborder"></div>
-	<div id="infowrap">
-		<div id="textbar">			
-		    <!-- build:section layout.launcher --><!-- /build -->				
-		    <!-- build:section layout.navigation --><!-- /build -->
-		</div>
+	<meta property="og:url" content="https://supplystudies.com/manifest/edit/">	
+	<link rel="canonical" href="https://supplystudies.com/manifest/edit/">
+	<!-- build:section layout.header --><!-- /build -->
+</head>
 
-	    <div id='editor_holder'></div>
-		<div id="editor_overview">
-			<p class="edit_callout">This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains, but the format is still in development. it isn't the only option. Manifest also supports <a href="data/#smap">data that was originally created for the Sourcemap project</a>, and a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a>.</p>
-			<div class="inputbox">
-				<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
-				<label for="file-input" id="file-input-label"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"/></svg> <span id="file-input-label-text">Load Manifest&hellip;</span></label>
-			</div>
-		
-	    	<button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
-		
+<body class="editor textpage">
+<div id="infoborder"></div>
+<section id="infowrap">
+	<section id="textbar">			
+	    <!-- build:section layout.launcher --><!-- /build -->				
+	    <!-- build:section layout.navigation --><!-- /build -->
+	</section>
+
+    <section id='editor_holder'></section>
+	<section id="editor_overview">
+		<p class="edit_callout">This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains, but the format is still in development. it isn't the only option. Manifest also supports <a href="data/#smap">data that was originally created for the Sourcemap project</a>, and a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a>.</p>
+		<div class="inputbox">
+			<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
+			<label for="file-input" id="file-input-label"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"/></svg> <span id="file-input-label-text">Load Manifest&hellip;</span></label>
 		</div>
-		
-		<div class="clear"></div>
-		<div id="map_chooser_wrap" class="closed"><div id="map_chooser"></div><div id="chooser_arrow"></div></div>
-		
-	<!-- build:section layout.footer --><!-- /build -->
-		
-	</div>
-    <!-- build:process -->	
-	<script src="js/Manifest-lib<%= minify %>.js"></script>
-	<script src="js/Manifest-edit<%= minify %>.js"></script>
-    <!-- /build -->
-  </body>
+	
+    	<button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
+	
+	</section>
+	
+	<div class="clear"></div>
+	<section id="map_chooser_wrap" class="closed"><div id="map_chooser"></div><div id="chooser_arrow"></div></section>	
+	<!-- build:section layout.footer --><!-- /build -->	
+</section>
+
+<!-- build:process -->	
+<script src="js/Manifest-lib<%= minify %>.js"></script>
+<script src="js/Manifest-edit<%= minify %>.js"></script>
+<!-- /build -->
+</body>
 </html>

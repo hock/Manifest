@@ -210,11 +210,15 @@ class ManifestUI {
 	}
 	
 	SetDocumentTitle() {
-		let scTitles = [];
+		let scTitles = [], setTitle = '';
 		for (let sc of MI.supplychains) { scTitles.push(sc.properties.title); }
 		
-		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { document.title = 'Manifest'; } 
-		else { document.title = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
+		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { setTitle = 'Manifest'; } 
+		else { setTitle = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
+		
+		document.title = setTitle;
+		document.querySelector('meta[property="og:title"]').setAttribute("content", setTitle);
+		
 	}
 	
 	ManifestResize() { MI.Visualization.Resize(); }

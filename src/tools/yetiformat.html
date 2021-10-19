@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<title>Manifest: Yeti Formatter</title>
+  </head>
+
+<body>
+	
+	<script>
+	 document.addEventListener("DOMContentLoaded", function(event) {
+		 fetch("amazon.json").then(r => r.json()).then(data => console.log(data));
+	 });
+	</script>
+</body>
+</html>

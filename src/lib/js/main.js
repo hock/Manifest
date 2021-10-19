@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function(event) {
+	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
 	MI = new Manifest();
 	MI.serviceurl = "https://supplystudies.com/manifest/services/";
 		

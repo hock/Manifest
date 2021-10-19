@@ -157,7 +157,7 @@ class ManifestSupplyChain {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
-		<p class="description">${ManifestUtilities.Linkify(ft.properties.description)}</p>
+		<div class="description">${ManifestUtilities.Linkify(ft.properties.description)}</div>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>

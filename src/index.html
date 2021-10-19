@@ -1,52 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-	<title>Manifest: Supply Chain Platform</title>
-	<meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-	
-    <!-- build:process -->
+
+	<title>Manifest: Supply Chain Platform</title>
+	<meta property="og:title" content="Manifest: Supply Chain Platform">
+
+	<!-- build:process -->
 	<base href="<%= baseurl %>" />	
 	<link rel="stylesheet" href="css/Manifest-main<%= minify %>.css" /> 
-    <!-- /build -->
+	<!-- /build -->
 
-	<link rel="icon" href="images/favicons/icon.png">	
-	<link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
-	
-	<script>
-	  var _paq = window._paq = window._paq || [];
-	  _paq.push(['trackPageView']);
-	  _paq.push(['enableLinkTracking']);
-	  (function() {
-	    var u="//supplystudies.com/matomo/";
-	    _paq.push(['setTrackerUrl', u+'matomo.php']);
-	    _paq.push(['setSiteId', '1']);
-	    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-	    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-	  })();
-	</script>
-  </head>
+	<meta property="og:url" content="https://supplystudies.com/manifest/">	
+	<link rel="canonical" href="https://supplystudies.com/manifest/">
+	<!-- build:section layout.header --><!-- /build -->
+</head>
 
 <body class="light">
-	<div id="loader">
-		<h1 id="loadertitle">Manifest</h1>
-		<h2 id="loadermessage">Supply Chain Platform</h2>
-		<div id="loaderspinner" class="lds-spinner">
-			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-		</div>
-	</div>
-	
-	<div id="manifestbar">
+	<section id="manifestbar">
 	    <!-- build:section layout.launcher --><!-- /build -->
-	</div>
+	</section>
 	
-	<div id="sidepanel">
+	<section id="sidepanel">
 		<div id="manifestlist"></div>
-	</div>
+	</section>
 	
-	<div class="vizmenu">
-		<div class="vizmenu-entry">
+	<section class="vizmenu">
+		<nav class="vizmenu-entry">
 			<div id="viz-choice-label" class="vizmenu-label">Visualize</div>
 			<select name="viz-choice" id="viz-choices">
 				<option id="map-viz-choice" value="map">Map</option>
@@ -55,15 +36,15 @@
 				<option id="chord-viz-choice" value="chord">Chord</option>
 				<option id="textview-viz-choice" value="textview">Raw</option>
 			</select>
-		</div>
-		<div class="vizmenu-entry">
+		</nav>
+		<nav class="vizmenu-entry">
 			<div id="measure-choice-label" class="vizmenu-label">Scale</div>	
 			<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
-		</div>
+		</nav>
 		<div class="clear"></div>
-	</div>
+	</section>
 	
-	<div class="view-wrapper">
+	<main class="view-wrapper">
 		<div id="vizwrap" class="vizwrap closed">
 			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill="#21222c"></rect></svg>
 			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();" />		
@@ -74,12 +55,13 @@
 			<input type="text" placeholder="Filter by..." id="searchbar" /> 
 			<i id="searchclear" class="fas fa-times-circle searchclear"></i>
 		</div>
+		
 		<div id="mapmenu"><i class="fas fa-layer-group"></i></div>
 		<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
 		<div id="messages" class="closed"></div>
 		<div id="mapcapture"><i class="fas fa-camera"></i></div>
 
-		<div id="mapmenu-window" class="closed">
+		<nav id="mapmenu-window" class="closed">
 			<h3>Map Baselayer</h3>
 			<ul id="basemap-chooser">
 				<li class="satellite"></li> <li class="terrain"></li> <li class="light"></li> <li class="google"></li>
@@ -92,11 +74,18 @@
 				<label class="layercontainer">Marine Traffic <input type="checkbox" value="marine"> <span class="layercheckmark"></span> </label>
 				<label class="layercontainer">Rail Connections <input type="checkbox" value="rail"> <span class="layercheckmark"></span> </label>
 			</div>
-		</div>
+		</nav>
 		<div class="map" id="map"></div>
 		<div class="textview closed" id="textview"></div>
-	</div>
+	</main>
 
+	<section id="loader">
+		<h1 id="loadertitle">Manifest</h1>
+		<h2 id="loadermessage">Supply Chain Platform</h2>
+		<div id="loaderspinner" class="lds-spinner">
+			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+		</div>
+	</section>
 	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	

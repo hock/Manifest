@@ -11,14 +11,15 @@ module.exports = function(grunt) {
 					beautify: true,
 					sections: {
 						layout: {
+							header: 'src/lib/html/header.html',
 							launcher: 'src/lib/html/launcher.html',
 							navigation: 'src/lib/html/navigation.html',
 							footer: 'src/lib/html/footer.html'						
 						}
 					},
 					data: {
-						baseurl: "https://supplystudies.com/manifest/",
-						minify: ".min", // or .min
+						baseurl: "http://hockbook.local/Manifest/dist/",
+						minify: "", // or .min
 						version: "0.2.1"
 					}
 				}

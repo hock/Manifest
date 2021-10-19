@@ -1,19 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 
 <head>
-    <title>Manifest - Editor</title>
-    <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Manifest - About</title>
+    <meta property="og:title" content="Manifest - Edit">
 
 
-    <base href="https://supplystudies.com/manifest/" />
-    <link rel="stylesheet" href="css/Manifest-edit.min.css" />
+    <base href="http://hockbook.local/Manifest/dist/" />
+    <link rel="stylesheet" href="css/Manifest-edit.css" />
 
 
-    <link rel="icon" href="images/favicons/icon.png">
-    <link rel="apple-touch-icon" href="images/favicons/apple-touch-icon.png">
+    <meta property="og:url" content="https://supplystudies.com/manifest/edit/">
+    <link rel="canonical" href="https://supplystudies.com/manifest/edit/">
+    <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+    <meta property="og:description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+    <meta property="og:image" content="/images/card.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="theme-color" content="#4d34db">
+    <link rel="icon" href="/images/favicons/icon.ico">
+    <link rel="icon" href="/images/favicons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/images/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <script type="module">
+        document.documentElement.classList.remove('no-js');
+        document.documentElement.classList.add('js');
+    </script>
 
     <script>
         var _paq = window._paq = window._paq || [];
@@ -35,8 +52,8 @@
 
 <body class="editor textpage">
     <div id="infoborder"></div>
-    <div id="infowrap">
-        <div id="textbar">
+    <section id="infowrap">
+        <section id="textbar">
             <div id="minfoheader">
                 <i id="minfo-hamburger" class="fas fa-bars"></i>
                 <span id="minfo"><span id="logotype">MANIFEST</span><span class="fulltext">: Supply Chain Platform</span></span>
@@ -82,10 +99,10 @@
             </nav>
             <div class="clear"></div>
 
-        </div>
+        </section>
 
-        <div id='editor_holder'></div>
-        <div id="editor_overview">
+        <section id='editor_holder'></section>
+        <section id="editor_overview">
             <p class="edit_callout">This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains, but the format is still in development. it isn't the only option. Manifest also supports <a href="data/#smap">data that was originally created for the Sourcemap project</a>, and a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a>.</p>
             <div class="inputbox">
                 <input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
@@ -96,14 +113,13 @@
 
             <button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
 
-        </div>
+        </section>
 
         <div class="clear"></div>
-        <div id="map_chooser_wrap" class="closed">
+        <section id="map_chooser_wrap" class="closed">
             <div id="map_chooser"></div>
             <div id="chooser_arrow"></div>
-        </div>
-
+        </section>
         <div class="footer">
             <div class="footer-wrap-left">
 
@@ -120,11 +136,11 @@
             </div>
         </div>
         <div class="clear"></div>
+    </section>
 
-    </div>
 
-    <script src="js/Manifest-lib.min.js"></script>
-    <script src="js/Manifest-edit.min.js"></script>
+    <script src="js/Manifest-lib.js"></script>
+    <script src="js/Manifest-edit.js"></script>
 
 </body>
 

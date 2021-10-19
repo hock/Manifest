@@ -5365,12 +5365,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-popup.color-C2EFFF .leaflet-popup-close-button { color: #C2EFFF;} 
 .leaflet-popup.color-FEDDD8 .leaflet-popup-close-button { color: #FEDDD8;} 
 
-
-/* Fix for 1px border bug */
-.leaflet-tile {
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
-}
-
 /* Location Picker */
 #map_chooser {
 		position: fixed;

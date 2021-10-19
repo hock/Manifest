@@ -100,10 +100,35 @@ class ManifestAtlas {
 		MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng(new L.LatLng(lat,lng), 16), 16);
 	}
 	
+	RenderIntro(feature, layer) {
+		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
+		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
+		popupContent = `
+		<h2 id="popup-${fid}" class="poptitle">
+			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
+			<span onclick="MI.Atlas.MapPointClick(${fid});">Welcome to Manifest!</span>
+		</h2>
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
+	
+		layer.bindPopup(popupContent, { className: 'pop-intro'});
+		tooltipTitle = feature.properties.title; 
+		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle}</div>`;
+		layer.bindTooltip(tooltipContent);	
+		
+		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
+		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
+		layer.on('mouseout', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOut(e, l, f); });	
+		
+		layer.setStyle(feature.properties.style); 	
+		MI.Atlas.MeasureSort(feature, layer);
+	}
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
+		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
@@ -111,7 +136,7 @@ class ManifestAtlas {
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
 		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
-
+	
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
 			fts.sort((a, b) => (a.properties.lid > b.properties.lid) ? 1 : -1);
@@ -132,7 +157,7 @@ class ManifestAtlas {
 				</div>`;
 			}
 		} 	
-		layer.bindPopup(popupContent);
+		layer.bindPopup(popupContent, { 'className' : 'pop-'+fid});
 
 		if (feature.properties.clustered.length > 0) { tooltipTitle = '<i class="fas fa-boxes"></i> Cluster of '+(feature.properties.clustered.length+1)+' Nodes'; }
 		else { tooltipTitle = feature.properties.title; }

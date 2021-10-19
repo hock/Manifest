@@ -7956,7 +7956,7 @@ String.prototype.hashCode = function() {
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
-		<p class="description">${ManifestUtilities.Linkify(ft.properties.description)}</p>
+		<div class="description">${ManifestUtilities.Linkify(ft.properties.description)}</div>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
@@ -8254,10 +8254,35 @@ class ManifestAtlas {
 		MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng(new L.LatLng(lat,lng), 16), 16);
 	}
 	
+	RenderIntro(feature, layer) {
+		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
+		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
+		popupContent = `
+		<h2 id="popup-${fid}" class="poptitle">
+			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
+			<span onclick="MI.Atlas.MapPointClick(${fid});">Welcome to Manifest!</span>
+		</h2>
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
+	
+		layer.bindPopup(popupContent, { className: 'pop-intro'});
+		tooltipTitle = feature.properties.title; 
+		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle}</div>`;
+		layer.bindTooltip(tooltipContent);	
+		
+		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
+		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
+		layer.on('mouseout', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOut(e, l, f); });	
+		
+		layer.setStyle(feature.properties.style); 	
+		MI.Atlas.MeasureSort(feature, layer);
+	}
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
+
+		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
@@ -8265,7 +8290,7 @@ class ManifestAtlas {
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
 		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
-
+	
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
 			fts.sort((a, b) => (a.properties.lid > b.properties.lid) ? 1 : -1);
@@ -8286,7 +8311,7 @@ class ManifestAtlas {
 				</div>`;
 			}
 		} 	
-		layer.bindPopup(popupContent);
+		layer.bindPopup(popupContent, { 'className' : 'pop-'+fid});
 
 		if (feature.properties.clustered.length > 0) { tooltipTitle = '<i class="fas fa-boxes"></i> Cluster of '+(feature.properties.clustered.length+1)+' Nodes'; }
 		else { tooltipTitle = feature.properties.title; }
@@ -8698,11 +8723,15 @@ class ManifestAtlas {
 	}
 	
 	SetDocumentTitle() {
-		let scTitles = [];
+		let scTitles = [], setTitle = '';
 		for (let sc of MI.supplychains) { scTitles.push(sc.properties.title); }
 		
-		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { document.title = 'Manifest'; } 
-		else { document.title = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
+		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { setTitle = 'Manifest'; } 
+		else { setTitle = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
+		
+		document.title = setTitle;
+		document.querySelector('meta[property="og:title"]').setAttribute("content", setTitle);
+		
 	}
 	
 	ManifestResize() { MI.Visualization.Resize(); }
@@ -9383,6 +9412,7 @@ class ChordDiagram {
 	}
 }
  document.addEventListener("DOMContentLoaded", function(event) {
+	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
 	MI = new Manifest();
 	MI.serviceurl = "https://supplystudies.com/manifest/services/";
 		
