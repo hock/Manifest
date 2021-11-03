@@ -76,19 +76,25 @@ class ManifestUI {
 	}
 
 	LoadFromLauncher(value, close=true) {
-		let unloaded = false, loadurl, id, type;
+		let unloaded = false, loadurl, id, type, idref;
 	
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
 				type = 'smap';
 				id = loadurl.substring(60).split('.')[0];
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
-			} else if (loadurl.toLowerCase().indexOf('https://spreadsheets.google.com/feeds/cells/') >= 0) {
+				idref = id;
+				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;					
+			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
 				type = 'gsheet';
-				id = loadurl.substring(44).split('/')[0];
+				id = loadurl.substring(39).split('/')[0];
+				idref = id;
 				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
 				id = id.hashCode();
+			} else {
+				type = 'manifest';
+				idref = loadurl;
+				id = loadurl.hashCode();
 			}
 				
 		} else {
@@ -102,12 +108,12 @@ class ManifestUI {
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
 			else if (type === 'gsheet') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
 		}
-	
+		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
 			
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
-			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, url:loadurl, start:MI.supplychains.length === 0}));
+			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, idref: idref, url:loadurl, start:MI.supplychains.length === 0}));
 			//$.getJSON(loadurl, function(d) { });				
 			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }

@@ -7,14 +7,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
 		if (hashtype === "collection") { LoadCollection(hashid, true); }
 		else { 
+			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }
 			switch (hashtype) {
-				case "smap": fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
+				case 'smap': fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
-				case "gsheet": fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+				case 'gsheet': fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
-				case "manifest": fetch(hashid).then(r => r.json())
+				case 'manifest': fetch(hashid).then(r => r.json())
 					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
 				default: LoadError('Option not supported');

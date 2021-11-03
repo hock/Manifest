@@ -21,6 +21,7 @@ class Manifest {
 
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
+		console.log(options);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 	
 		switch(type) {
@@ -63,7 +64,7 @@ class Manifest {
 	FormatSMAP(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
 		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
-		d.details.url = '#smap-'+d.details.url.split('&id=')[1];
+		d.details.url = '#smap-'+options.idref;
 		return d;
 	}
 
@@ -81,7 +82,7 @@ class Manifest {
 			console.log(sheetpoints);
 			
 
-			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.url, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
 			for (let n of sheetpoints) {
 				if (!(isNaN(Number(n.index)) || Number(n.index) === 0)) { 
 				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: n.measure.split(';').map(function(s) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}), sources: n.sources, notes: MI.Util.markdowner.makeHtml(n['additional notes'])}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
@@ -256,8 +257,6 @@ class Manifest {
 		}	
 		sc.graph.type = 'directed';
 	}
-
-	GSHEETGraph(d, options) { }
 
 	LoadManifestFile(filedata, filename) {
 	    if (!filedata) { return; }

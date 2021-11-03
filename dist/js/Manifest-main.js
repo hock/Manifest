@@ -7434,6 +7434,7 @@ class Manifest {
 
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
+		console.log(options);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 	
 		switch(type) {
@@ -7476,7 +7477,7 @@ class Manifest {
 	FormatSMAP(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
 		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
-		d.details.url = '#smap-'+d.details.url.split('&id=')[1];
+		d.details.url = '#smap-'+options.idref;
 		return d;
 	}
 
@@ -7494,7 +7495,7 @@ class Manifest {
 			console.log(sheetpoints);
 			
 
-			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.url, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
 			for (let n of sheetpoints) {
 				if (!(isNaN(Number(n.index)) || Number(n.index) === 0)) { 
 				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: n.measure.split(';').map(function(s) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}), sources: n.sources, notes: MI.Util.markdowner.makeHtml(n['additional notes'])}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
@@ -7669,8 +7670,6 @@ class Manifest {
 		}	
 		sc.graph.type = 'directed';
 	}
-
-	GSHEETGraph(d, options) { }
 
 	LoadManifestFile(filedata, filename) {
 	    if (!filedata) { return; }
@@ -8619,19 +8618,25 @@ class ManifestAtlas {
 	}
 
 	LoadFromLauncher(value, close=true) {
-		let unloaded = false, loadurl, id, type;
+		let unloaded = false, loadurl, id, type, idref;
 	
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
 				type = 'smap';
 				id = loadurl.substring(60).split('.')[0];
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
-			} else if (loadurl.toLowerCase().indexOf('https://spreadsheets.google.com/feeds/cells/') >= 0) {
+				idref = id;
+				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;					
+			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
 				type = 'gsheet';
-				id = loadurl.substring(44).split('/')[0];
+				id = loadurl.substring(39).split('/')[0];
+				idref = id;
 				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
 				id = id.hashCode();
+			} else {
+				type = 'manifest';
+				idref = loadurl;
+				id = loadurl.hashCode();
 			}
 				
 		} else {
@@ -8645,12 +8650,12 @@ class ManifestAtlas {
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
 			else if (type === 'gsheet') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
 		}
-	
+		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
 			
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
-			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, url:loadurl, start:MI.supplychains.length === 0}));
+			fetch(loadurl).then(r => r.json()).then(data => MI.Process(type, data, {id: id, idref: idref, url:loadurl, start:MI.supplychains.length === 0}));
 			//$.getJSON(loadurl, function(d) { });				
 			if (close) { MI.Interface.ShowLauncher(); }
 		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
@@ -9450,14 +9455,15 @@ class ChordDiagram {
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
 		if (hashtype === "collection") { LoadCollection(hashid, true); }
 		else { 
+			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }
 			switch (hashtype) {
-				case "smap": fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
+				case 'smap': fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
-				case "gsheet": fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+				case 'gsheet': fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
-				case "manifest": fetch(hashid).then(r => r.json())
+				case 'manifest': fetch(hashid).then(r => r.json())
 					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
 				default: LoadError('Option not supported');
