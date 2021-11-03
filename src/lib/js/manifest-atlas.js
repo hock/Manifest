@@ -128,7 +128,7 @@ class ManifestAtlas {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
 
-		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
+		if (fid === 10292612160000) { MI.Atlas.active_point = fid; MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">

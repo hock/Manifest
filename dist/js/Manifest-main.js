@@ -7434,7 +7434,6 @@ class Manifest {
 
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
-		console.log(options);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 	
 		switch(type) {
@@ -7453,7 +7452,7 @@ class Manifest {
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
 		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
-		if (d.details.url === '#manifest-') { d.details.url = ''; }
+		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
@@ -7490,11 +7489,6 @@ class Manifest {
 		let sheetsc = {};
 		//console.log(JSON.stringify(d));
 		if (typeof sheetoverview.rootgeocode === 'undefined') {
-			console.log("new gsheet");
-			console.log(sheetoverview);
-			console.log(sheetpoints);
-			
-
 			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
 			for (let n of sheetpoints) {
 				if (!(isNaN(Number(n.index)) || Number(n.index) === 0)) { 
@@ -7507,13 +7501,11 @@ class Manifest {
 				sheetsc.features.push(ft);
 				}
 			}
-			console.log(sheetsc);
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
 				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 				sheetsc.features.push(ft);
 			}	
-			console.log(sheetsc);			
 		}
 		else { // Format a Legacy Gsheet		
 			sheetsc = {type:'FeatureCollection', mtype: 'gsheet', features: [], properties: { title: sheetoverview.name, description: sheetoverview.description, address: sheetoverview.rootaddress, geocode: sheetoverview.rootgeocode, measure: sheetoverview.measure }, details: options, mapper: {}, raw: d.raw, stops: [], hops: []};
@@ -7672,13 +7664,16 @@ class Manifest {
 	}
 
 	LoadManifestFile(filedata, filename) {
-	    if (!filedata) { return; }
+		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === filename.hashCode()) { return false; }}
+		
+	    if (!filedata) { return false; }
 
 	    let reader = new FileReader();
-		document.getElementById('file-input-label-text').textContent = reader.filename = filename;
-	
+		reader.filename = filename;
 	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), url: '', start:MI.supplychains.length === 0}); };
 	    reader.readAsText(filedata);
+		document.getElementById('file-input').value = "";
+		return true;
 	}
 	
 	ExportManifest(d, filename, format) {
@@ -7846,6 +7841,7 @@ String.prototype.hashCode = function() {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader');
+
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
 			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
@@ -8311,7 +8307,7 @@ class ManifestAtlas {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
 
-		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
+		if (fid === 10292612160000) { MI.Atlas.active_point = fid; MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
@@ -8578,7 +8574,10 @@ class ManifestAtlas {
 		let dropArea = new jsondrop('minfodetail', { 
 			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), url: '', start:MI.supplychains.length === 0}); } 
 		});	
-		document.getElementById('file-input').addEventListener('change', (e) => { MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop()); });
+		document.getElementById('file-input').addEventListener('change', (e) => { if (!MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop())) { 
+			this.ShakeAlert(document.getElementById('manifestbar'));
+			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
+		}});
 	
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
@@ -8623,20 +8622,11 @@ class ManifestAtlas {
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
-				type = 'smap';
-				id = loadurl.substring(60).split('.')[0];
-				idref = id;
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;					
+				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
-				type = 'gsheet';
-				id = loadurl.substring(39).split('/')[0];
-				idref = id;
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
-				id = id.hashCode();
+				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
 			} else {
-				type = 'manifest';
-				idref = loadurl;
-				id = loadurl.hashCode();
+				type = 'manifest'; idref = loadurl; id = loadurl.hashCode();
 			}
 				
 		} else {
@@ -8786,6 +8776,7 @@ class ManifestAtlas {
 		document.getElementById('messages').textContent = msg;
 		this.interval = setTimeout((e) => {document.getElementById('messages').textContent = ''; document.getElementById('messages').classList.add("closed");}, 4000);
 	}
+	
 	ShakeAlert(element, time=20, coefficient=50){
 	    element.style.transition = '0.1s';
     

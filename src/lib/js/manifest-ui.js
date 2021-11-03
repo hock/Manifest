@@ -36,7 +36,10 @@ class ManifestUI {
 		let dropArea = new jsondrop('minfodetail', { 
 			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), url: '', start:MI.supplychains.length === 0}); } 
 		});	
-		document.getElementById('file-input').addEventListener('change', (e) => { MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop()); });
+		document.getElementById('file-input').addEventListener('change', (e) => { if (!MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop())) { 
+			this.ShakeAlert(document.getElementById('manifestbar'));
+			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
+		}});
 	
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
@@ -81,20 +84,11 @@ class ManifestUI {
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
-				type = 'smap';
-				id = loadurl.substring(60).split('.')[0];
-				idref = id;
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;					
+				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
-				type = 'gsheet';
-				id = loadurl.substring(39).split('/')[0];
-				idref = id;
-				loadurl = MI.serviceurl + '?type='+type+'&id=' + id;								
-				id = id.hashCode();
+				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
 			} else {
-				type = 'manifest';
-				idref = loadurl;
-				id = loadurl.hashCode();
+				type = 'manifest'; idref = loadurl; id = loadurl.hashCode();
 			}
 				
 		} else {
@@ -244,6 +238,7 @@ class ManifestUI {
 		document.getElementById('messages').textContent = msg;
 		this.interval = setTimeout((e) => {document.getElementById('messages').textContent = ''; document.getElementById('messages').classList.add("closed");}, 4000);
 	}
+	
 	ShakeAlert(element, time=20, coefficient=50){
 	    element.style.transition = '0.1s';
     

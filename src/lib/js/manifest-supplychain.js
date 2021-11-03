@@ -18,6 +18,7 @@ class ManifestSupplyChain {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader');
+
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
 			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
