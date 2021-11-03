@@ -9,8 +9,8 @@
     <meta property="og:title" content="Manifest - Edit">
 
 
-    <base href="http://hockbook.local/Manifest/dist/" />
-    <link rel="stylesheet" href="css/Manifest-edit.css" />
+    <base href="https://supplystudies.com/manifest/" />
+    <link rel="stylesheet" href="css/Manifest-edit.min.css" />
 
 
     <meta property="og:url" content="https://supplystudies.com/manifest/edit/">
@@ -103,7 +103,12 @@
 
         <section id='editor_holder'></section>
         <section id="editor_overview">
-            <p class="edit_callout">This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains, but the format is still in development. it isn't the only option. Manifest also supports <a href="data/#smap">data that was originally created for the Sourcemap project</a>, and a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a>.</p>
+            <div class="edit_callout">
+                <h3>Manifest JSON</h3> This is a simple editor for creating Manifest supply chains. These are just JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This is the preferred mechanism for modeling supply chains, but the format is still in development. it isn't the only option. Manifest also supports <a href="data/#smap">the SMAP geojson format that was originally created for the Sourcemap project</a>.
+            </div>
+            <div class="edit_callout">
+                <h3>Google Sheets</h3> An alternative to using Manifest JSON is to create your supply chain in a Google Sheet. We provide a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a> that can be loaded into Manifest by making the sheet public and <a href="https://supplystudies.com/manifest/#gsheet-1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo">passing its ID to Manifest</a>.
+            </div>
             <div class="inputbox">
                 <input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
                 <label for="file-input" id="file-input-label"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17">
@@ -139,8 +144,8 @@
     </section>
 
 
-    <script src="js/Manifest-lib.js"></script>
-    <script src="js/Manifest-edit.js"></script>
+    <script src="js/Manifest-lib.min.js"></script>
+    <script src="js/Manifest-edit.min.js"></script>
 
 </body>
 

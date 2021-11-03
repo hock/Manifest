@@ -73,24 +73,53 @@ class Manifest {
 		let sheetoverview = this.GSheetToJson(d.g)[0];
 		let sheetpoints = this.GSheetToJson(d.r);
 		let sheetid = options.id;
+		let sheetsc = {};
+		//console.log(JSON.stringify(d));
+		if (typeof sheetoverview.rootgeocode === 'undefined') {
+			console.log("new gsheet");
+			console.log(sheetoverview);
+			console.log(sheetpoints);
+			
 
-		let sheetsc = {type:'FeatureCollection', mtype: 'gsheet', features: [], properties: { title: sheetoverview.name, description: sheetoverview.description, address: sheetoverview.rootaddress, geocode: sheetoverview.rootgeocode, measure: sheetoverview.measure }, details: options, mapper: {}, raw: d.raw, stops: [], hops: []};
-		sheetsc.details.layers = []; sheetsc.details.measures = {};
-		sheetsc.details.url = '#gsheet-'+sheetsc.details.url.split('&id=')[1];
-		for (let point of sheetpoints) {
-			let j = sheetsc.features.length;
-			sheetsc.features[j] = {type: 'Feature'};			
-			sheetsc.features[j].properties = {};	
-			sheetsc.features[j].properties.title = point.name;
-			sheetsc.features[j].properties.description = point.description;
-			sheetsc.features[j].properties.placename = point.location;
-			sheetsc.features[j].properties.category = point.category;
-			sheetsc.features[j].properties.sources = point.sources;
-			sheetsc.features[j].properties.notes = point.notes;
-			sheetsc.features[j].properties.measures = {};
-			sheetsc.features[j].geometry = {type:'Point', coordinates:[Number(point.geocode.split(',')[1]), Number(point.geocode.split(',')[0])]};				
-			sheetsc.stops.push({ 'local_stop_id':Math.max(1,j), 'id':Math.max(1,j), 'attributes':sheetsc.features[j].properties });
-		}		
+			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.url, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			for (let n of sheetpoints) {
+				if (!(isNaN(Number(n.index)) || Number(n.index) === 0)) { 
+				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: n.measure.split(';').map(function(s) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}), sources: n.sources, notes: MI.Util.markdowner.makeHtml(n['additional notes'])}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
+				if (n.destinationindex !== '') {
+					let hops = n.destinationindex.split(',');
+					for (let h in hops) { sheetsc.hops.push({ from_stop_id:Number(n.index), to_stop_id:Number(hops[h]), attributes:ft.properties}); }
+				}		
+				sheetsc.features.push(ft);
+				}
+			}
+			console.log(sheetsc);
+			for (let h of sheetsc.hops) {
+				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
+				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+				sheetsc.features.push(ft);
+			}	
+			console.log(sheetsc);			
+		}
+		else { // Format a Legacy Gsheet		
+			sheetsc = {type:'FeatureCollection', mtype: 'gsheet', features: [], properties: { title: sheetoverview.name, description: sheetoverview.description, address: sheetoverview.rootaddress, geocode: sheetoverview.rootgeocode, measure: sheetoverview.measure }, details: options, mapper: {}, raw: d.raw, stops: [], hops: []};
+			sheetsc.details.layers = []; sheetsc.details.measures = {};
+			sheetsc.details.url = '#gsheet-'+sheetsc.details.url.split('&id=')[1];
+			for (let point of sheetpoints) {
+				let j = sheetsc.features.length;
+				sheetsc.features[j] = {type: 'Feature'};			
+				sheetsc.features[j].properties = {};	
+				sheetsc.features[j].properties.title = point.name;
+				sheetsc.features[j].properties.description = point.description;
+				sheetsc.features[j].properties.placename = point.location;
+				sheetsc.features[j].properties.category = point.category;
+				sheetsc.features[j].properties.sources = point.sources;
+				sheetsc.features[j].properties.notes = point.notes;
+				sheetsc.features[j].properties.measures = {};
+				sheetsc.features[j].geometry = {type:'Point', coordinates:[Number(point.geocode.split(',')[1]), Number(point.geocode.split(',')[0])]};				
+				sheetsc.stops.push({ 'local_stop_id':Math.max(1,j), 'id':Math.max(1,j), 'attributes':sheetsc.features[j].properties });
+			}					
+		}
 		return sheetsc;
 	}
 	GSheetToJson(sheet) {
@@ -99,6 +128,7 @@ class Manifest {
 			let row = {};
 			for (let [j, prop] of sheet.values[0].entries()) {
 				row[prop.toLowerCase()] = sheet.values[i][j];
+				if (typeof row[prop.toLowerCase()] === 'undefined') { row[prop.toLowerCase()] = '';}
 			}
 			rows[rows.length] = row;
 		}
