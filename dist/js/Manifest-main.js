@@ -7483,23 +7483,32 @@ class Manifest {
 	/** Format a google sheet file so Manifest can understand it */
 	FormatGSHEET(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d));
-		let sheetoverview = this.GSheetToJson(d.g)[0];
-		let sheetpoints = this.GSheetToJson(d.r);
+		let sheetoverview = this.GSheetToJson(d.g)[0], sheetpoints = this.GSheetToJson(d.r);
 		let sheetid = options.id;
 		let sheetsc = {};
-		//console.log(JSON.stringify(d));
+
 		if (typeof sheetoverview.rootgeocode === 'undefined') {
 			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			
+			sheetpoints = sheetpoints.sort((a,b) => Number(a.index) - Number(b.index) );
+			
+			if (sheetpoints[0].index === 'An increasing number for indexing purposes') { sheetpoints.splice(0,1); }
+			if (sheetpoints[0].index === '0' && sheetpoints[0].name === 'Sample') { sheetpoints.splice(0,1); }
+			
+			// @TODO This logic works great (see also hop handling below) -- should do this with the FormatManifest function also.
+			let indexmap = [];
+			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
+			
 			for (let n of sheetpoints) {
-				if (!(isNaN(Number(n.index)) || Number(n.index) === 0)) { 
-				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: n.measure.split(';').map(function(s) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}), sources: n.sources, notes: MI.Util.markdowner.makeHtml(n['additional notes'])}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
-					let hops = n.destinationindex.split(',');
-					for (let h in hops) { sheetsc.hops.push({ from_stop_id:Number(n.index), to_stop_id:Number(hops[h]), attributes:ft.properties}); }
+					let hops = n.destinationindex.replace(' ', '').split(',');
+					for (let h in hops) { if (typeof indexmap[hops[h]] !== 'undefined') {
+						sheetsc.hops.push({ from_stop_id:Number(n.index), to_stop_id:Number(indexmap[hops[h]]), attributes:ft.properties}); 
+					}}
 				}		
 				sheetsc.features.push(ft);
-				}
 			}
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
@@ -7527,6 +7536,7 @@ class Manifest {
 			}					
 		}
 		return sheetsc;
+	
 	}
 	GSheetToJson(sheet) {
 		let rows = [];
