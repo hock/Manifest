@@ -18,9 +18,9 @@ module.exports = function(grunt) {
 						}
 					},
 					data: {
-						baseurl: "https://supplystudies.com/manifest/",
+						baseurl: "https://manifest.supplystudies.com/dev/",
 						minify: ".min", // or .min
-						version: "0.2.2"
+						version: "0.2.3"
 					}
 				}
 			}
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/grate.js', 'src/lib/js/leaflet/geodesic.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js', 'src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
+				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/grate.js', 'src/lib/js/leaflet/geodesic.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {

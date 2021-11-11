@@ -1,9 +1,8 @@
 class ManifestSupplyChain {
 	constructor() {
 		this.measures = [{measure: 'weight', unit: 'kg'}, {measure: 'co2e', unit: 'kg'}, {measure: 'water', unit: 'kl'},
-{measure: 'energy', unit: 'kj'}, {measure: 'cost', unit: 'dollars'}, {measure: 'percent', unit: '%'}];
-	 	this.linetypes = { greatcircle: 'GREAT_CIRCLE_LINE', bezier: 'BEZIER_LINE', straight: 'STRAIGHT_LINE' };
-
+		{measure: 'energy', unit: 'kj'}, {measure: 'cost', unit: 'dollars'}, {measure: 'percent', unit: '%'}];
+		this.linetypes = { greatcircle: 'GREAT_CIRCLE_LINE', bezier: 'BEZIER_LINE', straight: 'STRAIGHT_LINE' };
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
 	Setup(d) {	
@@ -17,7 +16,7 @@ class ManifestSupplyChain {
 		this.SetupStyle(d);
 		
 		let mheader = document.createElement('div');
-		mheader.id = 'mheader-'+id; mheader.classList.add('mheader');
+		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
 
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
@@ -41,12 +40,55 @@ class ManifestSupplyChain {
 			if (el.checked) { MI.Atlas.map.addLayer(MI.Atlas.layerdefs[el.value]); } 
 			else { MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[el.value]); } }); 
 		});
+		
+		let supplycatmap = {}, supplycats = {};
+		for (let ft of d.features) {
+			if (ft.geometry.type === 'Point') {
+				for (let cat of ft.properties.category.split(',')) {
+					if (cat !== '') {
+						supplycatmap[String(cat)] = true;
+					}
+				}
+			}
+		}
+		
+		let supplycat = document.createElement('div');
+		supplycat.id = 'supplycat-'+id; supplycat.classList.add('supplycatgroup');
+		supplycat.innerHTML = `<label class="supplycatheader">${d.properties.title} <input type="checkbox" value="chain-${id}" checked> <span class="chaincheckmark"></span> </label>`;
+		supplycat.innerHTML += 
+			`<label id="nodeheader-${id}" class="nodelineheader nodes">Nodes 
+			 <input type="checkbox" value="nodes-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
+		supplycat.innerHTML += 
+			`<label id="lineheader-${id}" class="nodelineheader lines">Lines 
+			 <input type="checkbox" value="lines-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
+		
+		for (const [key, value] of Object.entries(supplycatmap)) {
+			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
+			supplycats[key] = [];
+		}
+		MI.supplychains[index].categories = supplycats;
+		document.getElementById('supplycategories').append(supplycat);	
 	
+		document.querySelectorAll('#supplycategories .supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
+			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
+			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
+		});
+		document.querySelectorAll('#supplycategories .nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
+			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
+			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
+		});
+		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
+			MI.Interface.filter.clear = false;
+			MI.Interface.Search(document.getElementById('searchbar').value, true);
+		});});
+		
 		// Finalize UI
 		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
 		let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
 	
-		if (document.getElementById('searchbar').value !== '') { MI.Interface.ClearSearch(); MI.Interface.Search(); }
+		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { 
+			MI.Interface.ClearSearch(); MI.Interface.Search(); 
+		}
 	
 		if (MI.Interface.IsMobile()) { MI.Interface.Mobilify(id, index); }
 		MI.Interface.SetDocumentTitle();
@@ -60,10 +102,10 @@ class ManifestSupplyChain {
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
-			for (let p of ['description','placename','category','images','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
+			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
 			const expandedProperties = { categories: ft.properties.category.split(','), 
 				images: ft.properties.images.split(','), 
@@ -71,23 +113,32 @@ class ManifestSupplyChain {
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
-			if (d.mapper) { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; }
-				
+			
+			if (d.mapper) { 
+				if (ft.properties.index) { d.mapper[Number(ft.properties.index-1)] = ft; } // manifest
+				else { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
+			}
 			if (ft.geometry.type === 'Point') { 
 				let point = this.SetupPoint(ft, d, index); points.features.push(point);
 			} else { 
-				let line = this.SetupLine(ft, d, index); let arrow = this.SetupArrow(line, d, index);
-				lines.features.push(ft); arrows.features.push(arrow);
+				let line = this.SetupLine(ft, d, index); 
+				if (line !== false) {
+					let arrow = this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
+					lines.features.push(line); arrows.features.push(arrow);
+				}
 			}	
 		}
 		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
 		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
 		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
-	
-		// Prepare to add layers
-		let maplayergroup = null;
-		MI.Atlas.maplayer = maplayergroup = L.layerGroup();
+		if (lines.features.length === 0) { document.querySelectorAll('.nodelineheader.lines').forEach(el => { 
+			let inputs = el.querySelectorAll('input');
+			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
+		}); }	
 
+		// Prepare to add layers
+		let maplayergroup =  L.layerGroup();
+				
 		let lineLayer = new L.geoJSON(lines, { style: MI.Atlas.styles.line });	
 		d.details.layers.push(maplayergroup.addLayer(lineLayer));		
 
@@ -117,7 +168,12 @@ class ManifestSupplyChain {
 		}	
 	
 		let pointLayer = new L.geoJSON(points, { onEachFeature: MI.Atlas.RenderPoint, pointToLayer: function (feature, latlng) { 
-			return L.circleMarker(latlng, MI.Atlas.styles.points); 
+			//let icons = ['factory','warehouse','inventory','building','boat'];
+			//let icon = icons[Math.floor(Math.random()*icons.length)];
+			if (feature.properties.icon !== '') { feature.properties.style.img = { url: 'images/markers/'+feature.properties.icon+'.png' }; }
+			//feature.properties.style.img = { url: 'images/markers/'+icon+'.png' };
+			
+			return L.circleMarker(latlng, MI.Atlas.styles.point); 
 		} });	
 		
 		for (let j in MI.Atlas.map._layers) { 
@@ -127,12 +183,14 @@ class ManifestSupplyChain {
 		}
 		
 		pointLayer.on('mouseup', function(e){	});
+		
+		MI.Atlas.maplayer.push({id: d.details.id, points: pointLayer, lines: lineLayer, arrows: arrowLayer});
+		
 		d.details.layers.push(maplayergroup.addLayer(pointLayer));
 		d.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
 	
 		MI.Interface.RefreshMeasureList();
-		document.getElementById('sidepanel').scrollTo(0, 0);	
-	
+		document.getElementById('sidepanel').scrollTo(0, 0);		
 		return d;
 	}
 	
@@ -143,10 +201,10 @@ class ManifestSupplyChain {
 	}
 	
 	SetupPoint(ft, d, index) {
-		let setup = { index: index, type: 'node', style: d.details.style, basestyle: d.details.style, latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
+		let setup = { index: index, type: 'node', style: JSON.parse(JSON.stringify(d.details.style)), basestyle: JSON.parse(JSON.stringify(d.details.style)), latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
 		Object.assign(ft.properties, setup);
 	
-		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid;
+		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
 
 		li.innerHTML = `
 		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
@@ -154,7 +212,7 @@ class ManifestSupplyChain {
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
 			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link">'+cat+'</a>').join(" ")}</p>
-			<p class="measures"> ${ft.properties.measures.map(m => m ? '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit : "").join(", ")}</p>
+			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
 
 		</div> 
 		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
@@ -179,7 +237,7 @@ class ManifestSupplyChain {
 	SetupLine(ft, d, index) {		
 		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
 		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
-		if (fromx === tox && fromy === toy) { fromx = tox = fromy = toy = 0; }
+		if (fromx === tox && fromy === toy) { return false; }
 		
 		ft.geometry.type = 'MultiLineString';
 		ft.properties.type = 'line';
@@ -219,21 +277,7 @@ class ManifestSupplyChain {
 		ft.geometry.raw = multipass;
 		ft.properties.style = Object.assign(MI.Atlas.styles.line, {color: d.details.style.darkColor});
 		ft.properties.basestyle = MI.Atlas.styles.line;
-				
-		// Arrows	
-		let midindex = Math.floor((multipass[0].length-1)*0.8);
-		let middle = multipass[0][midindex];		
-		let angle = Math.atan2(multipass[0][midindex+5][0] - multipass[0][midindex-5][0], multipass[0][midindex+5][1] - multipass[0][midindex-5][1]) * 180 / Math.PI;
-
-		let arrow = {
-			type: 'Feature',
-			properties: ft.properties,
-			geometry: { type: 'Point', coordinates:  multipass[0][midindex] }
-		};
-		Object.assign(arrow.properties, { type: 'arrow', angle: angle, 
-			style: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}),
-			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
-					
+							
 		return ft;
 	}
 
@@ -303,8 +347,8 @@ class ManifestSupplyChain {
 			targetid = next.id.split('-')[1];	
 		}
 
-		document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.remove(); }); 
-	
+		document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id+', #supplycat-'+id).forEach(el => { el.remove(); }); 
+
 		for (let s in MI.supplychains) {
 			if (MI.supplychains[s].details.id === id) {
 				for (let l of MI.supplychains[s].details.layers) { MI.Atlas.map.removeLayer(l); }
@@ -315,6 +359,11 @@ class ManifestSupplyChain {
 			for (let n in MI.supplychains[s].graph.nodes) { 
 				if (MI.supplychains[s].graph.nodes[n].hasOwnProperty('ref')) { MI.supplychains[s].graph.nodes[n].ref.properties.index = s;   } 
 			} 	// TODO can we just change the original and not the ref?
+		}
+		for (let l in MI.Atlas.maplayer) {
+			if (MI.Atlas.maplayer[l].id === id) {
+				delete MI.Atlas.maplayer[l]; MI.Atlas.maplayer.splice(l, 1);
+			}
 		}
 
 		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
@@ -353,5 +402,57 @@ class ManifestSupplyChain {
 		if (document.getElementById('blob-'+id)) { document.getElementById('blob-'+id).remove(); }
 		MI.Visualization.Set(MI.Visualization.type);			
 		MI.Interface.SetDocumentTitle();	
+	}
+	
+	Hide(id, hide, type='chain') {
+		event.stopPropagation();
+		
+		if (type === 'chain') {
+			let offset = document.getElementById('mheader-'+id).offsetHeight, targetid = 0;
+	
+			if (MI.supplychains.length > 1) {
+				let prev = document.getElementById('mheader-'+id).previousElementSibling;
+				while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
+		
+				let next = document.getElementById('mheader-'+id).nextElementSibling;
+				while (next) { if (next.classList.contains('mheader')) break; next = next.nextElementSibling; }
+		
+				if (!next) {
+					offset = 0;	next = prev = document.getElementById('mheader-'+id).previousElementSibling; 
+					while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
+				}
+				targetid = next.id.split('-')[1];	
+			}
+		}
+		let mlayer; for (let l of MI.Atlas.maplayer) { if (l.id === Number(id)) { mlayer = l; } }
+		if (hide) {
+			if (type === 'chain') { 
+				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
+				MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); MI.Atlas.map.removeLayer(mlayer.points); }
+			if (type === 'nodes') { MI.Atlas.map.removeLayer(mlayer.points); }
+			if (type === 'lines') { MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); }
+			
+		} else { 
+			document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
+			if (type === 'chain') { 
+				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
+				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); MI.Atlas.map.addLayer(mlayer.points); }
+			if (type === 'nodes') { MI.Atlas.map.addLayer(mlayer.points); }
+			if (type === 'lines') { 
+				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); 
+				document.getElementById('nodeheader-'+id).querySelectorAll('input').forEach(el => { if (el.checked) { 
+					MI.Atlas.map.removeLayer(mlayer.points); MI.Atlas.map.addLayer(mlayer.points);} }); 	
+			}
+		}
+	
+		if (type === 'all') {
+			let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
+			let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
+			if (MI.supplychains.length !== 0) {
+				if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); }
+				else { document.getElementById('sidepanel').scrollTo(0, document.getElementById('mdetails-'+targetid).offsetTop + (-1*offset)); }
+			}
+		}	
+		MI.Atlas.Refresh();
 	}
 }

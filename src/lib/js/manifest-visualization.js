@@ -3,25 +3,27 @@ class ManifestVisualization {
 		this.type = 'map';
 		this.last_active = null;
 		this.interval = 0;
+		this.listview = null;
 	}
 	
 	Set(type, refresh=true) {
 		MI.Visualization.Clear();
 		
 		this.type = type; document.getElementById('viz-choices').value = type;
-		['map','forcegraph','flow','chord','textview'].forEach(t => { document.body.classList.remove(t); }); document.body.classList.add(this.type);
+		['map','forcegraph','flow','chord','listview','textview'].forEach(t => { document.body.classList.remove(t); }); document.body.classList.add(this.type);
 		switch(type) {
 			case 'map': MI.Visualization.MapViz(); break;
 			case 'forcegraph': MI.Visualization.Graph(refresh, type); break;			
 			case 'flow': MI.Visualization.Graph(refresh, type); break;			
-			case 'chord': MI.Visualization.Graph(refresh, type); break;				
+			case 'chord': MI.Visualization.Graph(refresh, type); break;	
+			case 'listview': MI.Visualization.ListViz(); break;			
 			case 'textview': MI.Visualization.TextViz(); break;
 		  	default: console.log('Visualization type not supported...');
 		}
 	}
 	 
 	MapViz() {
-		document.querySelectorAll('#vizwrap, #textview').forEach(el => { el.classList.add('closed'); });
+		document.querySelectorAll('#vizwrap, #textview, #listview').forEach(el => { el.classList.add('closed'); });
 		MI.Atlas.DisplayLayers(true);
 		document.querySelectorAll('.viz, #vizshell defs').forEach(el => { el.remove(); });
 
@@ -30,7 +32,7 @@ class ManifestVisualization {
 	}
 	
 	Graph(refresh, type) {
-		document.querySelectorAll('#vizwrap, #textview').forEach(el => { el.classList.add('closed'); }); 
+		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); 
 		document.getElementById('vizwrap').classList.remove('closed');
 		
 		if (MI.Atlas.active_point && MI.Atlas.active_point._popup) { this.last_active = MI.Atlas.active_point._popup._source.feature.properties.lid; } else { this.last_active = null; }
@@ -69,7 +71,7 @@ class ManifestVisualization {
 	}
 	
 	TextViz() {
-		document.querySelectorAll('#vizwrap, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('textview').classList.remove('closed');
+		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('textview').classList.remove('closed');
 		document.querySelectorAll('.viz, #vizshell defs').forEach(el => { el.remove(); });
 					
 		for (let sc of MI.supplychains) { if (!(document.getElementById('blob-'+sc.details.id))) {		
@@ -97,7 +99,46 @@ class ManifestVisualization {
 			for (let s in MI.supplychains) { if (MI.supplychains[s].details.id == did) { MI.ExportManifest(MI.Visualization.ManifestMarkdown(did), did, 'markdown'); } }
 		});}); 
 	}
+	
+	ListViz() {
+		let values = [];
+		
+		for (let sc of MI.supplychains) {
+		
+			let rawvalues = sc.features.filter(e => e.geometry.type === 'Point');
+			for (let val of rawvalues) {
+				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category.split(',').join(', '), notes: val.properties.notes});
+			}
+		}
+		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('listview').classList.remove('closed');
 
+		let options = {
+		    item: function(values) {			
+				return `<li class="entry">
+							<div class="manifest col">${values.manifest}</div>
+				
+							<div class="index col">${values.index}</div>
+			
+							<div class="name col">${values.name}</div>
+							<div class="description col">${values.description}</div>
+							<div class="placename col">${values.placename}</div>
+							<div class="geocode col">${values.geocode}</div>
+			
+							<div class="categories col">${values.categories}</div>
+							<div class="notes col">${values.notes}</div>
+							<div class="clear"></div>
+			
+			
+						</li>`;
+			},
+			page:50,
+		    pagination: [ { paginationClass: "pagination", innerWindow: 1, left: 3, right: 3, item: '<li><a class="page"></a></li>'}]	
+		};
+		if (this.listview === null) { this.listview = new List('datalist', options, values); }
+		else { this.listview.clear(); this.listview.add(values);}
+
+	}
+	
 	ManifestMarkdown(id) {
 		let md = '';
 		for (let s in MI.supplychains) {

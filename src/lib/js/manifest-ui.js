@@ -1,7 +1,8 @@
 class ManifestUI {
 	constructor() { 
-		this.prevsearch = '';
 		this.interval = null;
+		this.filter = {clear: true, term: null};
+		
 		document.getElementById('fullscreen-menu').addEventListener('click', (e) => { MI.Interface.ToggleFullscreen(); });
 		document.getElementById('mapcapture').addEventListener('click', (e) => { MI.ExportManifest(null, document.title, 'map'); });
 		document.querySelectorAll('#minfo, #minfo-hamburger').forEach(el => { el.addEventListener('click', (e) => { MI.Interface.ShowLauncher(); }); });
@@ -117,23 +118,40 @@ class ManifestUI {
 	Search(term) {
 		if (term) { document.getElementById('searchbar').value = term; }
 		let s = document.getElementById('searchbar').value.toLowerCase();
+		
 		// Only do something if the search has changed.
-		if (s === MI.Interface.prevsearch) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.prevsearch = s; }
-	
-		document.querySelectorAll('.mlist li').forEach(el => { 
-	        if (el.textContent.toLowerCase().indexOf(s) !== -1)  { el.style.display = 'list-item'; } else { el.style.display = 'none'; }
-	    });
-		// TODO, if nothing in the list, more overtly hide the supply chain
-		let found = false;
+		if (s === MI.Interface.filter.term && MI.Interface.filter.clear) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.filter.term = s;}
+		
+		let closedcats = [];
+		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
+		
+		if (!MI.Interface.filter.clear) {		
+			document.querySelectorAll('.mlist li').forEach(el => { 
+				let cats = el.querySelectorAll('.cat-link'), catcount = 0;
+				for (let cc of closedcats) { for (let cat of cats) { cat = cat.textContent.toLowerCase(); if (cc === cat) { catcount++; } } }
+				if ( catcount >= cats.length) { el.style.display = 'none'; } else { el.style.display = 'list-item'; }
+		    });
+			MI.Interface.filter.clear = true;
+		}
 
+		let found = false;
 		for (let i in MI.Atlas.map._layers) {
-			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined' && MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
+			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined') {
 				found = false;
-				for (let k of ['title','description','category','placename']) {
-					if (String(MI.Atlas.map._layers[i].feature.properties[k]).toLowerCase().indexOf(s) !== -1) { found = true; }
+				
+				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0;
+				for (let cc of closedcats) { for (let cat of cats) { if (cc === cat) { catcount++; } } }
+		        if (catcount >= cats.length) { found = false; }
+				else {
+					for (let k of ['title','description','category','placename']) {
+						if (String(MI.Atlas.map._layers[i].feature.properties[k]).toLowerCase().indexOf(s) !== -1) { found = true; }
+					}
 				}
 				if (!(found)) { 
-					MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.1, opacity: 0.1 }); 
+					if (MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
+						MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.1, opacity: 0.1 }); }
+					else { 	MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.0, opacity: 0.0 }); }
+						
 					MI.Atlas.map._layers[i].feature.properties.hidden = true;
 					if (MI.Atlas.active_point && MI.Visualization.type === 'map') {
 						if (MI.Atlas.active_point._popup._source._leaflet_id === MI.Atlas.map._layers[i]._leaflet_id) {
@@ -153,16 +171,14 @@ class ManifestUI {
 							opacity: MI.Atlas.map._layers[i].feature.properties.basestyle.opacity }); 
 					MI.Atlas.map._layers[i].feature.properties.hidden = false;				
 				}
-			
 			} 
 		}	
-	
-		if (MI.Visualization.type === 'map') {  MI.Atlas.UpdateCluster(s); MI.Atlas.Refresh(); } else { MI.Visualization.Update(); }
+		if (MI.Visualization.type === 'map' && MI.Atlas.map._renderer) {  MI.Atlas.UpdateCluster(s); MI.Atlas.Refresh(); } else { MI.Visualization.Update(); }
 	}
 
 	ClearSearch() {
 		document.getElementById('searchbar').value = ''; 
-		MI.Interface.prevsearch = null;
+		MI.Interface.filter = {term: null, clear: true};
 	}
 	
 	Link(link, event) {

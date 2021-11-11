@@ -3178,7 +3178,12 @@
   			this._zoom = zoom;
   			return this;
   		}
-  		return this.setView(this.getCenter(), zoom, {zoom: options});
+		if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
+		    return this.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._latlng),zoom, {zoom: options});
+		} else {
+			return this.setView(this.getCenter(), zoom, {zoom: options});
+		}
+  		
   	},
 
   	// @method zoomIn(delta?: Number, options?: Zoom options): this
@@ -7887,7 +7892,6 @@
   	// @aka CircleMarker options
   	options: {
   		fill: true,
-
   		// @option radius: Number = 10
   		// Radius of the circle marker, in pixels
   		radius: 10
@@ -7910,7 +7914,7 @@
   		// Fired when the marker is moved via [`setLatLng`](#circlemarker-setlatlng). Old and new coordinates are included in event arguments as `oldLatLng`, `latlng`.
   		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng});
   	},
-
+	
   	// @method getLatLng(): LatLng
   	// Returns the current geographical position of the circle marker
   	getLatLng: function () {
@@ -7957,6 +7961,17 @@
   	},
 
   	_updatePath: function () {
+        if (this.options.img && !this.options.img.el) {
+            const img = document.createElement('img');
+            img.src = this.options.img.url;
+            this.options.img.el = img;
+            img.onload = () => {
+                this.redraw();
+            };
+            img.onerror = () => {
+                this.options.img = null;
+            };
+        } 
   		this._renderer._updateCircle(this);
   	},
 
@@ -12398,6 +12413,15 @@
   		}
 
   		this._fillStroke(ctx, layer);
+		if (layer.feature.properties.style.img) { this._ctx.drawImage(layer.feature.properties.style.img.el, p.x - r / 2, p.y - r / 2, r, r); }
+		else { 
+			ctx.font = "8px Arial"; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.textAlign = "center";
+			if (layer.feature.properties.clustered.length > 0) {
+				this._ctx.drawImage(MI.Atlas.clusterimg.el, p.x - r / 2, p.y - r / 2, r, r);
+			} else {
+				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y+3);
+			}
+		}
   	},
 
   	_fillStroke: function (ctx, layer) {
@@ -14061,5 +14085,5 @@
 
 })));
 
-
 L.Canvas.prototype._updateTriangle=function(layer){var p,ctx;if(!this._drawing||layer._empty())return null;p=layer._point;ctx=this._ctx;wh=layer._width/2;hh=layer._height/2;r=0!==layer._rotation?layer._rotation*(2*Math.PI)/360:0;this._layers[layer._leaflet_id]=layer;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(r);ctx.beginPath();ctx.moveTo(0,-hh);ctx.lineTo(wh,2*hh);ctx.lineTo(-wh,2*hh);ctx.closePath();ctx.restore();this._fillStroke(ctx,layer)},L.TriangleMarker=L.Path.extend({options:{fill:!0,width:12,height:12,rotation:0},initialize:function(latlng,options){L.setOptions(this,options);this._latlng=L.latLng(latlng);this._width=this.options.width;this._height=this.options.height;this._rotation=this.options.rotation;this._renderer=this.options.renderer},setLatLng:function(latlng){this._latlng=L.latLng(latlng);this.redraw();return this.fire("move",{latlng:this._latlng})},getLatLng:function(){return this._latlng},setWidth:function(width){this.options.width=this._width=width;return this.redraw()},setHeight:function(height){this.options.height=this._height=height;return this.redraw()},setRotation:function(deg){this.options.rotation=this._rotation=deg;return this.redraw()},getWidth:function(){return this._width},getHeight:function(){return this._height},getRotation:function(){return this._rotation},setStyle:function(options){var width=options&&options.width||this._width,height=options&&options.height||this._height;L.Path.prototype.setStyle.call(this,options);this.setWidth(width);this.setHeight(height);return this},_project:function(){this._point=this._map.latLngToLayerPoint(this._latlng);this._updateBounds()},_updateBounds:function(){var w=this._width/2,h=this._height/2,b=this._clickTolerance(),p=[w+b,h+b];this._pxBounds=new L.Bounds(this._point.subtract(p),this._point.add(p))},_update:function(){if(this._map)this._updatePath()},_updatePath:function(){this._renderer._updateTriangle(this)},_empty:function(){return this._width&&this._height&&!this._renderer._bounds.intersects(this._pxBounds)},_containsPoint:function(p){return this._pxBounds&&this._pxBounds.contains(p)}});L.triangleMarker=function(latlng,options){return new L.TriangleMarker(latlng,options)};
+

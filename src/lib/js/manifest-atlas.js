@@ -6,9 +6,10 @@ class ManifestAtlas {
 			preferCanvas: true, minZoom: 2, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
 			scrollWheelZoom: false, closePopupOnClick: pop 
 		});
-		this.maplayer = null;
+		this.maplayer = [];
 		this.active_point = null;
 		this.homecontrol = null;
+		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
 		
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
 			
@@ -34,7 +35,7 @@ class ManifestAtlas {
 		 	dark: new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
 
 			shipping: new L.TileLayer(this.tiletypes.SHIPPING, 
-				{ maxNativeZoom: 4, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
+				{ maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
 			marine: new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
 			rail: new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
 		};
@@ -53,6 +54,8 @@ class ManifestAtlas {
 		this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 		this.map.on('popupopen', (e) => { this.PopupOpen(e); });
 		this.map.on('popupclose', (e) => { this.PopupClose(e); });
+		this.map.on('tooltipopen', (e) => { this.TooltipOpen(e); });
+		this.map.on('tooltipclose', (e) => { this.TooltipOpen(e); });
 
 		if (document.body.classList.contains('light')) { this.map.addLayer(this.layerdefs.google); } 
 		else if (document.body.classList.contains('dark')) { this.map.addLayer(this.layerdefs.dark); }	
@@ -65,7 +68,7 @@ class ManifestAtlas {
 	
 	PopupOpen(e) {		
 		let s = document.getElementById('searchbar').value.toLowerCase();
-		if (s !== '') {
+		if (s !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) {
 			let active = false;
 			if (e.popup._source.options.fillOpacity !== 0.1) { active = true; }
 			else {
@@ -94,6 +97,9 @@ class ManifestAtlas {
 			}
 		}
 	}
+	
+	TooltipOpen(e) { }
+	TooltipClose(e) { }
 	
 	TagClick(id, lat, lng) {
 		MI.Atlas.PointFocus(id); 
@@ -128,7 +134,7 @@ class ManifestAtlas {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
 
-		if (fid === 10292612160000) { MI.Atlas.active_point = fid; MI.Atlas.RenderIntro(feature, layer); return; }
+		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
@@ -143,7 +149,7 @@ class ManifestAtlas {
 			let bg = 'linear-gradient(90deg, ' + fts.map((f, i, fts) => f.properties.style.fillColor + ' ' + 100*(i/fts.length) + '%' ).join(', ') + ')';
 			popupContent = `
 			<h2 id="popup-cluster" class="poptitle cluster" style="background: url('${bgimg}'), ${bg}; color: ${fts[0].properties.style.textColor}">
-				Cluster of <span id="cluster-count" class="cluster-count">${feature.properties.clustered.length+1}</span> Nodes
+				<i class="fas fa-th"></i> Cluster of <span id="cluster-count" class="cluster-count">${feature.properties.clustered.length+1}</span> Nodes
 			</h2>`;
 			
 			for (let ft of fts) {
@@ -157,7 +163,7 @@ class ManifestAtlas {
 				</div>`;
 			}
 		} 	
-		layer.bindPopup(popupContent, { 'className' : 'pop-'+fid});
+		layer.bindPopup(popupContent);
 
 		if (feature.properties.clustered.length > 0) { tooltipTitle = '<i class="fas fa-boxes"></i> Cluster of '+(feature.properties.clustered.length+1)+' Nodes'; }
 		else { tooltipTitle = feature.properties.title; }
@@ -186,15 +192,26 @@ class ManifestAtlas {
 	}
 
 	/** Focus on a point on the map and open its popup. **/
-	PointFocus(pid) {	
+	PointFocus(pid, fit=false) {	
 		for (let i in this.map._layers) {		
 			if (typeof this.map._layers[i].feature !== 'undefined') {							
-				if (this.map._layers[i].feature.properties.lid === Number(pid)) {				
-					if (MI.Visualization.type === 'map') { this.SetActivePoint(this.map._layers[i]); this.map._layers[i].openPopup(); }
+				if (this.map._layers[i].feature.properties.lid === Number(pid)) {		
+					if (MI.Visualization.type === 'map') { 
+						this.SetActivePoint(this.map._layers[i]); 
+						
+						if (fit) { 
+							let sid = MI.supplychains[this.map._layers[i].feature.properties.mindex-1].details.id;
+							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});
+							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom); 
+						}
+						this.map._layers[i].openPopup(); 
+					}
 				}
 			} 
 		} 
-		if (document.getElementById('searchbar').value !== '') { this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase()); }
+		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) {
+			 this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase()); 
+		 }
 	}
 	
 	/** The UI side of the focus function, scrolls the user interface to a point based on map (or functional) action **/
@@ -228,10 +245,10 @@ class ManifestAtlas {
 	
 	PointMouseOut(e, layer, feature) { 
 		if (layer.feature.properties && layer.feature.properties.style && layer.options.fillOpacity !== 0.1) {
-			layer.setStyle(layer.feature.properties.style);
+			layer.setStyle({fillColor: layer.feature.properties.style.fillColor});
 			this.MeasureSort(feature, layer);
 			// Not Great!
-			if (document.getElementById('searchbar').value !== '') { MI.Interface.Search();}
+			if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { MI.Interface.Search();}
 	
 		} 
 		if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
@@ -263,8 +280,11 @@ class ManifestAtlas {
 		if (!ft && !MI.Atlas.active_point || MI.Visualization.type !== 'map') { return; } else { if (!ft) { ft = MI.Atlas.active_point._popup._source.feature; }}	
 		let ccount = 0, maxcount = 1;
 		
+		let closedcats = [];
+		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
 		document.querySelectorAll('.clusterbox').forEach(el => { 
-	        if (el.textContent.toLowerCase().indexOf(s) !== -1)  { el.style.display = 'block'; } else { el.style.display = 'none'; }		
+			let text = el.textContent.toLowerCase();
+	        if (text.indexOf(s) !== -1 && !(closedcats.some(text.includes.bind(text)))) { el.style.display = 'block'; } else { el.style.display = 'none'; }		
 	    });	
 				
 		if (!ft.properties.hidden) { ccount++; }
@@ -310,7 +330,7 @@ class ManifestAtlas {
 			const nodeId = document.getElementsByClassName('mlist')[document.getElementsByClassName('mlist').length-1].childNodes[0].id.split('_')[1];
 			if (MI.Visualization.type === 'map') {
 				MI.Interface.ShowHeader(mlistId);
-				MI.Atlas.PointFocus(nodeId);	
+				MI.Atlas.PointFocus(nodeId, true);	
 			}	
 			else if (MI.Visualization.type === 'textview') {
 				MI.Interface.ShowHeader(mlistId);

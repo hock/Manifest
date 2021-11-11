@@ -5416,7 +5416,7 @@ body.editor .leaflet-left .leaflet-control {
 	position:absolute;
 	top:1rem; right: 0.8rem;
 	box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); border-radius:.25rem; padding: .375rem .25rem .375rem .25rem;
-	z-index:12000;
+	z-index:12250;
 }
 
 body.light .vizmenu #viz-choices, body.light .vizmenu #measure-choices { color: #222; background-color: #fff; border-color: #ccc; }
@@ -5577,6 +5577,54 @@ body.fullscreen #textview {
 }
 #textview.closed { display:none; }
 
+#listview {
+	background: #fff;
+	z-index: 12100;
+	width: 100%;
+	height: 100vh;
+	position: absolute;
+}
+#datalist {
+	margin: 6rem 1rem 1rem 1rem;
+	overflow: auto;
+	height: calc(100% - 7rem);
+}
+.dataviewer div.dot { 
+	cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; text-align:center; font-size:0.8rem;
+	background:#4d34db; border-color:#efecfa; color:#efecfa;
+}
+.dataviewer ul {list-style:none; margin:0.5rem 0; padding:0;}
+.dataviewer ul li.entry, #datasort { padding:0.5rem 0.5rem 0.5rem 0.5rem;}
+.dataviewer ul li.entry:nth-child(odd) { background:#efecfa; } 
+
+.dataviewer ul li.entry span { display:inline-block;}
+.dataviewer ul li.entry div.col { width:10%; padding:0.25rem; float:left; overflow:auto; height:3rem; border-right:1px solid #ccc;}
+.dataviewer ul li.entry div.index, #datasort .sort.index { width:2rem;}
+
+.dataviewer ul li.entry div.description, #datasort .sort.description { width:30%;}
+.dataviewer ul li.entry div.description p, .dataviewer ul li.entry div.description ul { display:inline; padding:0; margin:0;}
+.dataviewer ul.pagination { display:block; position: absolute; top: 1rem; left: 60rem;}
+.dataviewer ul.pagination li { display:inline; cursor:pointer; padding:0.25rem;}
+
+#datasort { position:sticky; top:0; background:#fff; border:1px solid #ccc; border-radius:0.25rem; }
+#datasort .sort { width:10%; padding:0.25rem; float:left; border-right:1px solid #ccc; text-decoration:underline; }
+#datasort .sort { cursor:pointer; }
+#datasort .sort.asc, #datasort .sort.desc { }
+#datasort .sort.asc::after{content:"\025B2";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:middle; text-decoration:none; display:inline-block;}
+#datasort .sort.desc::after{content:"\0025BC";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:middle; text-decoration:none; display:inline-block;}
+
+#datalist ul.pagination li { padding:0.25rem; display:inline-block; border-radius:0.25rem; margin:0 0.25rem;}
+#datalist ul.pagination li.active { background:#efecfa; }
+
+#datasearch { border:1px solid #ccc; border-radius:0.25rem; 
+	position: absolute;
+	top: 1rem;
+	left: 29rem;
+	font-size: 1rem;
+	padding: 1rem;
+	width: 30rem;}
+#datasearch {margin:0;}
+#datasearch::placeholder { color:#000;}
 
 .ui-helper-hidden {
 	display: none;
@@ -5736,7 +5784,7 @@ body.fullscreen #textview {
 }
 
 @media only screen and (max-width: 920px) and (orientation: portrait) { 
-
+	.listview { display:none;}
 	.vizwrap{position:relative;top:3.5rem;height:60%;width:100%;display:block;}
 	.vizwrap.closed { display:none; }
 	.view-wrapper.top .vizwrap { height:0;}
@@ -5779,7 +5827,7 @@ body.fullscreen #textview {
 	.map { position: absolute; top: 0; right: 0; bottom: 0; width: 100%; *height:100%; }
 
 	#manifestbar { border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; background:0.5rem center no-repeat; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); transition: height .25s ease-in-out;} 
-	#sidepanel { border-radius:0.25rem; position: absolute; top: 4rem; left: 0; bottom: 0; z-index:12500; margin:1rem; width: 27rem; *height: 100%; overflow: auto; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); overflow-wrap: break-word; } 
+	#sidepanel { border-radius:0.25rem; position: absolute; top: 4rem; left: 0; bottom: 0; z-index:12000; margin:1rem; width: 27rem; *height: 100%; overflow: auto; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); overflow-wrap: break-word; } 
 
 	#loader { position:absolute; z-index:50000; height:100%; width:100%; text-align:center; }
 	#loader h1 { position: relative; margin:20% auto 2.5rem auto; height:0; padding-top:70px; text-align:center; background:url("../images/logo.png") center top no-repeat; }
@@ -5824,7 +5872,7 @@ body.fullscreen #textview {
 	#manifestlist p.measures { font-size:0.8rem; }
 	#manifestlist ul.mlist { list-style:none; margin:0; padding:0; }
 	#manifestlist li { padding:0.5rem 0; border-bottom:1px solid; width:94%; margin:0 auto;}
-	#manifestlist li div.dot { cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; text-align:center; font-size:0.5rem; color:#fff; line-height:1rem;}
+	#manifestlist li div.dot { cursor:pointer; height:1rem; min-width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; padding:0 0.1rem; float:left; text-align:center; font-size:0.5rem; color:#fff; line-height:1rem;}
 	#manifestlist li div.dot:hover { }
 	#manifestlist ul.mlist .description, #manifestlist ul.mlist .pdetails, #manifestlist ul.mlist .featuredimages { margin:0.25rem 0;}
 	
@@ -5927,15 +5975,19 @@ body.fullscreen #textview {
 		background-size:cover;
 	}
 	
-	.layercontainer { display: block; position: relative; padding-left: 1.5rem; cursor: pointer; font-size: 1rem; user-select: none; }
-	.layercontainer input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-	.layercheckmark { position: absolute; top: 0; left: 0; height: 1.2rem; width: 1.2rem; background-color: #eee; }
-	.layercontainer:hover input ~ .layercheckmark { background-color: #ccc; }
-	.layercontainer input:checked ~ .layercheckmark { background-color: #2196F3; }
-	.layercheckmark:after { content: ""; position: absolute; display: none; }
-	.layercontainer input:checked ~ .layercheckmark:after { display: block; }
-	.layercontainer .layercheckmark:after { left: 0.4rem; top: 0.2rem; width: 0.2rem; height: 0.5rem; 
-		border: solid white; border-width: 0 0.2rem 0.2rem 0; transform: rotate(45deg); }
+	#supplycategories { margin-top:0.5rem;}
+	.layercontainer, .supplycatheader, .supplycat, .nodelineheader { display: block; position: relative; padding-left: 1.5rem; cursor: pointer; font-size: 0.8rem; user-select: none; }
+	.layercontainer input, .supplycatheader input, .supplycat input, .nodelineheader input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+	.layercheckmark, .chaincheckmark, .supplycatcheckmark, .nodelinecheckmark { position: absolute; top: 0; left: 0; height: 1rem; width: 1rem; background-color: #eee; }
+	
+	.layercontainer:hover input ~ .layercheckmark, .supplycatheader:hover input ~ .chaincheckmark, .supplycat:hover input ~ .supplycatcheckmark, .nodelineheader:hover input ~ .nodelinecheckmark { background-color: #ccc; }
+	.layercontainer input:checked ~ .layercheckmark, .supplycatheader input:checked ~ .chaincheckmark, .supplycat input:checked ~ .supplycatcheckmark, .nodelineheader input:checked ~ .nodelinecheckmark { background-color: #2196F3; }
+	.layercheckmark:after, .chaincheckmark:after, .supplycatcheckmark:after, .nodelinecheckmark:after { content: ""; position: absolute; display: none; }
+	.layercontainer input:checked ~ .layercheckmark:after, .supplycatheader input:checked ~ .chaincheckmark:after, .supplycat input:checked ~ .supplycatcheckmark:after, .nodelineheader input:checked ~ .nodelinecheckmark:after { display: block; }
+	.layercontainer .layercheckmark:after, .supplycatheader .chaincheckmark:after, .supplycat .supplycatcheckmark:after, .nodelineheader .nodelinecheckmark:after { left: 0.3rem; top: 0.15rem; width: 0.2rem; height: 0.4rem; border: solid white; border-width: 0 0.2rem 0.2rem 0; transform: rotate(45deg); }
+	.supplycat, .nodelineheader { padding-left:3rem; max-width:6rem; overflow:hidden;}	
+	.supplycatcheckmark, .nodelinecheckmark {left: 1.5rem; }
+		
 	
 	#fullscreen-menu{position:absolute;bottom:1.5rem;right:3.8rem;box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2);
 		border-radius:.25rem;padding:.375rem .25rem .375rem .25rem;z-index:11000;}

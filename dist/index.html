@@ -9,7 +9,7 @@
     <meta property="og:title" content="Manifest: Supply Chain Platform">
 
 
-    <base href="https://supplystudies.com/manifest/" />
+    <base href="https://manifest.supplystudies.com/dev/" />
     <link rel="stylesheet" href="css/Manifest-main.min.css" />
 
 
@@ -99,6 +99,7 @@
                 <option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
                 <option id="flow-viz-choice" value="flow">Flow</option>
                 <option id="chord-viz-choice" value="chord">Chord</option>
+                <option id="listview-viz-choice" value="listview">List</option>
                 <option id="textview-viz-choice" value="textview">Raw</option>
             </select>
         </nav>
@@ -146,9 +147,30 @@
                 <label class="layercontainer">Marine Traffic <input type="checkbox" value="marine"> <span class="layercheckmark"></span> </label>
                 <label class="layercontainer">Rail Connections <input type="checkbox" value="rail"> <span class="layercheckmark"></span> </label>
             </div>
+            <div id="supplycategories">
+                <h3>Supply Chain Manifests</h3>
+            </div>
         </nav>
         <div class="map" id="map"></div>
         <div class="textview closed" id="textview"></div>
+        <div class="listview closed" id="listview">
+            <div id="datalist" class="dataviewer smapviewer">
+                <div id="datasort">
+                    <div class="manifest col sort" data-sort='manifest'>Manifest</div>
+                    <div class="index col sort" data-sort='index'>#</div>
+                    <div class="name col sort" data-sort='name'>Name</div>
+                    <div class="description col sort" data-sort='description'>Description</div>
+                    <div class="placename col sort" data-sort='placename'>Address</div>
+                    <div class="geocode col sort" data-sort='geocode'>Geocode</div>
+                    <div class="categories col sort" data-sort='categories'>Category</div>
+                    <div class="notes col sort" data-sort='notes'>Additional Notes</div>
+                    <div class="clear"></div>
+                </div>
+                <input type="search" id="datasearch" class="search" placeholder="Search..." />
+                <ul class=list id="manifestlistview"></ul>
+                <ul class="pagination"></ul>
+            </div>
+        </div>
     </main>
 
     <section id="loader">

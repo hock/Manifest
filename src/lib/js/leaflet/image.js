@@ -40,7 +40,11 @@ module.exports = function leafletImage(map, callback) {
     layerQueue.awaitAll(layersDone);
 
     function drawTileLayer(l) {
-        if (l instanceof L.TileLayer) layerQueue.defer(handleTileLayer, l);
+        if (l instanceof L.TileLayer) {
+			if (l._url.substr(0,24) !== 'https://tiles.arcgis.com' && l._url.substr(0,24) !== 'https://tiles.marinetraf' && l._url.substr(0,24) !== 'https://{s}.tiles.openra') {
+				layerQueue.defer(handleTileLayer, l); 
+			}
+		}
         else if (l._heat) layerQueue.defer(handlePathRoot, l._canvas);
     }
 
@@ -72,7 +76,7 @@ module.exports = function leafletImage(map, callback) {
         done();
     }
 
-    function handleTileLayer(layer, callback) {
+    function handleTileLayer(layer, callback) {		
         // `L.TileLayer.Canvas` was removed in leaflet 1.0
         var isCanvasLayer = (L.TileLayer.Canvas && layer instanceof L.TileLayer.Canvas),
 	    	canvas = createHiPPICanvas(dimensions.x, dimensions.y, 2);
@@ -84,6 +88,8 @@ module.exports = function leafletImage(map, callback) {
 
         if (zoom > layer.options.maxZoom ||
             zoom < layer.options.minZoom ||
+            zoom > layer.options.maxNativeZoom ||
+			
             // mapbox.tileLayer
             (hasMapbox &&
                 layer instanceof L.mapbox.tileLayer && !layer.options.tiles)) {
@@ -221,7 +227,6 @@ module.exports = function leafletImage(map, callback) {
     }
 
     function handleMarkerLayer(marker, callback) {
-		console.log(marker);
         var canvas = createHiPPICanvas(dimensions.x*2, dimensions.y*2, 2),
             ctx = canvas.getContext('2d'),
             pixelBounds = map.getPixelBounds(),

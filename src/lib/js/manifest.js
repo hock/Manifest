@@ -25,12 +25,12 @@ class Manifest {
 	
 		switch(type) {
 			case 'manifest': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST(d, options))); 
-				this.SMAPGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
+				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
 			case 'smap': this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP(d.g, options))); 
 				this.SMAPGraph(d.r, Object.assign(options, {style: d.g.details.style})); break;
 			case 'yeti': this.Supplychain.Map(this.Supplychain.Setup(this.FormatYETI(d, options))); break;
 			case 'gsheet': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET(d, options))); 
-				this.SMAPGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
+				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
 		}		
 		this.Visualization.Set(MI.Visualization.type);	
 		if (options.start) { MI.Atlas.SetView();}	
@@ -41,7 +41,7 @@ class Manifest {
 		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category, images: n.attributes.image.map(function(s) { return s.URL;}).join(','), measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -52,7 +52,7 @@ class Manifest {
 		}
 		for (let h of d.hops) {
 			h.from = d.features[h.from_stop_id-1]; h.to = d.features[h.to_stop_id-1];
-			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 			d.features.push(ft);
 		}
 	
@@ -87,7 +87,7 @@ class Manifest {
 			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
 			
 			for (let n of sheetpoints) {
-				let ft = {type: 'Feature', properties: {title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon:n.icon ? n.icon : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
 					let hops = n.destinationindex.replace(' ', '').split(',');
@@ -99,7 +99,7 @@ class Manifest {
 			}
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
-				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 				sheetsc.features.push(ft);
 			}	
 		}
@@ -171,7 +171,56 @@ class Manifest {
 		return d;
 	}
 
-	/** Setup the graph relationships for legacy Sourcemap files **/
+	/** Setup the graph relationships for Manifest files **/
+	ManifestGraph(d, options) {
+		let sc = null;
+		for (let s in MI.supplychains) {
+			if (MI.supplychains[s].details.id === options.id) { 
+				MI.supplychains[s].graph = {nodes:[], links:[]}; 
+				sc = MI.supplychains[s]; 
+			} 
+		}
+
+		if (typeof d.supplychain.stops !== 'undefined') {
+			for (let i = 0; i < d.supplychain.stops.length; ++i) {
+			
+				let title = (d.supplychain.stops[i].attributes.title) ? d.supplychain.stops[i].attributes.title : 'Node';
+				let place = (d.supplychain.stops[i].attributes.placename) ? d.supplychain.stops[i].attributes.placename : 
+							((d.supplychain.stops[i].attributes.address) ? d.supplychain.stops[i].attributes.address : '');
+				let loc = place.split(', ').pop();
+				let localstopid = Number(d.supplychain.stops[i].local_stop_id-1);
+				let newNode = { id: options.id+'-'+localstopid, name: title, loc: loc, place: place, group: options.id, links: [], ref: sc.mapper[localstopid],
+					color: options.style.color, fillColor: options.style.fillColor };
+				sc.graph.nodes[d.supplychain.stops[i].local_stop_id - 1] = newNode;
+			}
+		}
+		
+		if (typeof d.supplychain.hops !== 'undefined' && d.supplychain.hops.length > 0) {
+			sc.graph.type = 'directed';
+			for (let j = 0; j < d.supplychain.hops.length; ++j) {	
+				sc.graph.nodes[d.supplychain.hops[j].to_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[j].from_stop_id - 1].loc);
+				let newLink = { source: Number(d.supplychain.hops[j].from_stop_id - 1), target: Number(d.supplychain.hops[j].to_stop_id - 1),
+					 color: options.style.color, fillColor: options.style.fillColor};
+				sc.graph.links.push(newLink);
+
+			} 	
+			for (let k = 0; k < d.supplychain.hops.length; ++k) {
+				sc.graph.nodes[d.supplychain.hops[k].from_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[k].to_stop_id - 1].loc);
+			}
+		} else { sc.graph.type = 'undirected'; }
+
+		for (let l = 0; l < sc.graph.links.length; l++) {
+			sc.graph.links[l].source = String(options.id)+'-'+(sc.graph.links[l].source);
+			sc.graph.links[l].target = String(options.id)+'-'+(sc.graph.links[l].target);		
+		}
+		for (let l = 0; l < sc.graph.nodes.length; l++) {
+			if (typeof sc.graph.nodes[l] !== 'undefined') {
+				let id = sc.graph.nodes[l].id.split('-');
+				sc.graph.nodes[l].id = id[0]+'-'+(Number(id[1]));				
+			}
+		}		
+	}
+	
 	SMAPGraph(d, options) {
 		let sc = null;
 		for (let s in MI.supplychains) {
@@ -279,14 +328,11 @@ class Manifest {
 		if (format === 'map') {
 			try {
 				MI.Interface.ShowLoader();
-				leafletImage(MI.Atlas.map, function(err, canvas) {
-					let a = document.createElement('a');
-					canvas.toBlob(function(blob){
-					    a.href = URL.createObjectURL(blob);
-				  		a.setAttribute('download', filename+'.png');
-				  		a.click();		
-					  },'image/png');
-					  MI.Interface.ClearLoader();
+				leafletImage(MI.Atlas.map, function(err, canvas) {			
+					let link = document.createElement('a');
+					link.download = filename+'.png';
+					canvas.toBlob(function(blob){ link.href = URL.createObjectURL(blob); link.click(); },'image/png');
+					MI.Interface.ClearLoader();
 				});
 			} catch(e) { }
 			  		

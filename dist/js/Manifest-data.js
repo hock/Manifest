@@ -2016,8 +2016,7 @@ module.exports = naturalCompare;
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__("./src/index.js");
 /******/ })()
-;
-//# sourceMappingURL=list.js.map document.addEventListener("DOMContentLoaded", function(event) { Start(); });
+; document.addEventListener("DOMContentLoaded", function(event) { Start(); });
 
 /** Initializes the user interface for (mostly) static pages. **/
 function Start() {
