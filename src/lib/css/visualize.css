@@ -387,8 +387,56 @@ body.fullscreen #textview {
 	top: 0;
 }
 
+/* Storymap */
+body.light.storymap .map {
+	background:#fff;
+} 
+.storymap .category, .storymap #manifestlist li .pdetails p, .storymap #mlist-1029261216 #local_10292612160000 .pdetails p.placename, .storymap #mlist-1029261216 #local_10292612160000 .pdetails p.measures, .storymap #manifestlist li div.dot, .storymap #manifestbar, .storymap .footer, .storymap .searchwidget, .storymap #mapmenu, .storymap #fullscreen-menu, .storymap #mapcapture, .storymap .leaflet-popup-pane, .storymap .closemap, .storymap .menumap, .storymap .vizmenu {
+	display:none;
+}
+.storymap #manifestlist .mheader {
+	position:initial;
+}
+
+.storymap #manifestlist .mtitle a {
+	width: auto;
+	display: initial;
+	white-space: initial
+}
+.storymap #manifestlist .mtitle {
+	padding: 1.2rem;
+	font-size: 4rem;
+	border:none;
+}
+.storymap #manifestlist .mlist > li, .storymap #manifestlist .mdescription {
+	min-height:100vh;
+	border:none;
+}
+.storymap .mtitle, .storymap .mdetails, .storymap .mdescription, .storymap .mlist, .storymap #manifestlist h5.mdetail_title, .storymap .pdetails, .storymap .placename {
+	font-size:1.5rem;
+}
+.storymap #manifestlist li {
+	padding:2rem 0;
+}
+
+.storymap .leaflet-left .leaflet-control {
+	margin-left:1rem;
+}
+.storymap #sidepanel {
+	top:0;
+	left:auto;
+	right:0;
+	width:40%;
+	margin:0;
+	border-radius:0;
+}
+.storymap .view-wrapper {
+	width:60%;
+	left:0;
+	right:auto;
+}
+
 @media only screen and (max-width: 920px) and (orientation: portrait) { 
-	.listview { display:none;}
 	.vizwrap{position:relative;top:3.5rem;height:60%;width:100%;display:block;}
 	.vizwrap.closed { display:none; }
 	.view-wrapper.top .vizwrap { height:0;}
@@ -407,6 +455,10 @@ body.fullscreen #textview {
 	.vizmenu #measure-choices { margin-right:0;}
 	.vizmenu-label { display:none;}
 		
-	#textview{font-size:1rem;top:3.5rem;height:calc(100% - 3.5rem);width:100%;position:absolute;padding:0.2rem 1rem;}
+	#textview, #listview {font-size:1rem;top:3.5rem;height:calc(100% - 3.5rem);width:100%;position:absolute;padding:0.2rem 1rem;}
+	#datasearch { left:2rem; width:20rem;}
+	#datalist .pagination { left:24rem;}
+	.dataviewer ul li.entry div.description, #datasort .sort.description { width:10%;}	
+	.dataviewer ul li.entry div.col, #datasort .sort { border-right:none;}
 
 }

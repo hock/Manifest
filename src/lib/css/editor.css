@@ -45,7 +45,7 @@
 	body.editor #editor_holder .json-editor-btn-edit_properties span {display:none;}
 
 	body.editor #editor_holder div[data-schemapath=root\.nodes] { min-height:5rem;}
-
+	body.editor #editor_holder div[data-schemapath=root\.nodes] select { font-size:2rem;}
 	body.editor #editor_holder div[data-schemapath=root\.nodes] div[data-schemaid=arr_item] { padding-bottom:0.5rem; border-bottom:1px solid #fff;}
 	body.editor #editor_holder div[data-schemapath=root\.nodes] div[data-schemaid=arr_item] > .je-object__title > label:before { content:"\f041"; margin-right:0.5rem; font-family: FontAwesome; }
 	body.editor .je-modal { border:1px solid #ccc; border-radius:0.25rem; padding:0.5rem; box-shadow:rgba(100,100,100,0.4) 0.05rem 0.05rem;}

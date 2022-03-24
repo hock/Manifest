@@ -22,7 +22,7 @@ class ManifestUI {
 			else if (selected === 'file') { document.getElementById('loadlistpanel').className = 'file'; } 
 			else { document.getElementById('loadlistpanel').className = ''; }
 		});
-
+				
 		document.getElementById('load-samples-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-samples').value); });	
 		document.querySelectorAll('#basemap-chooser li').forEach(el => { el.addEventListener('click', (e) => { this.SetBasemap(el.classList[0]); }); });
 		document.getElementById('viz-choices').addEventListener('change', (e) => { MI.Visualization.Set(document.getElementById('viz-choices').value); });
@@ -41,15 +41,36 @@ class ManifestUI {
 			this.ShakeAlert(document.getElementById('manifestbar'));
 			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
 		}});
-	
+		if (MI.options.storyMap) { this.SetBasemap('light'); }
+		
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
 		['dragover', 'dragenter'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.add('is-dragover'); }));
 		['dragleave', 'dragend', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.remove('is-dragover'); }));
 
 		window.onresize = this.ManifestResize;	
-		setTimeout(this.ClearLoader, 1);
+		setTimeout(this.ClearLoader, 150);
 	}
+	
+	Storyize() {
+		document.body.classList.add('storymap');
+		MI.Atlas.radius = 20;
+	} 
+	
+	SetupStoryTrigger(selector){
+		let els = document.querySelectorAll(selector);
+		els = Array.from(els);
+		els.forEach(el => {
+  	    	let observer = new IntersectionObserver((entries, observer) => { 
+				entries.forEach(entry => { if (entry.isIntersecting) { 
+					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], false, true);	
+				}});
+  	  	  	});
+			observer.observe(el);
+	  });
+	}
+
+	// Example usage
 	
 	/** Handles header actions **/
 	ShowHeader(id) {
@@ -85,9 +106,9 @@ class ManifestUI {
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
-				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id;
+				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
-				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
+				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
 			} else {
 				type = 'manifest'; idref = loadurl; id = loadurl.hashCode();
 			}
@@ -99,9 +120,9 @@ class ManifestUI {
 			option = [option.shift(), option.join('-')];
 			id = option[1];
 		
-			if (type === 'smap') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; } 
+			if (type === 'smap') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; } 
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
-			else if (type === 'gsheet') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
+			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
 		}
 		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
@@ -120,16 +141,23 @@ class ManifestUI {
 		let s = document.getElementById('searchbar').value.toLowerCase();
 		
 		// Only do something if the search has changed.
-		if (s === MI.Interface.filter.term && MI.Interface.filter.clear) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.filter.term = s;}
+		if (s !== MI.Interface.filter.term) {MI.Interface.filter.clear = false; }
+		if (MI.Interface.filter.clear) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.filter.term = s;}
 		
 		let closedcats = [];
-		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
-		
+		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value); }});
+	
 		if (!MI.Interface.filter.clear) {		
-			document.querySelectorAll('.mlist li').forEach(el => { 
+			document.querySelectorAll('.mlist > li').forEach(el => { 
 				let cats = el.querySelectorAll('.cat-link'), catcount = 0;
-				for (let cc of closedcats) { for (let cat of cats) { cat = cat.textContent.toLowerCase(); if (cc === cat) { catcount++; } } }
-				if ( catcount >= cats.length) { el.style.display = 'none'; } else { el.style.display = 'list-item'; }
+				for (let cc of closedcats) { for (let cat of cats) { cat = cat.dataset.cat.toLowerCase(); if (cc === cat) { catcount++; } } }
+
+				let uncat = 'cat-'+el.parentElement.id.split('-')[1]+'-';
+				//console.log(uncat);
+				//console.log(closedcats);
+			
+				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && cats[0].dataset.cat === uncat) { el.style.display = 'none'; } 
+					else { el.style.display = 'list-item'; }
 		    });
 			MI.Interface.filter.clear = true;
 		}
@@ -139,40 +167,55 @@ class ManifestUI {
 			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined') {
 				found = false;
 				
-				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0;
-				for (let cc of closedcats) { for (let cat of cats) { if (cc === cat) { catcount++; } } }
+				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0, 
+					catid = MI.Atlas.map._layers[i].feature.properties.scid ? MI.Atlas.map._layers[i].feature.properties.scid : null;
+				for (let cc of closedcats) { for (let cat of cats) { if (cc === 'cat-'+catid+'-'+cat) { catcount++; } } }
+				//console.log(closedcats.includes('uncategorized'));
+				//console.log(cats);
 		        if (catcount >= cats.length) { found = false; }
 				else {
 					for (let k of ['title','description','category','placename']) {
 						if (String(MI.Atlas.map._layers[i].feature.properties[k]).toLowerCase().indexOf(s) !== -1) { found = true; }
 					}
 				}
+				
+			
+				console.log('----');
+				let uncat = 'cat-'+catid+'-';
+				console.log('cat-'+catid+'-'+cats[0] + ' vs ' + uncat);
+				
+				if (closedcats.includes(uncat+'uncategorized') && cats.length === 1 && 'cat-'+catid+'-'+cats[0] === uncat) {
+					found = false;
+				}
+				// TODO Ideally we hide lines if one of the nodes isn't present... for categories this is more complicated and probably requires some changes to the line feature structure to store more information about its connected nodes.
+			
 				if (!(found)) { 
-					if (MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
-						MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.1, opacity: 0.1 }); }
-					else { 	MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.0, opacity: 0.0 }); }
-						
 					MI.Atlas.map._layers[i].feature.properties.hidden = true;
 					if (MI.Atlas.active_point && MI.Visualization.type === 'map') {
 						if (MI.Atlas.active_point._popup._source._leaflet_id === MI.Atlas.map._layers[i]._leaflet_id) {
 							if (MI.Atlas.active_point._popup._source.feature.properties.clustered.length === 0) { MI.Atlas.active_point.closePopup(); } 
 							else {				
 								let id = MI.Atlas.active_point._popup._source.feature.properties.lid;
-								
 								let next = document.getElementById('popup-'+id).nextElementSibling;
-								while (next) { if (next.classList.contains('clusterbox')) break; next = next.nextElementSibling; }								
+								while (next) { if (next.classList.contains('clusterbox')) break; next = next.nextElementSibling; }
 								if (next) { MI.Atlas.PointFocus(next.id.split('-')[1]);} 
 							}
 						}
 					}
-				} else { 
-					MI.Atlas.map._layers[i].setStyle({ 
-							fillOpacity: MI.Atlas.map._layers[i].feature.properties.basestyle.fillOpacity, 
-							opacity: MI.Atlas.map._layers[i].feature.properties.basestyle.opacity }); 
-					MI.Atlas.map._layers[i].feature.properties.hidden = false;				
-				}
+				} else { MI.Atlas.map._layers[i].feature.properties.hidden = false; }
 			} 
 		}	
+		// Check Lines
+		for (let i in MI.Atlas.map._layers) {
+			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined') {
+				if (MI.Atlas.map._layers[i].feature.properties.connections) {
+					if (MI.Atlas.map._layers[i].feature.properties.connections.from.properties.hidden === true ||
+						MI.Atlas.map._layers[i].feature.properties.connections.to.properties.hidden === true) {
+							MI.Atlas.map._layers[i].feature.properties.hidden = true;
+					}
+				}
+			}
+		}
 		if (MI.Visualization.type === 'map' && MI.Atlas.map._renderer) {  MI.Atlas.UpdateCluster(s); MI.Atlas.Refresh(); } else { MI.Visualization.Update(); }
 	}
 

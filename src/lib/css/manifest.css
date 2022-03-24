@@ -75,7 +75,7 @@
 	#manifestlist ul.mlist li ul { font-size:0.8rem; padding-left:0.5rem; list-style:disc;}
 	#manifestlist ul.mlist li ul li { border:none; padding:0.25rem;}
 	
-	.leaflet-popup-content ul { padding-left:1rem;}
+	.leaflet-popup-content ul { padding-left:1rem; font-size:0.8rem;}
 		
 	#manifestlist ul.mlist details.sources ol li p, #manifestlist ul.mlist details.sources ol li ol, #manifestlist ul.mlist details.sources ol li ul, #manifestlist ul.mlist details.sources ol li blockquote { display:inline; margin:0; padding:0;}
 	#manifestlist ul.mlist details.sources ol { list-style:square; margin:0 ; padding:0.2rem 0; font-size:0.9rem;}
@@ -91,7 +91,7 @@
 	#manifestlist h5.mdetail_title { display:inline; font-size:1rem; line-height:1.5rem;}
 	#manifestlist p.placename, #manifestlist p.category { display:inline-block; margin-right:0.2rem;}
 	#manifestlist li img, #manifestlist .mdescription img { width:100%; }
-	 #manifestlist .mdescription img + img { margin-top:0.25rem;}
+	#manifestlist .mdescription img + img { margin-top:0.25rem;}
 	#manifestlist li .pdetails .cat-link {text-decoration:underline;cursor:pointer;}
 	#manifestlist li .manifest-link {text-decoration:underline;cursor:pointer;}
 
@@ -135,8 +135,8 @@
 		padding:.375rem .25rem .375rem .25rem;z-index:11000;}
 	#mapmenu i{padding:0 .375rem;font-size:1.5rem;line-height:1.5;cursor:pointer;opacity:0.6;display:inline-block;}
 	#mapmenu i:hover{opacity:1;}
-	#mapmenu-window{position:absolute;bottom:1.5rem;right:0.8rem;box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2);border-radius:.25rem;
-		padding:.375rem .25rem .375rem .25rem;z-index:12000;padding:0.5rem 1rem;font-size:1.5rem;width:10.8rem;line-height:1.5;}
+	#mapmenu-window{ position:absolute;bottom:1.5rem;right:0.8rem;box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2);border-radius:.25rem;
+		padding:.375rem .25rem .375rem .25rem;z-index:12000;padding:0.5rem 1rem;font-size:1.5rem;width:10.8rem;line-height:1.5; max-height: 28rem; overflow: scroll;}
 	#mapmenu-window h3{font-size:0.8rem;text-transform:none;margin:0 0 0.5rem 0;padding:0;font-weight:normal;color:#999;}
 	#mapmenu-window #basemap-chooser{position:relative;height:10rem;list-style:none;margin:0;padding:0;}
 	#mapmenu-window #datalayers{margin-top:1rem;}
@@ -218,9 +218,9 @@
 	
 	/* Manifest Splash */
 	.leaflet-popup.pop-intro .leaflet-popup-content-wrapper {background: #fff;color: #333; padding:1rem;}
-	.leaflet-popup.pop-intro .leaflet-popup-content { }
+	.leaflet-popup.pop-intro .leaflet-popup-content { width:max-content !important; }
 	.leaflet-popup.pop-intro .leaflet-popup-tip{background: #fff;}
-	.leaflet-popup.pop-intro .poptitle { border-bottom: 1px solid #ccc; background:none; color: #4d34db; font-size:1.4rem;}
+	.leaflet-popup.pop-intro .poptitle { border-bottom: 1px solid #ccc; background:none; color: #4d34db; font-size:2rem;}
 	
 	.leaflet-popup.pop-intro .leaflet-popup-content-wrapper a {color: #4d34db;}
 	#mlist-1029261216 #local_10292612160000 p, #mlist-1029261216 #local_10292612160000 ul, #mlist-1029261216 #local_10292612160000 img { 
@@ -234,6 +234,28 @@
 	margin: 0;
 	color:#333;}
 	#mlist-1029261216 #local_10292612160000 .pdetails p.placename, #mlist-1029261216 #local_10292612160000 .pdetails p.measures { display:initial;}
+	
+	#intro-readme {
+		float:left;
+		width:10rem;
+		margin-left:1rem; padding:1rem;
+		margin:-2rem -2rem -2rem 1rem;		
+		height: 22rem;
+		overflow-y: scroll;
+		background: #eee;
+		border-radius: 0 0.75rem 0.75rem 0
+	}
+	#intro-readme h2 {
+		margin: 0 -1rem 0 -1rem;
+		padding: 1rem;
+	}
+	#intro-readme h3 {
+		padding:0;
+	}
+	
+	#intro-content { width:20rem; float:left; }
+	#intro-content-log ul { list-style:none; margin:0; padding:0;}
+	#intro-content-log ul li { margin-bottom:1rem;}
 	
 	.fa-tag { cursor:pointer; }
 	.fa-tag:hover { filter: brightness(120%); }

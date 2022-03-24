@@ -5,3 +5,5 @@ function Start() {
 	document.querySelectorAll('#minfo-hamburger, #minfo').forEach(el => { 
 		el.addEventListener('click', (e) => { document.getElementById('minfodetail').classList.toggle('closed'); }); });	
 }
+
+//# sourceMappingURL=Manifest-static.js.map

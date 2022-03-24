@@ -1,5 +1,3 @@
-document.addEventListener("DOMContentLoaded", function(event) { Start(); });
-
 function Start() { 	
 	fetch('json/smapindex.json').then(r => r.json()).then(d => SetTable(JSON.parse(d))); 
 	

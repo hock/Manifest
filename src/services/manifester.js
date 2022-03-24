@@ -52,7 +52,7 @@ const server = http.createServer((req, res) => {
 				"method":"GET", 
 				"uri": "https://api.aprs.fi/api/get?name="+vid+"&what=loc&apikey="+aprsfikey+"&format=json",
 			    "headers": {
-			           'User-Agent': 'manifest/0.2 (+https://supplystudies.com/manifest/)'
+			           'User-Agent': 'manifest/0.2 (+https://manifest.supplystudies.com/)'
 			    },
 				"json": true
 			});

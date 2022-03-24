@@ -2,8 +2,8 @@
 Grate = {};
 Grate.great_circle_route = function(pt1, pt2, ttl, bounds) {
     var gc = new arc.GreatCircle({x: pt1[0], y: pt1[1]}, {x: pt2[0], y: pt2[1]});	    
-	var line = gc.Arc(100);	   
-	return [bezier(line.geometries[0].coords)];
+	var line = gc.Arc(ttl);	   
+	return [line.geometries[0].coords];
 };
 
 function bezier(pts) {

@@ -5,15 +5,17 @@
 
 /** Manifest Class **/
 class Manifest {
-	constructor() {
+	constructor(options) {
+		this.options = options;
+		// Default options (passed from main.js)
+		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
+		
 		this.initialized = false;
 		
 		this.supplychains = [];
-		this.serviceurl = "";
-		
 		this.Supplychain = new ManifestSupplyChain();
 		this.Interface = new ManifestUI();
-		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
+		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile(), retinaTiles: options.retinaTiles});
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
 		this.Util = new ManifestUtilities();
@@ -38,10 +40,12 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		//manifest.options = { color: ['#000000','#999999','#999999'] };
+		
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: manifest.options ? manifest.options : {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -52,7 +56,7 @@ class Manifest {
 		}
 		for (let h of d.hops) {
 			h.from = d.features[h.from_stop_id-1]; h.to = d.features[h.to_stop_id-1];
-			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 			d.features.push(ft);
 		}
 	
@@ -75,7 +79,7 @@ class Manifest {
 		let sheetsc = {};
 
 		if (typeof sheetoverview.rootgeocode === 'undefined') {
-			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, options: sheetoverview.options ? sheetoverview.options : {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
 			
 			sheetpoints = sheetpoints.sort((a,b) => Number(a.index) - Number(b.index) );
 			
@@ -87,7 +91,7 @@ class Manifest {
 			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
 			
 			for (let n of sheetpoints) {
-				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon:n.icon ? n.icon : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon: n.icon ? n.icon : '', color: n.color ? n.color : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
 					let hops = n.destinationindex.replace(' ', '').split(',');
@@ -99,7 +103,7 @@ class Manifest {
 			}
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
-				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 				sheetsc.features.push(ft);
 			}	
 		}
@@ -338,8 +342,9 @@ class Manifest {
 			  		
 		} else if (format === 'json') {
 			let json = '';
-			if (d.mtype === 'smap') { json = this._smapToManifest(d);
-			} else { json = d.raw; }
+			if (d.mtype === 'smap') { json = this._smapToManifest(d); } 
+			else if (d.mtype === 'gsheet') { json = this._gsheetToManifest(d); }
+			else { json = d.raw; }
 			a.setAttribute('href', 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(json)));
 			a.setAttribute('download', filename+'.json');
 			a.click();
@@ -349,6 +354,49 @@ class Manifest {
 			a.click();
 		}
 	}
+
+	_gsheetToManifest(d) {
+		let s = {summary:{name:d.properties.title, description:d.properties.description}, nodes:[]};
+		let off = 0;
+		for (let node of d.graph.nodes) {
+			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
+			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
+				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates.reverse().join(',')},
+				attributes:{destinationindex:[],image:[{URL:''}],sources:[{URL:''}]}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
+			s.nodes[Number(node.id.split('-')[1])] = n;
+		}
+
+		for (let link of d.graph.links) { 
+
+			s.nodes[Number(link.source.split('-')[1])].attributes.destinationindex.push(Number(link.target.split('-')[1])+1); 
+		}
+		for (let i = 0; i < s.nodes.length; i++) {
+			if (typeof s.nodes[i] === 'undefined') {
+				s.nodes.splice(i, 1); 
+				
+				for (let j = 0; j < s.nodes.length; j++) { if (j >= i && typeof s.nodes[j] !== 'undefined') {
+					s.nodes[j].overview.index = Number(s.nodes[j].overview.index) - 1;			
+				}}
+				for (let k = 0; k < s.nodes.length; k++) { if (typeof s.nodes[k] !== 'undefined') {
+					for (let d in s.nodes[k].attributes.destinationindex) {
+						if (s.nodes[k].attributes.destinationindex[d] > i) {
+							s.nodes[k].attributes.destinationindex[d] = Number(s.nodes[k].attributes.destinationindex[d]) - 1;
+						}
+					}					
+				}}		
+				
+				i--;
+			} 
+		}
+		for (let node of s.nodes) {  if (typeof node !== 'undefined') {
+			if (node.attributes.destinationindex.length === 0) { node.attributes.destinationindex = '';} 
+			else { node.attributes.destinationindex = node.attributes.destinationindex.filter((d, index, dests) => { return dests.indexOf(d) === index; }).join(','); }
+		}}
+		
+		return s;
+	}
+	
 	_smapToManifest(d) {
 		let s = {summary:{name:d.properties.title, description:d.properties.description}, nodes:[]};
 		let off = 0;
@@ -416,7 +464,7 @@ class ManifestMessenger {
 	}
 	
 	AddObject(oid) {
-		let call = 'https://supplystudies.com/manifest/services/?type=aprsfi&id='+oid;
+		let call = 'https://manifest.supplystudies.com/services/?type=aprsfi&id='+oid;
 		this.Add(call, function(d) {
 			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
 			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;

@@ -4,13 +4,13 @@ class ManifestAtlas {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
 			preferCanvas: true, minZoom: 2, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
-			scrollWheelZoom: false, closePopupOnClick: pop 
+			scrollWheelZoom: false, smoothWheelZoom: true, smoothSensitivity:1, closePopupOnClick: pop 
 		});
 		this.maplayer = [];
 		this.active_point = null;
 		this.homecontrol = null;
 		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
-		
+		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
 			
 		this.tiletypes = {
@@ -27,28 +27,34 @@ class ManifestAtlas {
 		
 		/* Define Layers */
 		this.layerdefs = {
-			google: new L.TileLayer(this.tiletypes.GOOGLE, 
-				{ maxZoom: 20, className: 'googlebase', detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
-			light: new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
-			terrain: new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
-			satellite: new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
-		 	dark: new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+			google: 	new L.TileLayer(this.tiletypes.GOOGLE, { maxZoom: 20, className: 'googlebase', detectRetina: options.retinaTiles,
+						subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google', edgeBufferTiles: 1 }),		
+			light:		new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 20, 
+						ext: 'png', attribution: 'Toner, Stamen', edgeBufferTiles: 1  }),
+			terrain: 	new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 18, 
+						ext: 'png', attribution: 'Terrain, Stamen', edgeBufferTiles: 1  }),	
+			satellite: 	new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: options.retinaTiles, maxZoom: 20, maxNativeZoom: 20, 
+						attribution: 'Satellite, ESRI', edgeBufferTiles: 1  }),
+		 	dark: 		new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: options.retinaTiles, 
+						attribution: 'Dark, CartoDB', edgeBufferTiles: 1  }),
 
-			shipping: new L.TileLayer(this.tiletypes.SHIPPING, 
-				{ maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
-			marine: new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
-			rail: new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
+			shipping: 	new L.TileLayer(this.tiletypes.SHIPPING, { maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer',
+					 	bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
+			marine: 	new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: options.retinaTiles, 
+						className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
+			rail: 		new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, detectRetina: options.retinaTiles, className: 'raillayer', 
+						attribution: '[OpenStreetMap Data]' })		
 		};
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 8, weight: 4, opacity: 1, fillOpacity: 1 },
-			'highlight': { fillColor: '#ffffff' },
-			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 3, opacity: 0.2, smoothFactor: 1 },
-			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 },
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1 },
+			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
+			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
 		};
-	
+		this.radius = 10;
+		
 		// Map configuration
 		this.homecontrol = L.Control.zoomHome().addTo(this.map);
 		this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
@@ -59,33 +65,18 @@ class ManifestAtlas {
 
 		if (document.body.classList.contains('light')) { this.map.addLayer(this.layerdefs.google); } 
 		else if (document.body.classList.contains('dark')) { this.map.addLayer(this.layerdefs.dark); }	
-		
-		// Add Shipping Layer
-		this.map.addLayer(this.layerdefs.shipping);		
 	}
 	
 	Refresh() { this.map._renderer._redraw(); }
 	
 	PopupOpen(e) {		
-		let s = document.getElementById('searchbar').value.toLowerCase();
-		if (s !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) {
-			let active = false;
-			if (e.popup._source.options.fillOpacity !== 0.1) { active = true; }
-			else {
-				for (let i in e.popup._source.feature.properties.clustered) {
-					if (e.popup._source.feature.properties.clustered[i].properties.hidden === false) { active = true; }
-				}
-			}
-			if (!active) { e.sourceTarget.closePopup(); this.SetActivePoint(null); return; }
-
-			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
-		}
+		this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
 
-		e.popup._source.setStyle(this.styles.highlight);			
+		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});			
 		
 	}
 	
@@ -93,7 +84,7 @@ class ManifestAtlas {
 		this.SetActivePoint(null); 		
 		if (typeof e.popup._source !== 'undefined') {
 			if (e.popup._source.feature.properties.type === 'node') {
-				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.basestyle.fillColor});		
+				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.fillColor});		
 			}
 		}
 	}
@@ -108,14 +99,16 @@ class ManifestAtlas {
 	
 	RenderIntro(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
-		let popupContent, tooltipTitle, fid = feature.properties.lid;
-
+		let popupContent, tooltipTitle, fid = feature.properties.lid;		
+		
 		popupContent = `
+		<div id="intro-content">
 		<h2 id="popup-${fid}" class="poptitle">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
-			<span onclick="MI.Atlas.MapPointClick(${fid});">Welcome to Manifest!</span>
+			<span onclick="MI.Atlas.MapPointClick(${fid});">Manifest</span>
 		</h2>
-		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>
+		</div><div id="intro-readme"><div id="intro-content-log"></div></div><div class='clear'></div>`;
 	
 		layer.bindPopup(popupContent, { className: 'pop-intro'});
 		tooltipTitle = feature.properties.title; 
@@ -126,9 +119,16 @@ class ManifestAtlas {
 		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
 		layer.on('mouseout', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOut(e, l, f); });	
 		
+		// Render Change log
+		fetch("CHANGELOG.md").then(c => c.text()).then(readme => this.RenderChangeLog(readme) );
 		layer.setStyle(feature.properties.style); 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
+	
+	RenderChangeLog(readme) {
+		document.getElementById('intro-content-log').innerHTML = MI.Util.markdowner.makeHtml(readme);
+	}
+	
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
@@ -192,9 +192,14 @@ class ManifestAtlas {
 	}
 
 	/** Focus on a point on the map and open its popup. **/
-	PointFocus(pid, fit=false) {	
+	PointFocus(pid, fit=false, flyto=false) {	
 		for (let i in this.map._layers) {		
-			if (typeof this.map._layers[i].feature !== 'undefined') {							
+			if (typeof this.map._layers[i].feature !== 'undefined') {			
+				if (flyto) { 
+					this.map._layers[i].setStyle({
+						fillColor: this.map._layers[i].feature.properties.style.fillColor, 
+						color: this.map._layers[i].feature.properties.style.color});		
+				}
 				if (this.map._layers[i].feature.properties.lid === Number(pid)) {		
 					if (MI.Visualization.type === 'map') { 
 						this.SetActivePoint(this.map._layers[i]); 
@@ -202,9 +207,18 @@ class ManifestAtlas {
 						if (fit) { 
 							let sid = MI.supplychains[this.map._layers[i].feature.properties.mindex-1].details.id;
 							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});
-							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom); 
+							let zoomlevel = MI.options.storyMap ? 10 : this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom+1;
+							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), zoomlevel, {reset: true}); 
+							
 						}
-						this.map._layers[i].openPopup(); 
+						if (flyto) {
+							this.map.flyTo(this.GetOffsetLatlng(this.map._layers[i]._latlng), 12); 		
+							this.SetActivePoint({_latlng: this.map._layers[i].feature.properties.latlng}); 
+							this.map._layers[i].setStyle({fillColor: this.map._layers[i].feature.properties.style.highlightColor});			
+								
+						} else {
+							this.map._layers[i].openPopup(); 
+						}
 					}
 				}
 			} 
@@ -219,7 +233,7 @@ class ManifestAtlas {
 		if (node === null) { return; }
 		let id;		
 		if ( typeof node === 'object' ) {
-			if (node._popup._source.options.fillOpacity === 0.1) { return; }
+			// TEMP if (node._popup._source.options.fillOpacity === 0.1) { return; }
 			id = node._popup._source.feature.properties.lid;
 		} else { id = node; if (document.getElementById('local_'+id)) {document.getElementById('local_'+id).click();} else { return; } }
 	
@@ -233,7 +247,22 @@ class ManifestAtlas {
 	}
 	
 	PointMouseOver(e, layer, feature) { 
-		if (layer.options.fillOpacity !== 0.1) { layer.setStyle(this.styles.highlight); } 
+		layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); 
+		
+		if (MI.options.hoverHighlight) {
+		for (let l in MI.Atlas.map._layers) {
+			if (MI.Atlas.map._layers[l].feature && typeof MI.Atlas.map._layers[l].feature.properties.connections === 'undefined' &&
+				MI.Atlas.map._layers[l].feature.properties.lid !== feature.properties.lid) {
+					if (!(this.active_point) || (this.active_point && 
+						MI.Atlas.map._layers[l].feature.properties.lid !== this.active_point._popup._source.feature.properties.lid)) { 
+							MI.Atlas.map._layers[l].setStyle({fillOpacity:0.5, opacity:0.5});
+					}
+			} else if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.connections && 
+						MI.Atlas.map._layers[l].feature.properties.connections.from.properties.lid !== feature.properties.lid && 
+						MI.Atlas.map._layers[l].feature.properties.connections.to.properties.lid !== feature.properties.lid) {
+					MI.Atlas.map._layers[l].setStyle({fillOpacity:0.1, opacity:0.1});
+				}
+		}}
 		if (feature.properties.clustered.length > 0) {
 			let ccount = 0;
 			if (!feature.properties.hidden) { ccount++; }
@@ -244,18 +273,24 @@ class ManifestAtlas {
 	}
 	
 	PointMouseOut(e, layer, feature) { 
-		if (layer.feature.properties && layer.feature.properties.style && layer.options.fillOpacity !== 0.1) {
-			layer.setStyle({fillColor: layer.feature.properties.style.fillColor});
-			this.MeasureSort(feature, layer);
-			// Not Great!
-			if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { MI.Interface.Search();}
-	
-		} 
+		layer.setStyle({fillColor: layer.feature.properties.style.fillColor, color: layer.feature.properties.style.color});
 		if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
 			if (this.active_point._popup._source._leaflet_id === e.sourceTarget._leaflet_id) {
-				if (layer.options.fillOpacity !== 0.1) { layer.setStyle(this.styles.highlight); }
+				if (!feature.properties.hidden) { layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); }
 			}
 		}
+		if (MI.options.hoverHighlight) {
+		for (let l in MI.Atlas.map._layers) {
+			if (MI.Atlas.map._layers[l].feature && typeof MI.Atlas.map._layers[l].feature.properties.connections === 'undefined') {
+				MI.Atlas.map._layers[l].setStyle({fillOpacity:1, opacity:1});
+			} else if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.connections) {
+				if (MI.Atlas.map._layers[l].feature.properties.angle) {
+					MI.Atlas.map._layers[l].setStyle({fillOpacity:1, opacity:1});
+				} else {
+					MI.Atlas.map._layers[l].setStyle({opacity:0.2});
+				}
+			}
+		}}
 	}	
 	
 	/** Scales the map based on selected measure **/
@@ -302,7 +337,7 @@ class ManifestAtlas {
 		if (MI.Interface.IsMobile()) {
 			targetPoint = this.map.project(ll, z).add([0, document.getElementById('sidepanel').offsetHeight/2]);
 		    return this.map.unproject(targetPoint, z);
-		} else if (!document.body.classList.contains('fullscreen')) {	
+		} else if (!document.body.classList.contains('fullscreen') && !MI.options.storyMap) {	
 			targetPoint = this.map.project(ll, z).subtract([document.getElementById('sidepanel').offsetWidth/2,0]);
 		   return this.map.unproject(targetPoint, z);			
 		} else {
@@ -330,7 +365,9 @@ class ManifestAtlas {
 			const nodeId = document.getElementsByClassName('mlist')[document.getElementsByClassName('mlist').length-1].childNodes[0].id.split('_')[1];
 			if (MI.Visualization.type === 'map') {
 				MI.Interface.ShowHeader(mlistId);
-				MI.Atlas.PointFocus(nodeId, true);	
+				if (!MI.options.storyMap) {
+					MI.Atlas.PointFocus(nodeId, true);	
+				}
 			}	
 			else if (MI.Visualization.type === 'textview') {
 				MI.Interface.ShowHeader(mlistId);
@@ -348,7 +385,7 @@ class ManifestAtlas {
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {
-		if (cluster) { return Math.min(ft.properties.clustered.length*5+8,30); } else { return 8; }
+		if (cluster) { return Math.min(ft.properties.clustered.length*5+this.radius,30); } else { return this.radius; }
 	}
 	
 	GetScaledRadius(ft, measureSort) {

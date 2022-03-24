@@ -3375,14 +3375,28 @@
   		var start = Date.now(),
   		    S = (r(1) - r0) / rho,
   		    duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
-
+		
+	
+		// Hide Lines
+		for (let s in MI.supplychains) { MI.Supplychain.Hide(MI.supplychains[s].details.id, true, 'lines'); }
+					
   		function frame() {
+	
+			
   			var t = (Date.now() - start) / duration,
   			    s = easeOut(t) * S;
-
+		
   			if (t <= 1) {
   				this._flyToFrame = requestAnimFrame(frame, this);
-
+		  		
+				// Refresh points
+		  		for (var id in MI.Atlas.map._renderer._layers) {
+					if (MI.Atlas.map._renderer._layers[id].feature.geometry.type === 'Point' && !MI.Atlas.map._renderer._layers[id].feature.properties.angle) {
+		  				MI.Atlas.map._renderer._layers[id]._reset();
+					} 
+		  		}
+				requestAnimFrame(MI.Atlas.map._renderer._update, MI.Atlas.map._renderer);
+		  		
   				this._move(
   					this.unproject(from.add(to.subtract(from).multiplyBy(u(s) / u1)), startZoom),
   					this.getScaleZoom(w0 / w(s), startZoom),
@@ -3392,6 +3406,9 @@
   				this
   					._move(targetCenter, targetZoom)
   					._moveEnd(true);
+					
+					// Show Lines
+					for (let s in MI.supplychains) { MI.Supplychain.Hide(MI.supplychains[s].details.id, false, 'lines'); }
   			}
   		}
 
@@ -4576,7 +4593,7 @@
   		this.on('zoomanim', function (e) {
   			var prop = TRANSFORM,
   			    transform = this._proxy.style[prop];
-
+	
   			setTransform(this._proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
 
   			// workaround for case when transform is the same and so transitionend event is not fired
@@ -9246,7 +9263,7 @@
   	_animateZoom: function (e) {
   		var scale = this._map.getZoomScale(e.zoom),
   		    offset = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min;
-
+			
   		setTransform(this._image, offset, scale);
   	},
 
@@ -10786,7 +10803,7 @@
 
   		// @option keepBuffer: Number = 2
   		// When panning the map, keep this many rows and columns of tiles before unloading them.
-  		keepBuffer: 2
+  		keepBuffer: 4
   	},
 
   	initialize: function (options) {
@@ -11232,6 +11249,7 @@
   		var scale = this._map.getZoomScale(zoom, level.zoom),
   		    translate = level.origin.multiplyBy(scale)
   		        .subtract(this._map._getNewPixelOrigin(center, zoom)).round();
+	  	  	  // TODO Zoom scaling adjustment here??
 
   		if (any3d) {
   			setTransform(level.el, translate, scale);
@@ -12299,7 +12317,7 @@
 
   	_requestRedraw: function (layer) {
   		if (!this._map) { return; }
-
+		
   		this._extendRedrawBounds(layer);
   		this._redrawRequest = this._redrawRequest || requestAnimFrame(this._redraw, this);
   	},
@@ -12365,35 +12383,64 @@
   	},
 
   	_updatePoly: function (layer, closed) {
-  		if (!this._drawing) { return; }
+		if (!MI.options.simpleLines) {
+	  		if (!this._drawing) { return; }
 
-  		var i, j, len2, p,
-  		    parts = layer._parts,
-  		    len = parts.length,
-  		    ctx = this._ctx;
+	  		var i, j, len2, p,
+	  		    parts = layer._parts,
+	  		    len = parts.length,
+	  		    ctx = this._ctx;
 
-  		if (!len) { return; }
+	  		if (!len) { return; }
 
-  		ctx.beginPath();
+	  		ctx.beginPath();
+		
+	  		for (i = 0; i < len; i++) {
+	  			for (j = 0, len2 = parts[i].length; j < len2; j++) {
+	  				p = parts[i][j];
+	  				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
+	  			}
+	  			if (closed) {
+	  				ctx.closePath();
+	  			}
+	  		}
 
-  		for (i = 0; i < len; i++) {
-  			for (j = 0, len2 = parts[i].length; j < len2; j++) {
-  				p = parts[i][j];
-  				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
-  			}
-  			if (closed) {
-  				ctx.closePath();
-  			}
-  		}
+	  		this._fillStroke(ctx, layer);
+		} else {
+	  		if (!this._drawing) { return; }
+	  		var i, j, len2, p,
+	  		    parts = layer._rings,
+	  		    len = parts.length,
+	  		    ctx = this._ctx;
 
-  		this._fillStroke(ctx, layer);
+	  		if (!len) { return; }
+		
+	  		ctx.beginPath();
+			if (len === 1 && parts[0].length === 3) {
 
-  		// TODO optimization: 1 fill/stroke for all features with equal style instead of 1 for each feature
+				ctx.moveTo(parts[0][0].x, parts[0][0].y);
+				let cy = 2*parts[0][1].y - parts[0][0].y/2 - parts[0][2].y/2;
+				let cx = 2*parts[0][1].x - parts[0][0].x/2 - parts[0][2].x/2;
+				ctx.quadraticCurveTo(cx, cy, parts[0][2].x, parts[0][2].y);
+			} else if (layer.feature.geometry.coordinates[0].length !== 3){
+		  		for (i = 0; i < len; i++) {
+		  			for (j = 0, len2 = parts[i].length; j < len2; j++) {
+		  				p = parts[i][j];
+		  				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
+		  			}
+		  			if (closed) {
+		  				ctx.closePath();
+		  			}
+		  		}
+			}
+
+	  		this._fillStroke(ctx, layer);
+		}
   	},
 
   	_updateCircle: function (layer) {
-
-  		if (!this._drawing || layer._empty()) { return; }
+		
+  		if (!this._drawing || layer._empty() || layer.feature.properties.hidden === true) { return; }
 
   		var p = layer._point,
   		    ctx = this._ctx,
@@ -12413,6 +12460,10 @@
   		}
 
   		this._fillStroke(ctx, layer);
+		//if (layer.options.fillColor === '#ffffff') {
+			//this._ctx.drawImage(MI.Atlas.highlightimg.el, p.x - r / 2, p.y - r / 2, r, r);
+			//}
+		//else 
 		if (layer.feature.properties.style.img) { this._ctx.drawImage(layer.feature.properties.style.img.el, p.x - r / 2, p.y - r / 2, r, r); }
 		else { 
 			ctx.font = "8px Arial"; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.textAlign = "center";
@@ -12425,6 +12476,8 @@
   	},
 
   	_fillStroke: function (ctx, layer) {
+  		if (layer.feature.properties.hidden === true) { return; }
+		
   		var options = layer.options;
 
   		if (options.fill) {
@@ -12454,7 +12507,7 @@
 
   		for (var order = this._drawFirst; order; order = order.next) {
   			layer = order.layer;
-  			if (layer.options.interactive && layer._containsPoint(point)) {
+  			if (layer.options.interactive && layer._containsPoint(point) && layer.feature.properties.hidden === false) {
   				if (!(e.type === 'click' || e.type !== 'preclick') || !this._map._draggableMoved(layer)) {
   					clickedLayer = layer;
   				}
@@ -12494,7 +12547,7 @@
 
   		for (var order = this._drawFirst; order; order = order.next) {
   			layer = order.layer;
-  			if (layer.options.interactive && layer._containsPoint(point)) {
+  			if (layer.options.interactive && layer._containsPoint(point) && layer.feature.properties.hidden === false) {
   				candidateHoveredLayer = layer;
   			}
   		}
@@ -12524,6 +12577,7 @@
   	},
 
   	_bringToFront: function (layer) {
+		if (layer.feature.properties.hidden === true) { return; }
   		var order = layer._order;
 
   		if (!order) { return; }
@@ -12555,6 +12609,8 @@
   	},
 
   	_bringToBack: function (layer) {
+		if (layer.feature.properties.hidden === true) { return; }
+		
   		var order = layer._order;
 
   		if (!order) { return; }

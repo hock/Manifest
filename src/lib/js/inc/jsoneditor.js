@@ -27934,6 +27934,3 @@ function ipValidator(schema, value, path, translate) {
 
 /******/ });
 });
-/*
-//@ sourceMappingURL=jsoneditor.js.map
-*/

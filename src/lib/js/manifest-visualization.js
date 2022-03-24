@@ -21,7 +21,7 @@ class ManifestVisualization {
 		  	default: console.log('Visualization type not supported...');
 		}
 	}
-	 
+	
 	MapViz() {
 		document.querySelectorAll('#vizwrap, #textview, #listview').forEach(el => { el.classList.add('closed'); });
 		MI.Atlas.DisplayLayers(true);
@@ -107,7 +107,7 @@ class ManifestVisualization {
 		
 			let rawvalues = sc.features.filter(e => e.geometry.type === 'Point');
 			for (let val of rawvalues) {
-				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category.split(',').join(', '), notes: val.properties.notes});
+				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
 			}
 		}
 		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('listview').classList.remove('closed');

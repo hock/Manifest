@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
 	grunt.initConfig({
 	  pkg: grunt.file.readJSON('package.json'),
 		
@@ -44,7 +43,9 @@ module.exports = function(grunt) {
 
 		uglify: {
 			options: {
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',				
+				sourceMap: true,
+				sourceMapIn: function(path) { return path + ".map";}
 			},
 			js: {
 				files : {
@@ -61,14 +62,14 @@ module.exports = function(grunt) {
 
 		concat: {
 			options: {
-				separator: ' ',
+				sourceMap: true,
 			},
 			js_lib: {
 				src: ['src/lib/js/leaflet/leaflet.js', 'src/lib/js/inc/d3.v4.js', 'src/lib/js/inc/d3.sankey.js', 'src/lib/js/inc/jsondrop.js'],
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/showdown.js', 'src/lib/js/inc/tinycolor.js', 'src/lib/js/leaflet/image.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/grate.js', 'src/lib/js/leaflet/geodesic.js', 'src/lib/js/manifest.js', 'src/lib/js/manifest-supplychain.js', 'src/lib/js/manifest-atlas.js', 'src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js', "src/lib/js/main.js"],
+				src: ['src/lib/js/inc/showdown.js','src/lib/js/inc/tinycolor.js','src/lib/js/leaflet/image.js','src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/smoothzoom.js','src/lib/js/leaflet/edgebuffer.js','src/lib/js/leaflet/grate.js','src/lib/js/leaflet/geodesic.js','src/lib/js/manifest.js','src/lib/js/manifest-supplychain.js','src/lib/js/manifest-atlas.js','src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js','src/lib/js/main.js'],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {
@@ -100,7 +101,42 @@ module.exports = function(grunt) {
 				dest: 'dist/css/<%= pkg.name %>-static.css'
 			}
 		},
-		
+		changelogcustomizable: {
+			changelog: {
+			options: {
+				start: null,
+				end: null,
+				header: 'Changelog',
+				dest: {
+					dir: './',
+					fileName: 'changelog',
+					extension: 'md'
+				},
+				type: 'all',
+				templates: {
+					features: {
+						regex: {
+							dev: /^(.*)feature(.*)$/gim,
+							release: /^(.*)release(.*)feature(.*)$/gim
+						},
+						template: '##FEATURE:\n\n{{#if features}}{{#each features}}{{> feature}}{{/each}}{{else}}{{/if}}\n'
+					},
+					feature: {
+						template: '\t{{{this}}}\n'
+					},
+					fixes: {
+						regex: {
+							dev: /^(.*)fixes #\d+:?(.*)$/gim,
+							release: /^(.*)release(.*)fixes #\d+:?(.*)$/gim
+						},
+						template: '##FIXES:\n\n{{#if fixes}}{{#each fixes}}{{> fix}}{{/each}}{{else}}{{/if}}\n'
+					},
+					fix: {
+						template: '\t{{{this}}}\n'
+					}
+				}
+			}}
+		},
 		watch: {
   		  html: {
   		    files: ['src/**/*.html'],

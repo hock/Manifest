@@ -5455,7 +5455,8 @@ if (typeof define === 'function' && define.amd) {
 } else {
   root.showdown = showdown;
 }
-}).call(this); // TinyColor v1.0.0
+}).call(this);
+// TinyColor v1.0.0
 // https://github.com/bgrins/TinyColor
 // 2014-06-13, Brian Grinstead, MIT License
 
@@ -6562,7 +6563,8 @@ else {
 }
 
 })();
- (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.leafletImage = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.leafletImage = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /* global L */
 
 var queue = require('d3-queue').queue;
@@ -6780,7 +6782,7 @@ module.exports = function leafletImage(map, callback) {
 			
 			ctx.font = "12px Arial, Helvetica, sans-serif";
 			ctx.fillStyle = "#f5f5f5";
-			ctx.fillText("http://supplystudies.com/manifest/", 10, 32);
+			ctx.fillText("http://manifest.supplystudies.com/", 10, 32);
 			
             callback(null, {
                 canvas: canvas
@@ -6986,7 +6988,8 @@ module.exports = function leafletImage(map, callback) {
 
 }));
 },{}]},{},[1])(1)
-}); /*
+});
+/*
  * Leaflet zoom control with a home button for resetting the view.
  *
  * Distributed under the CC-BY-SA-3.0 license. See the file "LICENSE"
@@ -7079,12 +7082,169 @@ module.exports = function leafletImage(map, callback) {
     L.Control.zoomHome = function (options) {
         return new L.Control.ZoomHome(options);
     };
-}()); /* Native Grate Code */
+}());
+
+L.Map.mergeOptions({
+    // @section Mousewheel options
+    // @option smoothWheelZoom: Boolean|String = true
+    // Whether the map can be zoomed by using the mouse wheel. If passed `'center'`,
+    // it will zoom to the center of the view regardless of where the mouse was.
+    smoothWheelZoom: true,
+
+    // @option smoothWheelZoom: number = 1
+    // setting zoom speed
+    smoothSensitivity:1
+
+});
+
+
+L.Map.SmoothWheelZoom = L.Handler.extend({
+
+    addHooks: function () {
+        L.DomEvent.on(this._map._container, 'wheel', this._onWheelScroll, this);
+    },
+
+    removeHooks: function () {
+        L.DomEvent.off(this._map._container, 'wheel', this._onWheelScroll, this);
+    },
+
+    _onWheelScroll: function (e) {
+        if (!this._isWheeling) {
+            this._onWheelStart(e);
+        }
+        this._onWheeling(e);
+    },
+
+    _onWheelStart: function (e) {
+        var map = this._map;
+        this._isWheeling = true;
+        this._wheelMousePosition = map.mouseEventToContainerPoint(e);
+        this._centerPoint = map.getSize()._divideBy(2);
+        this._startLatLng = map.containerPointToLatLng(this._centerPoint);
+        this._wheelStartLatLng = map.containerPointToLatLng(this._wheelMousePosition);
+        this._startZoom = map.getZoom();
+        this._moved = false;
+        this._zooming = true;
+
+        map._stop();
+        if (map._panAnim) map._panAnim.stop();
+
+        this._goalZoom = map.getZoom();
+        this._prevCenter = map.getCenter();
+        this._prevZoom = map.getZoom();
+
+        this._zoomAnimationId = requestAnimationFrame(this._updateWheelZoom.bind(this));
+    },
+
+    _onWheeling: function (e) {
+        var map = this._map;
+
+        this._goalZoom = this._goalZoom + L.DomEvent.getWheelDelta(e) * 0.003 * map.options.smoothSensitivity;
+        if (this._goalZoom < map.getMinZoom() || this._goalZoom > map.getMaxZoom()) {
+            this._goalZoom = map._limitZoom(this._goalZoom);
+        }
+        this._wheelMousePosition = this._map.mouseEventToContainerPoint(e);
+
+        clearTimeout(this._timeoutId);
+        this._timeoutId = setTimeout(this._onWheelEnd.bind(this), 200);
+
+        L.DomEvent.preventDefault(e);
+        L.DomEvent.stopPropagation(e);
+    },
+
+    _onWheelEnd: function (e) {
+        this._isWheeling = false;
+        cancelAnimationFrame(this._zoomAnimationId);
+        this._map._moveEnd(true);
+    },
+
+    _updateWheelZoom: function () {
+        var map = this._map;
+		
+        if ((!map.getCenter().equals(this._prevCenter)) || map.getZoom() != this._prevZoom)
+            return;
+
+        let scale = this._zoom = map.getZoom() + (this._goalZoom - map.getZoom()) * 0.3;
+        this._zoom = Math.floor(this._zoom * 100) / 100;
+
+        var delta = this._wheelMousePosition.subtract(this._centerPoint);
+        if (delta.x === 0 && delta.y === 0)
+            return;
+
+		// @TODO This would allow better scrolling but lines are too complicated
+		//map._renderer._reset();
+
+        if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
+            this._center = MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._latlng);
+        } else if (map.options.smoothWheelZoom === 'center') {
+            this._center = this._startLatLng;
+        } else {
+            this._center = map.unproject(map.project(this._wheelStartLatLng, this._zoom).subtract(delta), this._zoom);
+        }
+	
+		
+        if (!this._moved) {
+            map._moveStart(true, false);
+            this._moved = true;
+        }
+
+        map._move(this._center, this._zoom);
+        this._prevCenter = map.getCenter();
+        this._prevZoom = map.getZoom();
+
+        this._zoomAnimationId = requestAnimationFrame(this._updateWheelZoom.bind(this));
+    }
+
+});
+
+L.Map.addInitHook('addHandler', 'smoothWheelZoom', L.Map.SmoothWheelZoom );
+(function (factory, window) {
+  // define an AMD module that relies on 'leaflet'
+  if (typeof define === 'function' && define.amd) {
+    define(['leaflet'], factory);
+
+  // define a Common JS module that relies on 'leaflet'
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('leaflet'));
+  }
+
+  // attach your plugin to the global 'L' variable
+  if (typeof window !== 'undefined' && window.L && !window.L.EdgeBuffer) {
+    factory(window.L);
+  }
+}(function (L) {
+  L.EdgeBuffer = {
+    previousMethods: {
+      getTiledPixelBounds: L.GridLayer.prototype._getTiledPixelBounds
+    }
+  };
+
+  L.GridLayer.include({
+
+    _getTiledPixelBounds : function(center, zoom, tileZoom) {
+      var pixelBounds = L.EdgeBuffer.previousMethods.getTiledPixelBounds.call(this, center, zoom, tileZoom);
+
+      // Default is to buffer one tiles beyond the pixel bounds (edgeBufferTiles = 1).
+      var edgeBufferTiles = 1;
+      if ((this.options.edgeBufferTiles !== undefined) && (this.options.edgeBufferTiles !== null)) {
+        edgeBufferTiles = this.options.edgeBufferTiles;
+      }
+
+      if (edgeBufferTiles > 0) {
+        var pixelEdgeBuffer = L.GridLayer.prototype.getTileSize.call(this).multiplyBy(edgeBufferTiles);
+        pixelBounds = new L.Bounds(pixelBounds.min.subtract(pixelEdgeBuffer), pixelBounds.max.add(pixelEdgeBuffer));
+      }
+      return pixelBounds;
+    }
+  });
+
+}, window));
+/* Native Grate Code */
 Grate = {};
 Grate.great_circle_route = function(pt1, pt2, ttl, bounds) {
     var gc = new arc.GreatCircle({x: pt1[0], y: pt1[1]}, {x: pt2[0], y: pt2[1]});	    
-	var line = gc.Arc(100);	   
-	return [bezier(line.geometries[0].coords)];
+	var line = gc.Arc(ttl);	   
+	return [line.geometries[0].coords];
 };
 
 function bezier(pts) {
@@ -7401,7 +7561,8 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   arc.Coord = Coord;
   arc.Arc = Arc;
   arc.GreatCircle = GreatCircle;
-} /*! Leaflet.Geodesic 2.5.5-0 - (c) Henry Thasler - https://github.com/henrythasler/Leaflet.Geodesic */
+}
+/*! Leaflet.Geodesic 2.5.5-0 - (c) Henry Thasler - https://github.com/henrythasler/Leaflet.Geodesic */
 !function(t,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports,require("leaflet")):"function"==typeof define&&define.amd?define(["exports","leaflet"],n):n(((t=t||self).L=t.L||{},t.L.geodesic={}),t.L)}(this,(function(t,n){"use strict";
 /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -7416,22 +7577,25 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 
     See the Apache Version 2.0 License for specific language governing permissions
     and limitations under the License.
-    ***************************************************************************** */var e=function(t,n){return(e=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,n){t.__proto__=n}||function(t,n){for(var e in n)n.hasOwnProperty(e)&&(t[e]=n[e])})(t,n)};function i(t,n){function i(){this.constructor=t}e(t,n),t.prototype=null===n?Object.create(n):(i.prototype=n.prototype,new i)}var a=function(){return(a=Object.assign||function(t){for(var n,e=1,i=arguments.length;e<i;e++)for(var a in n=arguments[e])Object.prototype.hasOwnProperty.call(n,a)&&(t[a]=n[a]);return t}).apply(this,arguments)};function s(){for(var t=0,n=0,e=arguments.length;n<e;n++)t+=arguments[n].length;var i=Array(t),a=0;for(n=0;n<e;n++)for(var s=arguments[n],o=0,r=s.length;o<r;o++,a++)i[a]=s[o];return i}var o=function(){function t(t){this.options={wrap:!0,steps:3},this.ellipsoid={a:6378137,b:6356752.3142,f:1/298.257223563},this.options=a(a({},this.options),t)}return t.prototype.toRadians=function(t){return t*Math.PI/180},t.prototype.toDegrees=function(t){return 180*t/Math.PI},t.prototype.mod=function(t,n){var e=t%n;return e<0?e+n:e},t.prototype.wrap360=function(t){return 0<=t&&t<360?t:this.mod(t,360)},t.prototype.wrap=function(t,n){return void 0===n&&(n=360),-n<=t&&t<=n?t:this.mod(t+n,2*n)-n},t.prototype.direct=function(t,n,e,i){void 0===i&&(i=100);var a=this.toRadians(t.lat),s=this.toRadians(t.lng),o=this.toRadians(n),r=e,h=1e3*Number.EPSILON,l=this.ellipsoid,c=l.a,p=l.b,u=l.f,g=Math.sin(o),f=Math.cos(o),d=(1-u)*Math.tan(a),M=1/Math.sqrt(1+d*d),L=d*M,y=Math.atan2(d,f),v=M*g,w=1-v*v,m=w*(c*c-p*p)/(p*p),b=1+m/16384*(4096+m*(m*(320-175*m)-768)),E=m/1024*(256+m*(m*(74-47*m)-128)),S=r/(p*b),O=null,P=null,R=null,x=null,D=0;do{R=Math.cos(2*y+S),x=S,S=r/(p*b)+E*(O=Math.sin(S))*(R+E/4*((P=Math.cos(S))*(2*R*R-1)-E/6*R*(4*O*O-3)*(4*R*R-3)))}while(Math.abs(S-x)>h&&++D<i);if(D>=i)throw new EvalError("Direct vincenty formula failed to converge after "+i+" iterations \n                (start="+t.lat+"/"+t.lng+"; bearing="+n+"; distance="+e+")");var G=L*O-M*P*f,N=Math.atan2(L*P+M*O*f,(1-u)*Math.sqrt(v*v+G*G)),j=u/16*w*(4+u*(4-3*w)),k=s+(Math.atan2(O*g,M*P-L*O*f)-(1-j)*u*v*(S+j*O*(R+j*P*(2*R*R-1)))),_=Math.atan2(v,-G);return{lat:this.toDegrees(N),lng:this.toDegrees(k),bearing:this.wrap360(this.toDegrees(_))}},t.prototype.inverse=function(t,e,i,a){void 0===i&&(i=100),void 0===a&&(a=!0);var s=t,o=e,r=this.toRadians(s.lat),h=this.toRadians(s.lng),l=this.toRadians(o.lat),c=this.toRadians(o.lng),p=Math.PI,u=Number.EPSILON,g=this.ellipsoid,f=g.a,d=g.b,M=g.f,L=c-h,y=(1-M)*Math.tan(r),v=1/Math.sqrt(1+y*y),w=y*v,m=(1-M)*Math.tan(l),b=1/Math.sqrt(1+m*m),E=m*b,S=Math.abs(L)>p/2||Math.abs(l-r)>p/2,O=L,P=null,R=null,x=S?p:0,D=0,G=S?-1:1,N=null,j=1,k=null,_=1,q=null,I=null,C=0;do{if(N=b*(P=Math.sin(O))*(b*P)+(v*E-w*b*(R=Math.cos(O)))*(v*E-w*b*R),Math.abs(N)<u)break;if(G=w*E+v*b*R,I=O,O=L+(1-(q=M/16*(_=1-(k=v*b*P/(D=Math.sqrt(N)))*k)*(4+M*(4-3*_))))*M*k*((x=Math.atan2(D,G))+q*D*((j=0!==_?G-2*w*E/_:0)+q*G*(2*j*j-1))),(S?Math.abs(O)-p:Math.abs(O))>p)throw new EvalError("λ > π")}while(Math.abs(O-I)>1e-12&&++C<i);if(C>=i){if(a)return this.inverse(t,new n.LatLng(e.lat,e.lng-.01),i,a);throw new EvalError("Inverse vincenty formula failed to converge after "+i+" iterations \n                    (start="+t.lat+"/"+t.lng+"; dest="+e.lat+"/"+e.lng+")")}var A=_*(f*f-d*d)/(d*d),B=A/1024*(256+A*(A*(74-47*A)-128)),J=d*(1+A/16384*(4096+A*(A*(320-175*A)-768)))*(x-B*D*(j+B/4*(G*(2*j*j-1)-B/6*j*(4*D*D-3)*(4*j*j-3)))),T=Math.abs(N)<u?0:Math.atan2(b*P,v*E-w*b*R),U=Math.abs(N)<u?p:Math.atan2(v*P,-w*b+v*E*R);return{distance:J,initialBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(T)),finalBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(U))}},t.prototype.intersection=function(t,e,i,a){var s=this.toRadians(t.lat),o=this.toRadians(t.lng),r=this.toRadians(i.lat),h=this.toRadians(i.lng),l=this.toRadians(e),c=this.toRadians(a),p=r-s,u=h-o,g=Math.PI,f=Number.EPSILON,d=2*Math.asin(Math.sqrt(Math.sin(p/2)*Math.sin(p/2)+Math.cos(s)*Math.cos(r)*Math.sin(u/2)*Math.sin(u/2)));if(Math.abs(d)<f)return t;var M=(Math.sin(r)-Math.sin(s)*Math.cos(d))/(Math.sin(d)*Math.cos(s)),L=(Math.sin(s)-Math.sin(r)*Math.cos(d))/(Math.sin(d)*Math.cos(r)),y=Math.acos(Math.min(Math.max(M,-1),1)),v=Math.acos(Math.min(Math.max(L,-1),1)),w=l-(Math.sin(h-o)>0?y:2*g-y),m=(Math.sin(h-o)>0?2*g-v:v)-c;if(0===Math.sin(w)&&0===Math.sin(m))return null;if(Math.sin(w)*Math.sin(m)<0)return null;var b=-Math.cos(w)*Math.cos(m)+Math.sin(w)*Math.sin(m)*Math.cos(d),E=Math.atan2(Math.sin(d)*Math.sin(w)*Math.sin(m),Math.cos(m)+Math.cos(w)*b),S=Math.asin(Math.min(Math.max(Math.sin(s)*Math.cos(E)+Math.cos(s)*Math.sin(E)*Math.cos(l),-1),1)),O=o+Math.atan2(Math.sin(l)*Math.sin(E)*Math.cos(s),Math.cos(E)-Math.sin(s)*Math.sin(S));return new n.LatLng(this.toDegrees(S),this.toDegrees(O))},t.prototype.midpoint=function(t,e){var i=this.toRadians(t.lat),a=this.toRadians(t.lng),s=this.toRadians(e.lat),o=this.toRadians(e.lng-t.lng),r=Math.cos(i),h=0,l=Math.sin(i),c={x:r+Math.cos(s)*Math.cos(o),y:h+Math.cos(s)*Math.sin(o),z:l+Math.sin(s)},p=Math.atan2(c.z,Math.sqrt(c.x*c.x+c.y*c.y)),u=a+Math.atan2(c.y,c.x);return new n.LatLng(this.toDegrees(p),this.toDegrees(u))},t}(),r=function(){function t(t){this.geodesic=new o,this.steps=t&&void 0!==t.steps?t.steps:3}return t.prototype.recursiveMidpoint=function(t,n,e){var i=[t,n],a=this.geodesic.midpoint(t,n);return e>0?(i.splice.apply(i,s([0,1],this.recursiveMidpoint(t,a,e-1))),i.splice.apply(i,s([i.length-2,2],this.recursiveMidpoint(a,n,e-1)))):i.splice(1,0,a),i},t.prototype.line=function(t,n){return this.recursiveMidpoint(t,n,Math.min(8,this.steps))},t.prototype.multiLineString=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=[],a=1;a<t.length;a++)i.splice.apply(i,s([i.length-1,1],n.line(t[a-1],t[a])));e.push(i)})),e},t.prototype.lineString=function(t){return this.multiLineString([t])[0]},t.prototype.splitLine=function(t,e){var i={point:new n.LatLng(89.9,-180.0000001),bearing:180},a={point:new n.LatLng(89.9,180.0000001),bearing:180},s=new n.LatLng(t.lat,t.lng),o=new n.LatLng(e.lat,e.lng);s.lng=this.geodesic.wrap(s.lng,360),o.lng=this.geodesic.wrap(o.lng,360),o.lng-s.lng>180?o.lng=o.lng-360:o.lng-s.lng<-180&&(o.lng=o.lng+360);var r=[[new n.LatLng(s.lat,this.geodesic.wrap(s.lng,180)),new n.LatLng(o.lat,this.geodesic.wrap(o.lng,180))]];if(s.lng>=-180&&s.lng<=180){if(o.lng<-180){var h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng+360),new n.LatLng(o.lat,o.lng+360)]])}else if(o.lng>180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,a.point,a.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng-360),new n.LatLng(o.lat,o.lng-360)]])}}else if(o.lng>=-180&&o.lng<=180)if(s.lng<-180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng+360),new n.LatLng(l.lat,l.lng+360)],[l,o]])}else if(s.lng>180){var l;h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng-360),new n.LatLng(l.lat,l.lng-360)],[l,o]])}return r},t.prototype.splitMultiLineString=function(t){var n=this,e=[];return t.forEach((function(t){if(1===t.length)e.push(t);else{for(var i=[],a=1;a<t.length;a++){var s=n.splitLine(t[a-1],t[a]);i.pop(),i=i.concat(s[0]),s.length>1&&(e.push(i),i=s[1])}e.push(i)}})),e},t.prototype.wrapMultiLineString=function(t){var e=[];return t.forEach((function(t){var i=[],a=null;t.forEach((function(t){if(null===a)i.push(t),a=t;else{var e=t.lng-a.lng,s=Math.sign(e/180)*Math.ceil(Math.abs(e/180));Math.abs(e)>180?i.push(new n.LatLng(t.lat,t.lng-180*s)):i.push(new n.LatLng(t.lat,t.lng))}})),e.push(i)})),e},t.prototype.circle=function(t,e){for(var i=[],a=0;a<this.steps;a++){var s=this.geodesic.direct(t,360/this.steps*a,e);i.push(new n.LatLng(s.lat,s.lng))}return i.push(new n.LatLng(i[0].lat,i[0].lng)),i},t.prototype.splitCircle=function(t){var n=[];return 3===(n=this.splitMultiLineString([t])).length&&(n[2]=s(n[2],n[0]),n.shift()),n},t.prototype.distance=function(t,e){return this.geodesic.inverse(new n.LatLng(t.lat,this.geodesic.wrap(t.lng,180)),new n.LatLng(e.lat,this.geodesic.wrap(e.lng,180))).distance},t.prototype.multilineDistance=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=0,a=1;a<t.length;a++)i+=n.distance(t[a-1],t[a]);e.push(i)})),e},t.prototype.updateStatistics=function(t,n){var e={};return e.distanceArray=this.multilineDistance(t),e.totalDistance=e.distanceArray.reduce((function(t,n){return t+n}),0),e.points=0,t.forEach((function(t){e.points+=t.reduce((function(t){return t+1}),0)})),e.vertices=0,n.forEach((function(t){e.vertices+=t.reduce((function(t){return t+1}),0)})),e},t}();function h(t){return"object"==typeof t&&null!==t&&"lat"in t&&"lng"in t&&"number"==typeof t.lat&&"number"==typeof t.lng}function l(t){return t instanceof Array&&"number"==typeof t[0]&&"number"==typeof t[1]}function c(t){return t instanceof n.LatLng||(!!l(t)||!!h(t))}function p(t){if(t instanceof n.LatLng)return t;if(l(t))return new n.LatLng(t[0],t[1]);if(h(t))return new n.LatLng(t.lat,t.lng);throw new Error("L.LatLngExpression expected. Unknown object found.")}var u=function(t){function e(e,i){var s=t.call(this,[],i)||this;return s.defaultOptions={wrap:!0,steps:3},s.statistics={},s.points=[],n.Util.setOptions(s,a(a({},s.defaultOptions),i)),s.geom=new r(s.options),void 0!==e&&s.setLatLngs(e),s}return i(e,t),e.prototype.updateGeometry=function(){var n;if(n=this.geom.multiLineString(this.points),this.statistics=this.geom.updateStatistics(this.points,n),this.options.wrap){var e=this.geom.splitMultiLineString(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,this.geom.wrapMultiLineString(n))},e.prototype.setLatLngs=function(t){return this.points=function(t){for(var n=[],e=function(e){if(c(e)){var i=[];return t.forEach((function(t){i.push(p(t))})),n.push(i),"break"}if(!(e instanceof Array))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");if(!c(e[0]))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");var a=[];e.forEach((function(t){a.push(p(t))})),n.push(a)},i=0,a=t;i<a.length;i++){if("break"===e(a[i]))break}return n}(t),this.updateGeometry(),this},e.prototype.addLatLng=function(t,n){var e=p(t);return 0===this.points.length?this.points.push([e]):void 0===n?this.points[this.points.length-1].push(e):n.push(e),this.updateGeometry(),this},e.prototype.fromGeoJson=function(t){var e=[],i=[];return"FeatureCollection"===t.type?i=t.features:"Feature"===t.type?i=[t]:["MultiPoint","LineString","MultiLineString","Polygon","MultiPolygon"].includes(t.type)?i=[{type:"Feature",geometry:t,properties:{}}]:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.type+'" not supported.'),i.forEach((function(t){switch(t.geometry.type){case"MultiPoint":case"LineString":e=s(e,[n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,0)]);break;case"MultiLineString":case"Polygon":e=s(e,n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,1));break;case"MultiPolygon":t.geometry.coordinates.forEach((function(t){e=s(e,n.GeoJSON.coordsToLatLngs(t,1))}));break;default:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.geometry.type+'" not supported.')}})),e.length&&this.setLatLngs(e),this},e.prototype.distance=function(t,n){return this.geom.distance(p(t),p(n))},e}(n.Polyline),g=function(t){function e(e,i){var s=t.call(this,[],i)||this;s.defaultOptions={wrap:!0,steps:24,fill:!0,noClip:!0},s.statistics={},n.Util.setOptions(s,a(a({},s.defaultOptions),i));var o=s.options;return s.radius=void 0===o.radius?1e6:o.radius,s.center=void 0===e?new n.LatLng(0,0):p(e),s.geom=new r(s.options),s.update(),s}return i(e,t),e.prototype.update=function(){var n=this.geom.circle(this.center,this.radius);if(this.statistics=this.geom.updateStatistics([[this.center]],[n]),this.statistics.totalDistance=this.geom.multilineDistance([n]).reduce((function(t,n){return t+n}),0),this.options.wrap){var e=this.geom.splitCircle(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,n)},e.prototype.distanceTo=function(t){var n=p(t);return this.geom.distance(this.center,n)},e.prototype.setLatLng=function(t,n){this.center=p(t),this.radius=n||this.radius,this.update()},e.prototype.setRadius=function(t,n){this.radius=t,this.center=n?p(n):this.center,this.update()},e}(n.Polyline);void 0!==window.L&&(window.L.Geodesic=u,window.L.geodesic=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(u.bind.apply(u,s([void 0],t)))},window.L.GeodesicCircle=g,window.L.geodesiccircle=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(g.bind.apply(g,s([void 0],t)))}),t.GeodesicCircleClass=g,t.GeodesicLine=u,Object.defineProperty(t,"__esModule",{value:!0})})); /* Manifest =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+    ***************************************************************************** */var e=function(t,n){return(e=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(t,n){t.__proto__=n}||function(t,n){for(var e in n)n.hasOwnProperty(e)&&(t[e]=n[e])})(t,n)};function i(t,n){function i(){this.constructor=t}e(t,n),t.prototype=null===n?Object.create(n):(i.prototype=n.prototype,new i)}var a=function(){return(a=Object.assign||function(t){for(var n,e=1,i=arguments.length;e<i;e++)for(var a in n=arguments[e])Object.prototype.hasOwnProperty.call(n,a)&&(t[a]=n[a]);return t}).apply(this,arguments)};function s(){for(var t=0,n=0,e=arguments.length;n<e;n++)t+=arguments[n].length;var i=Array(t),a=0;for(n=0;n<e;n++)for(var s=arguments[n],o=0,r=s.length;o<r;o++,a++)i[a]=s[o];return i}var o=function(){function t(t){this.options={wrap:!0,steps:3},this.ellipsoid={a:6378137,b:6356752.3142,f:1/298.257223563},this.options=a(a({},this.options),t)}return t.prototype.toRadians=function(t){return t*Math.PI/180},t.prototype.toDegrees=function(t){return 180*t/Math.PI},t.prototype.mod=function(t,n){var e=t%n;return e<0?e+n:e},t.prototype.wrap360=function(t){return 0<=t&&t<360?t:this.mod(t,360)},t.prototype.wrap=function(t,n){return void 0===n&&(n=360),-n<=t&&t<=n?t:this.mod(t+n,2*n)-n},t.prototype.direct=function(t,n,e,i){void 0===i&&(i=100);var a=this.toRadians(t.lat),s=this.toRadians(t.lng),o=this.toRadians(n),r=e,h=1e3*Number.EPSILON,l=this.ellipsoid,c=l.a,p=l.b,u=l.f,g=Math.sin(o),f=Math.cos(o),d=(1-u)*Math.tan(a),M=1/Math.sqrt(1+d*d),L=d*M,y=Math.atan2(d,f),v=M*g,w=1-v*v,m=w*(c*c-p*p)/(p*p),b=1+m/16384*(4096+m*(m*(320-175*m)-768)),E=m/1024*(256+m*(m*(74-47*m)-128)),S=r/(p*b),O=null,P=null,R=null,x=null,D=0;do{R=Math.cos(2*y+S),x=S,S=r/(p*b)+E*(O=Math.sin(S))*(R+E/4*((P=Math.cos(S))*(2*R*R-1)-E/6*R*(4*O*O-3)*(4*R*R-3)))}while(Math.abs(S-x)>h&&++D<i);if(D>=i)throw new EvalError("Direct vincenty formula failed to converge after "+i+" iterations \n                (start="+t.lat+"/"+t.lng+"; bearing="+n+"; distance="+e+")");var G=L*O-M*P*f,N=Math.atan2(L*P+M*O*f,(1-u)*Math.sqrt(v*v+G*G)),j=u/16*w*(4+u*(4-3*w)),k=s+(Math.atan2(O*g,M*P-L*O*f)-(1-j)*u*v*(S+j*O*(R+j*P*(2*R*R-1)))),_=Math.atan2(v,-G);return{lat:this.toDegrees(N),lng:this.toDegrees(k),bearing:this.wrap360(this.toDegrees(_))}},t.prototype.inverse=function(t,e,i,a){void 0===i&&(i=100),void 0===a&&(a=!0);var s=t,o=e,r=this.toRadians(s.lat),h=this.toRadians(s.lng),l=this.toRadians(o.lat),c=this.toRadians(o.lng),p=Math.PI,u=Number.EPSILON,g=this.ellipsoid,f=g.a,d=g.b,M=g.f,L=c-h,y=(1-M)*Math.tan(r),v=1/Math.sqrt(1+y*y),w=y*v,m=(1-M)*Math.tan(l),b=1/Math.sqrt(1+m*m),E=m*b,S=Math.abs(L)>p/2||Math.abs(l-r)>p/2,O=L,P=null,R=null,x=S?p:0,D=0,G=S?-1:1,N=null,j=1,k=null,_=1,q=null,I=null,C=0;do{if(N=b*(P=Math.sin(O))*(b*P)+(v*E-w*b*(R=Math.cos(O)))*(v*E-w*b*R),Math.abs(N)<u)break;if(G=w*E+v*b*R,I=O,O=L+(1-(q=M/16*(_=1-(k=v*b*P/(D=Math.sqrt(N)))*k)*(4+M*(4-3*_))))*M*k*((x=Math.atan2(D,G))+q*D*((j=0!==_?G-2*w*E/_:0)+q*G*(2*j*j-1))),(S?Math.abs(O)-p:Math.abs(O))>p)throw new EvalError("λ > π")}while(Math.abs(O-I)>1e-12&&++C<i);if(C>=i){if(a)return this.inverse(t,new n.LatLng(e.lat,e.lng-.01),i,a);throw new EvalError("Inverse vincenty formula failed to converge after "+i+" iterations \n                    (start="+t.lat+"/"+t.lng+"; dest="+e.lat+"/"+e.lng+")")}var A=_*(f*f-d*d)/(d*d),B=A/1024*(256+A*(A*(74-47*A)-128)),J=d*(1+A/16384*(4096+A*(A*(320-175*A)-768)))*(x-B*D*(j+B/4*(G*(2*j*j-1)-B/6*j*(4*D*D-3)*(4*j*j-3)))),T=Math.abs(N)<u?0:Math.atan2(b*P,v*E-w*b*R),U=Math.abs(N)<u?p:Math.atan2(v*P,-w*b+v*E*R);return{distance:J,initialBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(T)),finalBearing:Math.abs(J)<u?NaN:this.wrap360(this.toDegrees(U))}},t.prototype.intersection=function(t,e,i,a){var s=this.toRadians(t.lat),o=this.toRadians(t.lng),r=this.toRadians(i.lat),h=this.toRadians(i.lng),l=this.toRadians(e),c=this.toRadians(a),p=r-s,u=h-o,g=Math.PI,f=Number.EPSILON,d=2*Math.asin(Math.sqrt(Math.sin(p/2)*Math.sin(p/2)+Math.cos(s)*Math.cos(r)*Math.sin(u/2)*Math.sin(u/2)));if(Math.abs(d)<f)return t;var M=(Math.sin(r)-Math.sin(s)*Math.cos(d))/(Math.sin(d)*Math.cos(s)),L=(Math.sin(s)-Math.sin(r)*Math.cos(d))/(Math.sin(d)*Math.cos(r)),y=Math.acos(Math.min(Math.max(M,-1),1)),v=Math.acos(Math.min(Math.max(L,-1),1)),w=l-(Math.sin(h-o)>0?y:2*g-y),m=(Math.sin(h-o)>0?2*g-v:v)-c;if(0===Math.sin(w)&&0===Math.sin(m))return null;if(Math.sin(w)*Math.sin(m)<0)return null;var b=-Math.cos(w)*Math.cos(m)+Math.sin(w)*Math.sin(m)*Math.cos(d),E=Math.atan2(Math.sin(d)*Math.sin(w)*Math.sin(m),Math.cos(m)+Math.cos(w)*b),S=Math.asin(Math.min(Math.max(Math.sin(s)*Math.cos(E)+Math.cos(s)*Math.sin(E)*Math.cos(l),-1),1)),O=o+Math.atan2(Math.sin(l)*Math.sin(E)*Math.cos(s),Math.cos(E)-Math.sin(s)*Math.sin(S));return new n.LatLng(this.toDegrees(S),this.toDegrees(O))},t.prototype.midpoint=function(t,e){var i=this.toRadians(t.lat),a=this.toRadians(t.lng),s=this.toRadians(e.lat),o=this.toRadians(e.lng-t.lng),r=Math.cos(i),h=0,l=Math.sin(i),c={x:r+Math.cos(s)*Math.cos(o),y:h+Math.cos(s)*Math.sin(o),z:l+Math.sin(s)},p=Math.atan2(c.z,Math.sqrt(c.x*c.x+c.y*c.y)),u=a+Math.atan2(c.y,c.x);return new n.LatLng(this.toDegrees(p),this.toDegrees(u))},t}(),r=function(){function t(t){this.geodesic=new o,this.steps=t&&void 0!==t.steps?t.steps:3}return t.prototype.recursiveMidpoint=function(t,n,e){var i=[t,n],a=this.geodesic.midpoint(t,n);return e>0?(i.splice.apply(i,s([0,1],this.recursiveMidpoint(t,a,e-1))),i.splice.apply(i,s([i.length-2,2],this.recursiveMidpoint(a,n,e-1)))):i.splice(1,0,a),i},t.prototype.line=function(t,n){return this.recursiveMidpoint(t,n,Math.min(8,this.steps))},t.prototype.multiLineString=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=[],a=1;a<t.length;a++)i.splice.apply(i,s([i.length-1,1],n.line(t[a-1],t[a])));e.push(i)})),e},t.prototype.lineString=function(t){return this.multiLineString([t])[0]},t.prototype.splitLine=function(t,e){var i={point:new n.LatLng(89.9,-180.0000001),bearing:180},a={point:new n.LatLng(89.9,180.0000001),bearing:180},s=new n.LatLng(t.lat,t.lng),o=new n.LatLng(e.lat,e.lng);s.lng=this.geodesic.wrap(s.lng,360),o.lng=this.geodesic.wrap(o.lng,360),o.lng-s.lng>180?o.lng=o.lng-360:o.lng-s.lng<-180&&(o.lng=o.lng+360);var r=[[new n.LatLng(s.lat,this.geodesic.wrap(s.lng,180)),new n.LatLng(o.lat,this.geodesic.wrap(o.lng,180))]];if(s.lng>=-180&&s.lng<=180){if(o.lng<-180){var h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng+360),new n.LatLng(o.lat,o.lng+360)]])}else if(o.lng>180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,a.point,a.bearing))&&(r=[[s,l],[new n.LatLng(l.lat,l.lng-360),new n.LatLng(o.lat,o.lng-360)]])}}else if(o.lng>=-180&&o.lng<=180)if(s.lng<-180){h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng+360),new n.LatLng(l.lat,l.lng+360)],[l,o]])}else if(s.lng>180){var l;h=this.geodesic.inverse(s,o).initialBearing;(l=this.geodesic.intersection(s,h,i.point,i.bearing))&&(r=[[new n.LatLng(s.lat,s.lng-360),new n.LatLng(l.lat,l.lng-360)],[l,o]])}return r},t.prototype.splitMultiLineString=function(t){var n=this,e=[];return t.forEach((function(t){if(1===t.length)e.push(t);else{for(var i=[],a=1;a<t.length;a++){var s=n.splitLine(t[a-1],t[a]);i.pop(),i=i.concat(s[0]),s.length>1&&(e.push(i),i=s[1])}e.push(i)}})),e},t.prototype.wrapMultiLineString=function(t){var e=[];return t.forEach((function(t){var i=[],a=null;t.forEach((function(t){if(null===a)i.push(t),a=t;else{var e=t.lng-a.lng,s=Math.sign(e/180)*Math.ceil(Math.abs(e/180));Math.abs(e)>180?i.push(new n.LatLng(t.lat,t.lng-180*s)):i.push(new n.LatLng(t.lat,t.lng))}})),e.push(i)})),e},t.prototype.circle=function(t,e){for(var i=[],a=0;a<this.steps;a++){var s=this.geodesic.direct(t,360/this.steps*a,e);i.push(new n.LatLng(s.lat,s.lng))}return i.push(new n.LatLng(i[0].lat,i[0].lng)),i},t.prototype.splitCircle=function(t){var n=[];return 3===(n=this.splitMultiLineString([t])).length&&(n[2]=s(n[2],n[0]),n.shift()),n},t.prototype.distance=function(t,e){return this.geodesic.inverse(new n.LatLng(t.lat,this.geodesic.wrap(t.lng,180)),new n.LatLng(e.lat,this.geodesic.wrap(e.lng,180))).distance},t.prototype.multilineDistance=function(t){var n=this,e=[];return t.forEach((function(t){for(var i=0,a=1;a<t.length;a++)i+=n.distance(t[a-1],t[a]);e.push(i)})),e},t.prototype.updateStatistics=function(t,n){var e={};return e.distanceArray=this.multilineDistance(t),e.totalDistance=e.distanceArray.reduce((function(t,n){return t+n}),0),e.points=0,t.forEach((function(t){e.points+=t.reduce((function(t){return t+1}),0)})),e.vertices=0,n.forEach((function(t){e.vertices+=t.reduce((function(t){return t+1}),0)})),e},t}();function h(t){return"object"==typeof t&&null!==t&&"lat"in t&&"lng"in t&&"number"==typeof t.lat&&"number"==typeof t.lng}function l(t){return t instanceof Array&&"number"==typeof t[0]&&"number"==typeof t[1]}function c(t){return t instanceof n.LatLng||(!!l(t)||!!h(t))}function p(t){if(t instanceof n.LatLng)return t;if(l(t))return new n.LatLng(t[0],t[1]);if(h(t))return new n.LatLng(t.lat,t.lng);throw new Error("L.LatLngExpression expected. Unknown object found.")}var u=function(t){function e(e,i){var s=t.call(this,[],i)||this;return s.defaultOptions={wrap:!0,steps:3},s.statistics={},s.points=[],n.Util.setOptions(s,a(a({},s.defaultOptions),i)),s.geom=new r(s.options),void 0!==e&&s.setLatLngs(e),s}return i(e,t),e.prototype.updateGeometry=function(){var n;if(n=this.geom.multiLineString(this.points),this.statistics=this.geom.updateStatistics(this.points,n),this.options.wrap){var e=this.geom.splitMultiLineString(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,this.geom.wrapMultiLineString(n))},e.prototype.setLatLngs=function(t){return this.points=function(t){for(var n=[],e=function(e){if(c(e)){var i=[];return t.forEach((function(t){i.push(p(t))})),n.push(i),"break"}if(!(e instanceof Array))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");if(!c(e[0]))throw new Error("L.LatLngExpression[] | L.LatLngExpression[][] expected. Unknown object found.");var a=[];e.forEach((function(t){a.push(p(t))})),n.push(a)},i=0,a=t;i<a.length;i++){if("break"===e(a[i]))break}return n}(t),this.updateGeometry(),this},e.prototype.addLatLng=function(t,n){var e=p(t);return 0===this.points.length?this.points.push([e]):void 0===n?this.points[this.points.length-1].push(e):n.push(e),this.updateGeometry(),this},e.prototype.fromGeoJson=function(t){var e=[],i=[];return"FeatureCollection"===t.type?i=t.features:"Feature"===t.type?i=[t]:["MultiPoint","LineString","MultiLineString","Polygon","MultiPolygon"].includes(t.type)?i=[{type:"Feature",geometry:t,properties:{}}]:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.type+'" not supported.'),i.forEach((function(t){switch(t.geometry.type){case"MultiPoint":case"LineString":e=s(e,[n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,0)]);break;case"MultiLineString":case"Polygon":e=s(e,n.GeoJSON.coordsToLatLngs(t.geometry.coordinates,1));break;case"MultiPolygon":t.geometry.coordinates.forEach((function(t){e=s(e,n.GeoJSON.coordsToLatLngs(t,1))}));break;default:console.log('[Leaflet.Geodesic] fromGeoJson() - Type "'+t.geometry.type+'" not supported.')}})),e.length&&this.setLatLngs(e),this},e.prototype.distance=function(t,n){return this.geom.distance(p(t),p(n))},e}(n.Polyline),g=function(t){function e(e,i){var s=t.call(this,[],i)||this;s.defaultOptions={wrap:!0,steps:24,fill:!0,noClip:!0},s.statistics={},n.Util.setOptions(s,a(a({},s.defaultOptions),i));var o=s.options;return s.radius=void 0===o.radius?1e6:o.radius,s.center=void 0===e?new n.LatLng(0,0):p(e),s.geom=new r(s.options),s.update(),s}return i(e,t),e.prototype.update=function(){var n=this.geom.circle(this.center,this.radius);if(this.statistics=this.geom.updateStatistics([[this.center]],[n]),this.statistics.totalDistance=this.geom.multilineDistance([n]).reduce((function(t,n){return t+n}),0),this.options.wrap){var e=this.geom.splitCircle(n);t.prototype.setLatLngs.call(this,e)}else t.prototype.setLatLngs.call(this,n)},e.prototype.distanceTo=function(t){var n=p(t);return this.geom.distance(this.center,n)},e.prototype.setLatLng=function(t,n){this.center=p(t),this.radius=n||this.radius,this.update()},e.prototype.setRadius=function(t,n){this.radius=t,this.center=n?p(n):this.center,this.update()},e}(n.Polyline);void 0!==window.L&&(window.L.Geodesic=u,window.L.geodesic=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(u.bind.apply(u,s([void 0],t)))},window.L.GeodesicCircle=g,window.L.geodesiccircle=function(){for(var t=[],n=0;n<arguments.length;n++)t[n]=arguments[n];return new(g.bind.apply(g,s([void 0],t)))}),t.GeodesicCircleClass=g,t.GeodesicLine=u,Object.defineProperty(t,"__esModule",{value:!0})}));
+/* Manifest =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
 /* Manifest Base Classes /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /** Manifest Class **/
 class Manifest {
-	constructor() {
+	constructor(options) {
+		this.options = options;
+		// Default options (passed from main.js)
+		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
+		
 		this.initialized = false;
 		
 		this.supplychains = [];
-		this.serviceurl = "";
-		
 		this.Supplychain = new ManifestSupplyChain();
 		this.Interface = new ManifestUI();
-		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile()});
+		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile(), retinaTiles: options.retinaTiles});
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
 		this.Util = new ManifestUtilities();
@@ -7456,10 +7620,12 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		//manifest.options = { color: ['#000000','#999999','#999999'] };
+		
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: manifest.options ? manifest.options : {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -7470,7 +7636,7 @@ class Manifest {
 		}
 		for (let h of d.hops) {
 			h.from = d.features[h.from_stop_id-1]; h.to = d.features[h.to_stop_id-1];
-			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 			d.features.push(ft);
 		}
 	
@@ -7493,7 +7659,7 @@ class Manifest {
 		let sheetsc = {};
 
 		if (typeof sheetoverview.rootgeocode === 'undefined') {
-			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
+			sheetsc = {type: 'FeatureCollection', mtype: 'gsheet', raw: d.raw, mapper: {}, options: sheetoverview.options ? sheetoverview.options : {}, details: {id: options.id, url: '#gsheet-'+options.idref, layers: [], measures: []}, properties: {title: sheetoverview.name, description: MI.Util.markdowner.makeHtml(sheetoverview.description)}, features: [], stops: [], hops: []};
 			
 			sheetpoints = sheetpoints.sort((a,b) => Number(a.index) - Number(b.index) );
 			
@@ -7505,7 +7671,7 @@ class Manifest {
 			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
 			
 			for (let n of sheetpoints) {
-				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon:n.icon ? n.icon : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon: n.icon ? n.icon : '', color: n.color ? n.color : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
 					let hops = n.destinationindex.replace(' ', '').split(',');
@@ -7517,7 +7683,7 @@ class Manifest {
 			}
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
-				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(',')}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
+				let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 				sheetsc.features.push(ft);
 			}	
 		}
@@ -7756,8 +7922,9 @@ class Manifest {
 			  		
 		} else if (format === 'json') {
 			let json = '';
-			if (d.mtype === 'smap') { json = this._smapToManifest(d);
-			} else { json = d.raw; }
+			if (d.mtype === 'smap') { json = this._smapToManifest(d); } 
+			else if (d.mtype === 'gsheet') { json = this._gsheetToManifest(d); }
+			else { json = d.raw; }
 			a.setAttribute('href', 'data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(json)));
 			a.setAttribute('download', filename+'.json');
 			a.click();
@@ -7767,6 +7934,49 @@ class Manifest {
 			a.click();
 		}
 	}
+
+	_gsheetToManifest(d) {
+		let s = {summary:{name:d.properties.title, description:d.properties.description}, nodes:[]};
+		let off = 0;
+		for (let node of d.graph.nodes) {
+			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
+			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
+				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates.reverse().join(',')},
+				attributes:{destinationindex:[],image:[{URL:''}],sources:[{URL:''}]}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
+			s.nodes[Number(node.id.split('-')[1])] = n;
+		}
+
+		for (let link of d.graph.links) { 
+
+			s.nodes[Number(link.source.split('-')[1])].attributes.destinationindex.push(Number(link.target.split('-')[1])+1); 
+		}
+		for (let i = 0; i < s.nodes.length; i++) {
+			if (typeof s.nodes[i] === 'undefined') {
+				s.nodes.splice(i, 1); 
+				
+				for (let j = 0; j < s.nodes.length; j++) { if (j >= i && typeof s.nodes[j] !== 'undefined') {
+					s.nodes[j].overview.index = Number(s.nodes[j].overview.index) - 1;			
+				}}
+				for (let k = 0; k < s.nodes.length; k++) { if (typeof s.nodes[k] !== 'undefined') {
+					for (let d in s.nodes[k].attributes.destinationindex) {
+						if (s.nodes[k].attributes.destinationindex[d] > i) {
+							s.nodes[k].attributes.destinationindex[d] = Number(s.nodes[k].attributes.destinationindex[d]) - 1;
+						}
+					}					
+				}}		
+				
+				i--;
+			} 
+		}
+		for (let node of s.nodes) {  if (typeof node !== 'undefined') {
+			if (node.attributes.destinationindex.length === 0) { node.attributes.destinationindex = '';} 
+			else { node.attributes.destinationindex = node.attributes.destinationindex.filter((d, index, dests) => { return dests.indexOf(d) === index; }).join(','); }
+		}}
+		
+		return s;
+	}
+	
 	_smapToManifest(d) {
 		let s = {summary:{name:d.properties.title, description:d.properties.description}, nodes:[]};
 		let off = 0;
@@ -7834,7 +8044,7 @@ class ManifestMessenger {
 	}
 	
 	AddObject(oid) {
-		let call = 'https://supplystudies.com/manifest/services/?type=aprsfi&id='+oid;
+		let call = 'https://manifest.supplystudies.com/services/?type=aprsfi&id='+oid;
 		this.Add(call, function(d) {
 			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
 			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
@@ -7882,7 +8092,8 @@ String.prototype.hashCode = function() {
   for (let i = 0; i < this.length; i++) { chr = this.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; }
   return Math.abs(hash);
 };
- class ManifestSupplyChain {
+
+class ManifestSupplyChain {
 	constructor() {
 		this.measures = [{measure: 'weight', unit: 'kg'}, {measure: 'co2e', unit: 'kg'}, {measure: 'water', unit: 'kl'},
 		{measure: 'energy', unit: 'kj'}, {measure: 'cost', unit: 'dollars'}, {measure: 'percent', unit: '%'}];
@@ -7901,11 +8112,12 @@ String.prototype.hashCode = function() {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-
+		let fillcolor = MI.options.storyMap ? '#ffffff' : d.details.style.fillColor, textcolor = MI.options.storyMap ? d.details.style.fillColor : d.details.style.textColor;
+		
 		mheader.innerHTML = `
-		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
+		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
 			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
-			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
+			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${textcolor};"></i>
 		</div>`;
 						
 		let mdetails = document.createElement('div');
@@ -7928,11 +8140,11 @@ String.prototype.hashCode = function() {
 		let supplycatmap = {}, supplycats = {};
 		for (let ft of d.features) {
 			if (ft.geometry.type === 'Point') {
-				for (let cat of ft.properties.category.split(',')) {
+				if (ft.properties.category) { for (let cat of ft.properties.category.split(',')) {
 					if (cat !== '') {
 						supplycatmap[String(cat)] = true;
 					}
-				}
+				}}
 			}
 		}
 		
@@ -7946,8 +8158,12 @@ String.prototype.hashCode = function() {
 			`<label id="lineheader-${id}" class="nodelineheader lines">Lines 
 			 <input type="checkbox" value="lines-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
 		
+		// TODO: Shouldn't show this if all nodes are categorized. 
+		if (Object.entries(supplycatmap).length > 1) {
+			supplycat.innerHTML += `<label class="supplycat">Uncategorized <input type="checkbox" value="cat-${id}-uncategorized" checked> <span class="supplycatcheckmark"></span> </label>`;			
+		}	 
 		for (const [key, value] of Object.entries(supplycatmap)) {
-			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
+			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${id}-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
 			supplycats[key] = [];
 		}
 		MI.supplychains[index].categories = supplycats;
@@ -7973,7 +8189,7 @@ String.prototype.hashCode = function() {
 		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { 
 			MI.Interface.ClearSearch(); MI.Interface.Search(); 
 		}
-	
+			
 		if (MI.Interface.IsMobile()) { MI.Interface.Mobilify(id, index); }
 		MI.Interface.SetDocumentTitle();
 	
@@ -7986,7 +8202,7 @@ String.prototype.hashCode = function() {
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -8005,9 +8221,11 @@ String.prototype.hashCode = function() {
 			if (ft.geometry.type === 'Point') { 
 				let point = this.SetupPoint(ft, d, index); points.features.push(point);
 			} else { 
-				let line = this.SetupLine(ft, d, index); 
+				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, d, index) : this.SetupLine(ft, d, index); 
+					
 				if (line !== false) {
-					let arrow = this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
+					let arrow = MI.options.simpleLines ? 
+						this.SetupSimpleArrow(JSON.parse(JSON.stringify(line)), d, index) : this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
 					lines.features.push(line); arrows.features.push(arrow);
 				}
 			}	
@@ -8020,6 +8238,18 @@ String.prototype.hashCode = function() {
 			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
 		}); }	
 
+		for (let i in lines.features) { 
+			for (let j in points.features) { 	
+				if (lines.features[i].properties.connections.from.scid === points.features[j].properties.scid && 
+					lines.features[i].properties.connections.from.index === points.features[j].properties.mindex) {
+					lines.features[i].properties.connections.from = arrows.features[i].properties.connections.from = points.features[j];
+				} 
+				else if (lines.features[i].properties.connections.to.scid === points.features[j].properties.scid && 
+					lines.features[i].properties.connections.to.index === points.features[j].properties.mindex) {
+					lines.features[i].properties.connections.to = arrows.features[i].properties.connections.to = points.features[j];
+				} 
+			}
+		}	
 		// Prepare to add layers
 		let maplayergroup =  L.layerGroup();
 				
@@ -8074,18 +8304,28 @@ String.prototype.hashCode = function() {
 		d.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
 	
 		MI.Interface.RefreshMeasureList();
+		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .mdetail_title'); }
+		
 		document.getElementById('sidepanel').scrollTo(0, 0);		
 		return d;
 	}
-	
+		
 	SetupStyle(d) {
-		let styling = {color: d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
+		d.options = d.options ? d.options : {};
+		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
+		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
-		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
+		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
 	SetupPoint(ft, d, index) {
 		let setup = { index: index, type: 'node', style: JSON.parse(JSON.stringify(d.details.style)), basestyle: JSON.parse(JSON.stringify(d.details.style)), latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
+		
+		// Individual point color
+		if ( ft.properties.color ) { 
+			let ftcolors = ft.properties.color.split(',');
+			setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
+		}
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
@@ -8095,7 +8335,7 @@ String.prototype.hashCode = function() {
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
-			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link">'+cat+'</a>').join(" ")}</p>
+			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link" data-cat="cat-'+d.details.id+'-'+cat+'">'+cat+'</a>').join(" ")}</p>
 			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
 
 		</div> 
@@ -8127,10 +8367,8 @@ String.prototype.hashCode = function() {
 		ft.properties.type = 'line';
 		ft.properties.clustered = null;
 		
-		let multipass = null;
-		let selectedlinetype = this.linetypes.greatcircle;
-		if (selectedlinetype  === this.linetypes.greatcircle) { multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); } 
-		else if (selectedlinetype === this.linetypes.bezier) { multipass = Grate.bezier_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); }
+
+		let multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 60, MI.Atlas.map.getPixelBounds());  
 		
 		let sign = Number(Math.sign(multipass[0][0][0] - multipass[0][1][0])), breakstart = 0, breakend = multipass.length, checksign = 0;
         for (let i = 0; i < multipass[0].length-1; i++) {		
@@ -8144,15 +8382,11 @@ String.prototype.hashCode = function() {
 			if (sign === 1) {
 				let part1 = multipass[0].slice(0, breakstart); part1.push([-180, part1[part1.length-1][1]]);
 				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([180, part1[part1.length-1][1]]);
-				//let extend1 = part1.map(x => [x[0]+360,x[1]]), extend2 = part2.map(x => [x[0]-360,x[1]]);
-				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
 				ft.geometry.coordinates = [part1, part2];
 				
 			} else if (sign === -1) {
 				let part1 = multipass[0].slice(0, breakstart); part1.push([180, part1[part1.length-1][1]]); 
 				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([-180, part1[part1.length-1][1]]);
-				//let extend1 = part1.map(x => [x[0]-360,x[1]]), extend2 = part2.map(x => [x[0]+360,x[1]]);
-				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
 				ft.geometry.coordinates = [part1, part2];
 			}
 		} 
@@ -8164,7 +8398,26 @@ String.prototype.hashCode = function() {
 							
 		return ft;
 	}
+	SetupSimpleLine(ft, d, index) {		
+		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
+		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
+		if (fromx === tox && fromy === toy) { return false; }
+	
+		ft.geometry.type = 'MultiLineString';
+		ft.properties.type = 'line';
+		ft.properties.clustered = null;
 
+		if (fromx - tox >= 180) { let sign = Math.sign(tox); tox = -180 * sign; }
+		else if (tox - fromx >= 180) { let sign = Math.sign(fromx); fromx = -180 * sign; }
+		let multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 3); 
+		ft.geometry.coordinates = multipass; 
+	
+		ft.geometry.raw = multipass;
+		ft.properties.style = Object.assign(MI.Atlas.styles.line, {color: d.details.style.darkColor});
+		ft.properties.basestyle = MI.Atlas.styles.line;
+						
+		return ft;
+	}
 	SetupArrow(ft, d, index) {	
 		let midindex = Math.floor((ft.geometry.raw[0].length-1)*0.8);
 		let middle = ft.geometry.raw[0][midindex];		
@@ -8180,7 +8433,27 @@ String.prototype.hashCode = function() {
 			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
 		return arrow;
 	}	
+	SetupSimpleArrow(ft, d, index) {	
+		let start = ft.geometry.coordinates[0][0], mid = ft.geometry.coordinates[0][1], end = ft.geometry.coordinates[0][2];
+	
+		let cy = 2*mid[1] - start[1]/2 - end[1]/2, cx = 2*mid[0] - start[0]/2 - end[0]/2;
+	
+		let t = 0.5; // given example value
+		let ax = (1 - t) * (1 - t) * start[0] + 2 * (1 - t) * t * cx + t * t * end[0];
+		let ay = (1 - t) * (1 - t) * start[1] + 2 * (1 - t) * t * cy + t * t * end[1];
+	
+		let angle = Math.atan2(end[0] - ax, end[1] - ay) * 180 / Math.PI;
 
+		let arrow = {
+			type: 'Feature',
+			properties: ft.properties,
+			geometry: { type: 'Point', coordinates:  [ax,ay] }		
+		};
+		Object.assign(arrow.properties, { type: 'arrow', angle: angle, 
+			style: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}),
+			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
+		return arrow;
+	}	
 	SetupMeasures(ft, sc) {
 		let measure = ft.properties.measures, measure_list = Object.assign([], this.measures), measurecheck = false, smapmeasures = [];
 		for (let e in ft.properties.measures) {
@@ -8289,7 +8562,7 @@ String.prototype.hashCode = function() {
 	}
 	
 	Hide(id, hide, type='chain') {
-		event.stopPropagation();
+		if (event) { event.stopPropagation(); }
 		
 		if (type === 'chain') {
 			let offset = document.getElementById('mheader-'+id).offsetHeight, targetid = 0;
@@ -8308,7 +8581,7 @@ String.prototype.hashCode = function() {
 				targetid = next.id.split('-')[1];	
 			}
 		}
-		let mlayer; for (let l of MI.Atlas.maplayer) { if (l.id === Number(id)) { mlayer = l; } }
+		let mlayer; for (let l of MI.Atlas.maplayer) { if (Number(l.id) === Number(id)) { mlayer = l; } }
 		if (hide) {
 			if (type === 'chain') { 
 				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
@@ -8339,19 +8612,20 @@ String.prototype.hashCode = function() {
 		}	
 		MI.Atlas.Refresh();
 	}
-} /** Initialize a Spatial Atlas **/
+}
+/** Initialize a Spatial Atlas **/
 class ManifestAtlas {
 	constructor(options) {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
 			preferCanvas: true, minZoom: 2, worldCopyJump: false, center: new L.LatLng(40.730610,-73.935242), zoom: 3, zoomControl: false, 
-			scrollWheelZoom: false, closePopupOnClick: pop 
+			scrollWheelZoom: false, smoothWheelZoom: true, smoothSensitivity:1, closePopupOnClick: pop 
 		});
 		this.maplayer = [];
 		this.active_point = null;
 		this.homecontrol = null;
 		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
-		
+		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
 			
 		this.tiletypes = {
@@ -8368,28 +8642,34 @@ class ManifestAtlas {
 		
 		/* Define Layers */
 		this.layerdefs = {
-			google: new L.TileLayer(this.tiletypes.GOOGLE, 
-				{ maxZoom: 20, className: 'googlebase', detectRetina: true, subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google' }),		
-			light: new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 20, ext: 'png', attribution: 'Toner, Stamen' }),
-			terrain: new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: true, subdomains: 'abcd', minZoom: 0, maxZoom: 18, ext: 'png', attribution: 'Terrain, Stamen' }),	
-			satellite: new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: true, maxZoom: 20, maxNativeZoom: 20, attribution: 'Satellite, ESRI' }),
-		 	dark: new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: true, attribution: 'Dark, CartoDB' }),
+			google: 	new L.TileLayer(this.tiletypes.GOOGLE, { maxZoom: 20, className: 'googlebase', detectRetina: options.retinaTiles,
+						subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google', edgeBufferTiles: 1 }),		
+			light:		new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 20, 
+						ext: 'png', attribution: 'Toner, Stamen', edgeBufferTiles: 1  }),
+			terrain: 	new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 18, 
+						ext: 'png', attribution: 'Terrain, Stamen', edgeBufferTiles: 1  }),	
+			satellite: 	new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: options.retinaTiles, maxZoom: 20, maxNativeZoom: 20, 
+						attribution: 'Satellite, ESRI', edgeBufferTiles: 1  }),
+		 	dark: 		new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: options.retinaTiles, 
+						attribution: 'Dark, CartoDB', edgeBufferTiles: 1  }),
 
-			shipping: new L.TileLayer(this.tiletypes.SHIPPING, 
-				{ maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer', bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
-			marine: new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: false, className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
-			rail: new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, className: 'raillayer', attribution: '[OpenStreetMap Data]' })		
+			shipping: 	new L.TileLayer(this.tiletypes.SHIPPING, { maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer',
+					 	bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
+			marine: 	new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: options.retinaTiles, 
+						className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
+			rail: 		new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, detectRetina: options.retinaTiles, className: 'raillayer', 
+						attribution: '[OpenStreetMap Data]' })		
 		};
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 8, weight: 4, opacity: 1, fillOpacity: 1 },
-			'highlight': { fillColor: '#ffffff' },
-			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 3, opacity: 0.2, smoothFactor: 1 },
-			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 1, fillOpacity: 1 },
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1 },
+			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
+			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
 		};
-	
+		this.radius = 10;
+		
 		// Map configuration
 		this.homecontrol = L.Control.zoomHome().addTo(this.map);
 		this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
@@ -8400,33 +8680,18 @@ class ManifestAtlas {
 
 		if (document.body.classList.contains('light')) { this.map.addLayer(this.layerdefs.google); } 
 		else if (document.body.classList.contains('dark')) { this.map.addLayer(this.layerdefs.dark); }	
-		
-		// Add Shipping Layer
-		this.map.addLayer(this.layerdefs.shipping);		
 	}
 	
 	Refresh() { this.map._renderer._redraw(); }
 	
 	PopupOpen(e) {		
-		let s = document.getElementById('searchbar').value.toLowerCase();
-		if (s !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) {
-			let active = false;
-			if (e.popup._source.options.fillOpacity !== 0.1) { active = true; }
-			else {
-				for (let i in e.popup._source.feature.properties.clustered) {
-					if (e.popup._source.feature.properties.clustered[i].properties.hidden === false) { active = true; }
-				}
-			}
-			if (!active) { e.sourceTarget.closePopup(); this.SetActivePoint(null); return; }
-
-			this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
-		}
+		this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
 
-		e.popup._source.setStyle(this.styles.highlight);			
+		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});			
 		
 	}
 	
@@ -8434,7 +8699,7 @@ class ManifestAtlas {
 		this.SetActivePoint(null); 		
 		if (typeof e.popup._source !== 'undefined') {
 			if (e.popup._source.feature.properties.type === 'node') {
-				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.basestyle.fillColor});		
+				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.fillColor});		
 			}
 		}
 	}
@@ -8449,14 +8714,16 @@ class ManifestAtlas {
 	
 	RenderIntro(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
-		let popupContent, tooltipTitle, fid = feature.properties.lid;
-
+		let popupContent, tooltipTitle, fid = feature.properties.lid;		
+		
 		popupContent = `
+		<div id="intro-content">
 		<h2 id="popup-${fid}" class="poptitle">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
-			<span onclick="MI.Atlas.MapPointClick(${fid});">Welcome to Manifest!</span>
+			<span onclick="MI.Atlas.MapPointClick(${fid});">Manifest</span>
 		</h2>
-		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>
+		</div><div id="intro-readme"><div id="intro-content-log"></div></div><div class='clear'></div>`;
 	
 		layer.bindPopup(popupContent, { className: 'pop-intro'});
 		tooltipTitle = feature.properties.title; 
@@ -8467,9 +8734,16 @@ class ManifestAtlas {
 		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
 		layer.on('mouseout', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOut(e, l, f); });	
 		
+		// Render Change log
+		fetch("CHANGELOG.md").then(c => c.text()).then(readme => this.RenderChangeLog(readme) );
 		layer.setStyle(feature.properties.style); 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
+	
+	RenderChangeLog(readme) {
+		document.getElementById('intro-content-log').innerHTML = MI.Util.markdowner.makeHtml(readme);
+	}
+	
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
 		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
@@ -8533,9 +8807,14 @@ class ManifestAtlas {
 	}
 
 	/** Focus on a point on the map and open its popup. **/
-	PointFocus(pid, fit=false) {	
+	PointFocus(pid, fit=false, flyto=false) {	
 		for (let i in this.map._layers) {		
-			if (typeof this.map._layers[i].feature !== 'undefined') {							
+			if (typeof this.map._layers[i].feature !== 'undefined') {			
+				if (flyto) { 
+					this.map._layers[i].setStyle({
+						fillColor: this.map._layers[i].feature.properties.style.fillColor, 
+						color: this.map._layers[i].feature.properties.style.color});		
+				}
 				if (this.map._layers[i].feature.properties.lid === Number(pid)) {		
 					if (MI.Visualization.type === 'map') { 
 						this.SetActivePoint(this.map._layers[i]); 
@@ -8543,9 +8822,18 @@ class ManifestAtlas {
 						if (fit) { 
 							let sid = MI.supplychains[this.map._layers[i].feature.properties.mindex-1].details.id;
 							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});
-							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom); 
+							let zoomlevel = MI.options.storyMap ? 10 : this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom+1;
+							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), zoomlevel, {reset: true}); 
+							
 						}
-						this.map._layers[i].openPopup(); 
+						if (flyto) {
+							this.map.flyTo(this.GetOffsetLatlng(this.map._layers[i]._latlng), 12); 		
+							this.SetActivePoint({_latlng: this.map._layers[i].feature.properties.latlng}); 
+							this.map._layers[i].setStyle({fillColor: this.map._layers[i].feature.properties.style.highlightColor});			
+								
+						} else {
+							this.map._layers[i].openPopup(); 
+						}
 					}
 				}
 			} 
@@ -8560,7 +8848,7 @@ class ManifestAtlas {
 		if (node === null) { return; }
 		let id;		
 		if ( typeof node === 'object' ) {
-			if (node._popup._source.options.fillOpacity === 0.1) { return; }
+			// TEMP if (node._popup._source.options.fillOpacity === 0.1) { return; }
 			id = node._popup._source.feature.properties.lid;
 		} else { id = node; if (document.getElementById('local_'+id)) {document.getElementById('local_'+id).click();} else { return; } }
 	
@@ -8574,7 +8862,22 @@ class ManifestAtlas {
 	}
 	
 	PointMouseOver(e, layer, feature) { 
-		if (layer.options.fillOpacity !== 0.1) { layer.setStyle(this.styles.highlight); } 
+		layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); 
+		
+		if (MI.options.hoverHighlight) {
+		for (let l in MI.Atlas.map._layers) {
+			if (MI.Atlas.map._layers[l].feature && typeof MI.Atlas.map._layers[l].feature.properties.connections === 'undefined' &&
+				MI.Atlas.map._layers[l].feature.properties.lid !== feature.properties.lid) {
+					if (!(this.active_point) || (this.active_point && 
+						MI.Atlas.map._layers[l].feature.properties.lid !== this.active_point._popup._source.feature.properties.lid)) { 
+							MI.Atlas.map._layers[l].setStyle({fillOpacity:0.5, opacity:0.5});
+					}
+			} else if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.connections && 
+						MI.Atlas.map._layers[l].feature.properties.connections.from.properties.lid !== feature.properties.lid && 
+						MI.Atlas.map._layers[l].feature.properties.connections.to.properties.lid !== feature.properties.lid) {
+					MI.Atlas.map._layers[l].setStyle({fillOpacity:0.1, opacity:0.1});
+				}
+		}}
 		if (feature.properties.clustered.length > 0) {
 			let ccount = 0;
 			if (!feature.properties.hidden) { ccount++; }
@@ -8585,18 +8888,24 @@ class ManifestAtlas {
 	}
 	
 	PointMouseOut(e, layer, feature) { 
-		if (layer.feature.properties && layer.feature.properties.style && layer.options.fillOpacity !== 0.1) {
-			layer.setStyle({fillColor: layer.feature.properties.style.fillColor});
-			this.MeasureSort(feature, layer);
-			// Not Great!
-			if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { MI.Interface.Search();}
-	
-		} 
+		layer.setStyle({fillColor: layer.feature.properties.style.fillColor, color: layer.feature.properties.style.color});
 		if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
 			if (this.active_point._popup._source._leaflet_id === e.sourceTarget._leaflet_id) {
-				if (layer.options.fillOpacity !== 0.1) { layer.setStyle(this.styles.highlight); }
+				if (!feature.properties.hidden) { layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); }
 			}
 		}
+		if (MI.options.hoverHighlight) {
+		for (let l in MI.Atlas.map._layers) {
+			if (MI.Atlas.map._layers[l].feature && typeof MI.Atlas.map._layers[l].feature.properties.connections === 'undefined') {
+				MI.Atlas.map._layers[l].setStyle({fillOpacity:1, opacity:1});
+			} else if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.connections) {
+				if (MI.Atlas.map._layers[l].feature.properties.angle) {
+					MI.Atlas.map._layers[l].setStyle({fillOpacity:1, opacity:1});
+				} else {
+					MI.Atlas.map._layers[l].setStyle({opacity:0.2});
+				}
+			}
+		}}
 	}	
 	
 	/** Scales the map based on selected measure **/
@@ -8643,7 +8952,7 @@ class ManifestAtlas {
 		if (MI.Interface.IsMobile()) {
 			targetPoint = this.map.project(ll, z).add([0, document.getElementById('sidepanel').offsetHeight/2]);
 		    return this.map.unproject(targetPoint, z);
-		} else if (!document.body.classList.contains('fullscreen')) {	
+		} else if (!document.body.classList.contains('fullscreen') && !MI.options.storyMap) {	
 			targetPoint = this.map.project(ll, z).subtract([document.getElementById('sidepanel').offsetWidth/2,0]);
 		   return this.map.unproject(targetPoint, z);			
 		} else {
@@ -8671,7 +8980,9 @@ class ManifestAtlas {
 			const nodeId = document.getElementsByClassName('mlist')[document.getElementsByClassName('mlist').length-1].childNodes[0].id.split('_')[1];
 			if (MI.Visualization.type === 'map') {
 				MI.Interface.ShowHeader(mlistId);
-				MI.Atlas.PointFocus(nodeId, true);	
+				if (!MI.options.storyMap) {
+					MI.Atlas.PointFocus(nodeId, true);	
+				}
 			}	
 			else if (MI.Visualization.type === 'textview') {
 				MI.Interface.ShowHeader(mlistId);
@@ -8689,7 +9000,7 @@ class ManifestAtlas {
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {
-		if (cluster) { return Math.min(ft.properties.clustered.length*5+8,30); } else { return 8; }
+		if (cluster) { return Math.min(ft.properties.clustered.length*5+this.radius,30); } else { return this.radius; }
 	}
 	
 	GetScaledRadius(ft, measureSort) {
@@ -8718,7 +9029,8 @@ class ManifestAtlas {
 		copy.splice(index, 1);
 		return item;
 	}
-} class ManifestUI {
+}
+class ManifestUI {
 	constructor() { 
 		this.interval = null;
 		this.filter = {clear: true, term: null};
@@ -8742,7 +9054,7 @@ class ManifestAtlas {
 			else if (selected === 'file') { document.getElementById('loadlistpanel').className = 'file'; } 
 			else { document.getElementById('loadlistpanel').className = ''; }
 		});
-
+				
 		document.getElementById('load-samples-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-samples').value); });	
 		document.querySelectorAll('#basemap-chooser li').forEach(el => { el.addEventListener('click', (e) => { this.SetBasemap(el.classList[0]); }); });
 		document.getElementById('viz-choices').addEventListener('change', (e) => { MI.Visualization.Set(document.getElementById('viz-choices').value); });
@@ -8761,15 +9073,36 @@ class ManifestAtlas {
 			this.ShakeAlert(document.getElementById('manifestbar'));
 			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
 		}});
-	
+		if (MI.options.storyMap) { this.SetBasemap('light'); }
+		
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
 		['dragover', 'dragenter'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.add('is-dragover'); }));
 		['dragleave', 'dragend', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.remove('is-dragover'); }));
 
 		window.onresize = this.ManifestResize;	
-		setTimeout(this.ClearLoader, 1);
+		setTimeout(this.ClearLoader, 150);
 	}
+	
+	Storyize() {
+		document.body.classList.add('storymap');
+		MI.Atlas.radius = 20;
+	} 
+	
+	SetupStoryTrigger(selector){
+		let els = document.querySelectorAll(selector);
+		els = Array.from(els);
+		els.forEach(el => {
+  	    	let observer = new IntersectionObserver((entries, observer) => { 
+				entries.forEach(entry => { if (entry.isIntersecting) { 
+					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], false, true);	
+				}});
+  	  	  	});
+			observer.observe(el);
+	  });
+	}
+
+	// Example usage
 	
 	/** Handles header actions **/
 	ShowHeader(id) {
@@ -8805,9 +9138,9 @@ class ManifestAtlas {
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
-				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id;
+				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
-				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
+				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
 			} else {
 				type = 'manifest'; idref = loadurl; id = loadurl.hashCode();
 			}
@@ -8819,9 +9152,9 @@ class ManifestAtlas {
 			option = [option.shift(), option.join('-')];
 			id = option[1];
 		
-			if (type === 'smap') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; } 
+			if (type === 'smap') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; } 
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
-			else if (type === 'gsheet') { loadurl = MI.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
+			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
 		}
 		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
@@ -8840,16 +9173,23 @@ class ManifestAtlas {
 		let s = document.getElementById('searchbar').value.toLowerCase();
 		
 		// Only do something if the search has changed.
-		if (s === MI.Interface.filter.term && MI.Interface.filter.clear) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.filter.term = s;}
+		if (s !== MI.Interface.filter.term) {MI.Interface.filter.clear = false; }
+		if (MI.Interface.filter.clear) { MI.Atlas.UpdateCluster(s); return; } else { MI.Interface.filter.term = s;}
 		
 		let closedcats = [];
-		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
-		
+		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value); }});
+	
 		if (!MI.Interface.filter.clear) {		
-			document.querySelectorAll('.mlist li').forEach(el => { 
+			document.querySelectorAll('.mlist > li').forEach(el => { 
 				let cats = el.querySelectorAll('.cat-link'), catcount = 0;
-				for (let cc of closedcats) { for (let cat of cats) { cat = cat.textContent.toLowerCase(); if (cc === cat) { catcount++; } } }
-				if ( catcount >= cats.length) { el.style.display = 'none'; } else { el.style.display = 'list-item'; }
+				for (let cc of closedcats) { for (let cat of cats) { cat = cat.dataset.cat.toLowerCase(); if (cc === cat) { catcount++; } } }
+
+				let uncat = 'cat-'+el.parentElement.id.split('-')[1]+'-';
+				//console.log(uncat);
+				//console.log(closedcats);
+			
+				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && cats[0].dataset.cat === uncat) { el.style.display = 'none'; } 
+					else { el.style.display = 'list-item'; }
 		    });
 			MI.Interface.filter.clear = true;
 		}
@@ -8859,40 +9199,55 @@ class ManifestAtlas {
 			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined') {
 				found = false;
 				
-				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0;
-				for (let cc of closedcats) { for (let cat of cats) { if (cc === cat) { catcount++; } } }
+				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0, 
+					catid = MI.Atlas.map._layers[i].feature.properties.scid ? MI.Atlas.map._layers[i].feature.properties.scid : null;
+				for (let cc of closedcats) { for (let cat of cats) { if (cc === 'cat-'+catid+'-'+cat) { catcount++; } } }
+				//console.log(closedcats.includes('uncategorized'));
+				//console.log(cats);
 		        if (catcount >= cats.length) { found = false; }
 				else {
 					for (let k of ['title','description','category','placename']) {
 						if (String(MI.Atlas.map._layers[i].feature.properties[k]).toLowerCase().indexOf(s) !== -1) { found = true; }
 					}
 				}
+				
+			
+				console.log('----');
+				let uncat = 'cat-'+catid+'-';
+				console.log('cat-'+catid+'-'+cats[0] + ' vs ' + uncat);
+				
+				if (closedcats.includes(uncat+'uncategorized') && cats.length === 1 && 'cat-'+catid+'-'+cats[0] === uncat) {
+					found = false;
+				}
+				// TODO Ideally we hide lines if one of the nodes isn't present... for categories this is more complicated and probably requires some changes to the line feature structure to store more information about its connected nodes.
+			
 				if (!(found)) { 
-					if (MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
-						MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.1, opacity: 0.1 }); }
-					else { 	MI.Atlas.map._layers[i].setStyle({ fillOpacity: 0.0, opacity: 0.0 }); }
-						
 					MI.Atlas.map._layers[i].feature.properties.hidden = true;
 					if (MI.Atlas.active_point && MI.Visualization.type === 'map') {
 						if (MI.Atlas.active_point._popup._source._leaflet_id === MI.Atlas.map._layers[i]._leaflet_id) {
 							if (MI.Atlas.active_point._popup._source.feature.properties.clustered.length === 0) { MI.Atlas.active_point.closePopup(); } 
 							else {				
 								let id = MI.Atlas.active_point._popup._source.feature.properties.lid;
-								
 								let next = document.getElementById('popup-'+id).nextElementSibling;
-								while (next) { if (next.classList.contains('clusterbox')) break; next = next.nextElementSibling; }								
+								while (next) { if (next.classList.contains('clusterbox')) break; next = next.nextElementSibling; }
 								if (next) { MI.Atlas.PointFocus(next.id.split('-')[1]);} 
 							}
 						}
 					}
-				} else { 
-					MI.Atlas.map._layers[i].setStyle({ 
-							fillOpacity: MI.Atlas.map._layers[i].feature.properties.basestyle.fillOpacity, 
-							opacity: MI.Atlas.map._layers[i].feature.properties.basestyle.opacity }); 
-					MI.Atlas.map._layers[i].feature.properties.hidden = false;				
-				}
+				} else { MI.Atlas.map._layers[i].feature.properties.hidden = false; }
 			} 
 		}	
+		// Check Lines
+		for (let i in MI.Atlas.map._layers) {
+			if (typeof MI.Atlas.map._layers[i].feature !== 'undefined') {
+				if (MI.Atlas.map._layers[i].feature.properties.connections) {
+					if (MI.Atlas.map._layers[i].feature.properties.connections.from.properties.hidden === true ||
+						MI.Atlas.map._layers[i].feature.properties.connections.to.properties.hidden === true) {
+							MI.Atlas.map._layers[i].feature.properties.hidden = true;
+					}
+				}
+			}
+		}
 		if (MI.Visualization.type === 'map' && MI.Atlas.map._renderer) {  MI.Atlas.UpdateCluster(s); MI.Atlas.Refresh(); } else { MI.Visualization.Update(); }
 	}
 
@@ -9031,7 +9386,8 @@ class ManifestAtlas {
 
 	IsMobile() { return window.innerWidth > 920 ? false : true; }
 	
-} var List;List =
+}
+var List;List =
 /******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -11049,7 +11405,8 @@ module.exports = naturalCompare;
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__("./src/index.js");
 /******/ })()
-; class ManifestVisualization {
+;
+class ManifestVisualization {
 	constructor(options) {
 		this.type = 'map';
 		this.last_active = null;
@@ -11072,7 +11429,7 @@ module.exports = naturalCompare;
 		  	default: console.log('Visualization type not supported...');
 		}
 	}
-	 
+	
 	MapViz() {
 		document.querySelectorAll('#vizwrap, #textview, #listview').forEach(el => { el.classList.add('closed'); });
 		MI.Atlas.DisplayLayers(true);
@@ -11158,7 +11515,7 @@ module.exports = naturalCompare;
 		
 			let rawvalues = sc.features.filter(e => e.geometry.type === 'Point');
 			for (let val of rawvalues) {
-				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category.split(',').join(', '), notes: val.properties.notes});
+				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
 			}
 		}
 		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('listview').classList.remove('closed');
@@ -11694,22 +12051,27 @@ class ChordDiagram {
 		this._drawChord();
 	}
 }
- document.addEventListener("DOMContentLoaded", function(event) {
+
+document.addEventListener("DOMContentLoaded", function(event) {
 	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
-	MI = new Manifest();
-	MI.serviceurl = "https://supplystudies.com/manifest/services/";
-		
+	let options = {
+		serviceurl: 'https://manifest.supplystudies.com/services/',
+		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
+	};
+	MI = new Manifest(options);
+	if (options.storyMap) { MI.Interface.Storyize(); }
+
 	if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
 		if (hashtype === "collection") { LoadCollection(hashid, true); }
 		else { 
 			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }
 			switch (hashtype) {
-				case 'smap': fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
-					.then(r => Start()).catch(e => LoadError(e)); break;
-				case 'gsheet': fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+				case 'smap': fetch(MI.options.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.options.serviceurl + '?type=smap&id=' + hashid}))
+					.then(r => Start()); break;
+				case 'gsheet': fetch(MI.options.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.options.serviceurl + '?type=gsheet&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
 				case 'manifest': fetch(hashid).then(r => r.json())
 					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
@@ -11764,7 +12126,7 @@ class ChordDiagram {
 
 		let starterstring =  d.collection[Math.floor(Math.random() * d.collection.length)].id.split("-"); 
 		let startertype = starterstring[0], starterid = [starterstring.shift(), starterstring.join('-')][1];		
-		return {url: (startertype === 'manifest') ? starterid : MI.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
+		return {url: (startertype === 'manifest') ? starterid : MI.options.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
 	}	
 	
 	function Start() {
@@ -11783,3 +12145,4 @@ class ChordDiagram {
 	// Do Testing
 	// ManifestTests();
 });	
+//# sourceMappingURL=Manifest-main.js.map

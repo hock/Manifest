@@ -216,7 +216,7 @@ module.exports = function leafletImage(map, callback) {
 			
 			ctx.font = "12px Arial, Helvetica, sans-serif";
 			ctx.fillStyle = "#f5f5f5";
-			ctx.fillText("http://supplystudies.com/manifest/", 10, 32);
+			ctx.fillText("http://manifest.supplystudies.com/", 10, 32);
 			
             callback(null, {
                 canvas: canvas

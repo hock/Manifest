@@ -87,6 +87,13 @@
 								 "disable_array_delete_last_row": "true" },
 				    "default": [ { "URL": "" } ]
 				},
+				"icon": {
+					"title": "Icon",
+					"type": "string",
+					"description": "An icon for this node.",					
+					"enum": [ "building","factory","warehouse","inventory","boat" ],
+					"default": ""	
+				},	
 				"sources": {
 					"title": "References",		
 					"type": "array",
@@ -98,7 +105,7 @@
 						"properties": {
 							"URL": {
 								"type": "string",
-								"options": { "inputAttributes": { "placeholder": "https://supplystudies.com/reference/" } }							
+								"options": { "inputAttributes": { "placeholder": "https://manifest.supplystudies.com/reference/" } }							
 							}
 						}
 					},

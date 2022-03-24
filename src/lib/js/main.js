@@ -1,19 +1,23 @@
 document.addEventListener("DOMContentLoaded", function(event) {
 	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
-	MI = new Manifest();
-	MI.serviceurl = "https://supplystudies.com/manifest/services/";
-		
+	let options = {
+		serviceurl: 'https://manifest.supplystudies.com/services/',
+		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
+	};
+	MI = new Manifest(options);
+	if (options.storyMap) { MI.Interface.Storyize(); }
+
 	if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
 		if (hashtype === "collection") { LoadCollection(hashid, true); }
 		else { 
 			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }
 			switch (hashtype) {
-				case 'smap': fetch(MI.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.serviceurl + '?type=smap&id=' + hashid}))
-					.then(r => Start()).catch(e => LoadError(e)); break;
-				case 'gsheet': fetch(MI.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.serviceurl + '?type=gsheet&id=' + hashid}))
+				case 'smap': fetch(MI.options.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.options.serviceurl + '?type=smap&id=' + hashid}))
+					.then(r => Start()); break;
+				case 'gsheet': fetch(MI.options.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
+					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.options.serviceurl + '?type=gsheet&id=' + hashid}))
 					.then(r => Start()).catch(e => LoadError(e)); break;
 				case 'manifest': fetch(hashid).then(r => r.json())
 					.then(data => MI.Process('manifest', data, {id: (data.summary.name).hashCode(), url: hashid}))
@@ -68,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		let starterstring =  d.collection[Math.floor(Math.random() * d.collection.length)].id.split("-"); 
 		let startertype = starterstring[0], starterid = [starterstring.shift(), starterstring.join('-')][1];		
-		return {url: (startertype === 'manifest') ? starterid : MI.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
+		return {url: (startertype === 'manifest') ? starterid : MI.options.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
 	}	
 	
 	function Start() {

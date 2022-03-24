@@ -17,11 +17,12 @@ class ManifestSupplyChain {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-
+		let fillcolor = MI.options.storyMap ? '#ffffff' : d.details.style.fillColor, textcolor = MI.options.storyMap ? d.details.style.fillColor : d.details.style.textColor;
+		
 		mheader.innerHTML = `
-		<div class="mtitle" style="background: ${d.details.style.fillColor}; color: ${d.details.style.textColor};">
+		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
 			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
-			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
+			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${textcolor};"></i>
 		</div>`;
 						
 		let mdetails = document.createElement('div');
@@ -44,11 +45,11 @@ class ManifestSupplyChain {
 		let supplycatmap = {}, supplycats = {};
 		for (let ft of d.features) {
 			if (ft.geometry.type === 'Point') {
-				for (let cat of ft.properties.category.split(',')) {
+				if (ft.properties.category) { for (let cat of ft.properties.category.split(',')) {
 					if (cat !== '') {
 						supplycatmap[String(cat)] = true;
 					}
-				}
+				}}
 			}
 		}
 		
@@ -62,8 +63,12 @@ class ManifestSupplyChain {
 			`<label id="lineheader-${id}" class="nodelineheader lines">Lines 
 			 <input type="checkbox" value="lines-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
 		
+		// TODO: Shouldn't show this if all nodes are categorized. 
+		if (Object.entries(supplycatmap).length > 1) {
+			supplycat.innerHTML += `<label class="supplycat">Uncategorized <input type="checkbox" value="cat-${id}-uncategorized" checked> <span class="supplycatcheckmark"></span> </label>`;			
+		}	 
 		for (const [key, value] of Object.entries(supplycatmap)) {
-			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
+			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${id}-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
 			supplycats[key] = [];
 		}
 		MI.supplychains[index].categories = supplycats;
@@ -89,7 +94,7 @@ class ManifestSupplyChain {
 		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { 
 			MI.Interface.ClearSearch(); MI.Interface.Search(); 
 		}
-	
+			
 		if (MI.Interface.IsMobile()) { MI.Interface.Mobilify(id, index); }
 		MI.Interface.SetDocumentTitle();
 	
@@ -102,7 +107,7 @@ class ManifestSupplyChain {
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -121,9 +126,11 @@ class ManifestSupplyChain {
 			if (ft.geometry.type === 'Point') { 
 				let point = this.SetupPoint(ft, d, index); points.features.push(point);
 			} else { 
-				let line = this.SetupLine(ft, d, index); 
+				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, d, index) : this.SetupLine(ft, d, index); 
+					
 				if (line !== false) {
-					let arrow = this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
+					let arrow = MI.options.simpleLines ? 
+						this.SetupSimpleArrow(JSON.parse(JSON.stringify(line)), d, index) : this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
 					lines.features.push(line); arrows.features.push(arrow);
 				}
 			}	
@@ -136,6 +143,18 @@ class ManifestSupplyChain {
 			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
 		}); }	
 
+		for (let i in lines.features) { 
+			for (let j in points.features) { 	
+				if (lines.features[i].properties.connections.from.scid === points.features[j].properties.scid && 
+					lines.features[i].properties.connections.from.index === points.features[j].properties.mindex) {
+					lines.features[i].properties.connections.from = arrows.features[i].properties.connections.from = points.features[j];
+				} 
+				else if (lines.features[i].properties.connections.to.scid === points.features[j].properties.scid && 
+					lines.features[i].properties.connections.to.index === points.features[j].properties.mindex) {
+					lines.features[i].properties.connections.to = arrows.features[i].properties.connections.to = points.features[j];
+				} 
+			}
+		}	
 		// Prepare to add layers
 		let maplayergroup =  L.layerGroup();
 				
@@ -190,18 +209,28 @@ class ManifestSupplyChain {
 		d.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
 	
 		MI.Interface.RefreshMeasureList();
+		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .mdetail_title'); }
+		
 		document.getElementById('sidepanel').scrollTo(0, 0);		
 		return d;
 	}
-	
+		
 	SetupStyle(d) {
-		let styling = {color: d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(), style: Object.assign({}, MI.Atlas.styles.point)};	
+		d.options = d.options ? d.options : {};
+		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
+		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
-		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
+		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
 	SetupPoint(ft, d, index) {
 		let setup = { index: index, type: 'node', style: JSON.parse(JSON.stringify(d.details.style)), basestyle: JSON.parse(JSON.stringify(d.details.style)), latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
+		
+		// Individual point color
+		if ( ft.properties.color ) { 
+			let ftcolors = ft.properties.color.split(',');
+			setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
+		}
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
@@ -211,7 +240,7 @@ class ManifestSupplyChain {
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
-			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link">'+cat+'</a>').join(" ")}</p>
+			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link" data-cat="cat-'+d.details.id+'-'+cat+'">'+cat+'</a>').join(" ")}</p>
 			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
 
 		</div> 
@@ -243,10 +272,8 @@ class ManifestSupplyChain {
 		ft.properties.type = 'line';
 		ft.properties.clustered = null;
 		
-		let multipass = null;
-		let selectedlinetype = this.linetypes.greatcircle;
-		if (selectedlinetype  === this.linetypes.greatcircle) { multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); } 
-		else if (selectedlinetype === this.linetypes.bezier) { multipass = Grate.bezier_route([fromx, fromy], [tox, toy], 7, MI.Atlas.map.getPixelBounds()); }
+
+		let multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 60, MI.Atlas.map.getPixelBounds());  
 		
 		let sign = Number(Math.sign(multipass[0][0][0] - multipass[0][1][0])), breakstart = 0, breakend = multipass.length, checksign = 0;
         for (let i = 0; i < multipass[0].length-1; i++) {		
@@ -260,15 +287,11 @@ class ManifestSupplyChain {
 			if (sign === 1) {
 				let part1 = multipass[0].slice(0, breakstart); part1.push([-180, part1[part1.length-1][1]]);
 				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([180, part1[part1.length-1][1]]);
-				//let extend1 = part1.map(x => [x[0]+360,x[1]]), extend2 = part2.map(x => [x[0]-360,x[1]]);
-				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
 				ft.geometry.coordinates = [part1, part2];
 				
 			} else if (sign === -1) {
 				let part1 = multipass[0].slice(0, breakstart); part1.push([180, part1[part1.length-1][1]]); 
 				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([-180, part1[part1.length-1][1]]);
-				//let extend1 = part1.map(x => [x[0]-360,x[1]]), extend2 = part2.map(x => [x[0]+360,x[1]]);
-				//ft.geometry.coordinates = [extend1, part1, part2, extend2];
 				ft.geometry.coordinates = [part1, part2];
 			}
 		} 
@@ -280,7 +303,26 @@ class ManifestSupplyChain {
 							
 		return ft;
 	}
+	SetupSimpleLine(ft, d, index) {		
+		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
+		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
+		if (fromx === tox && fromy === toy) { return false; }
+	
+		ft.geometry.type = 'MultiLineString';
+		ft.properties.type = 'line';
+		ft.properties.clustered = null;
 
+		if (fromx - tox >= 180) { let sign = Math.sign(tox); tox = -180 * sign; }
+		else if (tox - fromx >= 180) { let sign = Math.sign(fromx); fromx = -180 * sign; }
+		let multipass = Grate.great_circle_route([fromx, fromy], [tox, toy], 3); 
+		ft.geometry.coordinates = multipass; 
+	
+		ft.geometry.raw = multipass;
+		ft.properties.style = Object.assign(MI.Atlas.styles.line, {color: d.details.style.darkColor});
+		ft.properties.basestyle = MI.Atlas.styles.line;
+						
+		return ft;
+	}
 	SetupArrow(ft, d, index) {	
 		let midindex = Math.floor((ft.geometry.raw[0].length-1)*0.8);
 		let middle = ft.geometry.raw[0][midindex];		
@@ -296,7 +338,27 @@ class ManifestSupplyChain {
 			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
 		return arrow;
 	}	
+	SetupSimpleArrow(ft, d, index) {	
+		let start = ft.geometry.coordinates[0][0], mid = ft.geometry.coordinates[0][1], end = ft.geometry.coordinates[0][2];
+	
+		let cy = 2*mid[1] - start[1]/2 - end[1]/2, cx = 2*mid[0] - start[0]/2 - end[0]/2;
+	
+		let t = 0.5; // given example value
+		let ax = (1 - t) * (1 - t) * start[0] + 2 * (1 - t) * t * cx + t * t * end[0];
+		let ay = (1 - t) * (1 - t) * start[1] + 2 * (1 - t) * t * cy + t * t * end[1];
+	
+		let angle = Math.atan2(end[0] - ax, end[1] - ay) * 180 / Math.PI;
 
+		let arrow = {
+			type: 'Feature',
+			properties: ft.properties,
+			geometry: { type: 'Point', coordinates:  [ax,ay] }		
+		};
+		Object.assign(arrow.properties, { type: 'arrow', angle: angle, 
+			style: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}),
+			basestyle: Object.assign(MI.Atlas.styles.arrow, {color: d.details.style.darkColor, fillColor: d.details.style.color}) });
+		return arrow;
+	}	
 	SetupMeasures(ft, sc) {
 		let measure = ft.properties.measures, measure_list = Object.assign([], this.measures), measurecheck = false, smapmeasures = [];
 		for (let e in ft.properties.measures) {
@@ -405,7 +467,7 @@ class ManifestSupplyChain {
 	}
 	
 	Hide(id, hide, type='chain') {
-		event.stopPropagation();
+		if (event) { event.stopPropagation(); }
 		
 		if (type === 'chain') {
 			let offset = document.getElementById('mheader-'+id).offsetHeight, targetid = 0;
@@ -424,7 +486,7 @@ class ManifestSupplyChain {
 				targetid = next.id.split('-')[1];	
 			}
 		}
-		let mlayer; for (let l of MI.Atlas.maplayer) { if (l.id === Number(id)) { mlayer = l; } }
+		let mlayer; for (let l of MI.Atlas.maplayer) { if (Number(l.id) === Number(id)) { mlayer = l; } }
 		if (hide) {
 			if (type === 'chain') { 
 				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
