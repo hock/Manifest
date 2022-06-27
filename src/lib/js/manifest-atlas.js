@@ -24,7 +24,7 @@ class ManifestAtlas {
 			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=512&legends=1&zoom={z}&X={x}&Y={y}',
 			RAIL: 'https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png'
 		};
-		
+		 
 		/* Define Layers */
 		this.layerdefs = {
 			google: 	new L.TileLayer(this.tiletypes.GOOGLE, { maxZoom: 20, className: 'googlebase', detectRetina: options.retinaTiles,
@@ -48,7 +48,7 @@ class ManifestAtlas {
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1 },
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 8 },
 			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
 			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	

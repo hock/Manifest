@@ -17,7 +17,7 @@ class ManifestSupplyChain {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-		let fillcolor = MI.options.storyMap ? '#ffffff' : d.details.style.fillColor, textcolor = MI.options.storyMap ? d.details.style.fillColor : d.details.style.textColor;
+		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;
 		
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
@@ -217,9 +217,14 @@ class ManifestSupplyChain {
 		
 	SetupStyle(d) {
 		d.options = d.options ? d.options : {};
+		
+		MI.Atlas.styles.point.fontsize = d.options.fontsize ? d.options.fontsize : MI.Atlas.styles.point.fontsize;
+		
 		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
+		
+		
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
@@ -234,7 +239,7 @@ class ManifestSupplyChain {
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
-
+		
 		li.innerHTML = `
 		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
@@ -259,6 +264,24 @@ class ManifestSupplyChain {
 			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
 				el.remove();
 	  	} }); 
+		if (ft.properties.images.length > 1) {
+			document.querySelectorAll('#local_'+ft.properties.lid+' div.featuredimages')
+				.forEach(el => { 
+					el.setAttribute('data-index',0);
+					let leftbutton = document.createElement('button');
+					leftbutton.classList.add('images-button', 'images-display-left');
+					leftbutton.innerHTML = '<i class="fas fa-caret-left"></i>';
+					leftbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, -1); });
+					el.appendChild(leftbutton); 
+					
+					let rightbutton = document.createElement('button');
+					rightbutton.classList.add('images-button', 'images-display-right');
+					rightbutton.innerHTML = '<i class="fas fa-caret-right"></i>';
+					rightbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, 1); });
+					el.appendChild(rightbutton); 
+			}); 
+			MI.Interface.ImageScroll(ft.properties.lid, 1);
+		}
 		
 		return ft;
 	}

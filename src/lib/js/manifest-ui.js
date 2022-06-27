@@ -229,6 +229,17 @@ class ManifestUI {
 		this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
 	}
 	
+	ImageScroll(lid, n) {
+	    let slideIndex = Number(document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].getAttribute('data-index')) + n; 
+		let slides = document.querySelectorAll('#local_'+lid+' div.featuredimages img');
+	    if (slideIndex > slides.length) {slideIndex = 1;} 
+	    if (slideIndex < 1) {slideIndex = slides.length; }
+	    for (let i = 0; i < slides.length; i++) {
+	      slides[i].style.display = "none"; 
+	    }
+	    slides[slideIndex-1].style.display = "block"; 
+		document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].setAttribute('data-index', slideIndex);
+	}
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');

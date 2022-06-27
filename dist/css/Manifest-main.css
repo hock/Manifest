@@ -5910,7 +5910,7 @@ body.light.storymap .map {
 
 	#manifestlist { }
 	#manifestlist .manifest { position: relative; top: 0; margin:0; }
-	#manifestlist .mheader { position: sticky; top: 0; bottom:0; margin:0; }	
+	#manifestlist .mheader { position: sticky; top: 0; bottom:0; margin:0; z-index:1;}	
 	#manifestlist .mheader .fa-globe-americas, .fa-globe-asia, .fa-globe-europe, .fa-globe-africa { cursor:pointer; margin-right:0.5rem;}
 	#manifestlist .mheader .closemap { cursor:pointer; opacity:0.6; margin-left:0.5rem;}
 	#manifestlist .mheader .closemap:hover { opacity:1;}
@@ -5931,6 +5931,11 @@ body.light.storymap .map {
 	#manifestlist li div.dot { cursor:pointer; height:1rem; min-width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; padding:0 0.1rem; float:left; text-align:center; font-size:0.5rem; color:#fff; line-height:1rem;}
 	#manifestlist li div.dot:hover { }
 	#manifestlist ul.mlist .description, #manifestlist ul.mlist .pdetails, #manifestlist ul.mlist .featuredimages { margin:0.25rem 0;}
+	#manifestlist ul.mlist .featuredimages { position:relative;}
+	#manifestlist ul.mlist .featuredimages .images-button { overflow:auto; padding:0 0.5rem; font-size:1.5rem; background:#eee; border:none; position:absolute; bottom:0; }
+	#manifestlist ul.mlist .featuredimages .images-button:hover { background:#fff; color:#333; cursor:pointer;}
+	#manifestlist ul.mlist .featuredimages .images-display-left { left:0;}
+	#manifestlist ul.mlist .featuredimages .images-display-right { right:0;}
 	
 	#manifestlist li .pdetails p { display:inline;}
 	#manifestlist li .pdetails .measures .mtype:after { content: ": ";}

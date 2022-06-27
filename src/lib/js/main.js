@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	let options = {
 		serviceurl: 'https://manifest.supplystudies.com/services/',
 		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
+		// color: ['#000000','#999999','#999999']
+		//Optional options: fontsize: 20, color: ['#000000','#999999','#999999']
 	};
 	MI = new Manifest(options);
 	if (options.storyMap) { MI.Interface.Storyize(); }

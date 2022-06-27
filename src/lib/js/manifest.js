@@ -9,7 +9,7 @@ class Manifest {
 		this.options = options;
 		// Default options (passed from main.js)
 		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
-		
+
 		this.initialized = false;
 		
 		this.supplychains = [];
@@ -24,7 +24,8 @@ class Manifest {
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
-	
+		options = Object.assign(options, MI.options);
+		
 		switch(type) {
 			case 'manifest': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
@@ -40,9 +41,7 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		//manifest.options = { color: ['#000000','#999999','#999999'] };
-		
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: manifest.options ? manifest.options : {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: options, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
@@ -60,6 +59,7 @@ class Manifest {
 			d.features.push(ft);
 		}
 	
+		console.log(d.options);
 		return d;
 	}
 

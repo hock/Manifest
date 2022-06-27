@@ -12466,11 +12466,11 @@
 		//else 
 		if (layer.feature.properties.style.img) { this._ctx.drawImage(layer.feature.properties.style.img.el, p.x - r / 2, p.y - r / 2, r, r); }
 		else { 
-			ctx.font = "8px Arial"; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.textAlign = "center";
+			ctx.font = layer.feature.properties.style.fontsize+"px Arial"; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.textAlign = "center";
 			if (layer.feature.properties.clustered.length > 0) {
 				this._ctx.drawImage(MI.Atlas.clusterimg.el, p.x - r / 2, p.y - r / 2, r, r);
 			} else {
-				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y+3);
+				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y+(layer.feature.properties.style.fontsize/3));
 			}
 		}
   	},

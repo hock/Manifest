@@ -7589,7 +7589,7 @@ class Manifest {
 		this.options = options;
 		// Default options (passed from main.js)
 		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
-		
+
 		this.initialized = false;
 		
 		this.supplychains = [];
@@ -7604,7 +7604,8 @@ class Manifest {
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
-	
+		options = Object.assign(options, MI.options);
+		
 		switch(type) {
 			case 'manifest': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
@@ -7620,9 +7621,7 @@ class Manifest {
 
 	/** Format a Manifest file so Manifest can understand it */
 	FormatMANIFEST(manifest, options) {	
-		//manifest.options = { color: ['#000000','#999999','#999999'] };
-		
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: manifest.options ? manifest.options : {}, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: options, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
@@ -7640,6 +7639,7 @@ class Manifest {
 			d.features.push(ft);
 		}
 	
+		console.log(d.options);
 		return d;
 	}
 
@@ -8112,7 +8112,7 @@ class ManifestSupplyChain {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-		let fillcolor = MI.options.storyMap ? '#ffffff' : d.details.style.fillColor, textcolor = MI.options.storyMap ? d.details.style.fillColor : d.details.style.textColor;
+		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;
 		
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
@@ -8312,9 +8312,14 @@ class ManifestSupplyChain {
 		
 	SetupStyle(d) {
 		d.options = d.options ? d.options : {};
+		
+		MI.Atlas.styles.point.fontsize = d.options.fontsize ? d.options.fontsize : MI.Atlas.styles.point.fontsize;
+		
 		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
+		
+		
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
@@ -8329,7 +8334,7 @@ class ManifestSupplyChain {
 		Object.assign(ft.properties, setup);
 	
 		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
-
+		
 		li.innerHTML = `
 		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
 		<h5 class="mdetail_title">${ft.properties.title}</h5>
@@ -8354,6 +8359,24 @@ class ManifestSupplyChain {
 			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
 				el.remove();
 	  	} }); 
+		if (ft.properties.images.length > 1) {
+			document.querySelectorAll('#local_'+ft.properties.lid+' div.featuredimages')
+				.forEach(el => { 
+					el.setAttribute('data-index',0);
+					let leftbutton = document.createElement('button');
+					leftbutton.classList.add('images-button', 'images-display-left');
+					leftbutton.innerHTML = '<i class="fas fa-caret-left"></i>';
+					leftbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, -1); });
+					el.appendChild(leftbutton); 
+					
+					let rightbutton = document.createElement('button');
+					rightbutton.classList.add('images-button', 'images-display-right');
+					rightbutton.innerHTML = '<i class="fas fa-caret-right"></i>';
+					rightbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, 1); });
+					el.appendChild(rightbutton); 
+			}); 
+			MI.Interface.ImageScroll(ft.properties.lid, 1);
+		}
 		
 		return ft;
 	}
@@ -8639,7 +8662,7 @@ class ManifestAtlas {
 			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=512&legends=1&zoom={z}&X={x}&Y={y}',
 			RAIL: 'https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png'
 		};
-		
+		 
 		/* Define Layers */
 		this.layerdefs = {
 			google: 	new L.TileLayer(this.tiletypes.GOOGLE, { maxZoom: 20, className: 'googlebase', detectRetina: options.retinaTiles,
@@ -8663,7 +8686,7 @@ class ManifestAtlas {
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1 },
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 8 },
 			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
 			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
@@ -9261,6 +9284,17 @@ class ManifestUI {
 		this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
 	}
 	
+	ImageScroll(lid, n) {
+	    let slideIndex = Number(document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].getAttribute('data-index')) + n; 
+		let slides = document.querySelectorAll('#local_'+lid+' div.featuredimages img');
+	    if (slideIndex > slides.length) {slideIndex = 1;} 
+	    if (slideIndex < 1) {slideIndex = slides.length; }
+	    for (let i = 0; i < slides.length; i++) {
+	      slides[i].style.display = "none"; 
+	    }
+	    slides[slideIndex-1].style.display = "block"; 
+		document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].setAttribute('data-index', slideIndex);
+	}
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');
@@ -12057,6 +12091,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	let options = {
 		serviceurl: 'https://manifest.supplystudies.com/services/',
 		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
+		// color: ['#000000','#999999','#999999']
+		//Optional options: fontsize: 20, color: ['#000000','#999999','#999999']
 	};
 	MI = new Manifest(options);
 	if (options.storyMap) { MI.Interface.Storyize(); }

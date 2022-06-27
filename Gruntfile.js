@@ -17,9 +17,9 @@ module.exports = function(grunt) {
 						}
 					},
 					data: {
-						baseurl: "https://manifest.supplystudies.com/dev/",
-						minify: ".min", // or .min
-						version: "0.2.3"
+						baseurl: "http://hockbook.local/Manifest/dist/",
+						minify: "", // or .min
+						version: "0.2.4"
 					}
 				}
 			}
