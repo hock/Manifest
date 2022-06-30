@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
 	grunt.initConfig({
 	  pkg: grunt.file.readJSON('package.json'),
 		
@@ -11,6 +10,7 @@ module.exports = function(grunt) {
 					beautify: true,
 					sections: {
 						layout: {
+							header: 'src/lib/html/header.html',
 							launcher: 'src/lib/html/launcher.html',
 							navigation: 'src/lib/html/navigation.html',
 							footer: 'src/lib/html/footer.html'						
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 					data: {
 						baseurl: "http://localhost/Manifest/dist/",
 						minify: "", // or .min
-						version: "0.1.1"
+						version: "0.2.4"
 					}
 				}
 			}
@@ -29,19 +29,23 @@ module.exports = function(grunt) {
 		  target: {
 		    files: [{
 		      expand: true,
-		      src: ['dist/css/Manifest-main.css','dist/css/Manifest-static.css'],
+		      src: ['dist/css/Manifest-main.css','dist/css/Manifest-edit.css','dist/css/Manifest-static.css'],
 		      ext: '.min.css'
 		    }]
 		  }
 		},
 		
 		jshint: {
-			js: ['src/lib/js/*.js']                             
+			js: ['src/lib/js/*.js'],
+			options: { 'esversion': 6 }
+                      
 		},
 
 		uglify: {
 			options: {
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',				
+				sourceMap: true,
+				sourceMapIn: function(path) { return path + ".map";}
 			},
 			js: {
 				files : {
@@ -58,14 +62,14 @@ module.exports = function(grunt) {
 
 		concat: {
 			options: {
-				separator: ' ',
+				sourceMap: true,
 			},
 			js_lib: {
-				src: ['src/lib/js/inc/jquery.js', 'src/lib/js/inc/fontawesome.js', 'src/lib/js/leaflet/leaflet.js', 'src/lib/js/inc/d3.v4.js','src/lib/js/inc/jsondrop.js'],
+				src: ['src/lib/js/leaflet/leaflet.js', 'src/lib/js/inc/d3.v4.js', 'src/lib/js/inc/d3.sankey.js', 'src/lib/js/inc/jsondrop.js'],
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/waypoints.js', 'src/lib/js/inc/scrollto.js', 'src/lib/js/inc/autolinker.js', 'src/lib/js/leaflet/markercluster.js', 'src/lib/js/leaflet/zoomhome.js', 'src/lib/js/grate.js', 'src/lib/js/manifest.js', 'src/lib/js/visualize.js', "src/lib/js/main.js"],
+				src: ['src/lib/js/inc/showdown.js','src/lib/js/inc/tinycolor.js','src/lib/js/leaflet/image.js','src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/smoothzoom.js','src/lib/js/leaflet/edgebuffer.js','src/lib/js/leaflet/grate.js','src/lib/js/leaflet/geodesic.js','src/lib/js/manifest.js','src/lib/js/manifest-supplychain.js','src/lib/js/manifest-atlas.js','src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js','src/lib/js/main.js'],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {
@@ -73,11 +77,11 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-static.js'				
 			},
 			js_data: {
-				src: ['src/lib/js/inc/tablesortable.js','src/lib/js/static.js','src/lib/js/datatable.js'],
+				src: ['src/lib/js/inc/list.js','src/lib/js/static.js','src/lib/js/data.js'],
 				dest: 'dist/js/<%= pkg.name %>-data.js'
 			},
 			js_edit: {
-				src: ['src/lib/js/inc/jsoneditor.js','src/lib/js/edit.js'],
+				src: ['src/lib/js/inc/simplemde.js','src/lib/js/inc/jsoneditor.js','src/lib/js/edit.js'],
 				dest: 'dist/js/<%= pkg.name %>-edit.js'
 			},
 			js_services: {
@@ -88,12 +92,15 @@ module.exports = function(grunt) {
 				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/manifest.css'],
 				dest: 'dist/css/<%= pkg.name %>-main.css'
 			},
+			css_edit: {
+				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/leaflet.css','src/lib/css/visualize.css','src/lib/css/simplemde.css','src/lib/css/editor.css'],
+				dest: 'dist/css/<%= pkg.name %>-edit.css'
+			},
 			css_static: {
-				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/manifest.css'],
+				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/editor.css'],
 				dest: 'dist/css/<%= pkg.name %>-static.css'
 			}
 		},
-		
 		watch: {
   		  html: {
   		    files: ['src/**/*.html'],
