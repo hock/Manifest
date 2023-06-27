@@ -249,7 +249,7 @@ class ManifestSupplyChain {
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+ManifestUtilities.Linkify(src)+'</li>' : "").join("")}
+				${ft.properties.sources.map(src => src ? `<li><a href="${src}">${src}</a></li>` : "").join("")}
 				${ManifestUtilities.Linkify(ft.properties.notes)}
 			</ol>
 		</details>`;
