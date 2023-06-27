@@ -367,7 +367,7 @@ class ManifestSupplyChain {
 			
 				for (let l in measure_list) { if (l.measure === ftmeasure.mtype) { measurecheck = true; } }
 				if (measurecheck === false) { measure_list.push({measure: ftmeasure.mtype, unit: ftmeasure.munit}); }
-			
+				if (ftmeasure.mtype === 'length') {ftmeasure.mtype = "Length"}
 				if (typeof sc.measures[ftmeasure.mtype] === 'undefined') { sc.measures[ftmeasure.mtype] = {max: 1, min: 0}; }
 				let mmax = Number(sc.measures[ftmeasure.mtype].max) > Number(ftmeasure.mvalue) ? Number(sc.measures[ftmeasure.mtype].max) : Number(ftmeasure.mvalue);
 				sc.measures[ftmeasure.mtype] = { max: mmax, min: 0 };
