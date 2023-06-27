@@ -113,7 +113,7 @@ class ManifestSupplyChain {
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
 			const expandedProperties = { categories: ft.properties.category.split(','), 
-				images: ft.properties.images.split(','), 
+				images: ft.properties.images.split('|'), 
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
