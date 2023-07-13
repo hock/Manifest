@@ -1,10 +1,10 @@
-const express = require('express');
-const app = express();
-const url = require('url');
-const request = require('request-promise');
+const express = require('express'); // Import the Express module
+const app = express(); // Create an Express application
+const url = require('url'); // Import the URL module
+const request = require('request-promise'); // Import the request-promise module
 
-const gsheetkey = 'AIzaSyDbKq9njfiQa3UDGzRaaG0YaQOT0kYNoFQ';
-const aprsfikey = '161937.xJdpU4VkxgfJ2EA';
+const gsheetkey = 'AIzaSyDbKq9njfiQa3UDGzRaaG0YaQOT0kYNoFQ'; // Google Sheets API key
+const aprsfikey = '161937.xJdpU4VkxgfJ2EA'; // APRS.fi API key
 
 const port = 3000;
 app.listen(port, () => {
@@ -12,7 +12,7 @@ app.listen(port, () => {
 });
 
 app.get('/', (req, res) => {
-	var Manifester = {
+	let Manifester = {
 		g: null,
 		r: null,
 		getSmapGeo: function (id) {
@@ -94,7 +94,7 @@ app.get('/', (req, res) => {
 						res.end('{"g": ' + JSON.stringify(Manifester.g) + ', "r": ' + JSON.stringify(Manifester.r) + '}');
 					})
 					.catch(function (err) {
-						console.log('failure!');
+						console.log('failed');
 
 						res.statusCode = 404;
 						res.setHeader('Access-Control-Allow-Origin', '*');
@@ -153,7 +153,7 @@ app.get('/', (req, res) => {
 				res.end(JSON.stringify(result));
 			})
 			.catch(function (err) {
-				console.log('failure!');
+				console.log('failed');
 
 				res.statusCode = 404;
 				res.setHeader('Access-Control-Allow-Origin', '*');
