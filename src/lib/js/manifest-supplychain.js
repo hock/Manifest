@@ -113,7 +113,7 @@ class ManifestSupplyChain {
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
 			const expandedProperties = { categories: ft.properties.category.split(','), 
-				images: ft.properties.images.split(','), 
+				images: ft.properties.images.split('|'), 
 				sources: ft.properties.sources.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
@@ -249,7 +249,7 @@ class ManifestSupplyChain {
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
 			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+ManifestUtilities.Linkify(src)+'</li>' : "").join("")}
+				${ft.properties.sources.map(src => src ? `<li><a href="${src}">${src}</a></li>` : "").join("")}
 				${ManifestUtilities.Linkify(ft.properties.notes)}
 			</ol>
 		</details>`;
@@ -367,7 +367,7 @@ class ManifestSupplyChain {
 			
 				for (let l in measure_list) { if (l.measure === ftmeasure.mtype) { measurecheck = true; } }
 				if (measurecheck === false) { measure_list.push({measure: ftmeasure.mtype, unit: ftmeasure.munit}); }
-			
+				if (ftmeasure.mtype === 'length') {ftmeasure.mtype = "Length"}
 				if (typeof sc.measures[ftmeasure.mtype] === 'undefined') { sc.measures[ftmeasure.mtype] = {max: 1, min: 0}; }
 				let mmax = Number(sc.measures[ftmeasure.mtype].max) > Number(ftmeasure.mvalue) ? Number(sc.measures[ftmeasure.mtype].max) : Number(ftmeasure.mvalue);
 				sc.measures[ftmeasure.mtype] = { max: mmax, min: 0 };
