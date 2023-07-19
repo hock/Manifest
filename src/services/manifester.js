@@ -61,12 +61,12 @@ app.get('/', (req, res) => {
 		},
 	};
 
-	var url_parts = url.parse(req.url, true);
-	var query = url_parts.query;
+	let url_parts = url.parse(req.url, true);
+	let query = url_parts.query;
 
 	if (query.type == 'smap' || query.type == 'gsheet') {
-		var gprocessor = null;
-		var rprocessor = null;
+		let gprocessor = null;
+		let rprocessor = null;
 
 		if (query.type == 'smap') {
 			gprocessor = Manifester.getSmapGeo;
