@@ -27,6 +27,7 @@ module.exports = function leafletImage(map, callback) {
 
     // layers are drawn in the same order as they are composed in the DOM:
     // tiles, paths, and then markers
+
     map.eachLayer(drawTileLayer);
     //map.eachLayer(drawEsriDynamicLayer);
     
@@ -38,11 +39,14 @@ module.exports = function leafletImage(map, callback) {
     }
     map.eachLayer(drawMarkerLayer);
     layerQueue.awaitAll(layersDone);
-
+ 
+ 
     function drawTileLayer(l) {
-		if (l instanceof L.GridLayer) {
+		//if (l instanceof L.GridLayer) {
+			//console.log("its a grid layer");
 			// Vector Layer
-		} else if (l instanceof L.TileLayer) {
+		//} else 
+		if (l instanceof L.TileLayer) {
 			if (l._url.substr(0,24) !== 'https://tiles.arcgis.com' && l._url.substr(0,24) !== 'https://tiles.marinetraf' && l._url.substr(0,24) !== 'https://{s}.tiles.openra') {
 				layerQueue.defer(handleTileLayer, l); 
 			}
@@ -80,7 +84,6 @@ module.exports = function leafletImage(map, callback) {
     }
 
     function handleTileLayer(layer, callback) {	
-		console.log("handle");
         // `L.TileLayer.Canvas` was removed in leaflet 1.0
         var isCanvasLayer = (L.TileLayer.Canvas && layer instanceof L.TileLayer.Canvas),
 		canvas = createHiPPICanvas(dimensions.x, dimensions.y, 2);
@@ -192,7 +195,6 @@ module.exports = function leafletImage(map, callback) {
         }
 
         function drawTile(d) {
-			console.log(d);
             ctx.drawImage(d.img, Math.floor(d.pos.x), Math.floor(d.pos.y),
                 d.size, d.size);
         }

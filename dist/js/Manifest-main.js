@@ -6593,6 +6593,7 @@ module.exports = function leafletImage(map, callback) {
 
     // layers are drawn in the same order as they are composed in the DOM:
     // tiles, paths, and then markers
+
     map.eachLayer(drawTileLayer);
     //map.eachLayer(drawEsriDynamicLayer);
     
@@ -6604,11 +6605,14 @@ module.exports = function leafletImage(map, callback) {
     }
     map.eachLayer(drawMarkerLayer);
     layerQueue.awaitAll(layersDone);
-
+ 
+ 
     function drawTileLayer(l) {
-		if (l instanceof L.GridLayer) {
+		//if (l instanceof L.GridLayer) {
+			//console.log("its a grid layer");
 			// Vector Layer
-		} else if (l instanceof L.TileLayer) {
+		//} else 
+		if (l instanceof L.TileLayer) {
 			if (l._url.substr(0,24) !== 'https://tiles.arcgis.com' && l._url.substr(0,24) !== 'https://tiles.marinetraf' && l._url.substr(0,24) !== 'https://{s}.tiles.openra') {
 				layerQueue.defer(handleTileLayer, l); 
 			}
@@ -6646,7 +6650,6 @@ module.exports = function leafletImage(map, callback) {
     }
 
     function handleTileLayer(layer, callback) {	
-		console.log("handle");
         // `L.TileLayer.Canvas` was removed in leaflet 1.0
         var isCanvasLayer = (L.TileLayer.Canvas && layer instanceof L.TileLayer.Canvas),
 		canvas = createHiPPICanvas(dimensions.x, dimensions.y, 2);
@@ -6758,7 +6761,6 @@ module.exports = function leafletImage(map, callback) {
         }
 
         function drawTile(d) {
-			console.log(d);
             ctx.drawImage(d.img, Math.floor(d.pos.x), Math.floor(d.pos.y),
                 d.size, d.size);
         }
@@ -14493,8 +14495,8 @@ class ManifestSupplyChain {
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
 			const expandedProperties = { categories: ft.properties.category.split(','), 
-				images: ft.properties.images.split(','), 
-				sources: ft.properties.sources.split(',') };	
+				images: ft.properties.images.split('|'), 
+				sources: ft.properties.sources.split('|') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
@@ -14772,7 +14774,7 @@ class ManifestSupplyChain {
 			
 				for (let l in measure_list) { if (l.measure === ftmeasure.mtype) { measurecheck = true; } }
 				if (measurecheck === false) { measure_list.push({measure: ftmeasure.mtype, unit: ftmeasure.munit}); }
-			
+				if (ftmeasure.mtype === 'length') {ftmeasure.mtype = "Length"; }
 				if (typeof sc.measures[ftmeasure.mtype] === 'undefined') { sc.measures[ftmeasure.mtype] = {max: 1, min: 0}; }
 				let mmax = Number(sc.measures[ftmeasure.mtype].max) > Number(ftmeasure.mvalue) ? Number(sc.measures[ftmeasure.mtype].max) : Number(ftmeasure.mvalue);
 				sc.measures[ftmeasure.mtype] = { max: mmax, min: 0 };
@@ -14923,6 +14925,7 @@ class ManifestSupplyChain {
 		MI.Atlas.Refresh();
 	}
 }
+
 /** Initialize a Spatial Atlas **/
 class ManifestAtlas {
 	constructor(options) {
@@ -18384,8 +18387,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
 	let options = {
 		options: true,
-		//serviceurl: 'https://manifest.supplystudies.com/services/',
-		serviceurl: 'http://hockbook.local:3000',
+		serviceurl: 'https://manifest.supplystudies.com/services/',// serviceurl: 'http://hockbook.local:3000',
 		
 		view: 'interest', position: {lat: 40.730610, lng: -73.935242}, zoom: 3,
 		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
@@ -18468,7 +18470,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		}
 	}
-	MI.Process("yeti", yeti, {"id": ("casper sleep").hashCode()});
+	//MI.Process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 
 	function LoadSample(d) {
 		document.getElementById('collection-description').innerHTML = d.description;

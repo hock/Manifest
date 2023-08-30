@@ -2,8 +2,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
 	let options = {
 		options: true,
-		//serviceurl: 'https://manifest.supplystudies.com/services/',
-		serviceurl: 'http://hockbook.local:3000',
+		serviceurl: 'https://manifest.supplystudies.com/services/',// serviceurl: 'http://hockbook.local:3000',
 		
 		view: 'interest', position: {lat: 40.730610, lng: -73.935242}, zoom: 3,
 		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
@@ -86,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url, start:true})).then(r => Start())).catch(e => LoadError(e));
 		}
 	}
-	MI.Process("yeti", yeti, {"id": ("casper sleep").hashCode()});
+	//MI.Process("yeti", yeti, {"id": ("casper sleep").hashCode()});
 
 	function LoadSample(d) {
 		document.getElementById('collection-description').innerHTML = d.description;
