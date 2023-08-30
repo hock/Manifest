@@ -48,7 +48,7 @@
             return container;
         },
 
-        setHomeBounds: function (bounds) {
+        setHomeBounds: function (bounds) {			
             if (bounds === undefined) {
                 bounds = this._map.getBounds();
             } else {
@@ -67,10 +67,10 @@
             this.options.homeCoordinates = coordinates;
         },
 
-        setHomeZoom: function (zoom) {
+        setHomeZoom: function (zoom) {			
             if (zoom === undefined) {
                 zoom = this._map.getZoom();
-            }
+            }			
             this.options.homeZoom = zoom;
         },
 
@@ -84,7 +84,11 @@
 
         _zoomHome: function (e) {
             //jshint unused:false
-            this._map.setView(this.options.homeCoordinates, this.options.homeZoom);
+			 if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
+            	 this._map.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,this.options.homeZoom), this.options.homeZoom);					  
+			 } else {
+            	 this._map.setView(this.options.homeCoordinates, this.options.homeZoom);
+			 }
         }
     });
 

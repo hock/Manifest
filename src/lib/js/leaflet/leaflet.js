@@ -3179,7 +3179,7 @@
   			return this;
   		}
 		if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
-		    return this.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._latlng),zoom, {zoom: options});
+		    return this.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,zoom),zoom, {zoom: options});
 		} else {
 			return this.setView(this.getCenter(), zoom, {zoom: options});
 		}
@@ -3375,7 +3375,7 @@
   		var start = Date.now(),
   		    S = (r(1) - r0) / rho,
   		    duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
-		
+		
 	
 		// Hide Lines
 		for (let s in MI.supplychains) { MI.Supplychain.Hide(MI.supplychains[s].details.id, true, 'lines'); }
@@ -3385,7 +3385,7 @@
 			
   			var t = (Date.now() - start) / duration,
   			    s = easeOut(t) * S;
-		
+		
   			if (t <= 1) {
   				this._flyToFrame = requestAnimFrame(frame, this);
 		  		
@@ -4414,7 +4414,8 @@
   		};
 
   		if (e.type !== 'keypress' && e.type !== 'keydown' && e.type !== 'keyup') {
-  			var isMarker = target.getLatLng && (!target._radius || target._radius <= 10);
+  			var isMarker = target.getLatLng && (!target._radius || target._radius <= 50);
+
   			data.containerPoint = isMarker ?
   				this.latLngToContainerPoint(target.getLatLng()) : this.mouseEventToContainerPoint(e);
   			data.layerPoint = this.containerPointToLayerPoint(data.containerPoint);
@@ -4593,7 +4594,7 @@
   		this.on('zoomanim', function (e) {
   			var prop = TRANSFORM,
   			    transform = this._proxy.style[prop];
-	
+	
   			setTransform(this._proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
 
   			// workaround for case when transform is the same and so transitionend event is not fired
@@ -7918,6 +7919,7 @@
   		setOptions(this, options);
   		this._latlng = toLatLng(latlng);
   		this._radius = this.options.radius;
+		
   	},
 
   	// @method setLatLng(latLng: LatLng): this
@@ -9263,7 +9265,7 @@
   	_animateZoom: function (e) {
   		var scale = this._map.getZoomScale(e.zoom),
   		    offset = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min;
-			
+			
   		setTransform(this._image, offset, scale);
   	},
 
@@ -9626,6 +9628,7 @@
   				latlng = layer.getCenter();
   			} else if (layer.getLatLng) {
   				latlng = layer.getLatLng();
+				
   			} else {
   				throw new Error('Unable to get source layer LatLng.');
   			}
@@ -9636,7 +9639,6 @@
 
   		// update the overlay (content, layout, ect...)
   		this.update();
-
   		return latlng;
   	},
 

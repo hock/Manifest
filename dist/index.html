@@ -16,8 +16,10 @@
     <meta property="og:url" content="https://manifest.supplystudies.com/">
     <link rel="canonical" href="https://manifest.supplystudies.com/">
     <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
+    <meta property="og:title" content="Manifest: Supply Chain Platform">
     <meta property="og:description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
-    <meta property="og:image" content="images/card.jpg">
+    <meta property="og:image" content="https://manifest.supplystudies.com/images/card.jpg">
+    <meta property="twitter:image" content="https://manifest.supplystudies.com/images/card.jpg">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
 
@@ -32,21 +34,17 @@
         document.documentElement.classList.add('js');
     </script>
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-30152089-1"></script>
     <script>
-        var _paq = window._paq = window._paq || [];
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-            var u = "//supplystudies.com/matomo/";
-            _paq.push(['setTrackerUrl', u + 'matomo.php']);
-            _paq.push(['setSiteId', '1']);
-            var d = document,
-                g = d.createElement('script'),
-                s = d.getElementsByTagName('script')[0];
-            g.async = true;
-            g.src = u + 'matomo.js';
-            s.parentNode.insertBefore(g, s);
-        })();
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-30152089-1');
     </script>
 </head>
 

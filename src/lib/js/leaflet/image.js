@@ -40,12 +40,15 @@ module.exports = function leafletImage(map, callback) {
     layerQueue.awaitAll(layersDone);
 
     function drawTileLayer(l) {
-        if (l instanceof L.TileLayer) {
+		if (l instanceof L.GridLayer) {
+			// Vector Layer
+		} else if (l instanceof L.TileLayer) {
 			if (l._url.substr(0,24) !== 'https://tiles.arcgis.com' && l._url.substr(0,24) !== 'https://tiles.marinetraf' && l._url.substr(0,24) !== 'https://{s}.tiles.openra') {
 				layerQueue.defer(handleTileLayer, l); 
 			}
 		}
         else if (l._heat) layerQueue.defer(handlePathRoot, l._canvas);
+
     }
 
     function drawMarkerLayer(l) {
@@ -76,16 +79,16 @@ module.exports = function leafletImage(map, callback) {
         done();
     }
 
-    function handleTileLayer(layer, callback) {		
+    function handleTileLayer(layer, callback) {	
+		console.log("handle");
         // `L.TileLayer.Canvas` was removed in leaflet 1.0
         var isCanvasLayer = (L.TileLayer.Canvas && layer instanceof L.TileLayer.Canvas),
-	    	canvas = createHiPPICanvas(dimensions.x, dimensions.y, 2);
+		canvas = createHiPPICanvas(dimensions.x, dimensions.y, 2);
 
         var ctx = canvas.getContext('2d'),
             bounds = map.getPixelBounds(),
-            zoom = map.getZoom(),
-            tileSize = layer.options.tileSize;
-
+            zoom = map.getZoom(), tileSize = layer.options.tileSize;
+			
         if (zoom > layer.options.maxZoom ||
             zoom < layer.options.minZoom ||
             zoom > layer.options.maxNativeZoom ||
@@ -189,6 +192,7 @@ module.exports = function leafletImage(map, callback) {
         }
 
         function drawTile(d) {
+			console.log(d);
             ctx.drawImage(d.img, Math.floor(d.pos.x), Math.floor(d.pos.y),
                 d.size, d.size);
         }

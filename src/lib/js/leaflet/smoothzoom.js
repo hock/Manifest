@@ -53,10 +53,19 @@ L.Map.SmoothWheelZoom = L.Handler.extend({
 
     _onWheeling: function (e) {
         var map = this._map;
-
+      	
+		// Edited
+		map._renderer._reset();
+  //      if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
+	//		console.log(MI.Atlas.active_point._popup);
+	//		MI.Atlas.active_point._popup._updatePosition();		
+	//	}
+		// Edited
+		
         this._goalZoom = this._goalZoom + L.DomEvent.getWheelDelta(e) * 0.003 * map.options.smoothSensitivity;
-        if (this._goalZoom < map.getMinZoom() || this._goalZoom > map.getMaxZoom()) {
+        if (this._goalZoom < map.getMinZoom() || this._goalZoom > map.getMaxZoom()+.03) {
             this._goalZoom = map._limitZoom(this._goalZoom);
+			map.fire('viewreset');
         }
         this._wheelMousePosition = this._map.mouseEventToContainerPoint(e);
 
@@ -78,19 +87,19 @@ L.Map.SmoothWheelZoom = L.Handler.extend({
 		
         if ((!map.getCenter().equals(this._prevCenter)) || map.getZoom() != this._prevZoom)
             return;
-
-        let scale = this._zoom = map.getZoom() + (this._goalZoom - map.getZoom()) * 0.3;
+		
+      	this._zoom = map.getZoom() + (this._goalZoom - map.getZoom()) * 0.3;
         this._zoom = Math.floor(this._zoom * 100) / 100;
 
         var delta = this._wheelMousePosition.subtract(this._centerPoint);
         if (delta.x === 0 && delta.y === 0)
             return;
-
+		
+	
 		// @TODO This would allow better scrolling but lines are too complicated
-		//map._renderer._reset();
 
         if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
-            this._center = MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._latlng);
+            this._center = MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,this._zoom);
         } else if (map.options.smoothWheelZoom === 'center') {
             this._center = this._startLatLng;
         } else {

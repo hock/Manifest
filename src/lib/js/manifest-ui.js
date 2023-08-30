@@ -41,7 +41,9 @@ class ManifestUI {
 			this.ShakeAlert(document.getElementById('manifestbar'));
 			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
 		}});
-		if (MI.options.storyMap) { this.SetBasemap('light'); }
+		if (MI.options.storyMap) { 
+			//this.SetBasemap('light'); 
+		}
 		
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
@@ -55,15 +57,17 @@ class ManifestUI {
 	Storyize() {
 		document.body.classList.add('storymap');
 		MI.Atlas.radius = 20;
+		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
 	
+	//storymap
 	SetupStoryTrigger(selector){
 		let els = document.querySelectorAll(selector);
 		els = Array.from(els);
 		els.forEach(el => {
   	    	let observer = new IntersectionObserver((entries, observer) => { 
 				entries.forEach(entry => { if (entry.isIntersecting) { 
-					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], false, true);	
+					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], false, false);	
 				}});
   	  	  	});
 			observer.observe(el);
@@ -122,7 +126,7 @@ class ManifestUI {
 		
 			if (type === 'smap') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; } 
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
-			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode(); }	
+			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; idref = id; id = id.hashCode(); }	
 		}
 		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
@@ -153,8 +157,6 @@ class ManifestUI {
 				for (let cc of closedcats) { for (let cat of cats) { cat = cat.dataset.cat.toLowerCase(); if (cc === cat) { catcount++; } } }
 
 				let uncat = 'cat-'+el.parentElement.id.split('-')[1]+'-';
-				//console.log(uncat);
-				//console.log(closedcats);
 			
 				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && cats[0].dataset.cat === uncat) { el.style.display = 'none'; } 
 					else { el.style.display = 'list-item'; }
@@ -170,8 +172,7 @@ class ManifestUI {
 				let cats = MI.Atlas.map._layers[i].feature.properties.category.split(','), catmatch = false, catcount = 0, 
 					catid = MI.Atlas.map._layers[i].feature.properties.scid ? MI.Atlas.map._layers[i].feature.properties.scid : null;
 				for (let cc of closedcats) { for (let cat of cats) { if (cc === 'cat-'+catid+'-'+cat) { catcount++; } } }
-				//console.log(closedcats.includes('uncategorized'));
-				//console.log(cats);
+
 		        if (catcount >= cats.length) { found = false; }
 				else {
 					for (let k of ['title','description','category','placename']) {
@@ -179,10 +180,7 @@ class ManifestUI {
 					}
 				}
 				
-			
-				console.log('----');
 				let uncat = 'cat-'+catid+'-';
-				console.log('cat-'+catid+'-'+cats[0] + ' vs ' + uncat);
 				
 				if (closedcats.includes(uncat+'uncategorized') && cats.length === 1 && 'cat-'+catid+'-'+cats[0] === uncat) {
 					found = false;
@@ -261,7 +259,8 @@ class ManifestUI {
 	
 		MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[previoustiles]);
 		MI.Atlas.map.addLayer(MI.Atlas.layerdefs[tile]);	
-	
+		MI.Atlas.baselayer = tile;
+		
 		document.querySelectorAll('#datalayers input').forEach(el => { 
 			MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[el.value]);
 			if (el.checked) { MI.Atlas.map.addLayer(MI.Atlas.layerdefs[el.value]); }
@@ -272,10 +271,11 @@ class ManifestUI {
 	ToggleFullscreen() {
 		if (document.body.classList.contains('fullscreen')) {
 			document.body.classList.remove('fullscreen');
-			if (document.getElementsByClassName('leaflet-popup').length >= 1 && MI.Atlas.active_point !== null) { 
-				MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng( MI.Atlas.active_point._popup._latlng));				
-			}
 		} else { document.body.classList.add('fullscreen'); }
+		if (document.getElementsByClassName('leaflet-popup').length >= 1 && MI.Atlas.active_point !== null) { 
+			MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng( MI.Atlas.active_point._popup._source.feature.properties.latlng));				
+		}
+		MI.Atlas.homecontrol.setHomeCoordinates();
 		MI.Visualization.Resize();
 	}
 	

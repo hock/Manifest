@@ -3,3 +3,6 @@
 node_modules/
 tools/private
 package-lock.json
+src/services/keys.json
+dist/services/protomaps.pmtiles
+dist/services/keys.json

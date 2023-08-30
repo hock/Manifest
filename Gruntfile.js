@@ -69,7 +69,7 @@ module.exports = function(grunt) {
 				dest: 'dist/js/<%= pkg.name %>-lib.js'
 			},
 			js_main: {
-				src: ['src/lib/js/inc/showdown.js','src/lib/js/inc/tinycolor.js','src/lib/js/leaflet/image.js','src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/smoothzoom.js','src/lib/js/leaflet/edgebuffer.js','src/lib/js/leaflet/grate.js','src/lib/js/leaflet/geodesic.js','src/lib/js/manifest.js','src/lib/js/manifest-supplychain.js','src/lib/js/manifest-atlas.js','src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js','src/lib/js/main.js'],
+				src: ['src/lib/js/inc/showdown.js','src/lib/js/inc/tinycolor.js','src/lib/js/leaflet/image.js','src/lib/js/leaflet/zoomhome.js', 'src/lib/js/leaflet/smoothzoom.js','src/lib/js/leaflet/edgebuffer.js','src/lib/js/leaflet/grate.js','src/lib/js/leaflet/geodesic.js','src/lib/js/leaflet/protomaps.js','src/lib/js/manifest.js','src/lib/js/manifest-supplychain.js','src/lib/js/manifest-atlas.js','src/lib/js/manifest-ui.js','src/lib/js/inc/list.js','src/lib/js/manifest-visualization.js','src/lib/js/main.js'],
 				dest: 'dist/js/<%= pkg.name %>-main.js'
 			},
 			js_static: {
@@ -100,42 +100,6 @@ module.exports = function(grunt) {
 				src: ['src/lib/css/fonts.css','src/lib/css/fa.css','src/lib/css/editor.css'],
 				dest: 'dist/css/<%= pkg.name %>-static.css'
 			}
-		},
-		changelogcustomizable: {
-			changelog: {
-			options: {
-				start: null,
-				end: null,
-				header: 'Changelog',
-				dest: {
-					dir: './',
-					fileName: 'changelog',
-					extension: 'md'
-				},
-				type: 'all',
-				templates: {
-					features: {
-						regex: {
-							dev: /^(.*)feature(.*)$/gim,
-							release: /^(.*)release(.*)feature(.*)$/gim
-						},
-						template: '##FEATURE:\n\n{{#if features}}{{#each features}}{{> feature}}{{/each}}{{else}}{{/if}}\n'
-					},
-					feature: {
-						template: '\t{{{this}}}\n'
-					},
-					fixes: {
-						regex: {
-							dev: /^(.*)fixes #\d+:?(.*)$/gim,
-							release: /^(.*)release(.*)fixes #\d+:?(.*)$/gim
-						},
-						template: '##FIXES:\n\n{{#if fixes}}{{#each fixes}}{{> fix}}{{/each}}{{else}}{{/if}}\n'
-					},
-					fix: {
-						template: '\t{{{this}}}\n'
-					}
-				}
-			}}
 		},
 		watch: {
   		  html: {

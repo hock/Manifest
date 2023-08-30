@@ -389,8 +389,12 @@ body.fullscreen #textview {
 
 /* Storymap */
 body.light.storymap .map {
-	background:#fff;
+	background:#fff; 
 } 
+body.light.storymap #sidepanel {
+	background:none;
+	opacity:0.9;
+}
 .storymap .category, .storymap #manifestlist li .pdetails p, .storymap #mlist-1029261216 #local_10292612160000 .pdetails p.placename, .storymap #mlist-1029261216 #local_10292612160000 .pdetails p.measures, .storymap #manifestlist li div.dot, .storymap #manifestbar, .storymap .footer, .storymap .searchwidget, .storymap #mapmenu, .storymap #fullscreen-menu, .storymap #mapcapture, .storymap .leaflet-popup-pane, .storymap .closemap, .storymap .menumap, .storymap .vizmenu {
 	display:none;
 }
@@ -403,37 +407,109 @@ body.light.storymap .map {
 	display: initial;
 	white-space: initial
 }
+body.light.storymap #manifestlist .mheader .mtitle:hover {
+	filter: none;
+}
 .storymap #manifestlist .mtitle {
-	padding: 1.2rem;
-	font-size: 4rem;
-	border:none;
+	padding: 1rem;
+	font-size: 2rem;
+	background:#fff;
+	margin:1rem 1rem 0 1rem;
+	border-radius:1rem 1rem 0 0;
+	
 }
-.storymap #manifestlist .mlist > li, .storymap #manifestlist .mdescription {
-	min-height:100vh;
-	border:none;
-}
-.storymap .mtitle, .storymap .mdetails, .storymap .mdescription, .storymap .mlist, .storymap #manifestlist h5.mdetail_title, .storymap .pdetails, .storymap .placename {
-	font-size:1.5rem;
+.storymap #manifestlist .mdescription {
+	font-size:1.25rem;
+	padding:1rem;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px;
+	margin: 0 1rem 100vh 1rem;
+	border-radius: 0 0 1rem 1rem;
+	
 }
 .storymap #manifestlist li {
-	padding:2rem 0;
+	width:auto;
+}
+.storymap #manifestlist .mlist > li {
+	border:none;
+	font-size:1rem;
+	padding:1rem;
+	margin-left:60%;
+	margin-top:75vh;
+	margin-bottom:75vh;
+	background:rgba(255,255,255,1);
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+	border-radius:1rem 0 0 1rem;
 }
 
-.storymap .leaflet-left .leaflet-control {
-	margin-left:1rem;
+.storymap #manifestlist li .pdetails p.placename {
+	display:block;
 }
+
+.storymap #manifestlist .mlist > li .description {
+	text-align:justify;
+}
+.storymap #manifestlist .mlist > li .featuredimages img {
+	width:100vw;
+	margin-top:0.5rem;
+	margin-bottom:0.5rem;
+	margin-left:calc(-60vw - 1rem);
+	border-top:2px solid rgba(0, 0, 0, 0.25);
+	border-bottom:2px solid rgba(0, 0, 0, 0.25);
+}
+.storymap #manifestlist .mlist > li * {
+	font-size:1rem;
+}
+.storymap #manifestlist .mdescription * {
+	font-size:1.25rem;
+}
+
+.storymap #manifestlist h5.mdetail_title { font-size:2rem; padding-top:1rem; line-height:initial;}
+
+.storymap .leaflet-control {
+	display:none;
+}
+
 .storymap #sidepanel {
 	top:0;
 	left:auto;
 	right:0;
-	width:40%;
+	width:100%;
 	margin:0;
 	border-radius:0;
+	background:none;
 }
 .storymap .view-wrapper {
-	width:60%;
+	width:100%;
 	left:0;
 	right:auto;
+}
+
+.storymap #footer-badge {
+	width:auto; height:1rem;
+	padding:0.75rem 0.75rem;
+	background:#fff;
+	background-size:2rem;
+	text-align:center;
+	color:#aaa;
+	position: absolute;
+	bottom: 1rem; left: 1rem;
+	display:block;
+	z-index:5000;
+	border-radius:0.5rem;
+	z-index:15000;
+	cursor:pointer;
+}
+.storymap #footer-badge a {
+	font-family: "Roboto", Arial, Helvetica, sans-serif;
+	color:#aaa;
+}
+.storymap #footer-badge:hover {
+	background:#4d34db;
+	color:#fff;
+}
+.storymap #footer-badge:hover a {
+	text-decoration:none;
+	color:#fff;
 }
 
 @media only screen and (max-width: 920px) and (orientation: portrait) { 

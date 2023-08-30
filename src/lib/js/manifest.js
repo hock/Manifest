@@ -11,11 +11,12 @@ class Manifest {
 		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
 
 		this.initialized = false;
+		this.changelog = 'no notes';
 		
 		this.supplychains = [];
 		this.Supplychain = new ManifestSupplyChain();
-		this.Interface = new ManifestUI();
-		this.Atlas = new ManifestAtlas({mobile: this.Interface.IsMobile(), retinaTiles: options.retinaTiles});
+		this.Interface = new ManifestUI(); this.options.mobile = this.Interface.IsMobile();
+		this.Atlas = new ManifestAtlas(options);
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
 		this.Util = new ManifestUtilities();
@@ -36,7 +37,7 @@ class Manifest {
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
 		}		
 		this.Visualization.Set(MI.Visualization.type);	
-		if (options.start) { MI.Atlas.SetView();}	
+		if (options.start) { MI.Atlas.SetView(MI.options.view);}	
 	}
 
 	/** Format a Manifest file so Manifest can understand it */
@@ -57,9 +58,7 @@ class Manifest {
 			h.from = d.features[h.from_stop_id-1]; h.to = d.features[h.to_stop_id-1];
 			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 			d.features.push(ft);
-		}
-	
-		console.log(d.options);
+		}	
 		return d;
 	}
 
@@ -500,8 +499,8 @@ class ManifestUtilities {
 		this.markdowner.addExtension(customClassExt);
 	}
 	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
-	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
-	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))((manifest?:)\/\/[a-z0-9&#=.\/\-?_]+)/gi; }
+	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(https?:\/\/[^\s"]+)/gi; }
+	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(manifest?:\/\/[^\s"]+)/gi; }
 	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }
 }
 

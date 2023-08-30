@@ -144,15 +144,17 @@ class ManifestSupplyChain {
 		}); }	
 
 		for (let i in lines.features) { 
-			for (let j in points.features) { 	
-				if (lines.features[i].properties.connections.from.scid === points.features[j].properties.scid && 
-					lines.features[i].properties.connections.from.index === points.features[j].properties.mindex) {
-					lines.features[i].properties.connections.from = arrows.features[i].properties.connections.from = points.features[j];
-				} 
-				else if (lines.features[i].properties.connections.to.scid === points.features[j].properties.scid && 
-					lines.features[i].properties.connections.to.index === points.features[j].properties.mindex) {
-					lines.features[i].properties.connections.to = arrows.features[i].properties.connections.to = points.features[j];
-				} 
+			for (let j in points.features) {
+				if (typeof lines.features[i].properties.connections !== 'undefined') { 
+					if (lines.features[i].properties.connections.from.scid === points.features[j].properties.scid && 
+						lines.features[i].properties.connections.from.index === points.features[j].properties.mindex) {
+						lines.features[i].properties.connections.from = arrows.features[i].properties.connections.from = points.features[j];
+					} 
+					else if (lines.features[i].properties.connections.to.scid === points.features[j].properties.scid && 
+						lines.features[i].properties.connections.to.index === points.features[j].properties.mindex) {
+						lines.features[i].properties.connections.to = arrows.features[i].properties.connections.to = points.features[j];
+					} 
+				}
 			}
 		}	
 		// Prepare to add layers

@@ -237,7 +237,7 @@ class ForceGraph {
 		this.defs = this.svg.append('svg:defs');
 		
 		this.link = this.viz.append('g').attr('class', 'link').selectAll('path.link').data(this.graph.links).enter().append('path')
-			.attr('stroke-width', 2).attr('stroke', d => d.color).style('fill', 'none');
+			.attr('opacity', 0.2).attr('stroke-width', 2).attr('stroke', d => d.color).style('fill', 'none');
 		this.arrow = this.viz.append('g').attr('class', 'arrow').selectAll('path.arrow').data(this.graph.links).enter().append('path')
 			.attr('stroke-width', 0).style('fill', 'none').attr('marker-end', d => this._marker(d.color));
 		this.groups = this.viz.append('g').attr('class', 'groups');
