@@ -25,4 +25,4 @@ Manifest is configured with a set of options passed in main.js.
 	
 	MI = new Manifest(options);
 	
-Individual manifests can support their own options. 
+Individual manifests can support their own options.  
