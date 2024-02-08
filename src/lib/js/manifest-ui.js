@@ -24,15 +24,25 @@ class ManifestUI {
 		});
 				
 		document.getElementById('load-samples-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-samples').value); });	
-		document.querySelectorAll('#basemap-chooser li').forEach(el => { el.addEventListener('click', (e) => { this.SetBasemap(el.classList[0]); }); });
+		document.getElementById('basemap-chooser').addEventListener('change', (e) => { 
+			this.SetBasemap(document.getElementById('basemap-chooser').value); 
+		});
 		document.getElementById('viz-choices').addEventListener('change', (e) => { MI.Visualization.Set(document.getElementById('viz-choices').value); });
 		document.querySelectorAll('.sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });
 	
 		document.getElementById('measure-choices').addEventListener('change', (e) => { 
 			MI.Atlas.MeasureSort(); MI.Visualization.Set(MI.Visualization.type); });
 		document.getElementById('mapmenu').addEventListener('click', (e) => { document.getElementById('mapmenu-window').classList.remove('closed'); });
-		document.getElementById('mapmenu-window').addEventListener('mouseleave', (e) => { document.getElementById('mapmenu-window').classList.add('closed'); });
-
+		document.getElementById('close-mapmenu').addEventListener('click', (e) => { document.getElementById('mapmenu-window').classList.add('closed'); });
+		document.getElementById('load-datalayers-btn').addEventListener('click', (e) => { 
+			this.AddDataLayer(document.getElementById('load-datalayers-input').value); 
+		});
+		document.querySelectorAll('#datalayers input[type=checkbox]').forEach(el => { el.addEventListener('click', (e) => { 
+			MI.Atlas.ProcessDataLayerFromElement(el);}); 
+		});
+		document.getElementById('fullscreen-modal').addEventListener('click', (e) => { 
+			document.getElementById('fullscreen-modal').classList.toggle('closed');
+		});
 		let dropElement = document.getElementById('minfodetail');
 		let dropArea = new jsondrop('minfodetail', { 
 			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: file.name.hashCode(), url: '', start:MI.supplychains.length === 0}); } 
@@ -58,6 +68,18 @@ class ManifestUI {
 		document.body.classList.add('storymap');
 		MI.Atlas.radius = 20;
 		MI.Atlas.styles.point.fontsize = 0.1;
+		
+		let storybanner = document.createElement('div');
+		storybanner.id = 'storybanner';
+		storybanner.innerHTML = `M`;
+	
+		document.querySelectorAll('body.storymap').forEach(el => { el.append(storybanner); });
+		
+		document.getElementById('storybanner').addEventListener('click', (e) => { 
+			const newUrl = window.location.origin+window.location.pathname+window.location.hash;
+			window.location.replace(newUrl);
+		});
+		
 	} 
 	
 	//storymap
@@ -110,9 +132,9 @@ class ManifestUI {
 		if (value === 'url') {
 			loadurl = document.getElementById('load-samples-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
-				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id;
+				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.options.serviceurl + 'smap/' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
-				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; id = id.hashCode();
+				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + 'gsheet/' + id; id = id.hashCode();
 			} else {
 				type = 'manifest'; idref = loadurl; id = loadurl.hashCode();
 			}
@@ -124,9 +146,9 @@ class ManifestUI {
 			option = [option.shift(), option.join('-')];
 			id = option[1];
 		
-			if (type === 'smap') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; } 
+			if (type === 'smap') { loadurl = MI.options.serviceurl + 'smap/' + id; } 
 			else if	(type === 'manifest') { loadurl = id; id = id.hashCode(); } 
-			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + '?type='+type+'&id=' + id; idref = id; id = id.hashCode(); }	
+			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + 'gsheet/' + id; idref = id; id = id.hashCode(); }	
 		}
 		
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
@@ -154,11 +176,12 @@ class ManifestUI {
 		if (!MI.Interface.filter.clear) {		
 			document.querySelectorAll('.mlist > li').forEach(el => { 
 				let cats = el.querySelectorAll('.cat-link'), catcount = 0;
-				for (let cc of closedcats) { for (let cat of cats) { cat = cat.dataset.cat.toLowerCase(); if (cc === cat) { catcount++; } } }
+				for (let cc of closedcats) { for (let cat of cats) { cat = cat.dataset.cat.toLowerCase(); if (cc.toLowerCase() === cat) { catcount++; } } }
 
-				let uncat = 'cat-'+el.parentElement.id.split('-')[1]+'-';
-			
-				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && cats[0].dataset.cat === uncat) { el.style.display = 'none'; } 
+				let uncat = ('cat-'+el.parentElement.id.split('-')[1]+'-').toLowerCase();
+				let testcat = cats[0].dataset.cat.toLowerCase();
+				
+				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
 					else { el.style.display = 'list-item'; }
 		    });
 			MI.Interface.filter.clear = true;
@@ -224,19 +247,29 @@ class ManifestUI {
 	
 	Link(link, event) {
 		event.preventDefault(); event.stopPropagation();
-		this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
+		if (link.includes('manifest://')) {
+			this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
+		} else {
+			this.LoadFromLauncher('manifest-'+link);
+		}
 	}
 	
-	ImageScroll(lid, n) {
+	ImageScroll(lid, n, jump=false) {
 	    let slideIndex = Number(document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].getAttribute('data-index')) + n; 
-		let slides = document.querySelectorAll('#local_'+lid+' div.featuredimages img');
+		let slides = document.querySelectorAll('#local_'+lid+' div.featuredimages .ftimg');
+		let spots = document.querySelectorAll('#local_'+lid+' div.featuredimages .images-spot');
+		
 	    if (slideIndex > slides.length) {slideIndex = 1;} 
 	    if (slideIndex < 1) {slideIndex = slides.length; }
+		if (jump) { slideIndex = jump; }
 	    for (let i = 0; i < slides.length; i++) {
 	      slides[i].style.display = "none"; 
+		  spots[i].classList.remove('selected');
 	    }
 	    slides[slideIndex-1].style.display = "block"; 
+		spots[slideIndex-1].classList.add('selected');
 		document.querySelectorAll('#local_'+lid+' div.featuredimages')[0].setAttribute('data-index', slideIndex);
+		MI.Interface.StopVideoPlayback();
 	}
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
@@ -252,21 +285,28 @@ class ManifestUI {
 	}
 
 	SetBasemap(tile) {
-		const previoustiles = document.getElementById('basemap-preview').classList[0];
-	
-		document.getElementById('basemap-preview').classList.remove(...document.getElementById('basemap-preview').classList);	
-		document.getElementById('basemap-preview').classList.add(tile);
-	
-		MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[previoustiles]);
-		MI.Atlas.map.addLayer(MI.Atlas.layerdefs[tile]);	
-		MI.Atlas.baselayer = tile;
-		
-		document.querySelectorAll('#datalayers input').forEach(el => { 
-			MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[el.value]);
-			if (el.checked) { MI.Atlas.map.addLayer(MI.Atlas.layerdefs[el.value]); }
-		});
+	    MI.Atlas.switchBasemap(MI.Atlas.glMap, tile);
 	}
 	
+	AddDataLayer(ref) {	
+		let type = ref.split('.').pop();
+		if (type === 'geojson' || type === 'pmtiles') {
+			/*let dlayer = document.createElement('div');
+			let lclass = type === 'geojson' ? 'geojson' : 'vector';
+			dlayer.classList.add('layerrow');
+
+			dlayer.innerHTML = `<label class="layercontainer"><input type="checkbox" checked class="${lclass}" value="${ref}"><span class="layercheckmark"><i class="fas"></i></span> ${ ref.replace(/(^\w+:|^)\/\//, '')}</label>`;
+			document.getElementById('userdatalayers').append(dlayer);
+			dlayer.querySelectorAll('#datalayers input[type=checkbox]').forEach(el => { el.addEventListener('click', (e) => { 
+				MI.Atlas.ProcessDataLayerFromElement(el);
+			}); 
+			});*/
+			MI.Atlas.LoadExternalDataLayer(type, ref);
+
+		} else {
+			this.ShowMessage("This data type is not supported.");
+		}
+	}
 	/** Sets interface to full screen mode **/
 	ToggleFullscreen() {
 		if (document.body.classList.contains('fullscreen')) {
@@ -365,4 +405,13 @@ class ManifestUI {
 
 	IsMobile() { return window.innerWidth > 920 ? false : true; }
 	
+	StopVideoPlayback() {
+	  let iframes = document.querySelectorAll('iframe');
+	  Array.prototype.forEach.call(iframes, iframe => { 
+		  if (iframe.contentWindow) {
+	    	  iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', 
+			  func: 'pauseVideo' }), '*');
+		}
+	 });
+	}
 }

@@ -4,12 +4,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-	<title>Manifest - Datasets</title>
+	<title>Manifest - Manifests & Other Datasets</title>
 	<meta property="og:title" content="Manifest - Datasets">
 
 	<!-- build:process -->
-	<base href="<%= baseurl %>" />	
-	<link rel="stylesheet" href="css/Manifest-static<%= minify %>.css" /> 
+	<base href="<%= baseurl %>">	
+	<link rel="stylesheet" href="<%= css_staticpath %>"> 
 	<!-- /build -->
 
 	<meta property="og:url" content="https://manifest.supplystudies.com/data/">	
@@ -24,46 +24,46 @@
 		<!-- build:section layout.launcher --><!-- /build -->
     	<!-- build:section layout.navigation --><!-- /build -->
 	</section>
-	<h1>Datasets</h1>
+	<h1>Manifest Documents</h1>
 	<section id="datawrap">	
-	    <a href="edit/" class="splash-link"><img class="splash-image small" src="images/data-splash-cut.png" width="544" height="519" alt="Image preview of the Manifest JSON format." /></a>
-	
-		<p class="callout biggertext">Manifest supports a variety of file formats, including legacy Sourcemap-style supply chains. This page provides an overview of the data currently available for public access.</p>
-	
-		<h3><a name="manifest">Manifest File Format</a></h3>
-		<p>One of the goals of Manifest is to develop <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">a standard file format</a> for the critical analysis of supply chains. The format is still under development, but you can use the <a href="edit/">Manifest Editor</a> to review the current working structure and generate your own supply chains to experiment with in the <a href="">Manifest Viewer</a>.</p>
-		<p>We may eventually offer an open respository to contribute supply chains built with the Manifest Format.</p>
-			
-		<h3><a name="cases">Case Studies and Deployments</a></h3>
-		<p>This is a collection of deployments and case studies for Manifest, including courses where Manifest was used as a class assignment. </p>
+
+		<p class="biggertext callout">Manifest has been deployed in a variety of different contexts, from academic research projects and courses to workshops for organizers and activists. This page collects only those Manifests and datasets that have been identified for broad publication.</p>
+		<p class="bigtext">One important note about this collection is that <em>Manifest is not a database</em>. User-created documents are not shared with the public Manifest install at <a href="https://manifest.supplystudies.com">manifest.supplystudies.com</a> and the documents on this page include only those that have been <em>explicitly</em> shared for publication. If you have created Manifest documents or have deployed Manifest in classrooms and workshops and would like those documents indexed here, please <a href="mailto:mhockenberry@fordham.edu">get in touch</a>.</p>
+		<section id="manifestsamples">
+			<ul id="samplelist"></ul>
+		</section>
+		
+		<h1>Other Datasets</h1>
+		<h3><a id="cases">Courses, Workshops, and Deployments</a></h3>
+		<p>This is a collection of Manifests developed as a result of courses, workshops, or in other deployments. For example, Manifest is regularly used as part of the coursework for Media Logistics at Fordham, with the final projects including a partial Manifest document of the media object investigated by a student.</p>
 	
 		<section id="manifestlist" class="dataviewer smapviewer">
 			<ul class="list">
 				<li class="entry">
-					<div class="id dot">20211</div>
+					<div class="id dot">2021-1</div>
 					<div class="name"><a href="#collection-json/cases/mego_spring2021.json">MEGO Maps ("Tracking Global Media")</a></div>
 					<div class="description fulltext">Introduction to Global Media Studies (University of Colorado Boulder, Spring 2021)</div>
 					<div class="clear"></div>
 				</li>
 				<li class="entry">
-					<div class="id dot">20212</div>
+					<div class="id dot">2021-2</div>
 					<div class="name"><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></div>
 					<div class="description fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</div>
 				</li>
                 <li class="entry">
-                    <div class="id dot">20212</div>
+                    <div class="id dot">2021-2</div>
                     <div class="name"><a href="#collection-json/cases/mediaindustries_spring2021.json">Media Industry Operations Maps</a></div>
                     <div class="description fulltext">Introduction to Media Industries (Fordham University, Spring 2021)</div>
                 </li>
 			</ul>
 		</section>
 
-		<h3><a name="smap">Sourcemap Dataset</a></h3>
-		<p>This is an index of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
+		<h3><a id="smap">Sourcemap Archive</a></h3>
+		<p>This is an archive of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
 	
 		<div id="datalist" class="dataviewer smapviewer">
-			<div id="datasort">Sort by: <span class='sort' data-sort='id'>ID</span> <span class='sort' data-sort='nm'>Name</span> or </div>
-			<input type="search" id="datasearch" class="search" placeholder="search this dataset..."  />			
+			<div id="datasort">Sort by <span class='sort' data-sort='id'>ID Number</span> , <span class='sort' data-sort='nm'>Name</span> or </div>
+			<input type="search" id="datasearch" class="search" placeholder="search this dataset...">			
 			<ul class=list></ul>
 		    <ul class="pagination"></ul>	
 		</div>
@@ -72,8 +72,8 @@
 </section>
 
 <!-- build:process -->	
-<script src="js/Manifest-lib<%= minify %>.js"></script>
-<script src="js/Manifest-data<%= minify %>.js"></script>
+<script src="<%= js_libpath %>"></script>
+<script src="<%= js_datapath %>"></script>
 <!-- /build -->
 </body>
 </html>

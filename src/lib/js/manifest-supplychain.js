@@ -19,6 +19,7 @@ class ManifestSupplyChain {
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
 		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;
 		
+		//document.getElementById('loader').style.backgroundColor = fillcolor;
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
 			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
@@ -36,11 +37,6 @@ class ManifestSupplyChain {
 		
 		document.getElementById('mheader-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowHeader(nodeid); });
 		document.getElementById('closemap-'+id).addEventListener('click', (e, nodeid=id) => { MI.Supplychain.Remove(nodeid); });
-	
-		document.querySelectorAll('#datalayers input').forEach(el => { el.addEventListener('click', (e) => { 
-			if (el.checked) { MI.Atlas.map.addLayer(MI.Atlas.layerdefs[el.value]); } 
-			else { MI.Atlas.map.removeLayer(MI.Atlas.layerdefs[el.value]); } }); 
-		});
 		
 		let supplycatmap = {}, supplycats = {};
 		for (let ft of d.features) {
@@ -55,34 +51,46 @@ class ManifestSupplyChain {
 		
 		let supplycat = document.createElement('div');
 		supplycat.id = 'supplycat-'+id; supplycat.classList.add('supplycatgroup');
-		supplycat.innerHTML = `<label class="supplycatheader">${d.properties.title} <input type="checkbox" value="chain-${id}" checked> <span class="chaincheckmark"></span> </label>`;
-		supplycat.innerHTML += 
-			`<label id="nodeheader-${id}" class="nodelineheader nodes">Nodes 
-			 <input type="checkbox" value="nodes-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
-		supplycat.innerHTML += 
-			`<label id="lineheader-${id}" class="nodelineheader lines">Lines 
-			 <input type="checkbox" value="lines-${id}" checked> <span class="nodelinecheckmark"></span> </label>`;
+		supplycat.innerHTML = `<span class="supplyrow"><label class="supplycatheader"><input type="checkbox" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span>`;
+		document.getElementById('supplycategories').append(supplycat);	
+		
+		document.getElementById('supplytoggle-'+id).addEventListener('click', (e) => { 
+			document.getElementById('supplycatsub-'+id).classList.toggle('closed');
+			document.getElementById('supplytoggle-'+id).classList.toggle('plus');
+			
+			//if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
+			//else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } 
+		});
+		
+		let supplycatsub = document.createElement('div');
+		supplycatsub.id = 'supplycatsub-'+id; supplycatsub.classList.add('supplycatsub', 'closed'); 
+		
+		supplycatsub.innerHTML += 
+			`<span class="supplyrow"><label id="nodeheader-${id}" class="nodelineheader nodes"><input type="checkbox" value="nodes-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Nodes for ${d.properties.title}</label></span>`;
+		supplycatsub.innerHTML += 
+			`<span class="supplyrow"><label id="lineheader-${id}" class="nodelineheader lines"><input type="checkbox" value="lines-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Lines for ${d.properties.title} </label></span>`;
 		
 		// TODO: Shouldn't show this if all nodes are categorized. 
 		if (Object.entries(supplycatmap).length > 1) {
-			supplycat.innerHTML += `<label class="supplycat">Uncategorized <input type="checkbox" value="cat-${id}-uncategorized" checked> <span class="supplycatcheckmark"></span> </label>`;			
+			supplycatsub.innerHTML += `<span class="supplyrow"><label class="supplycat"><input type="checkbox" value="cat-${id}-uncategorized" checked><span class="supplycatcheckmark"><i class="fas"></i></span> Uncategorized Nodes</label></span>`;			
 		}	 
 		for (const [key, value] of Object.entries(supplycatmap)) {
-			supplycat.innerHTML += `<label class="supplycat">${key} <input type="checkbox" value="cat-${id}-${key}" checked> <span class="supplycatcheckmark"></span> </label>`;
+			supplycatsub.innerHTML += `<span class="supplyrow"><label class="supplycat"><input type="checkbox" value="cat-${id}-${key}" checked><span class="supplycatcheckmark"><i class="fas"></i></span> ${key}</label></span>`;
 			supplycats[key] = [];
 		}
+		supplycatsub.innerHTML += '</span>';
 		MI.supplychains[index].categories = supplycats;
-		document.getElementById('supplycategories').append(supplycat);	
+		document.getElementById('supplycat-'+id).append(supplycatsub);	
 	
-		document.querySelectorAll('#supplycategories .supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.querySelectorAll('#supplycategories #supplycat-'+id+' .supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
 			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
 			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
 		});
-		document.querySelectorAll('#supplycategories .nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.querySelectorAll('#supplycategories #supplycat-'+id+' .nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
 			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
 			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
 		});
-		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.querySelectorAll('#supplycategories #supplycat-'+id+' .supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
 			MI.Interface.filter.clear = false;
 			MI.Interface.Search(document.getElementById('searchbar').value, true);
 		});});
@@ -112,9 +120,7 @@ class ManifestSupplyChain {
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
-			const expandedProperties = { categories: ft.properties.category.split(','), 
-				images: ft.properties.images.split('|'), 
-				sources: ft.properties.sources.split('|') };	
+			const expandedProperties = { categories: ft.properties.category.split(',') };	
 							
 			ft.properties = Object.assign(ft.properties, expandedProperties);
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
@@ -248,10 +254,10 @@ class ManifestSupplyChain {
 		<div class="pdetails">
 			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
 			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link" data-cat="cat-'+d.details.id+'-'+cat+'">'+cat+'</a>').join(" ")}</p>
-			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
+			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? new Date(Number(m.mvalue)*1000).toDateString() : '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
 
 		</div> 
-		<div class="featuredimages">${ft.properties.images.map(img => img ? '<img src="'+img+'" alt="'+ft.properties.title+' image"/>' : "").join("")}</div>
+		<div class="featuredimages">${ft.properties.images.map(img => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? '<iframe class="ftimg" src="'+img.URL+'?modestbranding=1&enablejsapi=1&rel=0&fs=0&color=white&controls=0" width="560" height="315" loading="lazy" frameborder="0"></iframe>' : '<img class="ftimg" loading="lazy" src="'+img.URL+'" title="'+(img.caption ? img.caption : ft.properties.title)+'" alt="'+(img.caption ? img.caption+'"/>' : ft.properties.title+' image"/>') ) : "").join("")}</div>
 		<div class="description">${ManifestUtilities.Linkify(ft.properties.description)}</div>
 		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 			<summary>Notes</summary>
@@ -266,28 +272,64 @@ class ManifestSupplyChain {
 			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
 				el.remove();
 	  	} }); 
+		
+		this.SetupImages(ft);
+		return ft;
+	}
+
+	SetupImages(ft) {
 		if (ft.properties.images.length > 1) {
 			document.querySelectorAll('#local_'+ft.properties.lid+' div.featuredimages')
 				.forEach(el => { 
 					el.setAttribute('data-index',0);
+					el.classList.add('multiple');
+					
+					let imagescontrols = document.createElement('div');
+					imagescontrols.classList.add('images-controls');
+					el.appendChild(imagescontrols); 
+					
 					let leftbutton = document.createElement('button');
 					leftbutton.classList.add('images-button', 'images-display-left');
 					leftbutton.innerHTML = '<i class="fas fa-caret-left"></i>';
 					leftbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, -1); });
-					el.appendChild(leftbutton); 
+					imagescontrols.appendChild(leftbutton); 
+					
+					let imagebox = document.createElement('div');
+					imagebox.classList.add('images-box');
+					imagescontrols.appendChild(imagebox); 
+					
+					for (let i in ft.properties.images) {
+						let imagespot = document.createElement('div');
+						imagespot.classList.add('images-spot');
+						imagespot.innerHTML = '<i class="far fa-circle"></i>';
+						imagespot.setAttribute('data-lid', ft.properties.lid);
+						imagespot.setAttribute('data-index', Number(i)+1);
+						imagebox.appendChild(imagespot); 
+					}
+					
+					let imagesspots = Array.from(imagebox.children);
+					imagesspots.forEach(function(spot){
+					    spot.addEventListener('click', (e) => { 
+							e.stopPropagation(); 
+							MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index);  });
+					});
 					
 					let rightbutton = document.createElement('button');
 					rightbutton.classList.add('images-button', 'images-display-right');
 					rightbutton.innerHTML = '<i class="fas fa-caret-right"></i>';
 					rightbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, 1); });
-					el.appendChild(rightbutton); 
+					imagescontrols.appendChild(rightbutton); 
 			}); 
 			MI.Interface.ImageScroll(ft.properties.lid, 1);
 		}
-		
-		return ft;
+		if (ft.properties.images.length > 0) {
+			document.querySelectorAll('#local_'+ft.properties.lid+' .ftimg').forEach(el => { el.addEventListener('click', (e) => { 
+					document.getElementById('full-modal').style.backgroundImage = 'url('+el.src+')';
+					document.getElementById('fullscreen-modal').classList.toggle('closed');
+			});});
+		}
 	}
-
+	
 	SetupLine(ft, d, index) {		
 		let fromx = ft.geometry.coordinates[0][0]; let fromy = ft.geometry.coordinates[0][1];
 		let tox = ft.geometry.coordinates[1][0]; let toy = ft.geometry.coordinates[1][1];		
@@ -493,10 +535,9 @@ class ManifestSupplyChain {
 	
 	Hide(id, hide, type='chain') {
 		if (event) { event.stopPropagation(); }
+		let offset = document.getElementById('mheader-'+id).offsetHeight, targetid = 0;
 		
-		if (type === 'chain') {
-			let offset = document.getElementById('mheader-'+id).offsetHeight, targetid = 0;
-	
+		if (type === 'chain') {	
 			if (MI.supplychains.length > 1) {
 				let prev = document.getElementById('mheader-'+id).previousElementSibling;
 				while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
@@ -515,7 +556,10 @@ class ManifestSupplyChain {
 		if (hide) {
 			if (type === 'chain') { 
 				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
-				MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); MI.Atlas.map.removeLayer(mlayer.points); }
+				MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); MI.Atlas.map.removeLayer(mlayer.points); 
+				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = false; });
+				if (document.getElementsByClassName('pop-intro').length > 0) { MI.Atlas.SetActivePoint(null, true);}
+			}
 			if (type === 'nodes') { MI.Atlas.map.removeLayer(mlayer.points); }
 			if (type === 'lines') { MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); }
 			
@@ -523,7 +567,8 @@ class ManifestSupplyChain {
 			document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
 			if (type === 'chain') { 
 				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
-				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); MI.Atlas.map.addLayer(mlayer.points); }
+				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); MI.Atlas.map.addLayer(mlayer.points); 
+				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = true; });}
 			if (type === 'nodes') { MI.Atlas.map.addLayer(mlayer.points); }
 			if (type === 'lines') { 
 				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); 
@@ -532,14 +577,16 @@ class ManifestSupplyChain {
 			}
 		}
 	
-		if (type === 'all') {
-			let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
-			let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
-			if (MI.supplychains.length !== 0) {
-				if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); }
-				else { document.getElementById('sidepanel').scrollTo(0, document.getElementById('mdetails-'+targetid).offsetTop + (-1*offset)); }
-			}
-		}	
+		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
+		let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
+		if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { 
+			MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); 
+		}
+		else { 
+			targetid = targetid === 0 ? id : targetid;
+			document.getElementById('sidepanel').scrollTo(0, document.getElementById('mdetails-'+targetid).offsetTop + (-1*offset)); 
+		}		
+		
 		MI.Atlas.Refresh();
 	}
 }

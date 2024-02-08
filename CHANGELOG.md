@@ -1,3 +1,9 @@
+##Release Notes Version 0.3.1
+
+###New Features
+* External data: Manifest now supports loading external geojson and pmtiles.
+* Vector tiles: Manifest now uses vector tiles and defaults to Maptiler tilesets.
+
 ##Release Notes Version 0.2.4
 ###New Features
 
@@ -12,5 +18,3 @@
 ###Bug Fixes
 * Improved regular expressions for url matching.
 * Google sheet import now has parity with manifest files.
-
-

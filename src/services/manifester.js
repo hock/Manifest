@@ -99,6 +99,8 @@ function Service(k) {
 							res.setHeader('Content-Type', 'application/json');
 
 							console.log('gprocessor done');
+							console.log(Manifester.g);
+							console.log(Manifester.r);
 							res.end('{"g": ' + JSON.stringify(Manifester.g) + ', "r": ' + JSON.stringify(Manifester.r) + '}');
 						})
 						.catch(function (err) {

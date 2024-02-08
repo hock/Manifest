@@ -8,13 +8,14 @@
 	<meta property="og:title" content="Manifest: Supply Chain Platform">
 
 	<!-- build:process -->
-	<base href="<%= baseurl %>" />	
-	<link rel="stylesheet" href="css/Manifest-main<%= minify %>.css" /> 
+	<base href="<%= baseurl %>">
+	<link rel="stylesheet" href="<%= css_path %>"> 
+	<script src="<%= livereload %>"></script> 
 	<!-- /build -->
 
 	<meta property="og:url" content="https://manifest.supplystudies.com/">	
 	<link rel="canonical" href="https://manifest.supplystudies.com/">
-	<!-- build:section layout.header --><!-- /build -->
+	<!-- build:section layout.header --><!-- /build -->	
 </head>
 
 <body class="light">
@@ -48,12 +49,12 @@
 	<main class="view-wrapper">
 		<div id="vizwrap" class="vizwrap closed">
 			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill="#21222c"></rect></svg>
-			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();" />		
+			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();">		
 		</div>
 		
 		<div class="searchwidget">
 			<i class="fas fa-search"></i> 
-			<input type="text" placeholder="Filter by..." id="searchbar" /> 
+			<input type="text" placeholder="Filter by..." id="searchbar"> 
 			<i id="searchclear" class="fas fa-times-circle searchclear"></i>
 		</div>
 		
@@ -63,20 +64,29 @@
 		<div id="mapcapture"><i class="fas fa-camera"></i></div>
 
 		<nav id="mapmenu-window" class="closed">
-			<h3>Map Baselayer</h3>
-			<ul id="basemap-chooser">
-				<li class="satellite"></li> <li class="terrain"></li> <li class="light"></li> <li class="google"></li>
-				<div id="basemap-preview" class="google"></div>		
-				<div class="clear"></div>		
-			</ul>
+			<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
+			
+			<div id="basemapselect">
+				<h3><label for="basemap">Map Baselayer</label></h3>
+				<select name="basemap" id="basemap-chooser"></select>
+			</div>
 			<div id="datalayers">
 				<h3>Data Layers</h3> 
-				<label class="layercontainer">Shipping Lanes <input type="checkbox" value="shipping"> <span class="layercheckmark"></span> </label>
-				<label class="layercontainer">Marine Traffic <input type="checkbox" value="marine"> <span class="layercheckmark"></span> </label>
-				<label class="layercontainer">Rail Connections <input type="checkbox" value="rail"> <span class="layercheckmark"></span> </label>
+				<p id="datalayers-description">Add Pmtiles, Geojson, or Shapefiles.</p>
+				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
+				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
+				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
+				<div id="userdatalayers"></div>
+				<div id="load-datalayers-row">
+					<input type="text" id="load-datalayers-input"><button id="load-datalayers-btn"><i class="fas fa-plus-circle"></i></button>
+				</div>
+			</div>
+			<div id="liveobjects">
+				<h3>Live Objects</h3> 
+				<ul id="liveobjectlist"></ul>
 			</div>
 			<div id="supplycategories">
-				<h3>Supply Chain Manifests</h3> 
+				<h3>Manifest Documents</h3> 
 			</div>
 		</nav>
 		<div class="map" id="map"></div>
@@ -94,7 +104,7 @@
 					<div class="notes col sort" data-sort='notes'>Additional Notes</div>
 					<div class="clear"></div>
 				</div>
-				<input type="search" id="datasearch" class="search" placeholder="Search..."  />
+				<input type="search" id="datasearch" class="search" placeholder="Search...">
 				<ul class=list id="manifestlistview"></ul>
 			    <ul class="pagination"></ul>	
 			</div>
@@ -108,16 +118,16 @@
 			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
 		</div>
 	</section>
+	<section id="fullscreen-modal" class="closed"><div id="full-modal"></div></section>
 	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	
-	<script src="js/Manifest-lib<%= minify %>.js"></script>
-	<script src="js/Manifest-main<%= minify %>.js"></script>
+	<script src="<%= js_libpath %>"></script>
+	<script src="<%= js_mainpath %>"></script>
     <!-- /build -->
 	
     <!-- build:remove -->		
 	<script src="../src/lib/json/casper.json"></script>
-	<script src="../src/lib/js/test.js"></script>
     <!-- /build -->
 
 </body>

@@ -79,13 +79,17 @@
 						"properties": {
 							"URL": {
 								"type": "string",
-								"options": { "inputAttributes": { "placeholder": "https://path.to.featured.image.jpg" } }							
+								"options": { "inputAttributes": { "placeholder": "https://path.to.image.jpg" } }							
+							},
+							"caption": {
+								"type": "string",
+								"options": { "inputAttributes": { "placeholder": "Caption for image." } }							
 							}
 						}
 					},
 					"options": { "disable_collapse": true, "disable_array_reorder": "true", "disable_array_delete_all_rows": "true", 
 								 "disable_array_delete_last_row": "true" },
-				    "default": [ { "URL": "" } ]
+				    "default": [ { "URL": "", "caption": "" } ]
 				},
 				"icon": {
 					"title": "Icon",
@@ -98,12 +102,12 @@
 					"title": "References",		
 					"type": "array",
 					"format": "table",
-					"description": "Reference URLs for the information present in the node.",					
+					"description": "A reference (which could be a URL) for the information present in the node.",					
 					"items": {
 						"title": "Reference",
 						"type": "object",
 						"properties": {
-							"URL": {
+							"source": {
 								"type": "string",
 								"options": { "inputAttributes": { "placeholder": "https://manifest.supplystudies.com/reference/" } }							
 							}
@@ -115,7 +119,7 @@
 						"disable_array_delete_all_rows": "true",
 						"disable_array_delete_last_row": "true"
 					},
-				    "default": [ { "URL": "" } ]
+				    "default": [ { "source": "" } ]
 				}
 			}
 		},      		 

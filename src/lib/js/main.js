@@ -2,25 +2,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (document.documentElement.classList.contains('no-js')) { LoadError("Browser Not Supported"); return; }
 	let options = {
 		options: true,
-		serviceurl: 'https://manifest.supplystudies.com/services/',// serviceurl: 'http://hockbook.local:3000',
+		serviceurl: '<%= mserverurl %>',
+		 //serviceurl: 'http://hockbook.local:3000/',
 		
 		view: 'interest', position: {lat: 40.730610, lng: -73.935242}, zoom: 3,
-		hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false
+		 hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false, demoMode: false
 		//		position: {lat: 40.730610, lng: -73.935242}, zoom: 3,
 
 		// color: ['000000','999999','#999999'] - passed in url params as color=000000,999999,999999
 		// visualization: ['map','forcegraph','flow','chord','listview','textview']
-		// map = [google, dark, light, terrain, satellite] 
+		// map = [default, satellite, bw] 
 		// unimplemented options in loadparams: fontsize: 20,
 		
 	};
+	options = Object.assign(options, LoadParams(options));
 	MI = new Manifest(options);
-	options = LoadParams(options);
 	
 	console.log(options);
-	if (options.storyMap) { MI.Interface.Storyize(); }
+
+	if (MI.options.storyMap) { MI.Interface.Storyize(); }
 	if (MI.options.visualization) { MI.Visualization.type = MI.options.visualization; }
-	if (MI.options.map) { MI.Interface.SetBasemap(MI.options.map); }
 
 	if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
@@ -28,11 +29,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		else { 
 			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }
 			switch (hashtype) {
-				case 'smap': fetch(MI.options.serviceurl + '?type=smap&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.options.serviceurl + '?type=smap&id=' + hashid}))
+				case 'smap': fetch(MI.options.serviceurl + 'smap/' + hashid).then(r => r.json())
+					.then(data => MI.Process('smap', data, {id: hashid, idref: hashid, url:MI.options.serviceurl + 'smap/' + hashid}))
 					.then(r => Start()); break;
-				case 'gsheet': fetch(MI.options.serviceurl + '?type=gsheet&id=' + hashid).then(r => r.json())
-					.then(data => MI.Process('gsheet', data, {id: hashid.hashCode(), idref: hashid, url: MI.options.serviceurl + '?type=gsheet&id=' + hashid}))
+				case 'gsheet': fetch(MI.options.serviceurl + 'gsheet/' + hashid).then(r => r.json())
+					.then(data => { let gsheet = {g: data[0], r: data[1] }; MI.Process('gsheet', gsheet, {id: hashid.hashCode(), idref: hashid, url: MI.options.serviceurl + '/gsheet' + hashid});})
 					.then(r => Start()).catch(e => LoadError(e)); break;
 				case 'manifest': 
 					if (hashid === 'json/manifest.json') {
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					} break;
 				default: LoadError('Option not supported');
 			}  LoadCollection("json/samples.json", false);
+			
 		}
 	} else { 
 		fetch("CHANGELOG.md").then(c => c.text()).then(changelog => LoadIntroduction(changelog, true) );
@@ -70,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		if (!MI.Interface.IsMobile()) {
 			if (sample) {
 				fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url})).then(r => Start())).then(fetch("json/manifest.json")
+				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url}))).then(fetch("json/manifest.json")
 				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ("json/manifest.json").hashCode(), url: "json/manifest.json", start:true}))
 				.then(r => Start()))
 				.catch(e => LoadError(e));
@@ -100,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		let starterstring =  d.collection[Math.floor(Math.random() * d.collection.length)].id.split("-"); 
 		let startertype = starterstring[0], starterid = [starterstring.shift(), starterstring.join('-')][1];		
-		return {url: (startertype === 'manifest') ? starterid : MI.options.serviceurl + "?type="+startertype+"&id=" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
+		return {url: (startertype === 'manifest') ? starterid : MI.options.serviceurl + startertype+"/" + starterid, type:startertype, ref:starterid, id:((startertype !== 'smap') ? starterid.hashCode() : starterid)};
 	}	
 	
 	function LoadParams(o) {
@@ -130,11 +132,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (MI.Atlas.active_point === null) { MI.Atlas.SetView(MI.options.view); }
 			if (!(MI.initialized)) { MI.Interface.CleanupInterface(); }   
 		}
-		
-		// MI.Messenger.AddObject(353136000);
-		
+
+		// Do Testing
+		if (MI.options.demoMode) { ManifestTests(); }
 	}
 	
-	// Do Testing
-	// ManifestTests(); 
+	function ManifestTests() {
+		MI.Interface.ShowMessage('Welcome to Manifest!');
+		MI.Interface.AddDataLayer('services/data/sample/roads.geojson');
+		MI.Interface.AddDataLayer('services/data/sample/countries.pmtiles');
+		MI.Messenger.AddObject(353136000);
+		//setInterval(TestLoad, 5000);
+	}
 });	

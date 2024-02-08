@@ -1,3 +1,28 @@
+@font-face {
+	font-family: 'Roboto';
+	src: url('../webfonts/Roboto-Regular.ttf') format('truetype');
+	font-style: normal;
+	font-weight: normal;
+}
+@font-face {
+	font-family: 'Roboto';
+	src: url('../webfonts/Roboto-Italic.ttf') format('truetype');
+	font-style: italic;
+	font-weight: normal;
+}
+@font-face {
+	font-family: 'Roboto';
+	src: url('../webfonts/Roboto-Bold.ttf') format('truetype');
+	font-style: normal;
+	font-weight: bold;
+}
+@font-face {
+	font-family: 'Roboto';
+	src: url('../webfonts/Roboto-BoldItalic.ttf') format('truetype');
+	font-style: italic;
+	font-weight: bold;
+}
+
 /* cyrillic-ext */
 @font-face {
   font-family: 'Roboto';

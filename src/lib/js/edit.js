@@ -33,7 +33,8 @@ function Start() {
 	// Map setup
 	let mapCenter = [40.730610,-73.935242];
 	let map = L.map('map_chooser', {center : mapCenter, zoom : 3});
-	L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', { maxZoom: 12, attribution: 'Terrain, Stamen', worldCopyJump: false }).addTo(map);
+	
+	L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}@2x.png', { maxZoom: 12, attribution: 'Terrain, Stamen', worldCopyJump: false }).addTo(map);
 	
 	let marker = L.marker( mapCenter, {
 		icon: L.divIcon({

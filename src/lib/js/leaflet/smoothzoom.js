@@ -63,14 +63,15 @@ L.Map.SmoothWheelZoom = L.Handler.extend({
 		// Edited
 		
         this._goalZoom = this._goalZoom + L.DomEvent.getWheelDelta(e) * 0.003 * map.options.smoothSensitivity;
-        if (this._goalZoom < map.getMinZoom() || this._goalZoom > map.getMaxZoom()+.03) {
+        if ((this._goalZoom <= map.getMinZoom() && L.DomEvent.getWheelDelta(e) !== 1) || (this._goalZoom >= map.getMaxZoom() && L.DomEvent.getWheelDelta(e) !== -1)) {			
             this._goalZoom = map._limitZoom(this._goalZoom);
+	        this._map._moveEnd(true);	
 			map.fire('viewreset');
         }
         this._wheelMousePosition = this._map.mouseEventToContainerPoint(e);
 
         clearTimeout(this._timeoutId);
-        this._timeoutId = setTimeout(this._onWheelEnd.bind(this), 200);
+        this._timeoutId = setTimeout(this._onWheelEnd.bind(this), 1);
 
         L.DomEvent.preventDefault(e);
         L.DomEvent.stopPropagation(e);

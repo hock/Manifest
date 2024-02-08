@@ -107,7 +107,7 @@ class ManifestVisualization {
 		
 			let rawvalues = sc.features.filter(e => e.geometry.type === 'Point');
 			for (let val of rawvalues) {
-				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: String(val.geometry.coordinates).replace(',',', '), categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
+				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: (val.geometry.coordinates[0] !== '' && val.geometry.coordinates[1] !== '') ? String(val.geometry.coordinates).replace(',',', ') : '', categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
 			}
 		}
 		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); document.getElementById('listview').classList.remove('closed');
@@ -148,15 +148,17 @@ class ManifestVisualization {
 		
 				if (MI.supplychains[s].features.length >= 1) {
 					for (let ft of MI.supplychains[s].features) {
-						md += (ft.properties.title != undefined && ft.properties.title != '') ? '### '+ft.properties.title + '\n' : '';
-						md += (ft.properties.placename != undefined && ft.properties.placename != '') ? ''+ft.properties.placename + '\n' : '';
-						md += (ft.properties.category != undefined && ft.properties.category != '') ? ''+ft.properties.category + '\n' : '';
-						md += (ft.properties.description != undefined && ft.properties.description != '') ? ''+ft.properties.description.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
-						md += (ft.properties.sources != undefined && ft.properties.sources != '') ? ''+ft.properties.sources + '\n' : '';
-						md += (ft.properties.notes != undefined && ft.properties.notes != '') ? ''+ft.properties.notes.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
+						// TODO For now we purposefully ignore lines.. If we have detailed line information we can reconsider this.
+						if (ft.geometry.type === 'Point') {
+							md += (ft.properties.title != undefined && ft.properties.title != '') ? '### '+ft.properties.title + '\n' : '';
+							md += (ft.properties.placename != undefined && ft.properties.placename != '') ? ''+ft.properties.placename + '\n' : '';
+							md += (ft.properties.category != undefined && ft.properties.category != '') ? ''+ft.properties.category + '\n' : '';
+							md += (ft.properties.description != undefined && ft.properties.description != '') ? ''+ft.properties.description.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
+							md += (ft.properties.sources != undefined && ft.properties.sources != '') ? ''+'* '+ft.properties.sources.join('\n* ') + '\n' : '';
+							md += (ft.properties.notes != undefined && ft.properties.notes != '') ? ''+ft.properties.notes.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
 			
-						md += '\n';
-			
+							md += '\n';
+						}
 					}
 				}
 				md += '\n';

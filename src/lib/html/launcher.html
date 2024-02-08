@@ -5,27 +5,27 @@
 <div id="minfodetail" class="closed">
 	<p>A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
 	<nav id="minfomenu">
-		<a href="" class="hb-menu-item"><i class="fas fa-tablet"></i>Manifest Application</a>
-		<a href="edit/" class="hb-menu-item"><i class="fas fa-edit"></i>Supply Chain Editor</a>
+		<a href="" class="hb-menu-item"><i class="fas fa-tablet"></i>Manifest: Supply Chain Platform</a>
+		<a href="edit/" class="hb-menu-item"><i class="fas fa-edit"></i>Creating Manifests</a>
 		<div class="spacer"></div>
 		
-		<a href="about/" class="hb-menu-item"><i class="fas fa-archive"></i>About</a>
-		<a href="data/" class="hb-menu-item"><i class="fas fa-table"></i>Datasets</a>
-		<a href="https://supplystudies.com/syllabus/#reversesourcing" class="hb-menu-item"><i class="fas fa-archive"></i>Curriculum</a>
+		<a href="about/" class="hb-menu-item"><i class="fas fa-archive"></i>About the Project</a>
+		<a href="data/" class="hb-menu-item"><i class="fas fa-table"></i>Manifests & Other Datasets</a>
+		<a href="https://supplystudies.com/syllabus/#reversesourcing" class="hb-menu-item"><i class="fas fa-archive"></i>Supply Studies Curriculum</a>
 		<div class="spacer"></div>
 		<a href="https://supplystudies.com/" class="hb-menu-item"><i class="fas fa-cog"></i>Supply Studies</a>
 		<a href="https://github.com/hock/Manifest" class="hb-menu-item"><i class="fab fa-github-square"></i>Github</a>
 	</nav>
-	<p id="collection-description">You can start with data from our <a href="data/">repositories</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
+	<p id="collection-description">You can start with a Manifest from our <a href="data/">collection</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
 	<div id="loadlistpanel">
 		<select name="load-samples" id="load-samples">
 		    <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
 		    <optgroup id="load-samples-custom" label="Custom Manifest"></optgroup>		
 		</select>
 		
-		<input type="text" id="load-samples-input" />
-		<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple />
-		<label for="file-input" id="file-input-label" ><i class="fas fa-upload"></i> <span id="file-input-label-text">Upload Manifest File</span></label>
+		<input type="text" id="load-samples-input">
+		<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple>
+		<label for="file-input" id="file-input-label" ><i class="fas fa-upload"></i> <span id="file-input-label-text">Upload Manifest Document</span></label>
 		
 		<button id="load-samples-btn">Load</button>
 	</div>

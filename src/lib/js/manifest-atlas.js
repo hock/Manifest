@@ -8,54 +8,52 @@ class ManifestAtlas {
 		this.maplayer = [];
 		this.active_point = null;
 		this.homecontrol = null;
+		this.glMapLoaded = false;
 		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
 		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
-		this.baselayer = 'google';
+		this.baselayer = options.map ? options.map : 'default';
 		
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
-			
+		
+		let map_tiler_key = 'v6o4lBqX0HjNRonNxTdr';
+		map_tiler_key = '3l62IEM16L7oUgCXLpag';
+		
 		this.tiletypes = {
-			GOOGLE: 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-			DARK: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',	
-			LIGHT: 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}',	
+			DEFAULT: options.serviceurl + 'maptiler/' + 'bright-v2',			
 			PROTO: 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.mvt?key=e66d42174e71874a',
-			TERRAIN: 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}',
-			SATELLITE: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',	
-			
-			SHIPPING: 'https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/ShipRoutes/MapServer/WMTS/tile/1.0.0/ShipRoutes/default/default028mm/{z}/{y}/{x}.png',
-			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=512&legends=1&zoom={z}&X={x}&Y={y}',
-			RAIL: 'https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png'
+			SATELLITE:  options.serviceurl + 'maptiler/' + 'satellite',
+			ESRI_WORLD: 'services/maps/esri-world-imagery.json',	
+			TOPO: options.serviceurl + 'maptiler/' + 'topo-v2',				
+			GRAYSCALE: options.serviceurl + 'maptiler/' + 'backdrop',				
+			BW: options.serviceurl + 'maptiler/' + 'toner-v2',				
+			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=256&legends=1&X={x}&Y={y}&zoom={z}',
 		};
-		 
+		
+		maplibregl.addProtocol("pmtiles",new pmtiles.Protocol().tile);
+        maplibregl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.1/mapbox-gl-rtl-text.js');
+		 		
 		/* Define Layers */
 		this.layerdefs = {
-			google: 	new L.TileLayer(this.tiletypes.GOOGLE, { maxZoom: 18, className: 'googlebase', detectRetina: options.retinaTiles,
-						subdomains:['mt0','mt1','mt2','mt3'], attribution: 'Terrain, Google', edgeBufferTiles: 1 }),		
-			light:		new L.TileLayer(this.tiletypes.LIGHT, {detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 18, 
-						ext: 'png', attribution: 'Toner, Stamen', edgeBufferTiles: 1  }),
-			proto: 		protomaps.leafletLayer({url:'services/protomaps.pmtiles'}),
-		
-			terrain: 	new L.TileLayer(this.tiletypes.TERRAIN, { detectRetina: options.retinaTiles, subdomains: 'abcd', minZoom: 0, maxZoom: 18, 
-						ext: 'png', attribution: 'Terrain, Stamen', edgeBufferTiles: 1  }),	
-			satellite: 	new L.TileLayer(this.tiletypes.SATELLITE, { detectRetina: options.retinaTiles, maxZoom: 18, maxNativeZoom: 18, 
-						attribution: 'Satellite, ESRI', edgeBufferTiles: 1  }),
-		 	dark: 		new L.TileLayer(this.tiletypes.DARK, { subdomains: 'abcd', maxZoom: 19, detectRetina: options.retinaTiles, 
-						attribution: 'Dark, CartoDB', edgeBufferTiles: 1  }),
+			default:	{ description: 'Default', layer: new L.maplibreGL({ style: this.tiletypes.DEFAULT, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			topo:	{ description: 'Topographic', layer: new L.maplibreGL({ style: this.tiletypes.TOPO, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			satellite:	{ description: 'Satellite Image', layer: new L.maplibreGL({ style: this.tiletypes.SATELLITE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			grayscale:	{ description: 'Grayscale', layer: new L.maplibreGL({ style: this.tiletypes.GRAYSCALE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			bw:	{ description: 'Black and White', layer: new L.maplibreGL({ style: this.tiletypes.BW, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			//proto: 		{ description:'Proto', layer: protomaps.leafletLayer({url:'services/protomaps.pmtiles'})},
+		};		
 
-			shipping: 	new L.TileLayer(this.tiletypes.SHIPPING, { maxNativeZoom: 6, detectRetina: true, className: 'shippinglayer',
-					 	bounds:L.latLngBounds( L.latLng(-60, -180), L.latLng(60, 180)), attribution: '[ARCGIS Data]' }),
-			marine: 	new L.TileLayer(this.tiletypes.MARINE, { maxZoom: 19, tileSize: 512, detectRetina: options.retinaTiles, 
-						className: 'marinelayer', attribution: '[Marinetraffic Data]' }),
-			rail: 		new L.TileLayer(this.tiletypes.RAIL, { maxZoom: 19, detectRetina: options.retinaTiles, className: 'raillayer', 
-						attribution: '[OpenStreetMap Data]' })		
+		this.vdatalayers = {
+			shippinglanes: {id: 'shippinglanes', url: 'pmtiles://services/data/shippinglanes.pmtiles', type: 'vector', sourcelayer: 'Shipping_Lanes_v1', paintrules: { 'line-color': '#1a3d68', 'line-width': 3, 'line-opacity': 0.1 }, layertype: 'line'},
+			railroads: {id: 'railroads', url: 'pmtiles://services/data/railroads.pmtiles', type: 'vector', sourcelayer: 'globalrailways1', paintrules: { 'line-color': '#684519', 'line-width': 1, 'line-opacity': 0.6 }, layertype: 'line'},
+			marinetraffic: {id: 'marinetraffic', tiles: this.tiletypes.MARINE, type: 'raster', tileSize: 256, minZoom: 3, maxZoom: 18, paintrules: { 'raster-saturation': -1, 'raster-opacity': 0.75 }, layertype: 'line'}
 		};
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 8 },
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 9 },
 			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
 			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
-			'live': { rotation: 0, width: 16, height: 10, color: '#f9dbde', fillColor: '#FF0080', weight: 2, opacity: 1, fillOpacity: 1 }	
+			'live': { rotation: 0, width: 16, height: 10, color: '#dbedf9', fillColor: '#2196F3', weight: 2, opacity: 1, fillOpacity: 1 }	
 		};
 		this.radius = 10;
 		
@@ -67,8 +65,54 @@ class ManifestAtlas {
 		this.map.on('tooltipopen', (e) => { this.TooltipOpen(e); });
 		this.map.on('tooltipclose', (e) => { this.TooltipOpen(e); });
 		
-		if (document.body.classList.contains('dark')) { this.baselayer = 'dark'; }	
-		this.map.addLayer(this.layerdefs[this.baselayer]); 
+		//if (document.body.classList.contains('dark')) { this.baselayer = 'dark'; }	
+		this.map.addLayer(this.layerdefs[this.baselayer].layer); 
+		
+		for (let l in this.layerdefs) {	
+			let option = document.createElement('option'); option.value = l; option.textContent = this.layerdefs[l].description; 
+			document.getElementById('basemap-chooser').append(option);
+		}
+		// glMap Setup
+		this.glMap = this.layerdefs[this.baselayer].layer._glMap;
+		this.glMap.on('load', (e) => { 
+			for (let vl in MI.Atlas.vdatalayers) {
+				if (MI.Atlas.vdatalayers[vl].type === 'vector' && MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) === undefined) {
+					MI.Atlas.glMap.addSource('mlayer-'+MI.Atlas.vdatalayers[vl].id, {
+				      type: 'vector',
+				      url: 'pmtiles://services/data/'+MI.Atlas.vdatalayers[vl].id+'.pmtiles'
+				  	});	
+				} else if (MI.Atlas.vdatalayers[vl].type === 'raster' && MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) === undefined) {
+					MI.Atlas.glMap.addSource('mlayer-'+MI.Atlas.vdatalayers[vl].id, {
+						type: 'raster',
+						tiles: [MI.Atlas.vdatalayers[vl].tiles],
+						tileSize: MI.Atlas.vdatalayers[vl].tileSize
+				  	});	
+				}
+			}
+			/*
+			this.glMap.addSource("we-map-1927-source", {
+			        "type": "image",
+			        "url": "./json/samples/westernelectric/we-map-1927.png",
+			        "coordinates": [
+			            [-180, 85],
+			            [180, 85],
+			            [180, -85],
+			            [-180, -85]
+			        ]
+			    });
+			this.glMap.addLayer({
+				    "id": "overlay",
+				    "source": "we-map-1927-source",
+				    "type": "raster",
+				    "paint": {
+				        "raster-opacity": 1
+				    }
+				});
+			*/
+			
+			MI.Atlas.glMapLoaded = true;
+		});		
+
 	}
 	
 	Refresh() { this.map._renderer._redraw(); }
@@ -103,7 +147,7 @@ class ManifestAtlas {
 	}
 	
 	RenderIntro(feature, layer) {		
-		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
+		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;		
 				
 		popupContent = `
@@ -130,7 +174,7 @@ class ManifestAtlas {
 	
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
-		let bgimg = MI.Atlas.getTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
+		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
 
 		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
@@ -158,6 +202,7 @@ class ManifestAtlas {
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
+					<p class="closed">${ft.properties.category} | ${ft.properties.placename}</p>
 					<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(ft.properties.description))}</p>
 				</div>`;
 			}
@@ -248,8 +293,12 @@ class ManifestAtlas {
 			let offset = 0;
 			let prev = document.getElementById('local_'+id).parentElement.previousElementSibling;
 			while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
-		
-			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+id).offsetTop + (-1*offset), behavior: speed});	
+			
+			if (!MI.initialized) {
+				document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
+			} else {
+				document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+id).offsetTop + (-1*offset), behavior: speed});	
+			}
 		}
 	}
 	
@@ -352,17 +401,22 @@ class ManifestAtlas {
 		}	
 	}
 	
-	SetActivePoint(pt) {
-		if (pt) {
-			this.active_point = pt;
-			let latlng = pt._latlng ? pt._latlng : pt._popup._latlng;
-			this.homecontrol.setHomeCoordinates(this.GetOffsetLatlng(latlng, 3));
+	SetActivePoint(pt, clear=false) {
+		if (clear === true) {
+			if (this.active_point !== null && this.active_point.closePopup) { this.active_point.closePopup(); } 
+			return null;
+		} else {
+			if (pt) {
+				this.active_point = pt;
+				let latlng = pt._latlng ? pt._latlng : pt._popup._latlng;
+				this.homecontrol.setHomeCoordinates(this.GetOffsetLatlng(latlng, 3));
+			}
+			else {
+				this.active_point = null;
+				this.homecontrol.setHomeCoordinates(new L.LatLng(MI.options.position.lat,MI.options.position.lng));		
+			}	
+			return this.active_point;
 		}
-		else {
-			this.active_point = null;
-			this.homecontrol.setHomeCoordinates(new L.LatLng(MI.options.position.lat,MI.options.position.lng));		
-		}	
-		return this.active_point;
 	}
 	
 	/** A centering function that focuses on the first point of a supply chain **/
@@ -405,11 +459,146 @@ class ManifestAtlas {
 		return newRadius;
 	}
 
-	getTileImage(lat, lon, zoom) {
+	async switchBasemap(map, tile) {
+		let style = MI.Atlas.tiletypes[tile.toUpperCase()];
+		let def = MI.Atlas.layerdefs[tile.toLowerCase()];
+		
+		await until(_ => MI.Atlas.glMapLoaded === true);
+
+	    const layers = map.getStyle().layers;
+	    const sources = map.getStyle().sources;
+	    const filteredLayers = layers.filter(obj => { return obj.source !== undefined ? obj.source.includes('mlayer-') : false; });
+
+		const filteredSources = {};
+		for (let src of (Object.keys(sources))) { if (src.substr(0, 6) === 'mlayer') { filteredSources[src] = sources[src]; }}
+	
+	    fetch(style).then(r => r.json()).then(s => {
+	        const newStyle = s;
+	        newStyle.layers = [...newStyle.layers, ...filteredLayers];
+	        newStyle.sources = Object.assign(newStyle.sources, filteredSources); 
+	        map.setStyle(newStyle);
+			console.log(def);
+			document.querySelectorAll('.leaflet-control-attribution').forEach(el => { el.innerHTML = def.layer.options.attribution; });
+		});
+	}
+	
+	ProcessDataLayerFromElement(el, clear=false) {
+		if (el.classList.contains('vector')) {
+			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) === undefined) { 		
+				MI.Atlas.glMap.addLayer({
+					'id': MI.Atlas.vdatalayers[el.value].id,
+					'type': MI.Atlas.vdatalayers[el.value].layertype,
+					'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
+					'source-layer': MI.Atlas.vdatalayers[el.value].sourcelayer,
+					'paint': MI.Atlas.vdatalayers[el.value].paintrules
+				});	
+			} 
+			else { 
+				if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id); } } 
+		} else if (el.classList.contains('geojson')) {
+			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-point') === undefined && 
+				MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-line') === undefined &&
+				MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-poly') === undefined) { 	
+					MI.Atlas.glMap.addLayer({
+						'id': MI.Atlas.vdatalayers[el.value].id+'-point',
+						'type': 'circle',
+						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
+						'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' },
+						'filter': ['==', '$type', 'Point']
+					});	
+				
+					MI.Atlas.glMap.addLayer({
+						'id': MI.Atlas.vdatalayers[el.value].id+'-line',
+						'type': 'line',
+						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
+						'paint': { 'line-color': '#ff69b4', 'line-width': 2 },
+						'filter': ['==', '$type', 'LineString']
+					});	
+				
+					MI.Atlas.glMap.addLayer({
+						'id': MI.Atlas.vdatalayers[el.value].id+'-poly',
+						'type': 'fill',
+						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
+						'paint': { "fill-color": "#ff69b4" },
+						'filter': ['==', '$type', 'Polygon']
+					});	
+			} 
+			else { if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-point') !== undefined || 
+					 MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-line') !== undefined ||
+					 MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-poly') !== undefined) { 
+						 
+					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-point'); 
+					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-line'); 
+					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-poly'); 
+				} 
+			} 
+		} else {
+			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) === undefined) { 		
+				MI.Atlas.glMap.addLayer({
+					'id': MI.Atlas.vdatalayers[el.value].id,
+					'type': 'raster',
+					'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
+					'paint': MI.Atlas.vdatalayers[el.value].paintrules,
+					'minzoom': MI.Atlas.vdatalayers[el.value].minZoom,
+					'maxzoom': MI.Atlas.vdatalayers[el.value].maxZoom
+				});	
+			} 
+			else { if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id); } } 
+		}
+	}
+	LoadExternalDataLayer(type, ref) {
+		switch(type) {
+			case 'geojson': fetch(ref).then(r => r.json()).then(geojson => MI.Atlas._addGeojson(geojson,ref)); break;
+			case 'pmtiles': 
+				const p = new pmtiles.PMTiles(ref);
+				p.getMetadata().then(h => {					
+					for (let l in h.tilestats.layers) {		
+						let ltype = l.geometry === 'LineString' ? 'line' : 'fill';
+						let lpaint = ltype === 'line' ? { 'line-color': '#ff69b4', 'line-width': 2 } : { "fill-color": "#ff69b4" };
+						MI.Atlas._addPMTile(h.tilestats.layers[l], h.tilestats.layers[l].layer+'-'+l, ref, ltype, lpaint);
+						
+					}
+				}); break;
+		}	
+	}
+	_addPMTile(l, id, ref, type, paint) {
+		if (MI.Atlas.glMap.getSource('mlayer-'+'udl_'+id) === undefined) {
+			MI.Atlas.vdatalayers['udl_'+id] = {id: 'udl_'+id, url: 'pmtiles://'+ref, type: 'vector', layertype: type, sourcelayer: l.layer, paintrules: paint};			
+			MI.Atlas.glMap.addSource('mlayer-'+'udl_'+id, { type: 'vector', url: "pmtiles://"+ref });
+		
+			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
+			dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${id}`;
+			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+id; dcheck.value = 'udl_'+id; dcheck.classList.add('vector');
+
+			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
+			document.getElementById('userdatalayers').appendChild(dlayer); dlayer.appendChild(dcontainer); dcontainer.prepend(dcheck); 
+		
+			if (MI.Atlas.glMapLoaded) {MI.Atlas.ProcessDataLayerFromElement(dcheck);}
+		} else {
+			MI.Interface.ShowMessage('Data source already added.');
+		}
+	}
+	_addGeojson(geojson, ref) {
+		if (MI.Atlas.glMap.getSource('mlayer-udl_'+ref) === undefined) {
+			MI.Atlas.vdatalayers['udl_'+ref] = {id: 'udl_'+ref, data: ref, type: 'geojson', sourcelayer: ref};			
+			MI.Atlas.glMap.addSource('mlayer-udl_'+ref, { type: 'geojson', data: geojson });
+		
+			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
+			dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${ref}`;
+			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+ref; dcheck.value = 'udl_'+ref; dcheck.classList.add('geojson');
+
+			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
+			document.getElementById('userdatalayers').appendChild(dlayer); dlayer.appendChild(dcontainer); dcontainer.prepend(dcheck); 
+		
+			if (MI.Atlas.glMapLoaded) {MI.Atlas.ProcessDataLayerFromElement(dcheck);}
+		} else {
+			MI.Interface.ShowMessage('Data source already added.');
+		}		
+	}
+	GetTileImage(lat, lon, zoom) {
 	    let xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 	    let ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * (1<<zoom) ));
-		
-		return "https://stamen-tiles-c.a.ssl.fastly.net/toner-lite/"+zoom+"/"+xtile+"/"+ytile+".png";
+		return 'https://tiles.stadiamaps.com/tiles/stamen_toner/'+zoom+'/'+xtile+'/'+ytile+'@2x.png';
 	}
 	
 	/** Cycle through the colors for supply chains randomly **/

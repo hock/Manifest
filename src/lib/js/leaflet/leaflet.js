@@ -5590,7 +5590,7 @@
 
   		// @option prefix: String = 'Leaflet'
   		// The HTML text shown before the attributions. Pass `false` to disable.
-  		prefix: '<a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>'
+  		prefix: ''
   	},
 
   	initialize: function (options) {
@@ -12468,13 +12468,31 @@
 		//else 
 		if (layer.feature.properties.style.img) { this._ctx.drawImage(layer.feature.properties.style.img.el, p.x - r / 2, p.y - r / 2, r, r); }
 		else { 
-			ctx.font = layer.feature.properties.style.fontsize+"px Arial"; ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; ctx.textAlign = "center";
+			ctx.font = layer.feature.properties.style.fontsize+"px Roboto"; ctx.fillStyle = "rgb(255, 255, 255)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
 			if (layer.feature.properties.clustered.length > 0) {
 				this._ctx.drawImage(MI.Atlas.clusterimg.el, p.x - r / 2, p.y - r / 2, r, r);
 			} else {
-				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y+(layer.feature.properties.style.fontsize/3));
+				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y);
 			}
 		}
+		/*
+		if (!layer.feature.properties.clustered.length > 0) {
+	  		ctx.beginPath();
+			ctx.font = "12px Arial"; ctx.fillStyle = "rgb(255, 255, 255)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+			
+			let textheight = Number(ctx.measureText(String(layer.feature.properties.title)).actualBoundingBoxAscent) + Number(ctx.measureText(String(layer.feature.properties.title)).actualBoundingBoxDescent)+10;
+			let textascent = Number(ctx.measureText(String(layer.feature.properties.title)).actualBoundingBoxAscent);
+			let textwidth = Number(ctx.measureText(String(layer.feature.properties.title)).width)+10;
+
+			console.log(realradius);
+			ctx.roundRect(p.x-textwidth/2,p.y+r/2,textwidth,textheight, [10]);
+	  		this._fillStroke(ctx, layer);
+			
+			ctx.font = "12px Arial"; ctx.fillStyle = "rgb(255, 255, 255)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+			
+			ctx.fillText(String(layer.feature.properties.title),p.x,p.y+realradius/2+textheight/2);
+		}
+		*/
   	},
 
   	_fillStroke: function (ctx, layer) {

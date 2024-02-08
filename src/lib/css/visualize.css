@@ -402,6 +402,27 @@ body.light.storymap #sidepanel {
 	position:initial;
 }
 
+body.storymap #storybanner {
+	background: #4d34db;
+	border: #4d34db solid 0.2rem;
+	color:#fff;
+	
+	z-index: 50000;
+	position: absolute;
+	font-size: 2rem;
+	padding: 0.8rem 1.2rem;
+	margin: 1rem;
+	border-radius:1rem;
+	left: 0;
+	bottom:0;
+	cursor:pointer;
+}
+body.storymap #storybanner:hover {
+	color:#4d34db;
+	border-color:#4d34db;
+	background:#fff;
+}
+
 .storymap #manifestlist .mtitle a {
 	width: auto;
 	display: initial;
@@ -411,19 +432,21 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	filter: none;
 }
 .storymap #manifestlist .mtitle {
-	padding: 1rem;
+	padding: 2rem;
 	font-size: 2rem;
 	background:#fff;
-	margin:1rem 1rem 0 1rem;
-	border-radius:1rem 1rem 0 0;
+	width:40%;
+	margin:1rem 1rem 0 0;
+	border-radius:0 1rem 0 0;
 	
 }
 .storymap #manifestlist .mdescription {
 	font-size:1.25rem;
-	padding:1rem;
+	width: 40%;
+	padding: 2rem;
 	box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px;
-	margin: 0 1rem 100vh 1rem;
-	border-radius: 0 0 1rem 1rem;
+	margin: 0 1rem 15vh 0;
+	border-radius: 0 0 1rem 0;
 	
 }
 .storymap #manifestlist li {
@@ -440,28 +463,29 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 	border-radius:1rem 0 0 1rem;
 }
-
-.storymap #manifestlist li .pdetails p.placename {
-	display:block;
+.storymap #manifestlist .mlist > li + li {
+	margin-top:75vh; margin-bottom:75vh;
 }
 
-.storymap #manifestlist .mlist > li .description {
-	text-align:justify;
-}
+.storymap #manifestlist li .pdetails p.placename { display:block; }
+
+.storymap #manifestlist .mlist > li .description { text-align:justify; } 
+.storymap #manifestlist ul.mlist .featuredimages { height:auto; } 
+.storymap.light #manifestlist ul.mlist .featuredimages { background:none; } 
+.storymap #manifestlist ul.mlist .featuredimages.multiple { padding-bottom:0; }
 .storymap #manifestlist .mlist > li .featuredimages img {
-	width:100vw;
-	margin-top:0.5rem;
+	/*margin-top:0.5rem;
 	margin-bottom:0.5rem;
-	margin-left:calc(-60vw - 1rem);
+	/*margin-left:calc(-60vw - 1rem);
+	width:100vw;
 	border-top:2px solid rgba(0, 0, 0, 0.25);
-	border-bottom:2px solid rgba(0, 0, 0, 0.25);
+	border-bottom:2px solid rgba(0, 0, 0, 0.25);*/
 }
-.storymap #manifestlist .mlist > li * {
-	font-size:1rem;
-}
-.storymap #manifestlist .mdescription * {
-	font-size:1.25rem;
-}
+
+.storymap #manifestlist ul.mlist .featuredimages .ftimg { object-fit:contain; object-position:center center; height:auto; min-height:auto; width:100%; max-height:75vh;}
+
+.storymap #manifestlist .mlist > li * { font-size:1rem; }
+.storymap #manifestlist .mdescription * { font-size:1.25rem; }
 
 .storymap #manifestlist h5.mdetail_title { font-size:2rem; padding-top:1rem; line-height:initial;}
 
@@ -521,7 +545,7 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	
 	.vizsvg {position:relative;height:100%;width:100%;display:block;}
 	.vizmenu, body.light .vizmenu { background:none; border:none; }
-	.vizmenu { position: absolute; display:block; box-shadow:none; padding:0;  top: 0.5rem; right:1rem;  z-index:13000;} 
+	.vizmenu { position: absolute; display:block; box-shadow:none; padding:0;  top: 0.75rem; right:1rem;  z-index:13000;} 
 
 	.vizmenu-entry { padding:0; display:inline-block; float:none; background:none; border-color:#fff;}
 	.vizmenu-entry select {width:100%; }
@@ -531,10 +555,23 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	.vizmenu #measure-choices { margin-right:0;}
 	.vizmenu-label { display:none;}
 		
-	#textview, #listview {font-size:1rem;top:3.5rem;height:calc(100% - 3.5rem);width:100%;position:absolute;padding:0.2rem 1rem;}
-	#datasearch { left:2rem; width:20rem;}
+	#textview, #listview {font-size:1rem;top:3.5rem;height:calc(100% - 3.5rem);width:calc(100% - 2rem);position:absolute;padding:0.2rem 1rem;}
+	#datalist {
+	    margin: 1rem 0.5rem;
+	    overflow: auto;
+	    height: calc(100% - 1.5rem);
+	}
 	#datalist .pagination { left:24rem;}
 	.dataviewer ul li.entry div.description, #datasort .sort.description { width:10%;}	
 	.dataviewer ul li.entry div.col, #datasort .sort { border-right:none;}
+	.dataviewer ul li.entry div.col {
+	    width: 100%;
+		height:auto;
+	}
+	.dataviewer ul li.entry div.description, #datasort .sort.description { width: 100%; }
+	.dataviewer ul li.entry div.index { width:100%; }
+	#datasort {display:none;}
+	.dataviewer ul.pagination{display:block;position:static;}
+	#datasearch{position:static; width:100%;}
 
 }

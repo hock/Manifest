@@ -1,6 +1,7 @@
 /* Manifest =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
+
 /* Manifest Base Classes /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /** Manifest Class **/
@@ -8,7 +9,7 @@ class Manifest {
 	constructor(options) {
 		this.options = options;
 		// Default options (passed from main.js)
-		// options = { serviceurl: 'https://manifest.supplystudies.com/services/', hoverHighlight: false, retinaTiles: false };
+		// options = { hoverHighlight: false, retinaTiles: false };
 
 		this.initialized = false;
 		this.changelog = 'no notes';
@@ -30,8 +31,8 @@ class Manifest {
 		switch(type) {
 			case 'manifest': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
-			case 'smap': this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP(d.g, options))); 
-				this.SMAPGraph(d.r, Object.assign(options, {style: d.g.details.style})); break;
+			case 'smap': this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP(d.geo, options))); 
+				this.SMAPGraph(d.graph, Object.assign(options, {style: d.geo.details.style})); break;
 			case 'yeti': this.Supplychain.Map(this.Supplychain.Setup(this.FormatYETI(d, options))); break;
 			case 'gsheet': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
@@ -45,7 +46,8 @@ class Manifest {
 		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, options: options, details: {id: options.id, url: '#manifest-'+options.url, layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {
-			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s.URL;}).join(','), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.URL;}).join(','), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s;}), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.source;}), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
+
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
 			d.stops.push({ local_stop_id:Number(n.overview.index), id:Number(n.overview.index), attributes:ft.properties, geometry:ft.geometry });
 			if (n.attributes.destinationindex !== '') {
@@ -67,6 +69,9 @@ class Manifest {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
 		d.details = options; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
 		d.details.url = '#smap-'+options.idref;
+		for (let ft of d.features) {
+			ft.properties.images = ft.properties.sources = [''];
+		}
 		return d;
 	}
 
@@ -90,7 +95,22 @@ class Manifest {
 			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
 			
 			for (let n of sheetpoints) {
-				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images, icon: n.icon ? n.icon : '', color: n.color ? n.color : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split(';').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources, notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images.split('),('), icon: n.icon ? n.icon : '', color: n.color ? n.color : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split('),(').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0], mvalue:s.split(',')[1], munit:s.split(',')[2]};}}) : [], sources: n.sources.split('),('), notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				if (ft.properties.sources.length !== 1 || (ft.properties.sources[0].charAt(0) === '(' && ft.properties.sources[ft.properties.sources.length-1].slice(-1) === ')')) { 
+					ft.properties.sources[0] = ft.properties.sources[0].slice(1); 
+					ft.properties.sources[ft.properties.sources.length-1] = ft.properties.sources[ft.properties.sources.length-1].slice(0,-1);
+				}
+				if (ft.properties.images.length !== 1 || (ft.properties.images[0].charAt(0) === '(' && ft.properties.images[ft.properties.images.length-1].slice(-1) === ')')) { 
+					ft.properties.images[0] = ft.properties.images[0].slice(1); 
+					ft.properties.images[ft.properties.images.length-1] = ft.properties.images[ft.properties.images.length-1].slice(0,-1);
+				}
+				ft.properties.images = ft.properties.images.map(function(i) { 
+					let icap = i.split('|'); if (icap.length <= 1) { return { URL: icap[0] }; } else { return {URL: icap[0], caption: icap[1] }; }});
+				if (ft.properties.measures.length !== 0 && ft.properties.measures[0].mtype.charAt(0) === '(' && ft.properties.measures[ft.properties.measures.length-1].munit.slice(-1) === ')') { 
+					ft.properties.measures[0].mtype = ft.properties.measures[0].mtype.slice(1); 
+					ft.properties.measures[ft.properties.measures.length-1].munit = ft.properties.measures[ft.properties.measures.length-1].munit.slice(0,-1);
+				}				
+				
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
 					let hops = n.destinationindex.replace(' ', '').split(',');
@@ -325,20 +345,40 @@ class Manifest {
 		return true;
 	}
 	
-	ExportManifest(d, filename, format) {
+	_saveMapImage(gl, branding=false) {
+		MI.Atlas.glMap.prepareSaveImage = false;
+		
+		let canvas = document.createElement('canvas');
+		let markers = document.querySelectorAll('.leaflet-overlay-pane canvas')[0];
+	    canvas.width =  MI.Atlas.map.getSize().x;
+	    canvas.height =  MI.Atlas.map.getSize().y;
+		let composite = canvas.getContext('2d');
+		
+        composite.drawImage(gl._actualCanvas, 0, 0, MI.Atlas.map.getSize().x, MI.Atlas.map.getSize().y);
+		composite.drawImage(markers, 0, 0, MI.Atlas.map.getSize().x, MI.Atlas.map.getSize().y);
+		
+		if (branding) {
+			composite.fillStyle = '#4d34db';
+			composite.strokeStyle = "black";
+			composite.fillRect(0, 0, 330, 55);
+
+			composite.textBaseline = "top";
+			composite.font = "20px Roboto, Helvetica, sans-serif";
+			composite.fillStyle = "white";
+			composite.fillText("M", 10, 8);
+		}
+		let link = document.createElement('a');
+		link.download = 'test.png';
+		link.href = 	composite.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+		link.click();
+		
+	}
+	 ExportManifest(d, filename, format) {
 		let a = document.createElement('a');
-	
+		
 		if (format === 'map') {
-			try {
-				MI.Interface.ShowLoader();
-				leafletImage(MI.Atlas.map, function(err, canvas) {			
-					let link = document.createElement('a');
-					link.download = filename+'.png';
-					canvas.toBlob(function(blob){ link.href = URL.createObjectURL(blob); link.click(); },'image/png');
-					MI.Interface.ClearLoader();
-				});
-			} catch(e) { }
-			  		
+			MI.Atlas.glMap.prepareSaveImage = true;
+			MI.Atlas.glMap.triggerRepaint(); 
 		} else if (format === 'json') {
 			let json = '';
 			if (d.mtype === 'smap') { json = this._smapToManifest(d); } 
@@ -361,7 +401,7 @@ class Manifest {
 			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
 			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
 				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates.reverse().join(',')},
-				attributes:{destinationindex:[],image:[{URL:''}],sources:[{URL:''}]}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+				attributes:{destinationindex:[],image:node.ref.properties.images,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
 			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
 			s.nodes[Number(node.id.split('-')[1])] = n;
 		}
@@ -403,7 +443,7 @@ class Manifest {
 			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
 			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
 				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates.reverse().join(',')},
-				attributes:{destinationindex:[],image:[{URL:''}],sources:[{URL:''}]}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+				attributes:{destinationindex:[],image:[{URL:''}],sources:[{source:''}]}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
 			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
 			s.nodes[Number(node.id.split('-')[1])] = n;
 		}
@@ -450,64 +490,57 @@ class Manifest {
 
 class ManifestMessenger {
 	constructor(atlas) {
-		this.interval = null;
-		this.objects = [];
+		this.rate = 300000;
+		this.interval = setInterval(this.Update, this.rate);
+		this.objects = {};
 		
 		atlas.livelayer = new L.layerGroup();
-		atlas.map.addLayer(atlas.livelayer);		
+		atlas.map.addLayer(atlas.livelayer);				
 	}
 
-
 	Add(url, callback) {
-		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects.push(obj); console.log(this.objects);}); 
+		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects[obj.oid] = obj; console.log(this.objects);}); 
 	}
 	
 	AddObject(oid) {
-		let call = 'https://manifest.supplystudies.com/services/?type=aprsfi&id='+oid;
+		let call = MI.options.serviceurl+'aprsfi/vessel/'+oid;
 		this.Add(call, function(d) {
-			let vessel = {name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
+			console.log(d);
+			let vessel = {oid: oid, name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
 			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
-			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #FF0080;">The vessel ${vessel.name}</div>`;
+			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #2196F3;">The vessel ${vessel.name} (${d.entries[0].lat},${d.entries[0].lng})</div>`;
+			let marker = new L.triangleMarker(vessel.latlng, vessel.style);
+			marker.feature = {properties: {hidden: false}};
+			marker.bindTooltip(tooltipContent);
 			vessel.service = call;
-			vessel.mapref = MI.Atlas.livelayer.addLayer(new L.triangleMarker(vessel.latlng, vessel.style).bindTooltip(tooltipContent));
+			vessel.mapref = MI.Atlas.livelayer.addLayer(marker);
+			
+			let liveobject = document.createElement('li');
+			liveobject.classList.add('liveobject'); liveobject.id = 'lo-'+d.entries[0].lat+'|'+d.entries[0].lng;
+			liveobject.innerHTML = `${vessel.name} (${d.entries[0].lat},${d.entries[0].lng})`;
+			document.getElementById('liveobjectlist').append(liveobject);
+			
+			document.querySelectorAll('.liveobject').forEach(el => { el.addEventListener('click', (e) => { 
+				let ll = el.id.substring(3).split('|');
+				MI.Atlas.SetActivePoint(null, true);
+				console.log(ll);
+				MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng(new L.latLng(ll[0],ll[1]))); 
+				
+			});});
+			
 			return vessel;
 		});
 	}
 	
 	Update() {
-		
-	}
-	UpdateList() {
-		
+		MI.Atlas.livelayer.clearLayers();
+		const listlist = document.getElementById("liveobjectlist");
+		while (listlist.firstChild) {
+			listlist.removeChild(listlist.lastChild);
+		}
+		for (let obj in MI.Messenger.objects) {
+			MI.Messenger.AddObject(MI.Messenger.objects[obj].oid);
+		}
+	
 	}
 }
-
-/* Manifest Utility Class */
-class ManifestUtilities {
-	constructor() {
-		this.markdowner = new showdown.Converter();	
-		
-		let customClassExt = {
-		    type: 'output',
-		    filter: function (text) {
-		        return text
-		            .replace(/<p>\[\.([a-z0-9A-Z\s]+)\]<\/p>[\n]?<(.+)>/g, `<$2 class="$1">`)
-		            .replace(/<(.+)>\[\.([a-z0-9A-Z\s]+)\]/g, `<$1 class="$2">`)            
-					.replace(/class="(.+)"/g, function (str) { if (str.indexOf("<em>") !== -1) { return str.replace(/<[/]?em>/g, '_'); } return str; });
-		    }
-		};
-		this.markdowner.addExtension(customClassExt);
-	}
-	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
-	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(https?:\/\/[^\s"]+)/gi; }
-	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(manifest?:\/\/[^\s"]+)/gi; }
-	static RemToPixels(rem) { return rem * parseFloat(getComputedStyle(document.documentElement).fontSize); }
-}
-
-/* Utility functions */
-String.prototype.hashCode = function() {
-  let hash = 0, i, chr;
-  if (this.length === 0) return hash;
-  for (let i = 0; i < this.length; i++) { chr = this.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; }
-  return Math.abs(hash);
-};

@@ -8,8 +8,8 @@
 	<meta property="og:title" content="Manifest - About">
 
 	<!-- build:process -->
-	<base href="<%= baseurl %>" />	
-	<link rel="stylesheet" href="css/Manifest-static<%= minify %>.css" /> 
+	<base href="<%= baseurl %>">	
+	<link rel="stylesheet" href="<%= css_staticpath %>"> 
 	<!-- /build -->
 
 	<meta property="og:url" content="https://manifest.supplystudies.com/about/">	
@@ -17,7 +17,7 @@
 	<!-- build:section layout.header --><!-- /build -->
 </head>
 
-<body class="textpage">
+<body class="textpage aboutpage">
 <div id="infoborder"></div>
 <section id="infowrap">
 	<section id="textbar">			
@@ -26,43 +26,116 @@
 	</section>	
 	<h1>About Manifest</h1>
 	<section id="aboutwrap">
-		<a class="splash-link"><img class="splash-image" src="images/about-splash-cut.png" width="640" height="765" alt="Image preview of the Manifest interface"/></a>
+		<!-- a class="splash-link"><img class="splash-image" src="images/about-splash-cut.png" width="640" height="765" loading="lazy" alt="Image preview of the Manifest interface"/></a -->
 	
 		<p class="callout biggertext">Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
-	
-		<p class="bigtext">Professional logistics platforms developed by companies like SAP, Oracle, and IBM are incredibly complex, suited to global networks with hundreds of suppliers in dozens of countries. These systems interface with numerous data sources, with powerful capabilities for controlling the world's material distribution in the name of "supply chain management." Manifest is not one of these. Similarly, there are many tools available for detailed statistical evaluation, graph analysis, and geospatial modeling. And while Manifest can work in concert with these tools, its primary purpose is to:</p>
-		<ul class="dotlist">
-			<li><div class="listdot"></div>Provide common data standards for describing and sharing supply chains or similar material networks, along with a simple editor modeled on these standards.</li>
-			<li><div class="listdot"></div>Develop a flexible geospatial viewer for supply chain data that is transparent, interactive, and simple to understand, with support for specialized data views (graph relationships, etc.).</li>	
-			<li><div class="listdot"></div>Support basic analytic tools for evaluating and comparing critical supply chain measures.</li>														
-		</ul>
-		<p class="bigtext">The result is (hopefully) a system that is more flexible--someone using Manifest might find it valuable to map very high level connection, or to include "materials" not normally present in an industrial logistics platform. In pursuit of these goals, Manifest has been developed with a number of core design principles:</p>
-		<ul class="dotlist">
-			<li><div class="listdot"></div>Manifest is not a database. While we can host datasets, the primary workflow for creating and viewing data happens in the browser, where the system neither sees nor stores the data.</li>
-			<li><div class="listdot"></div>Supply chains in Manifest were not designed to be discrete "documents." The interface was developed for multiple supply chains (or partial supply chains) in order to understand relationships between them.</li>
-			<li><div class="listdot"></div>Manifest data tends to be descriptive, rather than rigidly structured. The Manifest format is designed to be open and general enough to contain information across a range of different contexts, irrespective of the rendering for a particular supply chain or single piece of data.</li>
-		</ul>
 		
-		<h3>Project Team</h3>
-		<ul class="dotlist">
-			<li><div class="listdot"></div>Matthew Hockenberry, Project Director, Fordham University</li>
-			<li><div class="listdot"></div>Colette Perold, Project Codirector, University of Colorado Boulder</li>		
-			<li><div class="listdot"></div>Ingrid Burrington, Research Coordinator, University of Delaware</li>		
-			<li><div class="listdot"></div>Lennox Anderson, Student Developer, University of Colorado Boulder</li>		
-			<li><div class="listdot"></div>Karina Garcia, Research Assistant, Fordham University</li>					
-		</ul>
+		<section class="ft-slider-wrapper">
+			<h3>Feature Overview</h3>
+			
+		  <button class="ft-slide-arrow" id="ft-slide-arrow-prev"> &#8249; </button>
+		  <button class="ft-slide-arrow" id="ft-slide-arrow-next"> &#8250; </button>
+  
+		  <ul class="ft-slides-container" id="ft-slides-container">
+		    <li class="ft-slide">
+				<div class="featured-caption">Overview of Manifest interface, with Manifest document and map visualization.</div>
+				<div class="featured-image"><img src="./images/features/1.png" loading="lazy" alt="Manifest Interface"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Popup with clustered points on map visualization.</div>
+				<div class="featured-image"><img src="./images/features/2.png" loading="lazy" alt="Clustered Popups"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Graph visualization showing connections within a Manifest document.</div>
+				<div class="featured-image"><img src="./images/features/3.png" loading="lazy" alt="Graph Visualization"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Flow visualization showing connections and composition within a Manifest document.</div>
+				<div class="featured-image"><img src="./images/features/4.png" loading="lazy" alt="Flow Visualization"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Chord visualization showing connections and composition within a Manifest document.</div>
+				<div class="featured-image"><img src="./images/features/5.png" loading="lazy" alt="Chord Visualization"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">List visualization for advanced sorting of nodes with a Manifest document.</div>
+				<div class="featured-image"><img src="./images/features/6.png" loading="lazy" alt="List Visualization"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Manifest documents are represented as JSON files and can be downloaded at any time.</div>
+				<div class="featured-image"><img src="./images/features/7.png" loading="lazy" alt="Manifest JSON"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Manifest documents with quantitative variables (like this one) can be visually scaled to compare values.</div>
+				<div class="featured-image"><img src="./images/features/8.png" loading="lazy" alt="Variable Scaling"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Nodes in Manifest documents can be categorized to support quick filtering (here, only nodes with the category <code>#inbound</code> are shown).</div>
+				<div class="featured-image"><img src="./images/features/9.png" loading="lazy" alt="Category Filtering"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Nodes can also be filtered by searching for arbitrary text matches (here, a search for "fuel").</div>
+				<div class="featured-image"><img src="./images/features/10.png" loading="lazy" alt="Manifest Search"></div>
+			</li>
+		    <li class="ft-slide">
+				<div class="featured-caption">Other layers can be loaded on top of Manifest documents. Here a layer showing current marine traffic has been loaded.</div>
+				<div class="featured-image"><img src="./images/features/11.png" loading="lazy" alt="Multiple Layers"></div>
+			</li>
+		  </ul>
+		</section>
 		
-		<h3>Advisory Board</h3>
-		<ul class="dotlist">
-			<li><div class="listdot"></div>Nicole Starosielski, Associate Professor of Media, Culture, and Communication, New York University</li>
-			<li><div class="listdot"></div>Shannon Mattern, Penn Presidential Compact Professor of Media Studies and Art History, University of Pennsylvania</li>
-			<li><div class="listdot"></div>Chris Csíkszentmihályi, Associate Professor of Information Science, Cornell University</li>
-			<li><div class="listdot"></div>Tamara Kneese, Director of Developer Engagement, Carbon Reduction and Green Software Team, Intel</li>
-			<li><div class="listdot"></div>Grant Whytoff, Digital Humanities Strategiest, Center for Digital Humanities, Princeton University</li>
-		</ul>
-		Former Students: Christian Kyle Madlansacay, Kimberly Ternan.
+		<div class="">
+			<h3>Project Goals</h3>		
+			<div class="">
+				<p class="bigtext">Professional logistics platforms developed by companies like SAP, Oracle, and IBM are incredibly complex, suited to global networks with hundreds of suppliers in dozens of countries. These systems interface with numerous data sources, with powerful capabilities for controlling the world's material distribution in the name of "supply chain management." Manifest is not one of these. Similarly, there are many tools available for detailed statistical evaluation, graph analysis, and geospatial modeling. And while Manifest can work in concert with these tools, its primary purpose is to:</p>
+				<ul class="textlist">
+					<li class="textlistitem">Provide common data standards for describing and sharing supply chains or other material networks, along with a simple editor modeled on these standards.</li>
+					<li class="textlistitem">Develop a flexible geospatial viewer for supply chain data that is transparent, interactive, and simple to understand, with support for specialized data views (graph relationships, etc.).</li>	
+					<li class="textlistitem">Support basic analytic tools for evaluating and comparing critical supply chain measures.</li>														
+				</ul>
+				<p class="bigtext">The result, we hope, is a system flexible enough to meaningfully support a variety of different projects advancing the critical study of logistics.</p>
+			</div>
+			<div class="">
+				<h3>Design Principles</h3>
+				<p class="bigtext">This flexibility is intended to allow someone using Manifest to map high level connections the same way they might catalogue fundamental details, or to include "materials" not normally present in an industrial logistics platform. It also means that Manifest should be as capable of producing rich supply chain <em>narratives</em> as it is facilitating supply chain <em>analysis</em>. In pursuit of these goals, Manifest has been developed with a number of core design principles:</p>
+				<ul class="textlist">
+					<li class="textlistitem">Manifest is not a database. While we can host Manifest documents and other datasets, the primary workflow for creating and viewing documents happens in the browser, where the Manifest neither sees nor stores the data.</li>
+					<li class="textlistitem">Supply chains in Manifest are not required to be <em>complete</em>, nor are they limited to discrete and self-contained accounts. Rather the interface was developed to support viewing multiple supply chains (or fragments of supply chains) in order to understand relationships between them.</li>
+					<li class="textlistitem">Manifest data tends to be descriptive, rather than rigidly structured. To this end, the Manifest format is designed to be open and general enough to contain information across a range of different contexts, irrespective of the rendering of a particular supply chain or single piece of data.</li>
+				</ul>
+				<p class="bigtext">The goal is a system that rejects the collected and complete in favor of the distributed, the partial, and the temporary.</p>
+			</div>
+		</div>
 		
-		<p class="bigtext">For some reflections on the origins of Manifest, please read this brief essay, <a href="https://supplystudies.com/2021/09/29/manifest-manifesto-toward-supply-chain-reconciliation/">Manifest / Manifesto: Toward Supply Chain Reconciliation</a>, on Supply Studies. For updates, sign up for the Supply Studies <a href="https://supplystudies.com/updates/">mailing list</a>. Manifest is provided free for noncommercial use, if you'd like to talk about something else, please don't hesitate to <a href="mailto:mhockenberry@fordham.edu">get in touch</a>. </p>
+		<div id="teambox" class="textcolumnwrap">			
+			<div class="textcolumn">
+				<h3>Project Team</h3>
+				<ul class="textlist condense">
+					<li class="textlistitem">Matthew Hockenberry, Project Director, Assistant Professor of Communication and Media Studies, Fordham University</li>
+					<li class="textlistitem">Colette Perold, Project Codirector, Assistant Professor of Media Studies, University of Colorado Boulder</li>		
+					<li class="textlistitem">Ingrid Burrington, Research Coordinator, University of Delaware</li>		
+					<li class="textlistitem">Lennox Anderson, Student Developer, University of Colorado Boulder</li>		
+					<li class="textlistitem">Karina Garcia, Research Assistant, Fordham University</li>	
+					<li class="textlistitem">&nbsp;</li>
+					<li class="textlistitem">Project Alumni</li>
+					<li class="textlistitem"><em>Christian Kyle Madlansacay, Fordham University</em></li>
+					<li class="textlistitem"><em>Kimberly Ternan, Fordham University</em></li>
+				</ul>
+			</div>
+			<div class="textcolumn">
+				<h3>Advisory Board</h3>
+				<ul class="textlist condense">
+					<li class="textlistitem">Nicole Starosielski, Associate Professor of Media, Culture, and Communication, New York University</li>
+					<li class="textlistitem">Shannon Mattern, Penn Presidential Compact Professor of Media Studies and Art History, University of Pennsylvania</li>
+					<li class="textlistitem">Chris Csíkszentmihályi, Associate Professor of Information Science, Cornell University</li>
+					<li class="textlistitem">Tamara Kneese, Project Director, AIM Lab, Data & Society</li>
+					<li class="textlistitem">Grant Whytoff, Digital Humanities Strategiest, Center for Digital Humanities, Princeton University</li>
+				</ul>
+			</div>
+		</div>
+		
+		
+		<p class="bigtext">For some reflections on the origins of Manifest,see <a href="https://supplystudies.com/2021/09/29/manifest-manifesto-toward-supply-chain-reconciliation/">"Manifest / Manifesto: Toward Supply Chain Reconciliation."</a> For updates, sign up for the <em>Supply Studies</em> <a href="https://supplystudies.com/updates/">mailing list</a>. Manifest is provided free for noncommercial use, for any other uses, please <a href="mailto:mhockenberry@fordham.edu">get in touch</a>. </p>
 	
 		<p class="callin">
 			The project is supported by a <a href="https://www.neh.gov/divisions/odh">Digital Humanities Advancement Grant from the National Endowment for the Humanities</a> as well as Fordham University's Office of Research and <a href="https://www.fordham.edu/info/20768/communication_and_media_studies">Department of Communication and Media Studies</a>. It was previously supported by the <a href="http://steinhardt.nyu.edu/mcc/">Media, Culture, and Communication</a> department of <a href="http://www.nyu.edu/">New York University</a>. It is based on technologies originally developed as part of the <a href="http://supplystudies.com/sourcemap-org/">Sourcemap project</a>, which was created at the MIT Media Lab in 2007 as a collaboration between the MIT Center for Civic Media and the Tangible Media Group.
@@ -72,8 +145,8 @@
 </section>
 
 <!-- build:process -->	
-<script src="js/Manifest-lib<%= minify %>.js"></script>
-<script src="js/Manifest-static<%= minify %>.js"></script>
+<script src="<%= js_libpath %>"></script>
+<script src="<%= js_staticpath %>"></script>
 <!-- /build -->	
 
 </body>

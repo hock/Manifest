@@ -1,6268 +1,5380 @@
-var protomaps = (() => {
-  var __create = Object.create;
-  var __defProp = Object.defineProperty;
-  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-  var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-  var __getProtoOf = Object.getPrototypeOf;
-  var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __spreadValues = (a2, b) => {
-    for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a2, prop, b[prop]);
-    if (__getOwnPropSymbols)
-      for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a2, prop, b[prop]);
-      }
-    return a2;
-  };
-  var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
-  var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[Object.keys(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  };
-  var __export = (target, all) => {
-    __markAsModule(target);
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
-  };
-  var __reExport = (target, module, desc) => {
-    if (module && typeof module === "object" || typeof module === "function") {
-      for (let key of __getOwnPropNames(module))
-        if (!__hasOwnProp.call(target, key) && key !== "default")
-          __defProp(target, key, { get: () => module[key], enumerable: !(desc = __getOwnPropDesc(module, key)) || desc.enumerable });
-    }
-    return target;
-  };
-  var __toModule = (module) => {
-    return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", module && module.__esModule && "default" in module ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
-  };
-  var __async = (__this, __arguments, generator) => {
-    return new Promise((resolve, reject) => {
-      var fulfilled = (value) => {
-        try {
-          step2(generator.next(value));
-        } catch (e2) {
-          reject(e2);
-        }
-      };
-      var rejected = (value) => {
-        try {
-          step2(generator.throw(value));
-        } catch (e2) {
-          reject(e2);
-        }
-      };
-      var step2 = (x2) => x2.done ? resolve(x2.value) : Promise.resolve(x2.value).then(fulfilled, rejected);
-      step2((generator = generator.apply(__this, __arguments)).next());
+var protomapsL = (() => {
+    var bi = Object.create;
+    var De = Object.defineProperty;
+    var wi = Object.getOwnPropertyDescriptor;
+    var vi = Object.getOwnPropertyNames,
+        Jt = Object.getOwnPropertySymbols,
+        _i = Object.getPrototypeOf,
+        Gt = Object.prototype.hasOwnProperty,
+        zi = Object.prototype.propertyIsEnumerable;
+    var Qt = (t, e, r) => e in t ? De(t, e, {
+            enumerable: !0,
+            configurable: !0,
+            writable: !0,
+            value: r
+        }) : t[e] = r,
+        er = (t, e) => {
+            for (var r in e || (e = {}))
+                Gt.call(e, r) && Qt(t, r, e[r]);
+            if (Jt)
+                for (var r of Jt(e))
+                    zi.call(e, r) && Qt(t, r, e[r]);
+            return t
+        };
+    var tr = t => De(t, "__esModule", {
+        value: !0
     });
-  };
-
-  // node_modules/@mapbox/point-geometry/index.js
-  var require_point_geometry = __commonJS({
-    "node_modules/@mapbox/point-geometry/index.js"(exports, module) {
-      "use strict";
-      module.exports = Point9;
-      function Point9(x2, y) {
-        this.x = x2;
-        this.y = y;
-      }
-      Point9.prototype = {
-        clone: function() {
-          return new Point9(this.x, this.y);
-        },
-        add: function(p2) {
-          return this.clone()._add(p2);
-        },
-        sub: function(p2) {
-          return this.clone()._sub(p2);
-        },
-        multByPoint: function(p2) {
-          return this.clone()._multByPoint(p2);
-        },
-        divByPoint: function(p2) {
-          return this.clone()._divByPoint(p2);
-        },
-        mult: function(k) {
-          return this.clone()._mult(k);
-        },
-        div: function(k) {
-          return this.clone()._div(k);
-        },
-        rotate: function(a2) {
-          return this.clone()._rotate(a2);
-        },
-        rotateAround: function(a2, p2) {
-          return this.clone()._rotateAround(a2, p2);
-        },
-        matMult: function(m) {
-          return this.clone()._matMult(m);
-        },
-        unit: function() {
-          return this.clone()._unit();
-        },
-        perp: function() {
-          return this.clone()._perp();
-        },
-        round: function() {
-          return this.clone()._round();
-        },
-        mag: function() {
-          return Math.sqrt(this.x * this.x + this.y * this.y);
-        },
-        equals: function(other) {
-          return this.x === other.x && this.y === other.y;
-        },
-        dist: function(p2) {
-          return Math.sqrt(this.distSqr(p2));
-        },
-        distSqr: function(p2) {
-          var dx = p2.x - this.x, dy = p2.y - this.y;
-          return dx * dx + dy * dy;
-        },
-        angle: function() {
-          return Math.atan2(this.y, this.x);
-        },
-        angleTo: function(b) {
-          return Math.atan2(this.y - b.y, this.x - b.x);
-        },
-        angleWith: function(b) {
-          return this.angleWithSep(b.x, b.y);
-        },
-        angleWithSep: function(x2, y) {
-          return Math.atan2(this.x * y - this.y * x2, this.x * x2 + this.y * y);
-        },
-        _matMult: function(m) {
-          var x2 = m[0] * this.x + m[1] * this.y, y = m[2] * this.x + m[3] * this.y;
-          this.x = x2;
-          this.y = y;
-          return this;
-        },
-        _add: function(p2) {
-          this.x += p2.x;
-          this.y += p2.y;
-          return this;
-        },
-        _sub: function(p2) {
-          this.x -= p2.x;
-          this.y -= p2.y;
-          return this;
-        },
-        _mult: function(k) {
-          this.x *= k;
-          this.y *= k;
-          return this;
-        },
-        _div: function(k) {
-          this.x /= k;
-          this.y /= k;
-          return this;
-        },
-        _multByPoint: function(p2) {
-          this.x *= p2.x;
-          this.y *= p2.y;
-          return this;
-        },
-        _divByPoint: function(p2) {
-          this.x /= p2.x;
-          this.y /= p2.y;
-          return this;
-        },
-        _unit: function() {
-          this._div(this.mag());
-          return this;
-        },
-        _perp: function() {
-          var y = this.y;
-          this.y = this.x;
-          this.x = -y;
-          return this;
-        },
-        _rotate: function(angle) {
-          var cos = Math.cos(angle), sin = Math.sin(angle), x2 = cos * this.x - sin * this.y, y = sin * this.x + cos * this.y;
-          this.x = x2;
-          this.y = y;
-          return this;
-        },
-        _rotateAround: function(angle, p2) {
-          var cos = Math.cos(angle), sin = Math.sin(angle), x2 = p2.x + cos * (this.x - p2.x) - sin * (this.y - p2.y), y = p2.y + sin * (this.x - p2.x) + cos * (this.y - p2.y);
-          this.x = x2;
-          this.y = y;
-          return this;
-        },
-        _round: function() {
-          this.x = Math.round(this.x);
-          this.y = Math.round(this.y);
-          return this;
-        }
-      };
-      Point9.convert = function(a2) {
-        if (a2 instanceof Point9) {
-          return a2;
-        }
-        if (Array.isArray(a2)) {
-          return new Point9(a2[0], a2[1]);
-        }
-        return a2;
-      };
-    }
-  });
-
-  // node_modules/@mapbox/vector-tile/lib/vectortilefeature.js
-  var require_vectortilefeature = __commonJS({
-    "node_modules/@mapbox/vector-tile/lib/vectortilefeature.js"(exports, module) {
-      "use strict";
-      var Point9 = require_point_geometry();
-      module.exports = VectorTileFeature;
-      function VectorTileFeature(pbf, end, extent, keys, values) {
-        this.properties = {};
-        this.extent = extent;
-        this.type = 0;
-        this._pbf = pbf;
-        this._geometry = -1;
-        this._keys = keys;
-        this._values = values;
-        pbf.readFields(readFeature, this, end);
-      }
-      function readFeature(tag, feature, pbf) {
-        if (tag == 1)
-          feature.id = pbf.readVarint();
-        else if (tag == 2)
-          readTag(pbf, feature);
-        else if (tag == 3)
-          feature.type = pbf.readVarint();
-        else if (tag == 4)
-          feature._geometry = pbf.pos;
-      }
-      function readTag(pbf, feature) {
-        var end = pbf.readVarint() + pbf.pos;
-        while (pbf.pos < end) {
-          var key = feature._keys[pbf.readVarint()], value = feature._values[pbf.readVarint()];
-          feature.properties[key] = value;
-        }
-      }
-      VectorTileFeature.types = ["Unknown", "Point", "LineString", "Polygon"];
-      VectorTileFeature.prototype.loadGeometry = function() {
-        var pbf = this._pbf;
-        pbf.pos = this._geometry;
-        var end = pbf.readVarint() + pbf.pos, cmd = 1, length = 0, x2 = 0, y = 0, lines = [], line;
-        while (pbf.pos < end) {
-          if (length <= 0) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 7;
-            length = cmdLen >> 3;
-          }
-          length--;
-          if (cmd === 1 || cmd === 2) {
-            x2 += pbf.readSVarint();
-            y += pbf.readSVarint();
-            if (cmd === 1) {
-              if (line)
-                lines.push(line);
-              line = [];
-            }
-            line.push(new Point9(x2, y));
-          } else if (cmd === 7) {
-            if (line) {
-              line.push(line[0].clone());
-            }
-          } else {
-            throw new Error("unknown command " + cmd);
-          }
-        }
-        if (line)
-          lines.push(line);
-        return lines;
-      };
-      VectorTileFeature.prototype.bbox = function() {
-        var pbf = this._pbf;
-        pbf.pos = this._geometry;
-        var end = pbf.readVarint() + pbf.pos, cmd = 1, length = 0, x2 = 0, y = 0, x1 = Infinity, x22 = -Infinity, y1 = Infinity, y2 = -Infinity;
-        while (pbf.pos < end) {
-          if (length <= 0) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 7;
-            length = cmdLen >> 3;
-          }
-          length--;
-          if (cmd === 1 || cmd === 2) {
-            x2 += pbf.readSVarint();
-            y += pbf.readSVarint();
-            if (x2 < x1)
-              x1 = x2;
-            if (x2 > x22)
-              x22 = x2;
-            if (y < y1)
-              y1 = y;
-            if (y > y2)
-              y2 = y;
-          } else if (cmd !== 7) {
-            throw new Error("unknown command " + cmd);
-          }
-        }
-        return [x1, y1, x22, y2];
-      };
-      VectorTileFeature.prototype.toGeoJSON = function(x2, y, z2) {
-        var size = this.extent * Math.pow(2, z2), x0 = this.extent * x2, y0 = this.extent * y, coords = this.loadGeometry(), type = VectorTileFeature.types[this.type], i2, j;
-        function project3(line) {
-          for (var j2 = 0; j2 < line.length; j2++) {
-            var p2 = line[j2], y2 = 180 - (p2.y + y0) * 360 / size;
-            line[j2] = [
-              (p2.x + x0) * 360 / size - 180,
-              360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
-            ];
-          }
-        }
-        switch (this.type) {
-          case 1:
-            var points = [];
-            for (i2 = 0; i2 < coords.length; i2++) {
-              points[i2] = coords[i2][0];
-            }
-            coords = points;
-            project3(coords);
-            break;
-          case 2:
-            for (i2 = 0; i2 < coords.length; i2++) {
-              project3(coords[i2]);
-            }
-            break;
-          case 3:
-            coords = classifyRings(coords);
-            for (i2 = 0; i2 < coords.length; i2++) {
-              for (j = 0; j < coords[i2].length; j++) {
-                project3(coords[i2][j]);
-              }
-            }
-            break;
-        }
-        if (coords.length === 1) {
-          coords = coords[0];
-        } else {
-          type = "Multi" + type;
-        }
-        var result = {
-          type: "Feature",
-          geometry: {
-            type,
-            coordinates: coords
-          },
-          properties: this.properties
-        };
-        if ("id" in this) {
-          result.id = this.id;
-        }
-        return result;
-      };
-      function classifyRings(rings) {
-        var len = rings.length;
-        if (len <= 1)
-          return [rings];
-        var polygons = [], polygon, ccw;
-        for (var i2 = 0; i2 < len; i2++) {
-          var area = signedArea(rings[i2]);
-          if (area === 0)
-            continue;
-          if (ccw === void 0)
-            ccw = area < 0;
-          if (ccw === area < 0) {
-            if (polygon)
-              polygons.push(polygon);
-            polygon = [rings[i2]];
-          } else {
-            polygon.push(rings[i2]);
-          }
-        }
-        if (polygon)
-          polygons.push(polygon);
-        return polygons;
-      }
-      function signedArea(ring) {
-        var sum = 0;
-        for (var i2 = 0, len = ring.length, j = len - 1, p1, p2; i2 < len; j = i2++) {
-          p1 = ring[i2];
-          p2 = ring[j];
-          sum += (p2.x - p1.x) * (p1.y + p2.y);
-        }
-        return sum;
-      }
-    }
-  });
-
-  // node_modules/@mapbox/vector-tile/lib/vectortilelayer.js
-  var require_vectortilelayer = __commonJS({
-    "node_modules/@mapbox/vector-tile/lib/vectortilelayer.js"(exports, module) {
-      "use strict";
-      var VectorTileFeature = require_vectortilefeature();
-      module.exports = VectorTileLayer;
-      function VectorTileLayer(pbf, end) {
-        this.version = 1;
-        this.name = null;
-        this.extent = 4096;
-        this.length = 0;
-        this._pbf = pbf;
-        this._keys = [];
-        this._values = [];
-        this._features = [];
-        pbf.readFields(readLayer, this, end);
-        this.length = this._features.length;
-      }
-      function readLayer(tag, layer, pbf) {
-        if (tag === 15)
-          layer.version = pbf.readVarint();
-        else if (tag === 1)
-          layer.name = pbf.readString();
-        else if (tag === 5)
-          layer.extent = pbf.readVarint();
-        else if (tag === 2)
-          layer._features.push(pbf.pos);
-        else if (tag === 3)
-          layer._keys.push(pbf.readString());
-        else if (tag === 4)
-          layer._values.push(readValueMessage(pbf));
-      }
-      function readValueMessage(pbf) {
-        var value = null, end = pbf.readVarint() + pbf.pos;
-        while (pbf.pos < end) {
-          var tag = pbf.readVarint() >> 3;
-          value = tag === 1 ? pbf.readString() : tag === 2 ? pbf.readFloat() : tag === 3 ? pbf.readDouble() : tag === 4 ? pbf.readVarint64() : tag === 5 ? pbf.readVarint() : tag === 6 ? pbf.readSVarint() : tag === 7 ? pbf.readBoolean() : null;
-        }
-        return value;
-      }
-      VectorTileLayer.prototype.feature = function(i2) {
-        if (i2 < 0 || i2 >= this._features.length)
-          throw new Error("feature index out of bounds");
-        this._pbf.pos = this._features[i2];
-        var end = this._pbf.readVarint() + this._pbf.pos;
-        return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);
-      };
-    }
-  });
-
-  // node_modules/@mapbox/vector-tile/lib/vectortile.js
-  var require_vectortile = __commonJS({
-    "node_modules/@mapbox/vector-tile/lib/vectortile.js"(exports, module) {
-      "use strict";
-      var VectorTileLayer = require_vectortilelayer();
-      module.exports = VectorTile2;
-      function VectorTile2(pbf, end) {
-        this.layers = pbf.readFields(readTile, {}, end);
-      }
-      function readTile(tag, layers, pbf) {
-        if (tag === 3) {
-          var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
-          if (layer.length)
-            layers[layer.name] = layer;
-        }
-      }
-    }
-  });
-
-  // node_modules/@mapbox/vector-tile/index.js
-  var require_vector_tile = __commonJS({
-    "node_modules/@mapbox/vector-tile/index.js"(exports, module) {
-      module.exports.VectorTile = require_vectortile();
-      module.exports.VectorTileFeature = require_vectortilefeature();
-      module.exports.VectorTileLayer = require_vectortilelayer();
-    }
-  });
-
-  // node_modules/ieee754/index.js
-  var require_ieee754 = __commonJS({
-    "node_modules/ieee754/index.js"(exports) {
-      exports.read = function(buffer, offset, isLE, mLen, nBytes) {
-        var e2, m;
-        var eLen = nBytes * 8 - mLen - 1;
-        var eMax = (1 << eLen) - 1;
-        var eBias = eMax >> 1;
-        var nBits = -7;
-        var i2 = isLE ? nBytes - 1 : 0;
-        var d = isLE ? -1 : 1;
-        var s2 = buffer[offset + i2];
-        i2 += d;
-        e2 = s2 & (1 << -nBits) - 1;
-        s2 >>= -nBits;
-        nBits += eLen;
-        for (; nBits > 0; e2 = e2 * 256 + buffer[offset + i2], i2 += d, nBits -= 8) {
-        }
-        m = e2 & (1 << -nBits) - 1;
-        e2 >>= -nBits;
-        nBits += mLen;
-        for (; nBits > 0; m = m * 256 + buffer[offset + i2], i2 += d, nBits -= 8) {
-        }
-        if (e2 === 0) {
-          e2 = 1 - eBias;
-        } else if (e2 === eMax) {
-          return m ? NaN : (s2 ? -1 : 1) * Infinity;
-        } else {
-          m = m + Math.pow(2, mLen);
-          e2 = e2 - eBias;
-        }
-        return (s2 ? -1 : 1) * m * Math.pow(2, e2 - mLen);
-      };
-      exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
-        var e2, m, c2;
-        var eLen = nBytes * 8 - mLen - 1;
-        var eMax = (1 << eLen) - 1;
-        var eBias = eMax >> 1;
-        var rt = mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0;
-        var i2 = isLE ? 0 : nBytes - 1;
-        var d = isLE ? 1 : -1;
-        var s2 = value < 0 || value === 0 && 1 / value < 0 ? 1 : 0;
-        value = Math.abs(value);
-        if (isNaN(value) || value === Infinity) {
-          m = isNaN(value) ? 1 : 0;
-          e2 = eMax;
-        } else {
-          e2 = Math.floor(Math.log(value) / Math.LN2);
-          if (value * (c2 = Math.pow(2, -e2)) < 1) {
-            e2--;
-            c2 *= 2;
-          }
-          if (e2 + eBias >= 1) {
-            value += rt / c2;
-          } else {
-            value += rt * Math.pow(2, 1 - eBias);
-          }
-          if (value * c2 >= 2) {
-            e2++;
-            c2 /= 2;
-          }
-          if (e2 + eBias >= eMax) {
-            m = 0;
-            e2 = eMax;
-          } else if (e2 + eBias >= 1) {
-            m = (value * c2 - 1) * Math.pow(2, mLen);
-            e2 = e2 + eBias;
-          } else {
-            m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-            e2 = 0;
-          }
-        }
-        for (; mLen >= 8; buffer[offset + i2] = m & 255, i2 += d, m /= 256, mLen -= 8) {
-        }
-        e2 = e2 << mLen | m;
-        eLen += mLen;
-        for (; eLen > 0; buffer[offset + i2] = e2 & 255, i2 += d, e2 /= 256, eLen -= 8) {
-        }
-        buffer[offset + i2 - d] |= s2 * 128;
-      };
-    }
-  });
-
-  // node_modules/pbf/index.js
-  var require_pbf = __commonJS({
-    "node_modules/pbf/index.js"(exports, module) {
-      "use strict";
-      module.exports = Pbf;
-      var ieee754 = require_ieee754();
-      function Pbf(buf) {
-        this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
-        this.pos = 0;
-        this.type = 0;
-        this.length = this.buf.length;
-      }
-      Pbf.Varint = 0;
-      Pbf.Fixed64 = 1;
-      Pbf.Bytes = 2;
-      Pbf.Fixed32 = 5;
-      var SHIFT_LEFT_32 = (1 << 16) * (1 << 16);
-      var SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
-      var TEXT_DECODER_MIN_LENGTH = 12;
-      var utf8TextDecoder = typeof TextDecoder === "undefined" ? null : new TextDecoder("utf8");
-      Pbf.prototype = {
-        destroy: function() {
-          this.buf = null;
-        },
-        readFields: function(readField, result, end) {
-          end = end || this.length;
-          while (this.pos < end) {
-            var val = this.readVarint(), tag = val >> 3, startPos = this.pos;
-            this.type = val & 7;
-            readField(tag, result, this);
-            if (this.pos === startPos)
-              this.skip(val);
-          }
-          return result;
-        },
-        readMessage: function(readField, result) {
-          return this.readFields(readField, result, this.readVarint() + this.pos);
-        },
-        readFixed32: function() {
-          var val = readUInt32(this.buf, this.pos);
-          this.pos += 4;
-          return val;
-        },
-        readSFixed32: function() {
-          var val = readInt32(this.buf, this.pos);
-          this.pos += 4;
-          return val;
-        },
-        readFixed64: function() {
-          var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-          this.pos += 8;
-          return val;
-        },
-        readSFixed64: function() {
-          var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-          this.pos += 8;
-          return val;
-        },
-        readFloat: function() {
-          var val = ieee754.read(this.buf, this.pos, true, 23, 4);
-          this.pos += 4;
-          return val;
-        },
-        readDouble: function() {
-          var val = ieee754.read(this.buf, this.pos, true, 52, 8);
-          this.pos += 8;
-          return val;
-        },
-        readVarint: function(isSigned) {
-          var buf = this.buf, val, b;
-          b = buf[this.pos++];
-          val = b & 127;
-          if (b < 128)
-            return val;
-          b = buf[this.pos++];
-          val |= (b & 127) << 7;
-          if (b < 128)
-            return val;
-          b = buf[this.pos++];
-          val |= (b & 127) << 14;
-          if (b < 128)
-            return val;
-          b = buf[this.pos++];
-          val |= (b & 127) << 21;
-          if (b < 128)
-            return val;
-          b = buf[this.pos];
-          val |= (b & 15) << 28;
-          return readVarintRemainder2(val, isSigned, this);
-        },
-        readVarint64: function() {
-          return this.readVarint(true);
-        },
-        readSVarint: function() {
-          var num = this.readVarint();
-          return num % 2 === 1 ? (num + 1) / -2 : num / 2;
-        },
-        readBoolean: function() {
-          return Boolean(this.readVarint());
-        },
-        readString: function() {
-          var end = this.readVarint() + this.pos;
-          var pos = this.pos;
-          this.pos = end;
-          if (end - pos >= TEXT_DECODER_MIN_LENGTH && utf8TextDecoder) {
-            return readUtf8TextDecoder(this.buf, pos, end);
-          }
-          return readUtf8(this.buf, pos, end);
-        },
-        readBytes: function() {
-          var end = this.readVarint() + this.pos, buffer = this.buf.subarray(this.pos, end);
-          this.pos = end;
-          return buffer;
-        },
-        readPackedVarint: function(arr2, isSigned) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readVarint(isSigned));
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readVarint(isSigned));
-          return arr2;
-        },
-        readPackedSVarint: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readSVarint());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readSVarint());
-          return arr2;
-        },
-        readPackedBoolean: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readBoolean());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readBoolean());
-          return arr2;
-        },
-        readPackedFloat: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readFloat());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readFloat());
-          return arr2;
-        },
-        readPackedDouble: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readDouble());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readDouble());
-          return arr2;
-        },
-        readPackedFixed32: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readFixed32());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readFixed32());
-          return arr2;
-        },
-        readPackedSFixed32: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readSFixed32());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readSFixed32());
-          return arr2;
-        },
-        readPackedFixed64: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readFixed64());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readFixed64());
-          return arr2;
-        },
-        readPackedSFixed64: function(arr2) {
-          if (this.type !== Pbf.Bytes)
-            return arr2.push(this.readSFixed64());
-          var end = readPackedEnd(this);
-          arr2 = arr2 || [];
-          while (this.pos < end)
-            arr2.push(this.readSFixed64());
-          return arr2;
-        },
-        skip: function(val) {
-          var type = val & 7;
-          if (type === Pbf.Varint)
-            while (this.buf[this.pos++] > 127) {
-            }
-          else if (type === Pbf.Bytes)
-            this.pos = this.readVarint() + this.pos;
-          else if (type === Pbf.Fixed32)
-            this.pos += 4;
-          else if (type === Pbf.Fixed64)
-            this.pos += 8;
-          else
-            throw new Error("Unimplemented type: " + type);
-        },
-        writeTag: function(tag, type) {
-          this.writeVarint(tag << 3 | type);
-        },
-        realloc: function(min) {
-          var length = this.length || 16;
-          while (length < this.pos + min)
-            length *= 2;
-          if (length !== this.length) {
-            var buf = new Uint8Array(length);
-            buf.set(this.buf);
-            this.buf = buf;
-            this.length = length;
-          }
-        },
-        finish: function() {
-          this.length = this.pos;
-          this.pos = 0;
-          return this.buf.subarray(0, this.length);
-        },
-        writeFixed32: function(val) {
-          this.realloc(4);
-          writeInt32(this.buf, val, this.pos);
-          this.pos += 4;
-        },
-        writeSFixed32: function(val) {
-          this.realloc(4);
-          writeInt32(this.buf, val, this.pos);
-          this.pos += 4;
-        },
-        writeFixed64: function(val) {
-          this.realloc(8);
-          writeInt32(this.buf, val & -1, this.pos);
-          writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-          this.pos += 8;
-        },
-        writeSFixed64: function(val) {
-          this.realloc(8);
-          writeInt32(this.buf, val & -1, this.pos);
-          writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-          this.pos += 8;
-        },
-        writeVarint: function(val) {
-          val = +val || 0;
-          if (val > 268435455 || val < 0) {
-            writeBigVarint(val, this);
-            return;
-          }
-          this.realloc(4);
-          this.buf[this.pos++] = val & 127 | (val > 127 ? 128 : 0);
-          if (val <= 127)
-            return;
-          this.buf[this.pos++] = (val >>>= 7) & 127 | (val > 127 ? 128 : 0);
-          if (val <= 127)
-            return;
-          this.buf[this.pos++] = (val >>>= 7) & 127 | (val > 127 ? 128 : 0);
-          if (val <= 127)
-            return;
-          this.buf[this.pos++] = val >>> 7 & 127;
-        },
-        writeSVarint: function(val) {
-          this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
-        },
-        writeBoolean: function(val) {
-          this.writeVarint(Boolean(val));
-        },
-        writeString: function(str) {
-          str = String(str);
-          this.realloc(str.length * 4);
-          this.pos++;
-          var startPos = this.pos;
-          this.pos = writeUtf8(this.buf, str, this.pos);
-          var len = this.pos - startPos;
-          if (len >= 128)
-            makeRoomForExtraLength(startPos, len, this);
-          this.pos = startPos - 1;
-          this.writeVarint(len);
-          this.pos += len;
-        },
-        writeFloat: function(val) {
-          this.realloc(4);
-          ieee754.write(this.buf, val, this.pos, true, 23, 4);
-          this.pos += 4;
-        },
-        writeDouble: function(val) {
-          this.realloc(8);
-          ieee754.write(this.buf, val, this.pos, true, 52, 8);
-          this.pos += 8;
-        },
-        writeBytes: function(buffer) {
-          var len = buffer.length;
-          this.writeVarint(len);
-          this.realloc(len);
-          for (var i2 = 0; i2 < len; i2++)
-            this.buf[this.pos++] = buffer[i2];
-        },
-        writeRawMessage: function(fn, obj) {
-          this.pos++;
-          var startPos = this.pos;
-          fn(obj, this);
-          var len = this.pos - startPos;
-          if (len >= 128)
-            makeRoomForExtraLength(startPos, len, this);
-          this.pos = startPos - 1;
-          this.writeVarint(len);
-          this.pos += len;
-        },
-        writeMessage: function(tag, fn, obj) {
-          this.writeTag(tag, Pbf.Bytes);
-          this.writeRawMessage(fn, obj);
-        },
-        writePackedVarint: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedVarint, arr2);
-        },
-        writePackedSVarint: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedSVarint, arr2);
-        },
-        writePackedBoolean: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedBoolean, arr2);
-        },
-        writePackedFloat: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedFloat, arr2);
-        },
-        writePackedDouble: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedDouble, arr2);
-        },
-        writePackedFixed32: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedFixed32, arr2);
-        },
-        writePackedSFixed32: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedSFixed32, arr2);
-        },
-        writePackedFixed64: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedFixed64, arr2);
-        },
-        writePackedSFixed64: function(tag, arr2) {
-          if (arr2.length)
-            this.writeMessage(tag, writePackedSFixed64, arr2);
-        },
-        writeBytesField: function(tag, buffer) {
-          this.writeTag(tag, Pbf.Bytes);
-          this.writeBytes(buffer);
-        },
-        writeFixed32Field: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed32);
-          this.writeFixed32(val);
-        },
-        writeSFixed32Field: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed32);
-          this.writeSFixed32(val);
-        },
-        writeFixed64Field: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed64);
-          this.writeFixed64(val);
-        },
-        writeSFixed64Field: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed64);
-          this.writeSFixed64(val);
-        },
-        writeVarintField: function(tag, val) {
-          this.writeTag(tag, Pbf.Varint);
-          this.writeVarint(val);
-        },
-        writeSVarintField: function(tag, val) {
-          this.writeTag(tag, Pbf.Varint);
-          this.writeSVarint(val);
-        },
-        writeStringField: function(tag, str) {
-          this.writeTag(tag, Pbf.Bytes);
-          this.writeString(str);
-        },
-        writeFloatField: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed32);
-          this.writeFloat(val);
-        },
-        writeDoubleField: function(tag, val) {
-          this.writeTag(tag, Pbf.Fixed64);
-          this.writeDouble(val);
-        },
-        writeBooleanField: function(tag, val) {
-          this.writeVarintField(tag, Boolean(val));
-        }
-      };
-      function readVarintRemainder2(l2, s2, p2) {
-        var buf = p2.buf, h, b;
-        b = buf[p2.pos++];
-        h = (b & 112) >> 4;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        b = buf[p2.pos++];
-        h |= (b & 127) << 3;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        b = buf[p2.pos++];
-        h |= (b & 127) << 10;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        b = buf[p2.pos++];
-        h |= (b & 127) << 17;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        b = buf[p2.pos++];
-        h |= (b & 127) << 24;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        b = buf[p2.pos++];
-        h |= (b & 1) << 31;
-        if (b < 128)
-          return toNum2(l2, h, s2);
-        throw new Error("Expected varint not more than 10 bytes");
-      }
-      function readPackedEnd(pbf) {
-        return pbf.type === Pbf.Bytes ? pbf.readVarint() + pbf.pos : pbf.pos + 1;
-      }
-      function toNum2(low, high, isSigned) {
-        if (isSigned) {
-          return high * 4294967296 + (low >>> 0);
-        }
-        return (high >>> 0) * 4294967296 + (low >>> 0);
-      }
-      function writeBigVarint(val, pbf) {
-        var low, high;
-        if (val >= 0) {
-          low = val % 4294967296 | 0;
-          high = val / 4294967296 | 0;
-        } else {
-          low = ~(-val % 4294967296);
-          high = ~(-val / 4294967296);
-          if (low ^ 4294967295) {
-            low = low + 1 | 0;
-          } else {
-            low = 0;
-            high = high + 1 | 0;
-          }
-        }
-        if (val >= 18446744073709552e3 || val < -18446744073709552e3) {
-          throw new Error("Given varint doesn't fit into 10 bytes");
-        }
-        pbf.realloc(10);
-        writeBigVarintLow(low, high, pbf);
-        writeBigVarintHigh(high, pbf);
-      }
-      function writeBigVarintLow(low, high, pbf) {
-        pbf.buf[pbf.pos++] = low & 127 | 128;
-        low >>>= 7;
-        pbf.buf[pbf.pos++] = low & 127 | 128;
-        low >>>= 7;
-        pbf.buf[pbf.pos++] = low & 127 | 128;
-        low >>>= 7;
-        pbf.buf[pbf.pos++] = low & 127 | 128;
-        low >>>= 7;
-        pbf.buf[pbf.pos] = low & 127;
-      }
-      function writeBigVarintHigh(high, pbf) {
-        var lsb = (high & 7) << 4;
-        pbf.buf[pbf.pos++] |= lsb | ((high >>>= 3) ? 128 : 0);
-        if (!high)
-          return;
-        pbf.buf[pbf.pos++] = high & 127 | ((high >>>= 7) ? 128 : 0);
-        if (!high)
-          return;
-        pbf.buf[pbf.pos++] = high & 127 | ((high >>>= 7) ? 128 : 0);
-        if (!high)
-          return;
-        pbf.buf[pbf.pos++] = high & 127 | ((high >>>= 7) ? 128 : 0);
-        if (!high)
-          return;
-        pbf.buf[pbf.pos++] = high & 127 | ((high >>>= 7) ? 128 : 0);
-        if (!high)
-          return;
-        pbf.buf[pbf.pos++] = high & 127;
-      }
-      function makeRoomForExtraLength(startPos, len, pbf) {
-        var extraLen = len <= 16383 ? 1 : len <= 2097151 ? 2 : len <= 268435455 ? 3 : Math.floor(Math.log(len) / (Math.LN2 * 7));
-        pbf.realloc(extraLen);
-        for (var i2 = pbf.pos - 1; i2 >= startPos; i2--)
-          pbf.buf[i2 + extraLen] = pbf.buf[i2];
-      }
-      function writePackedVarint(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeVarint(arr2[i2]);
-      }
-      function writePackedSVarint(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeSVarint(arr2[i2]);
-      }
-      function writePackedFloat(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeFloat(arr2[i2]);
-      }
-      function writePackedDouble(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeDouble(arr2[i2]);
-      }
-      function writePackedBoolean(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeBoolean(arr2[i2]);
-      }
-      function writePackedFixed32(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeFixed32(arr2[i2]);
-      }
-      function writePackedSFixed32(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeSFixed32(arr2[i2]);
-      }
-      function writePackedFixed64(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeFixed64(arr2[i2]);
-      }
-      function writePackedSFixed64(arr2, pbf) {
-        for (var i2 = 0; i2 < arr2.length; i2++)
-          pbf.writeSFixed64(arr2[i2]);
-      }
-      function readUInt32(buf, pos) {
-        return (buf[pos] | buf[pos + 1] << 8 | buf[pos + 2] << 16) + buf[pos + 3] * 16777216;
-      }
-      function writeInt32(buf, val, pos) {
-        buf[pos] = val;
-        buf[pos + 1] = val >>> 8;
-        buf[pos + 2] = val >>> 16;
-        buf[pos + 3] = val >>> 24;
-      }
-      function readInt32(buf, pos) {
-        return (buf[pos] | buf[pos + 1] << 8 | buf[pos + 2] << 16) + (buf[pos + 3] << 24);
-      }
-      function readUtf8(buf, pos, end) {
-        var str = "";
-        var i2 = pos;
-        while (i2 < end) {
-          var b0 = buf[i2];
-          var c2 = null;
-          var bytesPerSequence = b0 > 239 ? 4 : b0 > 223 ? 3 : b0 > 191 ? 2 : 1;
-          if (i2 + bytesPerSequence > end)
-            break;
-          var b1, b2, b3;
-          if (bytesPerSequence === 1) {
-            if (b0 < 128) {
-              c2 = b0;
-            }
-          } else if (bytesPerSequence === 2) {
-            b1 = buf[i2 + 1];
-            if ((b1 & 192) === 128) {
-              c2 = (b0 & 31) << 6 | b1 & 63;
-              if (c2 <= 127) {
-                c2 = null;
-              }
-            }
-          } else if (bytesPerSequence === 3) {
-            b1 = buf[i2 + 1];
-            b2 = buf[i2 + 2];
-            if ((b1 & 192) === 128 && (b2 & 192) === 128) {
-              c2 = (b0 & 15) << 12 | (b1 & 63) << 6 | b2 & 63;
-              if (c2 <= 2047 || c2 >= 55296 && c2 <= 57343) {
-                c2 = null;
-              }
-            }
-          } else if (bytesPerSequence === 4) {
-            b1 = buf[i2 + 1];
-            b2 = buf[i2 + 2];
-            b3 = buf[i2 + 3];
-            if ((b1 & 192) === 128 && (b2 & 192) === 128 && (b3 & 192) === 128) {
-              c2 = (b0 & 15) << 18 | (b1 & 63) << 12 | (b2 & 63) << 6 | b3 & 63;
-              if (c2 <= 65535 || c2 >= 1114112) {
-                c2 = null;
-              }
-            }
-          }
-          if (c2 === null) {
-            c2 = 65533;
-            bytesPerSequence = 1;
-          } else if (c2 > 65535) {
-            c2 -= 65536;
-            str += String.fromCharCode(c2 >>> 10 & 1023 | 55296);
-            c2 = 56320 | c2 & 1023;
-          }
-          str += String.fromCharCode(c2);
-          i2 += bytesPerSequence;
-        }
-        return str;
-      }
-      function readUtf8TextDecoder(buf, pos, end) {
-        return utf8TextDecoder.decode(buf.subarray(pos, end));
-      }
-      function writeUtf8(buf, str, pos) {
-        for (var i2 = 0, c2, lead; i2 < str.length; i2++) {
-          c2 = str.charCodeAt(i2);
-          if (c2 > 55295 && c2 < 57344) {
-            if (lead) {
-              if (c2 < 56320) {
-                buf[pos++] = 239;
-                buf[pos++] = 191;
-                buf[pos++] = 189;
-                lead = c2;
-                continue;
-              } else {
-                c2 = lead - 55296 << 10 | c2 - 56320 | 65536;
-                lead = null;
-              }
-            } else {
-              if (c2 > 56319 || i2 + 1 === str.length) {
-                buf[pos++] = 239;
-                buf[pos++] = 191;
-                buf[pos++] = 189;
-              } else {
-                lead = c2;
-              }
-              continue;
-            }
-          } else if (lead) {
-            buf[pos++] = 239;
-            buf[pos++] = 191;
-            buf[pos++] = 189;
-            lead = null;
-          }
-          if (c2 < 128) {
-            buf[pos++] = c2;
-          } else {
-            if (c2 < 2048) {
-              buf[pos++] = c2 >> 6 | 192;
-            } else {
-              if (c2 < 65536) {
-                buf[pos++] = c2 >> 12 | 224;
-              } else {
-                buf[pos++] = c2 >> 18 | 240;
-                buf[pos++] = c2 >> 12 & 63 | 128;
-              }
-              buf[pos++] = c2 >> 6 & 63 | 128;
-            }
-            buf[pos++] = c2 & 63 | 128;
-          }
-        }
-        return pos;
-      }
-    }
-  });
-
-  // node_modules/rbush/rbush.min.js
-  var require_rbush_min = __commonJS({
-    "node_modules/rbush/rbush.min.js"(exports, module) {
-      !function(t2, i2) {
-        typeof exports == "object" && typeof module != "undefined" ? module.exports = i2() : typeof define == "function" && define.amd ? define(i2) : (t2 = t2 || self).RBush = i2();
-      }(exports, function() {
+    var K = (t, e) => () => (e || t((e = {
+            exports: {}
+        }).exports, e), e.exports),
+        ki = (t, e) => {
+            tr(t);
+            for (var r in e)
+                De(t, r, {
+                    get: e[r],
+                    enumerable: !0
+                })
+        },
+        Li = (t, e, r) => {
+            if (e && typeof e == "object" || typeof e == "function")
+                for (let i of vi(e))
+                    !Gt.call(t, i) && i !== "default" && De(t, i, {
+                        get: () => e[i],
+                        enumerable: !(r = wi(e, i)) || r.enumerable
+                    });
+            return t
+        },
+        N = t => Li(tr(De(t != null ? bi(_i(t)) : {}, "default", t && t.__esModule && "default" in t ? {
+            get: () => t.default,
+            enumerable: !0
+        } : {
+            value: t,
+            enumerable: !0
+        })), t);
+    var O = (t, e, r) => new Promise((i, n) => {
+        var a = l => {
+                try {
+                    o(r.next(l))
+                } catch (u) {
+                    n(u)
+                }
+            },
+            s = l => {
+                try {
+                    o(r.throw(l))
+                } catch (u) {
+                    n(u)
+                }
+            },
+            o = l => l.done ? i(l.value) : Promise.resolve(l.value).then(a, s);
+        o((r = r.apply(t, e)).next())
+    });
+    var re = K((ca, rr) => {
         "use strict";
-        function t2(t3, r3, e3, a3, h2) {
-          !function t4(n3, r4, e4, a4, h3) {
-            for (; a4 > e4; ) {
-              if (a4 - e4 > 600) {
-                var o3 = a4 - e4 + 1, s3 = r4 - e4 + 1, l3 = Math.log(o3), f3 = 0.5 * Math.exp(2 * l3 / 3), u3 = 0.5 * Math.sqrt(l3 * f3 * (o3 - f3) / o3) * (s3 - o3 / 2 < 0 ? -1 : 1), m2 = Math.max(e4, Math.floor(r4 - s3 * f3 / o3 + u3)), c3 = Math.min(a4, Math.floor(r4 + (o3 - s3) * f3 / o3 + u3));
-                t4(n3, r4, m2, c3, h3);
-              }
-              var p3 = n3[r4], d2 = e4, x2 = a4;
-              for (i2(n3, e4, r4), h3(n3[a4], p3) > 0 && i2(n3, e4, a4); d2 < x2; ) {
-                for (i2(n3, d2, x2), d2++, x2--; h3(n3[d2], p3) < 0; )
-                  d2++;
-                for (; h3(n3[x2], p3) > 0; )
-                  x2--;
-              }
-              h3(n3[e4], p3) === 0 ? i2(n3, e4, x2) : i2(n3, ++x2, a4), x2 <= r4 && (e4 = x2 + 1), r4 <= x2 && (a4 = x2 - 1);
+        rr.exports = ge;
+        function ge(t, e) {
+            this.x = t,
+            this.y = e
+        }
+        ge.prototype = {
+            clone: function() {
+                return new ge(this.x, this.y)
+            },
+            add: function(t) {
+                return this.clone()._add(t)
+            },
+            sub: function(t) {
+                return this.clone()._sub(t)
+            },
+            multByPoint: function(t) {
+                return this.clone()._multByPoint(t)
+            },
+            divByPoint: function(t) {
+                return this.clone()._divByPoint(t)
+            },
+            mult: function(t) {
+                return this.clone()._mult(t)
+            },
+            div: function(t) {
+                return this.clone()._div(t)
+            },
+            rotate: function(t) {
+                return this.clone()._rotate(t)
+            },
+            rotateAround: function(t, e) {
+                return this.clone()._rotateAround(t, e)
+            },
+            matMult: function(t) {
+                return this.clone()._matMult(t)
+            },
+            unit: function() {
+                return this.clone()._unit()
+            },
+            perp: function() {
+                return this.clone()._perp()
+            },
+            round: function() {
+                return this.clone()._round()
+            },
+            mag: function() {
+                return Math.sqrt(this.x * this.x + this.y * this.y)
+            },
+            equals: function(t) {
+                return this.x === t.x && this.y === t.y
+            },
+            dist: function(t) {
+                return Math.sqrt(this.distSqr(t))
+            },
+            distSqr: function(t) {
+                var e = t.x - this.x,
+                    r = t.y - this.y;
+                return e * e + r * r
+            },
+            angle: function() {
+                return Math.atan2(this.y, this.x)
+            },
+            angleTo: function(t) {
+                return Math.atan2(this.y - t.y, this.x - t.x)
+            },
+            angleWith: function(t) {
+                return this.angleWithSep(t.x, t.y)
+            },
+            angleWithSep: function(t, e) {
+                return Math.atan2(this.x * e - this.y * t, this.x * t + this.y * e)
+            },
+            _matMult: function(t) {
+                var e = t[0] * this.x + t[1] * this.y,
+                    r = t[2] * this.x + t[3] * this.y;
+                return this.x = e, this.y = r, this
+            },
+            _add: function(t) {
+                return this.x += t.x, this.y += t.y, this
+            },
+            _sub: function(t) {
+                return this.x -= t.x, this.y -= t.y, this
+            },
+            _mult: function(t) {
+                return this.x *= t, this.y *= t, this
+            },
+            _div: function(t) {
+                return this.x /= t, this.y /= t, this
+            },
+            _multByPoint: function(t) {
+                return this.x *= t.x, this.y *= t.y, this
+            },
+            _divByPoint: function(t) {
+                return this.x /= t.x, this.y /= t.y, this
+            },
+            _unit: function() {
+                return this._div(this.mag()), this
+            },
+            _perp: function() {
+                var t = this.y;
+                return this.y = this.x, this.x = -t, this
+            },
+            _rotate: function(t) {
+                var e = Math.cos(t),
+                    r = Math.sin(t),
+                    i = e * this.x - r * this.y,
+                    n = r * this.x + e * this.y;
+                return this.x = i, this.y = n, this
+            },
+            _rotateAround: function(t, e) {
+                var r = Math.cos(t),
+                    i = Math.sin(t),
+                    n = e.x + r * (this.x - e.x) - i * (this.y - e.y),
+                    a = e.y + i * (this.x - e.x) + r * (this.y - e.y);
+                return this.x = n, this.y = a, this
+            },
+            _round: function() {
+                return this.x = Math.round(this.x), this.y = Math.round(this.y), this
             }
-          }(t3, r3, e3 || 0, a3 || t3.length - 1, h2 || n2);
-        }
-        function i2(t3, i3, n3) {
-          var r3 = t3[i3];
-          t3[i3] = t3[n3], t3[n3] = r3;
-        }
-        function n2(t3, i3) {
-          return t3 < i3 ? -1 : t3 > i3 ? 1 : 0;
-        }
-        var r2 = function(t3) {
-          t3 === void 0 && (t3 = 9), this._maxEntries = Math.max(4, t3), this._minEntries = Math.max(2, Math.ceil(0.4 * this._maxEntries)), this.clear();
         };
-        function e2(t3, i3, n3) {
-          if (!n3)
-            return i3.indexOf(t3);
-          for (var r3 = 0; r3 < i3.length; r3++)
-            if (n3(t3, i3[r3]))
-              return r3;
-          return -1;
+        ge.convert = function(t) {
+            return t instanceof ge ? t : Array.isArray(t) ? new ge(t[0], t[1]) : t
         }
-        function a2(t3, i3) {
-          h(t3, 0, t3.children.length, i3, t3);
+    });
+    var pt = K((ma, ir) => {
+        "use strict";
+        var Si = re();
+        ir.exports = be;
+        function be(t, e, r, i, n) {
+            this.properties = {},
+            this.extent = r,
+            this.type = 0,
+            this._pbf = t,
+            this._geometry = -1,
+            this._keys = i,
+            this._values = n,
+            t.readFields(Fi, this, e)
         }
-        function h(t3, i3, n3, r3, e3) {
-          e3 || (e3 = p2(null)), e3.minX = 1 / 0, e3.minY = 1 / 0, e3.maxX = -1 / 0, e3.maxY = -1 / 0;
-          for (var a3 = i3; a3 < n3; a3++) {
-            var h2 = t3.children[a3];
-            o2(e3, t3.leaf ? r3(h2) : h2);
-          }
-          return e3;
+        function Fi(t, e, r) {
+            t == 1 ? e.id = r.readVarint() : t == 2 ? Mi(r, e) : t == 3 ? e.type = r.readVarint() : t == 4 && (e._geometry = r.pos)
         }
-        function o2(t3, i3) {
-          return t3.minX = Math.min(t3.minX, i3.minX), t3.minY = Math.min(t3.minY, i3.minY), t3.maxX = Math.max(t3.maxX, i3.maxX), t3.maxY = Math.max(t3.maxY, i3.maxY), t3;
-        }
-        function s2(t3, i3) {
-          return t3.minX - i3.minX;
-        }
-        function l2(t3, i3) {
-          return t3.minY - i3.minY;
-        }
-        function f2(t3) {
-          return (t3.maxX - t3.minX) * (t3.maxY - t3.minY);
-        }
-        function u2(t3) {
-          return t3.maxX - t3.minX + (t3.maxY - t3.minY);
-        }
-        function m(t3, i3) {
-          return t3.minX <= i3.minX && t3.minY <= i3.minY && i3.maxX <= t3.maxX && i3.maxY <= t3.maxY;
-        }
-        function c2(t3, i3) {
-          return i3.minX <= t3.maxX && i3.minY <= t3.maxY && i3.maxX >= t3.minX && i3.maxY >= t3.minY;
-        }
-        function p2(t3) {
-          return { children: t3, height: 1, leaf: true, minX: 1 / 0, minY: 1 / 0, maxX: -1 / 0, maxY: -1 / 0 };
-        }
-        function d(i3, n3, r3, e3, a3) {
-          for (var h2 = [n3, r3]; h2.length; )
-            if (!((r3 = h2.pop()) - (n3 = h2.pop()) <= e3)) {
-              var o3 = n3 + Math.ceil((r3 - n3) / e3 / 2) * e3;
-              t2(i3, o3, n3, r3, a3), h2.push(n3, o3, o3, r3);
+        function Mi(t, e) {
+            for (var r = t.readVarint() + t.pos; t.pos < r;) {
+                var i = e._keys[t.readVarint()],
+                    n = e._values[t.readVarint()];
+                e.properties[i] = n
             }
         }
-        return r2.prototype.all = function() {
-          return this._all(this.data, []);
-        }, r2.prototype.search = function(t3) {
-          var i3 = this.data, n3 = [];
-          if (!c2(t3, i3))
-            return n3;
-          for (var r3 = this.toBBox, e3 = []; i3; ) {
-            for (var a3 = 0; a3 < i3.children.length; a3++) {
-              var h2 = i3.children[a3], o3 = i3.leaf ? r3(h2) : h2;
-              c2(t3, o3) && (i3.leaf ? n3.push(h2) : m(t3, o3) ? this._all(h2, n3) : e3.push(h2));
+        be.types = ["Unknown", "Point", "LineString", "Polygon"];
+        be.prototype.loadGeometry = function() {
+            var t = this._pbf;
+            t.pos = this._geometry;
+            for (var e = t.readVarint() + t.pos, r = 1, i = 0, n = 0, a = 0, s = [], o; t.pos < e;) {
+                if (i <= 0) {
+                    var l = t.readVarint();
+                    r = l & 7,
+                    i = l >> 3
+                }
+                if (i--, r === 1 || r === 2)
+                    n += t.readSVarint(),
+                    a += t.readSVarint(),
+                    r === 1 && (o && s.push(o), o = []),
+                    o.push(new Si(n, a));
+                else if (r === 7)
+                    o && o.push(o[0].clone());
+                else
+                    throw new Error("unknown command " + r)
             }
-            i3 = e3.pop();
-          }
-          return n3;
-        }, r2.prototype.collides = function(t3) {
-          var i3 = this.data;
-          if (!c2(t3, i3))
-            return false;
-          for (var n3 = []; i3; ) {
-            for (var r3 = 0; r3 < i3.children.length; r3++) {
-              var e3 = i3.children[r3], a3 = i3.leaf ? this.toBBox(e3) : e3;
-              if (c2(t3, a3)) {
-                if (i3.leaf || m(t3, a3))
-                  return true;
-                n3.push(e3);
-              }
+            return o && s.push(o), s
+        };
+        be.prototype.bbox = function() {
+            var t = this._pbf;
+            t.pos = this._geometry;
+            for (var e = t.readVarint() + t.pos, r = 1, i = 0, n = 0, a = 0, s = 1 / 0, o = -1 / 0, l = 1 / 0, u = -1 / 0; t.pos < e;) {
+                if (i <= 0) {
+                    var f = t.readVarint();
+                    r = f & 7,
+                    i = f >> 3
+                }
+                if (i--, r === 1 || r === 2)
+                    n += t.readSVarint(),
+                    a += t.readSVarint(),
+                    n < s && (s = n),
+                    n > o && (o = n),
+                    a < l && (l = a),
+                    a > u && (u = a);
+                else if (r !== 7)
+                    throw new Error("unknown command " + r)
             }
-            i3 = n3.pop();
-          }
-          return false;
-        }, r2.prototype.load = function(t3) {
-          if (!t3 || !t3.length)
-            return this;
-          if (t3.length < this._minEntries) {
-            for (var i3 = 0; i3 < t3.length; i3++)
-              this.insert(t3[i3]);
-            return this;
-          }
-          var n3 = this._build(t3.slice(), 0, t3.length - 1, 0);
-          if (this.data.children.length)
-            if (this.data.height === n3.height)
-              this._splitRoot(this.data, n3);
+            return [s, l, o, u]
+        };
+        be.prototype.toGeoJSON = function(t, e, r) {
+            var i = this.extent * Math.pow(2, r),
+                n = this.extent * t,
+                a = this.extent * e,
+                s = this.loadGeometry(),
+                o = be.types[this.type],
+                l,
+                u;
+            function f(x) {
+                for (var w = 0; w < x.length; w++) {
+                    var z = x[w],
+                        h = 180 - (z.y + a) * 360 / i;
+                    x[w] = [(z.x + n) * 360 / i - 180, 360 / Math.PI * Math.atan(Math.exp(h * Math.PI / 180)) - 90]
+                }
+            }
+            switch (this.type) {
+            case 1:
+                var d = [];
+                for (l = 0; l < s.length; l++)
+                    d[l] = s[l][0];
+                s = d,
+                f(s);
+                break;
+            case 2:
+                for (l = 0; l < s.length; l++)
+                    f(s[l]);
+                break;
+            case 3:
+                for (s = Ci(s), l = 0; l < s.length; l++)
+                    for (u = 0; u < s[l].length; u++)
+                        f(s[l][u]);
+                break
+            }
+            s.length === 1 ? s = s[0] : o = "Multi" + o;
+            var c = {
+                type: "Feature",
+                geometry: {
+                    type: o,
+                    coordinates: s
+                },
+                properties: this.properties
+            };
+            return "id" in this && (c.id = this.id), c
+        };
+        function Ci(t) {
+            var e = t.length;
+            if (e <= 1)
+                return [t];
+            for (var r = [], i, n, a = 0; a < e; a++) {
+                var s = Ti(t[a]);
+                s !== 0 && (n === void 0 && (n = s < 0), n === s < 0 ? (i && r.push(i), i = [t[a]]) : i.push(t[a]))
+            }
+            return i && r.push(i), r
+        }
+        function Ti(t) {
+            for (var e = 0, r = 0, i = t.length, n = i - 1, a, s; r < i; n = r++)
+                a = t[r],
+                s = t[n],
+                e += (s.x - a.x) * (a.y + s.y);
+            return e
+        }
+    });
+    var yt = K((pa, ar) => {
+        "use strict";
+        var Pi = pt();
+        ar.exports = nr;
+        function nr(t, e) {
+            this.version = 1,
+            this.name = null,
+            this.extent = 4096,
+            this.length = 0,
+            this._pbf = t,
+            this._keys = [],
+            this._values = [],
+            this._features = [],
+            t.readFields(Di, this, e),
+            this.length = this._features.length
+        }
+        function Di(t, e, r) {
+            t === 15 ? e.version = r.readVarint() : t === 1 ? e.name = r.readString() : t === 5 ? e.extent = r.readVarint() : t === 2 ? e._features.push(r.pos) : t === 3 ? e._keys.push(r.readString()) : t === 4 && e._values.push(Ai(r))
+        }
+        function Ai(t) {
+            for (var e = null, r = t.readVarint() + t.pos; t.pos < r;) {
+                var i = t.readVarint() >> 3;
+                e = i === 1 ? t.readString() : i === 2 ? t.readFloat() : i === 3 ? t.readDouble() : i === 4 ? t.readVarint64() : i === 5 ? t.readVarint() : i === 6 ? t.readSVarint() : i === 7 ? t.readBoolean() : null
+            }
+            return e
+        }
+        nr.prototype.feature = function(t) {
+            if (t < 0 || t >= this._features.length)
+                throw new Error("feature index out of bounds");
+            this._pbf.pos = this._features[t];
+            var e = this._pbf.readVarint() + this._pbf.pos;
+            return new Pi(this._pbf, e, this.extent, this._keys, this._values)
+        }
+    });
+    var or = K((ya, sr) => {
+        "use strict";
+        var Bi = yt();
+        sr.exports = Ei;
+        function Ei(t, e) {
+            this.layers = t.readFields(Ri, {}, e)
+        }
+        function Ri(t, e, r) {
+            if (t === 3) {
+                var i = new Bi(r, r.readVarint() + r.pos);
+                i.length && (e[i.name] = i)
+            }
+        }
+    });
+    var lr = K((xa, Ge) => {
+        Ge.exports.VectorTile = or();
+        Ge.exports.VectorTileFeature = pt();
+        Ge.exports.VectorTileLayer = yt()
+    });
+    var ur = K(xt => {
+        xt.read = function(t, e, r, i, n) {
+            var a,
+                s,
+                o = n * 8 - i - 1,
+                l = (1 << o) - 1,
+                u = l >> 1,
+                f = -7,
+                d = r ? n - 1 : 0,
+                c = r ? -1 : 1,
+                x = t[e + d];
+            for (d += c, a = x & (1 << -f) - 1, x >>= -f, f += o; f > 0; a = a * 256 + t[e + d], d += c, f -= 8)
+                ;
+            for (s = a & (1 << -f) - 1, a >>= -f, f += i; f > 0; s = s * 256 + t[e + d], d += c, f -= 8)
+                ;
+            if (a === 0)
+                a = 1 - u;
             else {
-              if (this.data.height < n3.height) {
-                var r3 = this.data;
-                this.data = n3, n3 = r3;
-              }
-              this._insert(n3, this.data.height - n3.height - 1, true);
+                if (a === l)
+                    return s ? NaN : (x ? -1 : 1) * (1 / 0);
+                s = s + Math.pow(2, i),
+                a = a - u
             }
-          else
-            this.data = n3;
-          return this;
-        }, r2.prototype.insert = function(t3) {
-          return t3 && this._insert(t3, this.data.height - 1), this;
-        }, r2.prototype.clear = function() {
-          return this.data = p2([]), this;
-        }, r2.prototype.remove = function(t3, i3) {
-          if (!t3)
-            return this;
-          for (var n3, r3, a3, h2 = this.data, o3 = this.toBBox(t3), s3 = [], l3 = []; h2 || s3.length; ) {
-            if (h2 || (h2 = s3.pop(), r3 = s3[s3.length - 1], n3 = l3.pop(), a3 = true), h2.leaf) {
-              var f3 = e2(t3, h2.children, i3);
-              if (f3 !== -1)
-                return h2.children.splice(f3, 1), s3.push(h2), this._condense(s3), this;
-            }
-            a3 || h2.leaf || !m(h2, o3) ? r3 ? (n3++, h2 = r3.children[n3], a3 = false) : h2 = null : (s3.push(h2), l3.push(n3), n3 = 0, r3 = h2, h2 = h2.children[0]);
-          }
-          return this;
-        }, r2.prototype.toBBox = function(t3) {
-          return t3;
-        }, r2.prototype.compareMinX = function(t3, i3) {
-          return t3.minX - i3.minX;
-        }, r2.prototype.compareMinY = function(t3, i3) {
-          return t3.minY - i3.minY;
-        }, r2.prototype.toJSON = function() {
-          return this.data;
-        }, r2.prototype.fromJSON = function(t3) {
-          return this.data = t3, this;
-        }, r2.prototype._all = function(t3, i3) {
-          for (var n3 = []; t3; )
-            t3.leaf ? i3.push.apply(i3, t3.children) : n3.push.apply(n3, t3.children), t3 = n3.pop();
-          return i3;
-        }, r2.prototype._build = function(t3, i3, n3, r3) {
-          var e3, h2 = n3 - i3 + 1, o3 = this._maxEntries;
-          if (h2 <= o3)
-            return a2(e3 = p2(t3.slice(i3, n3 + 1)), this.toBBox), e3;
-          r3 || (r3 = Math.ceil(Math.log(h2) / Math.log(o3)), o3 = Math.ceil(h2 / Math.pow(o3, r3 - 1))), (e3 = p2([])).leaf = false, e3.height = r3;
-          var s3 = Math.ceil(h2 / o3), l3 = s3 * Math.ceil(Math.sqrt(o3));
-          d(t3, i3, n3, l3, this.compareMinX);
-          for (var f3 = i3; f3 <= n3; f3 += l3) {
-            var u3 = Math.min(f3 + l3 - 1, n3);
-            d(t3, f3, u3, s3, this.compareMinY);
-            for (var m2 = f3; m2 <= u3; m2 += s3) {
-              var c3 = Math.min(m2 + s3 - 1, u3);
-              e3.children.push(this._build(t3, m2, c3, r3 - 1));
-            }
-          }
-          return a2(e3, this.toBBox), e3;
-        }, r2.prototype._chooseSubtree = function(t3, i3, n3, r3) {
-          for (; r3.push(i3), !i3.leaf && r3.length - 1 !== n3; ) {
-            for (var e3 = 1 / 0, a3 = 1 / 0, h2 = void 0, o3 = 0; o3 < i3.children.length; o3++) {
-              var s3 = i3.children[o3], l3 = f2(s3), u3 = (m2 = t3, c3 = s3, (Math.max(c3.maxX, m2.maxX) - Math.min(c3.minX, m2.minX)) * (Math.max(c3.maxY, m2.maxY) - Math.min(c3.minY, m2.minY)) - l3);
-              u3 < a3 ? (a3 = u3, e3 = l3 < e3 ? l3 : e3, h2 = s3) : u3 === a3 && l3 < e3 && (e3 = l3, h2 = s3);
-            }
-            i3 = h2 || i3.children[0];
-          }
-          var m2, c3;
-          return i3;
-        }, r2.prototype._insert = function(t3, i3, n3) {
-          var r3 = n3 ? t3 : this.toBBox(t3), e3 = [], a3 = this._chooseSubtree(r3, this.data, i3, e3);
-          for (a3.children.push(t3), o2(a3, r3); i3 >= 0 && e3[i3].children.length > this._maxEntries; )
-            this._split(e3, i3), i3--;
-          this._adjustParentBBoxes(r3, e3, i3);
-        }, r2.prototype._split = function(t3, i3) {
-          var n3 = t3[i3], r3 = n3.children.length, e3 = this._minEntries;
-          this._chooseSplitAxis(n3, e3, r3);
-          var h2 = this._chooseSplitIndex(n3, e3, r3), o3 = p2(n3.children.splice(h2, n3.children.length - h2));
-          o3.height = n3.height, o3.leaf = n3.leaf, a2(n3, this.toBBox), a2(o3, this.toBBox), i3 ? t3[i3 - 1].children.push(o3) : this._splitRoot(n3, o3);
-        }, r2.prototype._splitRoot = function(t3, i3) {
-          this.data = p2([t3, i3]), this.data.height = t3.height + 1, this.data.leaf = false, a2(this.data, this.toBBox);
-        }, r2.prototype._chooseSplitIndex = function(t3, i3, n3) {
-          for (var r3, e3, a3, o3, s3, l3, u3, m2 = 1 / 0, c3 = 1 / 0, p3 = i3; p3 <= n3 - i3; p3++) {
-            var d2 = h(t3, 0, p3, this.toBBox), x2 = h(t3, p3, n3, this.toBBox), v = (e3 = d2, a3 = x2, o3 = void 0, s3 = void 0, l3 = void 0, u3 = void 0, o3 = Math.max(e3.minX, a3.minX), s3 = Math.max(e3.minY, a3.minY), l3 = Math.min(e3.maxX, a3.maxX), u3 = Math.min(e3.maxY, a3.maxY), Math.max(0, l3 - o3) * Math.max(0, u3 - s3)), M = f2(d2) + f2(x2);
-            v < m2 ? (m2 = v, r3 = p3, c3 = M < c3 ? M : c3) : v === m2 && M < c3 && (c3 = M, r3 = p3);
-          }
-          return r3 || n3 - i3;
-        }, r2.prototype._chooseSplitAxis = function(t3, i3, n3) {
-          var r3 = t3.leaf ? this.compareMinX : s2, e3 = t3.leaf ? this.compareMinY : l2;
-          this._allDistMargin(t3, i3, n3, r3) < this._allDistMargin(t3, i3, n3, e3) && t3.children.sort(r3);
-        }, r2.prototype._allDistMargin = function(t3, i3, n3, r3) {
-          t3.children.sort(r3);
-          for (var e3 = this.toBBox, a3 = h(t3, 0, i3, e3), s3 = h(t3, n3 - i3, n3, e3), l3 = u2(a3) + u2(s3), f3 = i3; f3 < n3 - i3; f3++) {
-            var m2 = t3.children[f3];
-            o2(a3, t3.leaf ? e3(m2) : m2), l3 += u2(a3);
-          }
-          for (var c3 = n3 - i3 - 1; c3 >= i3; c3--) {
-            var p3 = t3.children[c3];
-            o2(s3, t3.leaf ? e3(p3) : p3), l3 += u2(s3);
-          }
-          return l3;
-        }, r2.prototype._adjustParentBBoxes = function(t3, i3, n3) {
-          for (var r3 = n3; r3 >= 0; r3--)
-            o2(i3[r3], t3);
-        }, r2.prototype._condense = function(t3) {
-          for (var i3 = t3.length - 1, n3 = void 0; i3 >= 0; i3--)
-            t3[i3].children.length === 0 ? i3 > 0 ? (n3 = t3[i3 - 1].children).splice(n3.indexOf(t3[i3]), 1) : this.clear() : a2(t3[i3], this.toBBox);
-        }, r2;
-      });
-    }
-  });
-
-  // src/types/unitbezier.d.ts
-  var require_unitbezier_d = __commonJS({
-    "src/types/unitbezier.d.ts"() {
-    }
-  });
-
-  // node_modules/tinyqueue/tinyqueue.js
-  var require_tinyqueue = __commonJS({
-    "node_modules/tinyqueue/tinyqueue.js"(exports, module) {
-      (function(global, factory) {
-        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global = global || self, global.TinyQueue = factory());
-      })(exports, function() {
+            return (x ? -1 : 1) * s * Math.pow(2, a - i)
+        };
+        xt.write = function(t, e, r, i, n, a) {
+            var s,
+                o,
+                l,
+                u = a * 8 - n - 1,
+                f = (1 << u) - 1,
+                d = f >> 1,
+                c = n === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0,
+                x = i ? 0 : a - 1,
+                w = i ? 1 : -1,
+                z = e < 0 || e === 0 && 1 / e < 0 ? 1 : 0;
+            for (e = Math.abs(e), isNaN(e) || e === 1 / 0 ? (o = isNaN(e) ? 1 : 0, s = f) : (s = Math.floor(Math.log(e) / Math.LN2), e * (l = Math.pow(2, -s)) < 1 && (s--, l *= 2), s + d >= 1 ? e += c / l : e += c * Math.pow(2, 1 - d), e * l >= 2 && (s++, l /= 2), s + d >= f ? (o = 0, s = f) : s + d >= 1 ? (o = (e * l - 1) * Math.pow(2, n), s = s + d) : (o = e * Math.pow(2, d - 1) * Math.pow(2, n), s = 0)); n >= 8; t[r + x] = o & 255, x += w, o /= 256, n -= 8)
+                ;
+            for (s = s << n | o, u += n; u > 0; t[r + x] = s & 255, x += w, s /= 256, u -= 8)
+                ;
+            t[r + x - w] |= z * 128
+        }
+    });
+    var pr = K((ba, mr) => {
         "use strict";
-        var TinyQueue = function TinyQueue2(data, compare2) {
-          if (data === void 0)
-            data = [];
-          if (compare2 === void 0)
-            compare2 = defaultCompare;
-          this.data = data;
-          this.length = this.data.length;
-          this.compare = compare2;
-          if (this.length > 0) {
-            for (var i2 = (this.length >> 1) - 1; i2 >= 0; i2--) {
-              this._down(i2);
+        mr.exports = F;
+        var Qe = ur();
+        function F(t) {
+            this.buf = ArrayBuffer.isView && ArrayBuffer.isView(t) ? t : new Uint8Array(t || 0),
+            this.pos = 0,
+            this.type = 0,
+            this.length = this.buf.length
+        }
+        F.Varint = 0;
+        F.Fixed64 = 1;
+        F.Bytes = 2;
+        F.Fixed32 = 5;
+        var gt = (1 << 16) * (1 << 16),
+            hr = 1 / gt,
+            Oi = 12,
+            fr = typeof TextDecoder == "undefined" ? null : new TextDecoder("utf8");
+        F.prototype = {
+            destroy: function() {
+                this.buf = null
+            },
+            readFields: function(t, e, r) {
+                for (r = r || this.length; this.pos < r;) {
+                    var i = this.readVarint(),
+                        n = i >> 3,
+                        a = this.pos;
+                    this.type = i & 7,
+                    t(n, e, this),
+                    this.pos === a && this.skip(i)
+                }
+                return e
+            },
+            readMessage: function(t, e) {
+                return this.readFields(t, e, this.readVarint() + this.pos)
+            },
+            readFixed32: function() {
+                var t = et(this.buf, this.pos);
+                return this.pos += 4, t
+            },
+            readSFixed32: function() {
+                var t = cr(this.buf, this.pos);
+                return this.pos += 4, t
+            },
+            readFixed64: function() {
+                var t = et(this.buf, this.pos) + et(this.buf, this.pos + 4) * gt;
+                return this.pos += 8, t
+            },
+            readSFixed64: function() {
+                var t = et(this.buf, this.pos) + cr(this.buf, this.pos + 4) * gt;
+                return this.pos += 8, t
+            },
+            readFloat: function() {
+                var t = Qe.read(this.buf, this.pos, !0, 23, 4);
+                return this.pos += 4, t
+            },
+            readDouble: function() {
+                var t = Qe.read(this.buf, this.pos, !0, 52, 8);
+                return this.pos += 8, t
+            },
+            readVarint: function(t) {
+                var e = this.buf,
+                    r,
+                    i;
+                return i = e[this.pos++], r = i & 127, i < 128 || (i = e[this.pos++], r |= (i & 127) << 7, i < 128) || (i = e[this.pos++], r |= (i & 127) << 14, i < 128) || (i = e[this.pos++], r |= (i & 127) << 21, i < 128) ? r : (i = e[this.pos], r |= (i & 15) << 28, Ii(r, t, this))
+            },
+            readVarint64: function() {
+                return this.readVarint(!0)
+            },
+            readSVarint: function() {
+                var t = this.readVarint();
+                return t % 2 == 1 ? (t + 1) / -2 : t / 2
+            },
+            readBoolean: function() {
+                return Boolean(this.readVarint())
+            },
+            readString: function() {
+                var t = this.readVarint() + this.pos,
+                    e = this.pos;
+                return this.pos = t, t - e >= Oi && fr ? Gi(this.buf, e, t) : Ji(this.buf, e, t)
+            },
+            readBytes: function() {
+                var t = this.readVarint() + this.pos,
+                    e = this.buf.subarray(this.pos, t);
+                return this.pos = t, e
+            },
+            readPackedVarint: function(t, e) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readVarint(e));
+                var r = ae(this);
+                for (t = t || []; this.pos < r;)
+                    t.push(this.readVarint(e));
+                return t
+            },
+            readPackedSVarint: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readSVarint());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readSVarint());
+                return t
+            },
+            readPackedBoolean: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readBoolean());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readBoolean());
+                return t
+            },
+            readPackedFloat: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readFloat());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readFloat());
+                return t
+            },
+            readPackedDouble: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readDouble());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readDouble());
+                return t
+            },
+            readPackedFixed32: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readFixed32());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readFixed32());
+                return t
+            },
+            readPackedSFixed32: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readSFixed32());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readSFixed32());
+                return t
+            },
+            readPackedFixed64: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readFixed64());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readFixed64());
+                return t
+            },
+            readPackedSFixed64: function(t) {
+                if (this.type !== F.Bytes)
+                    return t.push(this.readSFixed64());
+                var e = ae(this);
+                for (t = t || []; this.pos < e;)
+                    t.push(this.readSFixed64());
+                return t
+            },
+            skip: function(t) {
+                var e = t & 7;
+                if (e === F.Varint)
+                    for (; this.buf[this.pos++] > 127;)
+                        ;
+                else if (e === F.Bytes)
+                    this.pos = this.readVarint() + this.pos;
+                else if (e === F.Fixed32)
+                    this.pos += 4;
+                else if (e === F.Fixed64)
+                    this.pos += 8;
+                else
+                    throw new Error("Unimplemented type: " + e)
+            },
+            writeTag: function(t, e) {
+                this.writeVarint(t << 3 | e)
+            },
+            realloc: function(t) {
+                for (var e = this.length || 16; e < this.pos + t;)
+                    e *= 2;
+                if (e !== this.length) {
+                    var r = new Uint8Array(e);
+                    r.set(this.buf),
+                    this.buf = r,
+                    this.length = e
+                }
+            },
+            finish: function() {
+                return this.length = this.pos, this.pos = 0, this.buf.subarray(0, this.length)
+            },
+            writeFixed32: function(t) {
+                this.realloc(4),
+                ve(this.buf, t, this.pos),
+                this.pos += 4
+            },
+            writeSFixed32: function(t) {
+                this.realloc(4),
+                ve(this.buf, t, this.pos),
+                this.pos += 4
+            },
+            writeFixed64: function(t) {
+                this.realloc(8),
+                ve(this.buf, t & -1, this.pos),
+                ve(this.buf, Math.floor(t * hr), this.pos + 4),
+                this.pos += 8
+            },
+            writeSFixed64: function(t) {
+                this.realloc(8),
+                ve(this.buf, t & -1, this.pos),
+                ve(this.buf, Math.floor(t * hr), this.pos + 4),
+                this.pos += 8
+            },
+            writeVarint: function(t) {
+                if (t = +t || 0, t > 268435455 || t < 0) {
+                    Xi(t, this);
+                    return
+                }
+                this.realloc(4),
+                this.buf[this.pos++] = t & 127 | (t > 127 ? 128 : 0),
+                !(t <= 127) && (this.buf[this.pos++] = (t >>>= 7) & 127 | (t > 127 ? 128 : 0), !(t <= 127) && (this.buf[this.pos++] = (t >>>= 7) & 127 | (t > 127 ? 128 : 0), !(t <= 127) && (this.buf[this.pos++] = t >>> 7 & 127)))
+            },
+            writeSVarint: function(t) {
+                this.writeVarint(t < 0 ? -t * 2 - 1 : t * 2)
+            },
+            writeBoolean: function(t) {
+                this.writeVarint(Boolean(t))
+            },
+            writeString: function(t) {
+                t = String(t),
+                this.realloc(t.length * 4),
+                this.pos++;
+                var e = this.pos;
+                this.pos = Qi(this.buf, t, this.pos);
+                var r = this.pos - e;
+                r >= 128 && dr(e, r, this),
+                this.pos = e - 1,
+                this.writeVarint(r),
+                this.pos += r
+            },
+            writeFloat: function(t) {
+                this.realloc(4),
+                Qe.write(this.buf, t, this.pos, !0, 23, 4),
+                this.pos += 4
+            },
+            writeDouble: function(t) {
+                this.realloc(8),
+                Qe.write(this.buf, t, this.pos, !0, 52, 8),
+                this.pos += 8
+            },
+            writeBytes: function(t) {
+                var e = t.length;
+                this.writeVarint(e),
+                this.realloc(e);
+                for (var r = 0; r < e; r++)
+                    this.buf[this.pos++] = t[r]
+            },
+            writeRawMessage: function(t, e) {
+                this.pos++;
+                var r = this.pos;
+                t(e, this);
+                var i = this.pos - r;
+                i >= 128 && dr(r, i, this),
+                this.pos = r - 1,
+                this.writeVarint(i),
+                this.pos += i
+            },
+            writeMessage: function(t, e, r) {
+                this.writeTag(t, F.Bytes),
+                this.writeRawMessage(e, r)
+            },
+            writePackedVarint: function(t, e) {
+                e.length && this.writeMessage(t, Ui, e)
+            },
+            writePackedSVarint: function(t, e) {
+                e.length && this.writeMessage(t, ji, e)
+            },
+            writePackedBoolean: function(t, e) {
+                e.length && this.writeMessage(t, Zi, e)
+            },
+            writePackedFloat: function(t, e) {
+                e.length && this.writeMessage(t, Ni, e)
+            },
+            writePackedDouble: function(t, e) {
+                e.length && this.writeMessage(t, qi, e)
+            },
+            writePackedFixed32: function(t, e) {
+                e.length && this.writeMessage(t, Wi, e)
+            },
+            writePackedSFixed32: function(t, e) {
+                e.length && this.writeMessage(t, $i, e)
+            },
+            writePackedFixed64: function(t, e) {
+                e.length && this.writeMessage(t, Hi, e)
+            },
+            writePackedSFixed64: function(t, e) {
+                e.length && this.writeMessage(t, Ki, e)
+            },
+            writeBytesField: function(t, e) {
+                this.writeTag(t, F.Bytes),
+                this.writeBytes(e)
+            },
+            writeFixed32Field: function(t, e) {
+                this.writeTag(t, F.Fixed32),
+                this.writeFixed32(e)
+            },
+            writeSFixed32Field: function(t, e) {
+                this.writeTag(t, F.Fixed32),
+                this.writeSFixed32(e)
+            },
+            writeFixed64Field: function(t, e) {
+                this.writeTag(t, F.Fixed64),
+                this.writeFixed64(e)
+            },
+            writeSFixed64Field: function(t, e) {
+                this.writeTag(t, F.Fixed64),
+                this.writeSFixed64(e)
+            },
+            writeVarintField: function(t, e) {
+                this.writeTag(t, F.Varint),
+                this.writeVarint(e)
+            },
+            writeSVarintField: function(t, e) {
+                this.writeTag(t, F.Varint),
+                this.writeSVarint(e)
+            },
+            writeStringField: function(t, e) {
+                this.writeTag(t, F.Bytes),
+                this.writeString(e)
+            },
+            writeFloatField: function(t, e) {
+                this.writeTag(t, F.Fixed32),
+                this.writeFloat(e)
+            },
+            writeDoubleField: function(t, e) {
+                this.writeTag(t, F.Fixed64),
+                this.writeDouble(e)
+            },
+            writeBooleanField: function(t, e) {
+                this.writeVarintField(t, Boolean(e))
             }
-          }
         };
-        TinyQueue.prototype.push = function push(item) {
-          this.data.push(item);
-          this.length++;
-          this._up(this.length - 1);
-        };
-        TinyQueue.prototype.pop = function pop() {
-          if (this.length === 0) {
-            return void 0;
-          }
-          var top = this.data[0];
-          var bottom = this.data.pop();
-          this.length--;
-          if (this.length > 0) {
-            this.data[0] = bottom;
-            this._down(0);
-          }
-          return top;
-        };
-        TinyQueue.prototype.peek = function peek() {
-          return this.data[0];
-        };
-        TinyQueue.prototype._up = function _up(pos) {
-          var ref = this;
-          var data = ref.data;
-          var compare2 = ref.compare;
-          var item = data[pos];
-          while (pos > 0) {
-            var parent = pos - 1 >> 1;
-            var current = data[parent];
-            if (compare2(item, current) >= 0) {
-              break;
+        function Ii(t, e, r) {
+            var i = r.buf,
+                n,
+                a;
+            if (a = i[r.pos++], n = (a & 112) >> 4, a < 128 || (a = i[r.pos++], n |= (a & 127) << 3, a < 128) || (a = i[r.pos++], n |= (a & 127) << 10, a < 128) || (a = i[r.pos++], n |= (a & 127) << 17, a < 128) || (a = i[r.pos++], n |= (a & 127) << 24, a < 128) || (a = i[r.pos++], n |= (a & 1) << 31, a < 128))
+                return we(t, n, e);
+            throw new Error("Expected varint not more than 10 bytes")
+        }
+        function ae(t) {
+            return t.type === F.Bytes ? t.readVarint() + t.pos : t.pos + 1
+        }
+        function we(t, e, r) {
+            return r ? e * 4294967296 + (t >>> 0) : (e >>> 0) * 4294967296 + (t >>> 0)
+        }
+        function Xi(t, e) {
+            var r,
+                i;
+            if (t >= 0 ? (r = t % 4294967296 | 0, i = t / 4294967296 | 0) : (r = ~(-t % 4294967296), i = ~(-t / 4294967296), r ^ 4294967295 ? r = r + 1 | 0 : (r = 0, i = i + 1 | 0)), t >= 18446744073709552e3 || t < -18446744073709552e3)
+                throw new Error("Given varint doesn't fit into 10 bytes");
+            e.realloc(10),
+            Vi(r, i, e),
+            Yi(i, e)
+        }
+        function Vi(t, e, r) {
+            r.buf[r.pos++] = t & 127 | 128,
+            t >>>= 7,
+            r.buf[r.pos++] = t & 127 | 128,
+            t >>>= 7,
+            r.buf[r.pos++] = t & 127 | 128,
+            t >>>= 7,
+            r.buf[r.pos++] = t & 127 | 128,
+            t >>>= 7,
+            r.buf[r.pos] = t & 127
+        }
+        function Yi(t, e) {
+            var r = (t & 7) << 4;
+            e.buf[e.pos++] |= r | ((t >>>= 3) ? 128 : 0),
+            !!t && (e.buf[e.pos++] = t & 127 | ((t >>>= 7) ? 128 : 0), !!t && (e.buf[e.pos++] = t & 127 | ((t >>>= 7) ? 128 : 0), !!t && (e.buf[e.pos++] = t & 127 | ((t >>>= 7) ? 128 : 0), !!t && (e.buf[e.pos++] = t & 127 | ((t >>>= 7) ? 128 : 0), !!t && (e.buf[e.pos++] = t & 127)))))
+        }
+        function dr(t, e, r) {
+            var i = e <= 16383 ? 1 : e <= 2097151 ? 2 : e <= 268435455 ? 3 : Math.floor(Math.log(e) / (Math.LN2 * 7));
+            r.realloc(i);
+            for (var n = r.pos - 1; n >= t; n--)
+                r.buf[n + i] = r.buf[n]
+        }
+        function Ui(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeVarint(t[r])
+        }
+        function ji(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeSVarint(t[r])
+        }
+        function Ni(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeFloat(t[r])
+        }
+        function qi(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeDouble(t[r])
+        }
+        function Zi(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeBoolean(t[r])
+        }
+        function Wi(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeFixed32(t[r])
+        }
+        function $i(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeSFixed32(t[r])
+        }
+        function Hi(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeFixed64(t[r])
+        }
+        function Ki(t, e) {
+            for (var r = 0; r < t.length; r++)
+                e.writeSFixed64(t[r])
+        }
+        function et(t, e) {
+            return (t[e] | t[e + 1] << 8 | t[e + 2] << 16) + t[e + 3] * 16777216
+        }
+        function ve(t, e, r) {
+            t[r] = e,
+            t[r + 1] = e >>> 8,
+            t[r + 2] = e >>> 16,
+            t[r + 3] = e >>> 24
+        }
+        function cr(t, e) {
+            return (t[e] | t[e + 1] << 8 | t[e + 2] << 16) + (t[e + 3] << 24)
+        }
+        function Ji(t, e, r) {
+            for (var i = "", n = e; n < r;) {
+                var a = t[n],
+                    s = null,
+                    o = a > 239 ? 4 : a > 223 ? 3 : a > 191 ? 2 : 1;
+                if (n + o > r)
+                    break;
+                var l,
+                    u,
+                    f;
+                o === 1 ? a < 128 && (s = a) : o === 2 ? (l = t[n + 1], (l & 192) == 128 && (s = (a & 31) << 6 | l & 63, s <= 127 && (s = null))) : o === 3 ? (l = t[n + 1], u = t[n + 2], (l & 192) == 128 && (u & 192) == 128 && (s = (a & 15) << 12 | (l & 63) << 6 | u & 63, (s <= 2047 || s >= 55296 && s <= 57343) && (s = null))) : o === 4 && (l = t[n + 1], u = t[n + 2], f = t[n + 3], (l & 192) == 128 && (u & 192) == 128 && (f & 192) == 128 && (s = (a & 15) << 18 | (l & 63) << 12 | (u & 63) << 6 | f & 63, (s <= 65535 || s >= 1114112) && (s = null))),
+                s === null ? (s = 65533, o = 1) : s > 65535 && (s -= 65536, i += String.fromCharCode(s >>> 10 & 1023 | 55296), s = 56320 | s & 1023),
+                i += String.fromCharCode(s),
+                n += o
             }
-            data[pos] = current;
-            pos = parent;
-          }
-          data[pos] = item;
-        };
-        TinyQueue.prototype._down = function _down(pos) {
-          var ref = this;
-          var data = ref.data;
-          var compare2 = ref.compare;
-          var halfLength = this.length >> 1;
-          var item = data[pos];
-          while (pos < halfLength) {
-            var left = (pos << 1) + 1;
-            var best = data[left];
-            var right = left + 1;
-            if (right < this.length && compare2(data[right], best) < 0) {
-              left = right;
-              best = data[right];
+            return i
+        }
+        function Gi(t, e, r) {
+            return fr.decode(t.subarray(e, r))
+        }
+        function Qi(t, e, r) {
+            for (var i = 0, n, a; i < e.length; i++) {
+                if (n = e.charCodeAt(i), n > 55295 && n < 57344)
+                    if (a)
+                        if (n < 56320) {
+                            t[r++] = 239,
+                            t[r++] = 191,
+                            t[r++] = 189,
+                            a = n;
+                            continue
+                        } else
+                            n = a - 55296 << 10 | n - 56320 | 65536,
+                            a = null;
+                    else {
+                        n > 56319 || i + 1 === e.length ? (t[r++] = 239, t[r++] = 191, t[r++] = 189) : a = n;
+                        continue
+                    }
+                else
+                    a && (t[r++] = 239, t[r++] = 191, t[r++] = 189, a = null);
+                n < 128 ? t[r++] = n : (n < 2048 ? t[r++] = n >> 6 | 192 : (n < 65536 ? t[r++] = n >> 12 | 224 : (t[r++] = n >> 18 | 240, t[r++] = n >> 12 & 63 | 128), t[r++] = n >> 6 & 63 | 128), t[r++] = n & 63 | 128)
             }
-            if (compare2(best, item) >= 0) {
-              break;
-            }
-            data[pos] = best;
-            pos = left;
-          }
-          data[pos] = item;
-        };
-        function defaultCompare(a2, b) {
-          return a2 < b ? -1 : a2 > b ? 1 : 0;
+            return r
         }
-        return TinyQueue;
-      });
-    }
-  });
-
-  // node_modules/polylabel/polylabel.js
-  var require_polylabel = __commonJS({
-    "node_modules/polylabel/polylabel.js"(exports, module) {
-      "use strict";
-      var Queue = require_tinyqueue();
-      if (Queue.default)
-        Queue = Queue.default;
-      module.exports = polylabel2;
-      module.exports.default = polylabel2;
-      function polylabel2(polygon, precision, debug) {
-        precision = precision || 1;
-        var minX, minY, maxX, maxY;
-        for (var i2 = 0; i2 < polygon[0].length; i2++) {
-          var p2 = polygon[0][i2];
-          if (!i2 || p2[0] < minX)
-            minX = p2[0];
-          if (!i2 || p2[1] < minY)
-            minY = p2[1];
-          if (!i2 || p2[0] > maxX)
-            maxX = p2[0];
-          if (!i2 || p2[1] > maxY)
-            maxY = p2[1];
-        }
-        var width = maxX - minX;
-        var height = maxY - minY;
-        var cellSize = Math.min(width, height);
-        var h = cellSize / 2;
-        if (cellSize === 0) {
-          var degeneratePoleOfInaccessibility = [minX, minY];
-          degeneratePoleOfInaccessibility.distance = 0;
-          return degeneratePoleOfInaccessibility;
-        }
-        var cellQueue = new Queue(void 0, compareMax);
-        for (var x2 = minX; x2 < maxX; x2 += cellSize) {
-          for (var y = minY; y < maxY; y += cellSize) {
-            cellQueue.push(new Cell(x2 + h, y + h, h, polygon));
-          }
-        }
-        var bestCell = getCentroidCell(polygon);
-        var bboxCell = new Cell(minX + width / 2, minY + height / 2, 0, polygon);
-        if (bboxCell.d > bestCell.d)
-          bestCell = bboxCell;
-        var numProbes = cellQueue.length;
-        while (cellQueue.length) {
-          var cell = cellQueue.pop();
-          if (cell.d > bestCell.d) {
-            bestCell = cell;
-            if (debug)
-              console.log("found best %d after %d probes", Math.round(1e4 * cell.d) / 1e4, numProbes);
-          }
-          if (cell.max - bestCell.d <= precision)
-            continue;
-          h = cell.h / 2;
-          cellQueue.push(new Cell(cell.x - h, cell.y - h, h, polygon));
-          cellQueue.push(new Cell(cell.x + h, cell.y - h, h, polygon));
-          cellQueue.push(new Cell(cell.x - h, cell.y + h, h, polygon));
-          cellQueue.push(new Cell(cell.x + h, cell.y + h, h, polygon));
-          numProbes += 4;
-        }
-        if (debug) {
-          console.log("num probes: " + numProbes);
-          console.log("best distance: " + bestCell.d);
-        }
-        var poleOfInaccessibility = [bestCell.x, bestCell.y];
-        poleOfInaccessibility.distance = bestCell.d;
-        return poleOfInaccessibility;
-      }
-      function compareMax(a2, b) {
-        return b.max - a2.max;
-      }
-      function Cell(x2, y, h, polygon) {
-        this.x = x2;
-        this.y = y;
-        this.h = h;
-        this.d = pointToPolygonDist(x2, y, polygon);
-        this.max = this.d + this.h * Math.SQRT2;
-      }
-      function pointToPolygonDist(x2, y, polygon) {
-        var inside = false;
-        var minDistSq = Infinity;
-        for (var k = 0; k < polygon.length; k++) {
-          var ring = polygon[k];
-          for (var i2 = 0, len = ring.length, j = len - 1; i2 < len; j = i2++) {
-            var a2 = ring[i2];
-            var b = ring[j];
-            if (a2[1] > y !== b[1] > y && x2 < (b[0] - a2[0]) * (y - a2[1]) / (b[1] - a2[1]) + a2[0])
-              inside = !inside;
-            minDistSq = Math.min(minDistSq, getSegDistSq(x2, y, a2, b));
-          }
-        }
-        return minDistSq === 0 ? 0 : (inside ? 1 : -1) * Math.sqrt(minDistSq);
-      }
-      function getCentroidCell(polygon) {
-        var area = 0;
-        var x2 = 0;
-        var y = 0;
-        var points = polygon[0];
-        for (var i2 = 0, len = points.length, j = len - 1; i2 < len; j = i2++) {
-          var a2 = points[i2];
-          var b = points[j];
-          var f2 = a2[0] * b[1] - b[0] * a2[1];
-          x2 += (a2[0] + b[0]) * f2;
-          y += (a2[1] + b[1]) * f2;
-          area += f2 * 3;
-        }
-        if (area === 0)
-          return new Cell(points[0][0], points[0][1], 0, polygon);
-        return new Cell(x2 / area, y / area, 0, polygon);
-      }
-      function getSegDistSq(px, py, a2, b) {
-        var x2 = a2[0];
-        var y = a2[1];
-        var dx = b[0] - x2;
-        var dy = b[1] - y;
-        if (dx !== 0 || dy !== 0) {
-          var t2 = ((px - x2) * dx + (py - y) * dy) / (dx * dx + dy * dy);
-          if (t2 > 1) {
-            x2 = b[0];
-            y = b[1];
-          } else if (t2 > 0) {
-            x2 += dx * t2;
-            y += dy * t2;
-          }
-        }
-        dx = px - x2;
-        dy = py - y;
-        return dx * dx + dy * dy;
-      }
-    }
-  });
-
-  // src/index.ts
-  var src_exports = {};
-  __export(src_exports, {
-    CenteredSymbolizer: () => CenteredSymbolizer,
-    CenteredTextSymbolizer: () => CenteredTextSymbolizer,
-    CircleSymbolizer: () => CircleSymbolizer,
-    FlexSymbolizer: () => FlexSymbolizer,
-    Font: () => Font,
-    GeomType: () => GeomType,
-    GroupSymbolizer: () => GroupSymbolizer,
-    IconSymbolizer: () => IconSymbolizer,
-    Index: () => Index,
-    Justify: () => Justify,
-    Labeler: () => Labeler,
-    Labelers: () => Labelers,
-    LineLabelPlacement: () => LineLabelPlacement,
-    LineLabelSymbolizer: () => LineLabelSymbolizer,
-    LineSymbolizer: () => LineSymbolizer,
-    OffsetSymbolizer: () => OffsetSymbolizer,
-    OffsetTextSymbolizer: () => OffsetTextSymbolizer,
-    PMTiles: () => PMTiles,
-    Padding: () => Padding,
-    PmtilesSource: () => PmtilesSource,
-    PolygonLabelSymbolizer: () => PolygonLabelSymbolizer,
-    PolygonSymbolizer: () => PolygonSymbolizer,
-    Sheet: () => Sheet,
-    ShieldSymbolizer: () => ShieldSymbolizer,
-    Static: () => Static,
-    TextPlacements: () => TextPlacements,
-    TextSymbolizer: () => TextSymbolizer,
-    TileCache: () => TileCache,
-    View: () => View,
-    ZxySource: () => ZxySource,
-    arr: () => arr,
-    covering: () => covering,
-    createPattern: () => createPattern,
-    cubicBezier: () => cubicBezier,
-    dark: () => dark,
-    exp: () => exp,
-    filterFn: () => filterFn,
-    getFont: () => getFont,
-    getZoom: () => getZoom,
-    isCCW: () => isCCW,
-    isInRing: () => isInRing,
-    json_style: () => json_style,
-    labelRules: () => labelRules,
-    leafletLayer: () => leafletLayer,
-    light: () => light,
-    linear: () => linear,
-    numberFn: () => numberFn,
-    numberOrFn: () => numberOrFn,
-    paintRules: () => paintRules,
-    painter: () => painter,
-    pointInPolygon: () => pointInPolygon,
-    pointMinDistToLines: () => pointMinDistToLines,
-    pointMinDistToPoints: () => pointMinDistToPoints,
-    sourcesToViews: () => sourcesToViews,
-    step: () => step,
-    toIndex: () => toIndex,
-    transformGeom: () => transformGeom,
-    widthFn: () => widthFn,
-    wrap: () => wrap
-  });
-
-  // src/frontends/static.ts
-  var import_point_geometry7 = __toModule(require_point_geometry());
-
-  // src/view.ts
-  var import_point_geometry2 = __toModule(require_point_geometry());
-
-  // src/tilecache.ts
-  var import_point_geometry = __toModule(require_point_geometry());
-  var import_vector_tile = __toModule(require_vector_tile());
-  var import_pbf = __toModule(require_pbf());
-
-  // node_modules/pmtiles/dist/index.mjs
-  var __async2 = (__this, __arguments, generator) => {
-    return new Promise((resolve, reject) => {
-      var fulfilled = (value) => {
-        try {
-          step2(generator.next(value));
-        } catch (e2) {
-          reject(e2);
-        }
-      };
-      var rejected = (value) => {
-        try {
-          step2(generator.throw(value));
-        } catch (e2) {
-          reject(e2);
-        }
-      };
-      var step2 = (x2) => x2.done ? resolve(x2.value) : Promise.resolve(x2.value).then(fulfilled, rejected);
-      step2((generator = generator.apply(__this, __arguments)).next());
     });
-  };
-  var u8 = Uint8Array;
-  var u16 = Uint16Array;
-  var u32 = Uint32Array;
-  var fleb = new u8([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0, 0]);
-  var fdeb = new u8([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 0, 0]);
-  var clim = new u8([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
-  var freb = function(eb, start) {
-    var b = new u16(31);
-    for (var i2 = 0; i2 < 31; ++i2) {
-      b[i2] = start += 1 << eb[i2 - 1];
-    }
-    var r2 = new u32(b[30]);
-    for (var i2 = 1; i2 < 30; ++i2) {
-      for (var j = b[i2]; j < b[i2 + 1]; ++j) {
-        r2[j] = j - b[i2] << 5 | i2;
-      }
-    }
-    return [b, r2];
-  };
-  var _a = freb(fleb, 2);
-  var fl = _a[0];
-  var revfl = _a[1];
-  fl[28] = 258, revfl[258] = 28;
-  var _b = freb(fdeb, 0);
-  var fd = _b[0];
-  var revfd = _b[1];
-  var rev = new u16(32768);
-  for (var i2 = 0; i2 < 32768; ++i2) {
-    x = (i2 & 43690) >>> 1 | (i2 & 21845) << 1;
-    x = (x & 52428) >>> 2 | (x & 13107) << 2;
-    x = (x & 61680) >>> 4 | (x & 3855) << 4;
-    rev[i2] = ((x & 65280) >>> 8 | (x & 255) << 8) >>> 1;
-  }
-  var x;
-  var hMap = function(cd, mb, r2) {
-    var s2 = cd.length;
-    var i2 = 0;
-    var l2 = new u16(mb);
-    for (; i2 < s2; ++i2) {
-      if (cd[i2])
-        ++l2[cd[i2] - 1];
-    }
-    var le = new u16(mb);
-    for (i2 = 0; i2 < mb; ++i2) {
-      le[i2] = le[i2 - 1] + l2[i2 - 1] << 1;
-    }
-    var co;
-    if (r2) {
-      co = new u16(1 << mb);
-      var rvb = 15 - mb;
-      for (i2 = 0; i2 < s2; ++i2) {
-        if (cd[i2]) {
-          var sv = i2 << 4 | cd[i2];
-          var r_1 = mb - cd[i2];
-          var v = le[cd[i2] - 1]++ << r_1;
-          for (var m = v | (1 << r_1) - 1; v <= m; ++v) {
-            co[rev[v] >>> rvb] = sv;
-          }
-        }
-      }
-    } else {
-      co = new u16(s2);
-      for (i2 = 0; i2 < s2; ++i2) {
-        if (cd[i2]) {
-          co[i2] = rev[le[cd[i2] - 1]++] >>> 15 - cd[i2];
-        }
-      }
-    }
-    return co;
-  };
-  var flt = new u8(288);
-  for (var i2 = 0; i2 < 144; ++i2)
-    flt[i2] = 8;
-  for (var i2 = 144; i2 < 256; ++i2)
-    flt[i2] = 9;
-  for (var i2 = 256; i2 < 280; ++i2)
-    flt[i2] = 7;
-  for (var i2 = 280; i2 < 288; ++i2)
-    flt[i2] = 8;
-  var fdt = new u8(32);
-  for (var i2 = 0; i2 < 32; ++i2)
-    fdt[i2] = 5;
-  var flrm = /* @__PURE__ */ hMap(flt, 9, 1);
-  var fdrm = /* @__PURE__ */ hMap(fdt, 5, 1);
-  var max = function(a2) {
-    var m = a2[0];
-    for (var i2 = 1; i2 < a2.length; ++i2) {
-      if (a2[i2] > m)
-        m = a2[i2];
-    }
-    return m;
-  };
-  var bits = function(d, p2, m) {
-    var o2 = p2 / 8 | 0;
-    return (d[o2] | d[o2 + 1] << 8) >> (p2 & 7) & m;
-  };
-  var bits16 = function(d, p2) {
-    var o2 = p2 / 8 | 0;
-    return (d[o2] | d[o2 + 1] << 8 | d[o2 + 2] << 16) >> (p2 & 7);
-  };
-  var shft = function(p2) {
-    return (p2 + 7) / 8 | 0;
-  };
-  var slc = function(v, s2, e2) {
-    if (s2 == null || s2 < 0)
-      s2 = 0;
-    if (e2 == null || e2 > v.length)
-      e2 = v.length;
-    var n2 = new (v.BYTES_PER_ELEMENT == 2 ? u16 : v.BYTES_PER_ELEMENT == 4 ? u32 : u8)(e2 - s2);
-    n2.set(v.subarray(s2, e2));
-    return n2;
-  };
-  var ec = [
-    "unexpected EOF",
-    "invalid block type",
-    "invalid length/literal",
-    "invalid distance",
-    "stream finished",
-    "no stream handler",
-    ,
-    "no callback",
-    "invalid UTF-8 data",
-    "extra field too long",
-    "date not in range 1980-2099",
-    "filename too long",
-    "stream finishing",
-    "invalid zip data"
-  ];
-  var err = function(ind, msg, nt) {
-    var e2 = new Error(msg || ec[ind]);
-    e2.code = ind;
-    if (Error.captureStackTrace)
-      Error.captureStackTrace(e2, err);
-    if (!nt)
-      throw e2;
-    return e2;
-  };
-  var inflt = function(dat, buf, st) {
-    var sl = dat.length;
-    if (!sl || st && st.f && !st.l)
-      return buf || new u8(0);
-    var noBuf = !buf || st;
-    var noSt = !st || st.i;
-    if (!st)
-      st = {};
-    if (!buf)
-      buf = new u8(sl * 3);
-    var cbuf = function(l22) {
-      var bl = buf.length;
-      if (l22 > bl) {
-        var nbuf = new u8(Math.max(bl * 2, l22));
-        nbuf.set(buf);
-        buf = nbuf;
-      }
-    };
-    var final = st.f || 0, pos = st.p || 0, bt = st.b || 0, lm = st.l, dm = st.d, lbt = st.m, dbt = st.n;
-    var tbts = sl * 8;
-    do {
-      if (!lm) {
-        final = bits(dat, pos, 1);
-        var type = bits(dat, pos + 1, 3);
-        pos += 3;
-        if (!type) {
-          var s2 = shft(pos) + 4, l2 = dat[s2 - 4] | dat[s2 - 3] << 8, t2 = s2 + l2;
-          if (t2 > sl) {
-            if (noSt)
-              err(0);
-            break;
-          }
-          if (noBuf)
-            cbuf(bt + l2);
-          buf.set(dat.subarray(s2, t2), bt);
-          st.b = bt += l2, st.p = pos = t2 * 8, st.f = final;
-          continue;
-        } else if (type == 1)
-          lm = flrm, dm = fdrm, lbt = 9, dbt = 5;
-        else if (type == 2) {
-          var hLit = bits(dat, pos, 31) + 257, hcLen = bits(dat, pos + 10, 15) + 4;
-          var tl = hLit + bits(dat, pos + 5, 31) + 1;
-          pos += 14;
-          var ldt = new u8(tl);
-          var clt = new u8(19);
-          for (var i2 = 0; i2 < hcLen; ++i2) {
-            clt[clim[i2]] = bits(dat, pos + i2 * 3, 7);
-          }
-          pos += hcLen * 3;
-          var clb = max(clt), clbmsk = (1 << clb) - 1;
-          var clm = hMap(clt, clb, 1);
-          for (var i2 = 0; i2 < tl; ) {
-            var r2 = clm[bits(dat, pos, clbmsk)];
-            pos += r2 & 15;
-            var s2 = r2 >>> 4;
-            if (s2 < 16) {
-              ldt[i2++] = s2;
-            } else {
-              var c2 = 0, n2 = 0;
-              if (s2 == 16)
-                n2 = 3 + bits(dat, pos, 3), pos += 2, c2 = ldt[i2 - 1];
-              else if (s2 == 17)
-                n2 = 3 + bits(dat, pos, 7), pos += 3;
-              else if (s2 == 18)
-                n2 = 11 + bits(dat, pos, 127), pos += 7;
-              while (n2--)
-                ldt[i2++] = c2;
+    var jr = K((Ft, Mt) => {
+        (function(t, e) {
+            typeof Ft == "object" && typeof Mt != "undefined" ? Mt.exports = e() : typeof define == "function" && define.amd ? define(e) : (t = t || self).RBush = e()
+        })(Ft, function() {
+            "use strict";
+            function t(h, m, p, b, y) {
+                (function g(v, _, k, S, D) {
+                    for (; S > k;) {
+                        if (S - k > 600) {
+                            var T = S - k + 1,
+                                E = _ - k + 1,
+                                W = Math.log(T),
+                                $ = .5 * Math.exp(2 * W / 3),
+                                ie = .5 * Math.sqrt(W * $ * (T - $) / T) * (E - T / 2 < 0 ? -1 : 1),
+                                V = Math.max(k, Math.floor(_ - E * $ / T + ie)),
+                                dt = Math.min(S, Math.floor(_ + (T - E) * $ / T + ie));
+                            g(v, _, V, dt, D)
+                        }
+                        var xe = v[_],
+                            ne = k,
+                            R = S;
+                        for (e(v, k, _), D(v[S], xe) > 0 && e(v, k, S); ne < R;) {
+                            for (e(v, ne, R), ne++, R--; D(v[ne], xe) < 0;)
+                                ne++;
+                            for (; D(v[R], xe) > 0;)
+                                R--
+                        }
+                        D(v[k], xe) === 0 ? e(v, k, R) : e(v, ++R, S),
+                        R <= _ && (k = R + 1),
+                        _ <= R && (S = R - 1)
+                    }
+                })(h, m, p || 0, b || h.length - 1, y || r)
             }
-          }
-          var lt = ldt.subarray(0, hLit), dt = ldt.subarray(hLit);
-          lbt = max(lt);
-          dbt = max(dt);
-          lm = hMap(lt, lbt, 1);
-          dm = hMap(dt, dbt, 1);
-        } else
-          err(1);
-        if (pos > tbts) {
-          if (noSt)
-            err(0);
-          break;
-        }
-      }
-      if (noBuf)
-        cbuf(bt + 131072);
-      var lms = (1 << lbt) - 1, dms = (1 << dbt) - 1;
-      var lpos = pos;
-      for (; ; lpos = pos) {
-        var c2 = lm[bits16(dat, pos) & lms], sym = c2 >>> 4;
-        pos += c2 & 15;
-        if (pos > tbts) {
-          if (noSt)
-            err(0);
-          break;
-        }
-        if (!c2)
-          err(2);
-        if (sym < 256)
-          buf[bt++] = sym;
-        else if (sym == 256) {
-          lpos = pos, lm = null;
-          break;
-        } else {
-          var add = sym - 254;
-          if (sym > 264) {
-            var i2 = sym - 257, b = fleb[i2];
-            add = bits(dat, pos, (1 << b) - 1) + fl[i2];
-            pos += b;
-          }
-          var d = dm[bits16(dat, pos) & dms], dsym = d >>> 4;
-          if (!d)
-            err(3);
-          pos += d & 15;
-          var dt = fd[dsym];
-          if (dsym > 3) {
-            var b = fdeb[dsym];
-            dt += bits16(dat, pos) & (1 << b) - 1, pos += b;
-          }
-          if (pos > tbts) {
-            if (noSt)
-              err(0);
-            break;
-          }
-          if (noBuf)
-            cbuf(bt + 131072);
-          var end = bt + add;
-          for (; bt < end; bt += 4) {
-            buf[bt] = buf[bt - dt];
-            buf[bt + 1] = buf[bt + 1 - dt];
-            buf[bt + 2] = buf[bt + 2 - dt];
-            buf[bt + 3] = buf[bt + 3 - dt];
-          }
-          bt = end;
-        }
-      }
-      st.l = lm, st.p = lpos, st.b = bt, st.f = final;
-      if (lm)
-        final = 1, st.m = lbt, st.d = dm, st.n = dbt;
-    } while (!final);
-    return bt == buf.length ? buf : slc(buf, 0, bt);
-  };
-  var et = /* @__PURE__ */ new u8(0);
-  var gzs = function(d) {
-    if (d[0] != 31 || d[1] != 139 || d[2] != 8)
-      err(6, "invalid gzip data");
-    var flg = d[3];
-    var st = 10;
-    if (flg & 4)
-      st += d[10] | (d[11] << 8) + 2;
-    for (var zs = (flg >> 3 & 1) + (flg >> 4 & 1); zs > 0; zs -= !d[st++])
-      ;
-    return st + (flg & 2);
-  };
-  var gzl = function(d) {
-    var l2 = d.length;
-    return (d[l2 - 4] | d[l2 - 3] << 8 | d[l2 - 2] << 16 | d[l2 - 1] << 24) >>> 0;
-  };
-  var zlv = function(d) {
-    if ((d[0] & 15) != 8 || d[0] >>> 4 > 7 || (d[0] << 8 | d[1]) % 31)
-      err(6, "invalid zlib data");
-    if (d[1] & 32)
-      err(6, "invalid zlib data: preset dictionaries not supported");
-  };
-  function inflateSync(data, out) {
-    return inflt(data, out);
-  }
-  function gunzipSync(data, out) {
-    return inflt(data.subarray(gzs(data), -8), out || new u8(gzl(data)));
-  }
-  function unzlibSync(data, out) {
-    return inflt((zlv(data), data.subarray(2, -4)), out);
-  }
-  function decompressSync(data, out) {
-    return data[0] == 31 && data[1] == 139 && data[2] == 8 ? gunzipSync(data, out) : (data[0] & 15) != 8 || data[0] >> 4 > 7 || (data[0] << 8 | data[1]) % 31 ? inflateSync(data, out) : unzlibSync(data, out);
-  }
-  var te = typeof TextEncoder != "undefined" && /* @__PURE__ */ new TextEncoder();
-  var td = typeof TextDecoder != "undefined" && /* @__PURE__ */ new TextDecoder();
-  var tds = 0;
-  try {
-    td.decode(et, { stream: true });
-    tds = 1;
-  } catch (e2) {
-  }
-  var mt = typeof queueMicrotask == "function" ? queueMicrotask : typeof setTimeout == "function" ? setTimeout : function(fn) {
-    fn();
-  };
-  var shift = (n2, shift2) => {
-    return n2 * Math.pow(2, shift2);
-  };
-  var unshift = (n2, shift2) => {
-    return Math.floor(n2 / Math.pow(2, shift2));
-  };
-  var getUint24 = (view, pos) => {
-    return shift(view.getUint16(pos + 1, true), 8) + view.getUint8(pos);
-  };
-  var getUint48 = (view, pos) => {
-    return shift(view.getUint32(pos + 2, true), 16) + view.getUint16(pos, true);
-  };
-  var compare = (tz, tx, ty, view, i2) => {
-    if (tz != view.getUint8(i2))
-      return tz - view.getUint8(i2);
-    const x2 = getUint24(view, i2 + 1);
-    if (tx != x2)
-      return tx - x2;
-    const y = getUint24(view, i2 + 4);
-    if (ty != y)
-      return ty - y;
-    return 0;
-  };
-  var queryLeafdir = (view, z2, x2, y) => {
-    const offset_len = queryView(view, z2 | 128, x2, y);
-    if (offset_len) {
-      return {
-        z: z2,
-        x: x2,
-        y,
-        offset: offset_len[0],
-        length: offset_len[1],
-        is_dir: true
-      };
-    }
-    return null;
-  };
-  var queryTile = (view, z2, x2, y) => {
-    const offset_len = queryView(view, z2, x2, y);
-    if (offset_len) {
-      return {
-        z: z2,
-        x: x2,
-        y,
-        offset: offset_len[0],
-        length: offset_len[1],
-        is_dir: false
-      };
-    }
-    return null;
-  };
-  var queryView = (view, z2, x2, y) => {
-    let m = 0;
-    let n2 = view.byteLength / 17 - 1;
-    while (m <= n2) {
-      const k = n2 + m >> 1;
-      const cmp = compare(z2, x2, y, view, k * 17);
-      if (cmp > 0) {
-        m = k + 1;
-      } else if (cmp < 0) {
-        n2 = k - 1;
-      } else {
-        return [getUint48(view, k * 17 + 7), view.getUint32(k * 17 + 13, true)];
-      }
-    }
-    return null;
-  };
-  var entrySort = (a2, b) => {
-    if (a2.is_dir && !b.is_dir) {
-      return 1;
-    }
-    if (!a2.is_dir && b.is_dir) {
-      return -1;
-    }
-    if (a2.z !== b.z) {
-      return a2.z - b.z;
-    }
-    if (a2.x !== b.x) {
-      return a2.x - b.x;
-    }
-    return a2.y - b.y;
-  };
-  var parseEntry = (dataview, i2) => {
-    const z_raw = dataview.getUint8(i2 * 17);
-    const z2 = z_raw & 127;
-    return {
-      z: z2,
-      x: getUint24(dataview, i2 * 17 + 1),
-      y: getUint24(dataview, i2 * 17 + 4),
-      offset: getUint48(dataview, i2 * 17 + 7),
-      length: dataview.getUint32(i2 * 17 + 13, true),
-      is_dir: z_raw >> 7 === 1
-    };
-  };
-  var sortDir = (a2) => {
-    const entries = [];
-    const view = new DataView(a2);
-    for (let i2 = 0; i2 < view.byteLength / 17; i2++) {
-      entries.push(parseEntry(view, i2));
-    }
-    return createDirectory(entries);
-  };
-  var createDirectory = (entries) => {
-    entries.sort(entrySort);
-    const buffer = new ArrayBuffer(17 * entries.length);
-    const arr2 = new Uint8Array(buffer);
-    for (let i2 = 0; i2 < entries.length; i2++) {
-      const entry = entries[i2];
-      let z2 = entry.z;
-      if (entry.is_dir)
-        z2 = z2 | 128;
-      arr2[i2 * 17] = z2;
-      arr2[i2 * 17 + 1] = entry.x & 255;
-      arr2[i2 * 17 + 2] = entry.x >> 8 & 255;
-      arr2[i2 * 17 + 3] = entry.x >> 16 & 255;
-      arr2[i2 * 17 + 4] = entry.y & 255;
-      arr2[i2 * 17 + 5] = entry.y >> 8 & 255;
-      arr2[i2 * 17 + 6] = entry.y >> 16 & 255;
-      arr2[i2 * 17 + 7] = entry.offset & 255;
-      arr2[i2 * 17 + 8] = unshift(entry.offset, 8) & 255;
-      arr2[i2 * 17 + 9] = unshift(entry.offset, 16) & 255;
-      arr2[i2 * 17 + 10] = unshift(entry.offset, 24) & 255;
-      arr2[i2 * 17 + 11] = unshift(entry.offset, 32) & 255;
-      arr2[i2 * 17 + 12] = unshift(entry.offset, 48) & 255;
-      arr2[i2 * 17 + 13] = entry.length & 255;
-      arr2[i2 * 17 + 14] = entry.length >> 8 & 255;
-      arr2[i2 * 17 + 15] = entry.length >> 16 & 255;
-      arr2[i2 * 17 + 16] = entry.length >> 24 & 255;
-    }
-    return buffer;
-  };
-  var deriveLeaf = (view, tile) => {
-    if (view.byteLength < 17)
-      return null;
-    const numEntries = view.byteLength / 17;
-    const entry = parseEntry(view, numEntries - 1);
-    if (entry.is_dir) {
-      let leaf_level = entry.z;
-      const level_diff = tile.z - leaf_level;
-      const leaf_x = Math.trunc(tile.x / (1 << level_diff));
-      const leaf_y = Math.trunc(tile.y / (1 << level_diff));
-      return { z: leaf_level, x: leaf_x, y: leaf_y };
-    }
-    return null;
-  };
-  function getHeader(source) {
-    return __async2(this, null, function* () {
-      let resp = yield source.getBytes(0, 512e3);
-      const dataview = new DataView(resp.data);
-      const json_size = dataview.getUint32(4, true);
-      const root_entries = dataview.getUint16(8, true);
-      const dec = new TextDecoder("utf-8");
-      const json_metadata = JSON.parse(dec.decode(new DataView(resp.data, 10, json_size)));
-      let tile_compression = Compression.Unknown;
-      if (json_metadata.compression === "gzip") {
-        tile_compression = Compression.Gzip;
-      }
-      let minzoom = 0;
-      if ("minzoom" in json_metadata) {
-        minzoom = +json_metadata.minzoom;
-      }
-      let maxzoom = 0;
-      if ("maxzoom" in json_metadata) {
-        maxzoom = +json_metadata.maxzoom;
-      }
-      let center_lon = 0;
-      let center_lat = 0;
-      let center_zoom = 0;
-      let min_lon = -180;
-      let min_lat = -85;
-      let max_lon = 180;
-      let max_lat = 85;
-      if (json_metadata.bounds) {
-        let split = json_metadata.bounds.split(",");
-        min_lon = +split[0];
-        min_lat = +split[1];
-        max_lon = +split[2];
-        max_lat = +split[3];
-      }
-      if (json_metadata.center) {
-        let split = json_metadata.center.split(",");
-        center_lon = +split[0];
-        center_lat = +split[1];
-        center_zoom = +split[2];
-      }
-      const header = {
-        specVersion: dataview.getUint16(2, true),
-        rootDirectoryOffset: 10 + json_size,
-        rootDirectoryLength: root_entries * 17,
-        jsonMetadataOffset: 10,
-        jsonMetadataLength: json_size,
-        leafDirectoryOffset: 0,
-        leafDirectoryLength: void 0,
-        tileDataOffset: 0,
-        tileDataLength: void 0,
-        numAddressedTiles: 0,
-        numTileEntries: 0,
-        numTileContents: 0,
-        clustered: false,
-        internalCompression: Compression.None,
-        tileCompression: tile_compression,
-        tileType: TileType.Mvt,
-        minZoom: minzoom,
-        maxZoom: maxzoom,
-        minLon: min_lon,
-        minLat: min_lat,
-        maxLon: max_lon,
-        maxLat: max_lat,
-        centerZoom: center_zoom,
-        centerLon: center_lon,
-        centerLat: center_lat,
-        etag: resp.etag
-      };
-      return header;
+            function e(h, m, p) {
+                var b = h[m];
+                h[m] = h[p],
+                h[p] = b
+            }
+            function r(h, m) {
+                return h < m ? -1 : h > m ? 1 : 0
+            }
+            var i = function(h) {
+                h === void 0 && (h = 9),
+                this._maxEntries = Math.max(4, h),
+                this._minEntries = Math.max(2, Math.ceil(.4 * this._maxEntries)),
+                this.clear()
+            };
+            function n(h, m, p) {
+                if (!p)
+                    return m.indexOf(h);
+                for (var b = 0; b < m.length; b++)
+                    if (p(h, m[b]))
+                        return b;
+                return -1
+            }
+            function a(h, m) {
+                s(h, 0, h.children.length, m, h)
+            }
+            function s(h, m, p, b, y) {
+                y || (y = w(null)),
+                y.minX = 1 / 0,
+                y.minY = 1 / 0,
+                y.maxX = -1 / 0,
+                y.maxY = -1 / 0;
+                for (var g = m; g < p; g++) {
+                    var v = h.children[g];
+                    o(y, h.leaf ? b(v) : v)
+                }
+                return y
+            }
+            function o(h, m) {
+                return h.minX = Math.min(h.minX, m.minX), h.minY = Math.min(h.minY, m.minY), h.maxX = Math.max(h.maxX, m.maxX), h.maxY = Math.max(h.maxY, m.maxY), h
+            }
+            function l(h, m) {
+                return h.minX - m.minX
+            }
+            function u(h, m) {
+                return h.minY - m.minY
+            }
+            function f(h) {
+                return (h.maxX - h.minX) * (h.maxY - h.minY)
+            }
+            function d(h) {
+                return h.maxX - h.minX + (h.maxY - h.minY)
+            }
+            function c(h, m) {
+                return h.minX <= m.minX && h.minY <= m.minY && m.maxX <= h.maxX && m.maxY <= h.maxY
+            }
+            function x(h, m) {
+                return m.minX <= h.maxX && m.minY <= h.maxY && m.maxX >= h.minX && m.maxY >= h.minY
+            }
+            function w(h) {
+                return {
+                    children: h,
+                    height: 1,
+                    leaf: !0,
+                    minX: 1 / 0,
+                    minY: 1 / 0,
+                    maxX: -1 / 0,
+                    maxY: -1 / 0
+                }
+            }
+            function z(h, m, p, b, y) {
+                for (var g = [m, p]; g.length;)
+                    if (!((p = g.pop()) - (m = g.pop()) <= b)) {
+                        var v = m + Math.ceil((p - m) / b / 2) * b;
+                        t(h, v, m, p, y),
+                        g.push(m, v, v, p)
+                    }
+            }
+            return i.prototype.all = function() {
+                return this._all(this.data, [])
+            }, i.prototype.search = function(h) {
+                var m = this.data,
+                    p = [];
+                if (!x(h, m))
+                    return p;
+                for (var b = this.toBBox, y = []; m;) {
+                    for (var g = 0; g < m.children.length; g++) {
+                        var v = m.children[g],
+                            _ = m.leaf ? b(v) : v;
+                        x(h, _) && (m.leaf ? p.push(v) : c(h, _) ? this._all(v, p) : y.push(v))
+                    }
+                    m = y.pop()
+                }
+                return p
+            }, i.prototype.collides = function(h) {
+                var m = this.data;
+                if (!x(h, m))
+                    return !1;
+                for (var p = []; m;) {
+                    for (var b = 0; b < m.children.length; b++) {
+                        var y = m.children[b],
+                            g = m.leaf ? this.toBBox(y) : y;
+                        if (x(h, g)) {
+                            if (m.leaf || c(h, g))
+                                return !0;
+                            p.push(y)
+                        }
+                    }
+                    m = p.pop()
+                }
+                return !1
+            }, i.prototype.load = function(h) {
+                if (!h || !h.length)
+                    return this;
+                if (h.length < this._minEntries) {
+                    for (var m = 0; m < h.length; m++)
+                        this.insert(h[m]);
+                    return this
+                }
+                var p = this._build(h.slice(), 0, h.length - 1, 0);
+                if (this.data.children.length)
+                    if (this.data.height === p.height)
+                        this._splitRoot(this.data, p);
+                    else {
+                        if (this.data.height < p.height) {
+                            var b = this.data;
+                            this.data = p,
+                            p = b
+                        }
+                        this._insert(p, this.data.height - p.height - 1, !0)
+                    }
+                else
+                    this.data = p;
+                return this
+            }, i.prototype.insert = function(h) {
+                return h && this._insert(h, this.data.height - 1), this
+            }, i.prototype.clear = function() {
+                return this.data = w([]), this
+            }, i.prototype.remove = function(h, m) {
+                if (!h)
+                    return this;
+                for (var p, b, y, g = this.data, v = this.toBBox(h), _ = [], k = []; g || _.length;) {
+                    if (g || (g = _.pop(), b = _[_.length - 1], p = k.pop(), y = !0), g.leaf) {
+                        var S = n(h, g.children, m);
+                        if (S !== -1)
+                            return g.children.splice(S, 1), _.push(g), this._condense(_), this
+                    }
+                    y || g.leaf || !c(g, v) ? b ? (p++, g = b.children[p], y = !1) : g = null : (_.push(g), k.push(p), p = 0, b = g, g = g.children[0])
+                }
+                return this
+            }, i.prototype.toBBox = function(h) {
+                return h
+            }, i.prototype.compareMinX = function(h, m) {
+                return h.minX - m.minX
+            }, i.prototype.compareMinY = function(h, m) {
+                return h.minY - m.minY
+            }, i.prototype.toJSON = function() {
+                return this.data
+            }, i.prototype.fromJSON = function(h) {
+                return this.data = h, this
+            }, i.prototype._all = function(h, m) {
+                for (var p = []; h;)
+                    h.leaf ? m.push.apply(m, h.children) : p.push.apply(p, h.children),
+                    h = p.pop();
+                return m
+            }, i.prototype._build = function(h, m, p, b) {
+                var y,
+                    g = p - m + 1,
+                    v = this._maxEntries;
+                if (g <= v)
+                    return a(y = w(h.slice(m, p + 1)), this.toBBox), y;
+                b || (b = Math.ceil(Math.log(g) / Math.log(v)), v = Math.ceil(g / Math.pow(v, b - 1))),
+                (y = w([])).leaf = !1,
+                y.height = b;
+                var _ = Math.ceil(g / v),
+                    k = _ * Math.ceil(Math.sqrt(v));
+                z(h, m, p, k, this.compareMinX);
+                for (var S = m; S <= p; S += k) {
+                    var D = Math.min(S + k - 1, p);
+                    z(h, S, D, _, this.compareMinY);
+                    for (var T = S; T <= D; T += _) {
+                        var E = Math.min(T + _ - 1, D);
+                        y.children.push(this._build(h, T, E, b - 1))
+                    }
+                }
+                return a(y, this.toBBox), y
+            }, i.prototype._chooseSubtree = function(h, m, p, b) {
+                for (; b.push(m), !m.leaf && b.length - 1 !== p;) {
+                    for (var y = 1 / 0, g = 1 / 0, v = void 0, _ = 0; _ < m.children.length; _++) {
+                        var k = m.children[_],
+                            S = f(k),
+                            D = (T = h, E = k, (Math.max(E.maxX, T.maxX) - Math.min(E.minX, T.minX)) * (Math.max(E.maxY, T.maxY) - Math.min(E.minY, T.minY)) - S);
+                        D < g ? (g = D, y = S < y ? S : y, v = k) : D === g && S < y && (y = S, v = k)
+                    }
+                    m = v || m.children[0]
+                }
+                var T,
+                    E;
+                return m
+            }, i.prototype._insert = function(h, m, p) {
+                var b = p ? h : this.toBBox(h),
+                    y = [],
+                    g = this._chooseSubtree(b, this.data, m, y);
+                for (g.children.push(h), o(g, b); m >= 0 && y[m].children.length > this._maxEntries;)
+                    this._split(y, m),
+                    m--;
+                this._adjustParentBBoxes(b, y, m)
+            }, i.prototype._split = function(h, m) {
+                var p = h[m],
+                    b = p.children.length,
+                    y = this._minEntries;
+                this._chooseSplitAxis(p, y, b);
+                var g = this._chooseSplitIndex(p, y, b),
+                    v = w(p.children.splice(g, p.children.length - g));
+                v.height = p.height,
+                v.leaf = p.leaf,
+                a(p, this.toBBox),
+                a(v, this.toBBox),
+                m ? h[m - 1].children.push(v) : this._splitRoot(p, v)
+            }, i.prototype._splitRoot = function(h, m) {
+                this.data = w([h, m]),
+                this.data.height = h.height + 1,
+                this.data.leaf = !1,
+                a(this.data, this.toBBox)
+            }, i.prototype._chooseSplitIndex = function(h, m, p) {
+                for (var b, y, g, v, _, k, S, D = 1 / 0, T = 1 / 0, E = m; E <= p - m; E++) {
+                    var W = s(h, 0, E, this.toBBox),
+                        $ = s(h, E, p, this.toBBox),
+                        ie = (y = W, g = $, v = void 0, _ = void 0, k = void 0, S = void 0, v = Math.max(y.minX, g.minX), _ = Math.max(y.minY, g.minY), k = Math.min(y.maxX, g.maxX), S = Math.min(y.maxY, g.maxY), Math.max(0, k - v) * Math.max(0, S - _)),
+                        V = f(W) + f($);
+                    ie < D ? (D = ie, b = E, T = V < T ? V : T) : ie === D && V < T && (T = V, b = E)
+                }
+                return b || p - m
+            }, i.prototype._chooseSplitAxis = function(h, m, p) {
+                var b = h.leaf ? this.compareMinX : l,
+                    y = h.leaf ? this.compareMinY : u;
+                this._allDistMargin(h, m, p, b) < this._allDistMargin(h, m, p, y) && h.children.sort(b)
+            }, i.prototype._allDistMargin = function(h, m, p, b) {
+                h.children.sort(b);
+                for (var y = this.toBBox, g = s(h, 0, m, y), v = s(h, p - m, p, y), _ = d(g) + d(v), k = m; k < p - m; k++) {
+                    var S = h.children[k];
+                    o(g, h.leaf ? y(S) : S),
+                    _ += d(g)
+                }
+                for (var D = p - m - 1; D >= m; D--) {
+                    var T = h.children[D];
+                    o(v, h.leaf ? y(T) : T),
+                    _ += d(v)
+                }
+                return _
+            }, i.prototype._adjustParentBBoxes = function(h, m, p) {
+                for (var b = p; b >= 0; b--)
+                    o(m[b], h)
+            }, i.prototype._condense = function(h) {
+                for (var m = h.length - 1, p = void 0; m >= 0; m--)
+                    h[m].children.length === 0 ? m > 0 ? (p = h[m - 1].children).splice(p.indexOf(h[m]), 1) : this.clear() : a(h[m], this.toBBox)
+            }, i
+        })
     });
-  }
-  function getZxy(header, source, cache, z2, x2, y, signal) {
-    return __async2(this, null, function* () {
-      let root_dir = yield cache.getArrayBuffer(source, header.rootDirectoryOffset, header.rootDirectoryLength, header);
-      if (header.specVersion === 1) {
-        root_dir = sortDir(root_dir);
-      }
-      const entry = queryTile(new DataView(root_dir), z2, x2, y);
-      if (entry) {
-        let resp = yield source.getBytes(entry.offset, entry.length, signal);
-        let tile_data = resp.data;
-        let view = new DataView(tile_data);
-        if (view.getUint8(0) == 31 && view.getUint8(1) == 139) {
-          tile_data = decompressSync(new Uint8Array(tile_data));
+    var Kr = K(() => {});
+    var Jr = K((Pt, Dt) => {
+        (function(t, e) {
+            typeof Pt == "object" && typeof Dt != "undefined" ? Dt.exports = e() : typeof define == "function" && define.amd ? define(e) : (t = t || self, t.TinyQueue = e())
+        })(Pt, function() {
+            "use strict";
+            var t = function(i, n) {
+                if (i === void 0 && (i = []), n === void 0 && (n = e), this.data = i, this.length = this.data.length, this.compare = n, this.length > 0)
+                    for (var a = (this.length >> 1) - 1; a >= 0; a--)
+                        this._down(a)
+            };
+            t.prototype.push = function(i) {
+                this.data.push(i),
+                this.length++,
+                this._up(this.length - 1)
+            },
+            t.prototype.pop = function() {
+                if (this.length !== 0) {
+                    var i = this.data[0],
+                        n = this.data.pop();
+                    return this.length--, this.length > 0 && (this.data[0] = n, this._down(0)), i
+                }
+            },
+            t.prototype.peek = function() {
+                return this.data[0]
+            },
+            t.prototype._up = function(i) {
+                for (var n = this, a = n.data, s = n.compare, o = a[i]; i > 0;) {
+                    var l = i - 1 >> 1,
+                        u = a[l];
+                    if (s(o, u) >= 0)
+                        break;
+                    a[i] = u,
+                    i = l
+                }
+                a[i] = o
+            },
+            t.prototype._down = function(i) {
+                for (var n = this, a = n.data, s = n.compare, o = this.length >> 1, l = a[i]; i < o;) {
+                    var u = (i << 1) + 1,
+                        f = a[u],
+                        d = u + 1;
+                    if (d < this.length && s(a[d], f) < 0 && (u = d, f = a[d]), s(f, l) >= 0)
+                        break;
+                    a[i] = f,
+                    i = u
+                }
+                a[i] = l
+            };
+            function e(r, i) {
+                return r < i ? -1 : r > i ? 1 : 0
+            }
+            return t
+        })
+    });
+    var Qr = K((Ua, At) => {
+        "use strict";
+        var ot = Jr();
+        ot.default && (ot = ot.default);
+        At.exports = Gr;
+        At.exports.default = Gr;
+        function Gr(t, e, r) {
+            e = e || 1;
+            for (var i, n, a, s, o = 0; o < t[0].length; o++) {
+                var l = t[0][o];
+                (!o || l[0] < i) && (i = l[0]),
+                (!o || l[1] < n) && (n = l[1]),
+                (!o || l[0] > a) && (a = l[0]),
+                (!o || l[1] > s) && (s = l[1])
+            }
+            var u = a - i,
+                f = s - n,
+                d = Math.min(u, f),
+                c = d / 2;
+            if (d === 0) {
+                var x = [i, n];
+                return x.distance = 0, x
+            }
+            for (var w = new ot(void 0, Wn), z = i; z < a; z += d)
+                for (var h = n; h < s; h += d)
+                    w.push(new fe(z + c, h + c, c, t));
+            var m = Hn(t),
+                p = new fe(i + u / 2, n + f / 2, 0, t);
+            p.d > m.d && (m = p);
+            for (var b = w.length; w.length;) {
+                var y = w.pop();
+                y.d > m.d && (m = y, r && console.log("found best %d after %d probes", Math.round(1e4 * y.d) / 1e4, b)),
+                !(y.max - m.d <= e) && (c = y.h / 2, w.push(new fe(y.x - c, y.y - c, c, t)), w.push(new fe(y.x + c, y.y - c, c, t)), w.push(new fe(y.x - c, y.y + c, c, t)), w.push(new fe(y.x + c, y.y + c, c, t)), b += 4)
+            }
+            r && (console.log("num probes: " + b), console.log("best distance: " + m.d));
+            var g = [m.x, m.y];
+            return g.distance = m.d, g
         }
-        return {
-          data: tile_data
+        function Wn(t, e) {
+            return e.max - t.max
+        }
+        function fe(t, e, r, i) {
+            this.x = t,
+            this.y = e,
+            this.h = r,
+            this.d = $n(t, e, i),
+            this.max = this.d + this.h * Math.SQRT2
+        }
+        function $n(t, e, r) {
+            for (var i = !1, n = 1 / 0, a = 0; a < r.length; a++)
+                for (var s = r[a], o = 0, l = s.length, u = l - 1; o < l; u = o++) {
+                    var f = s[o],
+                        d = s[u];
+                    f[1] > e != d[1] > e && t < (d[0] - f[0]) * (e - f[1]) / (d[1] - f[1]) + f[0] && (i = !i),
+                    n = Math.min(n, Kn(t, e, f, d))
+                }
+            return n === 0 ? 0 : (i ? 1 : -1) * Math.sqrt(n)
+        }
+        function Hn(t) {
+            for (var e = 0, r = 0, i = 0, n = t[0], a = 0, s = n.length, o = s - 1; a < s; o = a++) {
+                var l = n[a],
+                    u = n[o],
+                    f = l[0] * u[1] - u[0] * l[1];
+                r += (l[0] + u[0]) * f,
+                i += (l[1] + u[1]) * f,
+                e += f * 3
+            }
+            return e === 0 ? new fe(n[0][0], n[0][1], 0, t) : new fe(r / e, i / e, 0, t)
+        }
+        function Kn(t, e, r, i) {
+            var n = r[0],
+                a = r[1],
+                s = i[0] - n,
+                o = i[1] - a;
+            if (s !== 0 || o !== 0) {
+                var l = ((t - n) * s + (e - a) * o) / (s * s + o * o);
+                l > 1 ? (n = i[0], a = i[1]) : l > 0 && (n += s * l, a += o * l)
+            }
+            return s = t - n, o = e - a, s * s + o * o
+        }
+    });
+    var fa = {};
+    ki(fa, {
+        CenteredSymbolizer: () => It,
+        CenteredTextSymbolizer: () => U,
+        CircleSymbolizer: () => te,
+        FlexSymbolizer: () => $e,
+        Font: () => Ut,
+        GeomType: () => ee,
+        GroupSymbolizer: () => ye,
+        IconSymbolizer: () => li,
+        Index: () => Ct,
+        Justify: () => X,
+        Labeler: () => Ue,
+        Labelers: () => je,
+        LineLabelPlacement: () => Me,
+        LineLabelSymbolizer: () => ce,
+        LineSymbolizer: () => C,
+        OffsetSymbolizer: () => Xt,
+        OffsetTextSymbolizer: () => le,
+        PMTiles: () => rt,
+        Padding: () => hi,
+        PmtilesSource: () => Oe,
+        PolygonLabelSymbolizer: () => ue,
+        PolygonSymbolizer: () => A,
+        Sheet: () => gi,
+        ShieldSymbolizer: () => lt,
+        Static: () => pi,
+        TextPlacements: () => P,
+        TextSymbolizer: () => He,
+        TileCache: () => st,
+        Toner: () => ha,
+        View: () => St,
+        ZxySource: () => it,
+        arr: () => de,
+        covering: () => Zr,
+        createPattern: () => Ot,
+        cubicBezier: () => ta,
+        dark: () => Se,
+        exp: () => j,
+        filterFn: () => Je,
+        getFont: () => qt,
+        getZoom: () => Vt,
+        isCCW: () => Ir,
+        isInRing: () => Lt,
+        json_style: () => ua,
+        labelRules: () => Te,
+        leafletLayer: () => oa,
+        light: () => Le,
+        linear: () => ea,
+        numberFn: () => ft,
+        numberOrFn: () => jt,
+        paintRules: () => Ce,
+        painter: () => Ye,
+        pointInPolygon: () => Xr,
+        pointMinDistToLines: () => Yr,
+        pointMinDistToPoints: () => Vr,
+        sourcesToViews: () => Ve,
+        step: () => Qn,
+        toIndex: () => oe,
+        transformGeom: () => Ie,
+        widthFn: () => Nt,
+        wrap: () => Xe
+    });
+    var he = N(re());
+    var pe = N(re());
+    var ke = N(re()),
+        Ar = N(lr()),
+        Br = N(pr());
+    var Y = (t, e, r) => new Promise((i, n) => {
+            var a = l => {
+                    try {
+                        o(r.next(l))
+                    } catch (u) {
+                        n(u)
+                    }
+                },
+                s = l => {
+                    try {
+                        o(r.throw(l))
+                    } catch (u) {
+                        n(u)
+                    }
+                },
+                o = l => l.done ? i(l.value) : Promise.resolve(l.value).then(a, s);
+            o((r = r.apply(t, e)).next())
+        }),
+        q = Uint8Array,
+        me = Uint16Array,
+        yr = Uint32Array,
+        xr = new q([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0, 0]),
+        gr = new q([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 0, 0]),
+        en = new q([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]),
+        br = function(t, e) {
+            for (var r = new me(31), i = 0; i < 31; ++i)
+                r[i] = e += 1 << t[i - 1];
+            for (var n = new yr(r[30]), i = 1; i < 30; ++i)
+                for (var a = r[i]; a < r[i + 1]; ++a)
+                    n[a] = a - r[i] << 5 | i;
+            return [r, n]
+        },
+        wr = br(xr, 2),
+        vr = wr[0],
+        tn = wr[1];
+    vr[28] = 258,
+    tn[258] = 28;
+    var _r = br(gr, 0),
+        rn = _r[0],
+        wa = _r[1],
+        bt = new me(32768);
+    for (M = 0; M < 32768; ++M)
+        se = (M & 43690) >>> 1 | (M & 21845) << 1,
+        se = (se & 52428) >>> 2 | (se & 13107) << 2,
+        se = (se & 61680) >>> 4 | (se & 3855) << 4,
+        bt[M] = ((se & 65280) >>> 8 | (se & 255) << 8) >>> 1;
+    var se,
+        M,
+        Ae = function(t, e, r) {
+            for (var i = t.length, n = 0, a = new me(e); n < i; ++n)
+                t[n] && ++a[t[n] - 1];
+            var s = new me(e);
+            for (n = 0; n < e; ++n)
+                s[n] = s[n - 1] + a[n - 1] << 1;
+            var o;
+            if (r) {
+                o = new me(1 << e);
+                var l = 15 - e;
+                for (n = 0; n < i; ++n)
+                    if (t[n])
+                        for (var u = n << 4 | t[n], f = e - t[n], d = s[t[n] - 1]++ << f, c = d | (1 << f) - 1; d <= c; ++d)
+                            o[bt[d] >>> l] = u
+            } else
+                for (o = new me(i), n = 0; n < i; ++n)
+                    t[n] && (o[n] = bt[s[t[n] - 1]++] >>> 15 - t[n]);
+            return o
+        },
+        Be = new q(288);
+    for (M = 0; M < 144; ++M)
+        Be[M] = 8;
+    var M;
+    for (M = 144; M < 256; ++M)
+        Be[M] = 9;
+    var M;
+    for (M = 256; M < 280; ++M)
+        Be[M] = 7;
+    var M;
+    for (M = 280; M < 288; ++M)
+        Be[M] = 8;
+    var M,
+        zr = new q(32);
+    for (M = 0; M < 32; ++M)
+        zr[M] = 5;
+    var M,
+        nn = Ae(Be, 9, 1),
+        an = Ae(zr, 5, 1),
+        wt = function(t) {
+            for (var e = t[0], r = 1; r < t.length; ++r)
+                t[r] > e && (e = t[r]);
+            return e
+        },
+        J = function(t, e, r) {
+            var i = e / 8 | 0;
+            return (t[i] | t[i + 1] << 8) >> (e & 7) & r
+        },
+        vt = function(t, e) {
+            var r = e / 8 | 0;
+            return (t[r] | t[r + 1] << 8 | t[r + 2] << 16) >> (e & 7)
+        },
+        sn = function(t) {
+            return (t + 7) / 8 | 0
+        },
+        on = function(t, e, r) {
+            (e == null || e < 0) && (e = 0),
+            (r == null || r > t.length) && (r = t.length);
+            var i = new (t.BYTES_PER_ELEMENT == 2 ? me : t.BYTES_PER_ELEMENT == 4 ? yr : q)(r - e);
+            return i.set(t.subarray(e, r)), i
+        },
+        ln = ["unexpected EOF", "invalid block type", "invalid length/literal", "invalid distance", "stream finished", "no stream handler", , "no callback", "invalid UTF-8 data", "extra field too long", "date not in range 1980-2099", "filename too long", "stream finishing", "invalid zip data"],
+        G = function(t, e, r) {
+            var i = new Error(e || ln[t]);
+            if (i.code = t, Error.captureStackTrace && Error.captureStackTrace(i, G), !r)
+                throw i;
+            return i
+        },
+        _t = function(t, e, r) {
+            var i = t.length;
+            if (!i || r && r.f && !r.l)
+                return e || new q(0);
+            var n = !e || r,
+                a = !r || r.i;
+            r || (r = {}),
+            e || (e = new q(i * 3));
+            var s = function($t) {
+                    var Ht = e.length;
+                    if ($t > Ht) {
+                        var Kt = new q(Math.max(Ht * 2, $t));
+                        Kt.set(e),
+                        e = Kt
+                    }
+                },
+                o = r.f || 0,
+                l = r.p || 0,
+                u = r.b || 0,
+                f = r.l,
+                d = r.d,
+                c = r.m,
+                x = r.n,
+                w = i * 8;
+            do {
+                if (!f) {
+                    o = J(t, l, 1);
+                    var z = J(t, l + 1, 3);
+                    if (l += 3, z)
+                        if (z == 1)
+                            f = nn,
+                            d = an,
+                            c = 9,
+                            x = 5;
+                        else if (z == 2) {
+                            var b = J(t, l, 31) + 257,
+                                y = J(t, l + 10, 15) + 4,
+                                g = b + J(t, l + 5, 31) + 1;
+                            l += 14;
+                            for (var v = new q(g), _ = new q(19), k = 0; k < y; ++k)
+                                _[en[k]] = J(t, l + k * 3, 7);
+                            l += y * 3;
+                            for (var S = wt(_), D = (1 << S) - 1, T = Ae(_, S, 1), k = 0; k < g;) {
+                                var E = T[J(t, l, D)];
+                                l += E & 15;
+                                var h = E >>> 4;
+                                if (h < 16)
+                                    v[k++] = h;
+                                else {
+                                    var W = 0,
+                                        $ = 0;
+                                    for (h == 16 ? ($ = 3 + J(t, l, 3), l += 2, W = v[k - 1]) : h == 17 ? ($ = 3 + J(t, l, 7), l += 3) : h == 18 && ($ = 11 + J(t, l, 127), l += 7); $--;)
+                                        v[k++] = W
+                                }
+                            }
+                            var ie = v.subarray(0, b),
+                                V = v.subarray(b);
+                            c = wt(ie),
+                            x = wt(V),
+                            f = Ae(ie, c, 1),
+                            d = Ae(V, x, 1)
+                        } else
+                            G(1);
+                    else {
+                        var h = sn(l) + 4,
+                            m = t[h - 4] | t[h - 3] << 8,
+                            p = h + m;
+                        if (p > i) {
+                            a && G(0);
+                            break
+                        }
+                        n && s(u + m),
+                        e.set(t.subarray(h, p), u),
+                        r.b = u += m,
+                        r.p = l = p * 8,
+                        r.f = o;
+                        continue
+                    }
+                    if (l > w) {
+                        a && G(0);
+                        break
+                    }
+                }
+                n && s(u + 131072);
+                for (var dt = (1 << c) - 1, xe = (1 << x) - 1, ne = l;; ne = l) {
+                    var W = f[vt(t, l) & dt],
+                        R = W >>> 4;
+                    if (l += W & 15, l > w) {
+                        a && G(0);
+                        break
+                    }
+                    if (W || G(2), R < 256)
+                        e[u++] = R;
+                    else if (R == 256) {
+                        ne = l,
+                        f = null;
+                        break
+                    } else {
+                        var Zt = R - 254;
+                        if (R > 264) {
+                            var k = R - 257,
+                                Pe = xr[k];
+                            Zt = J(t, l, (1 << Pe) - 1) + vr[k],
+                            l += Pe
+                        }
+                        var ct = d[vt(t, l) & xe],
+                            mt = ct >>> 4;
+                        ct || G(3),
+                        l += ct & 15;
+                        var V = rn[mt];
+                        if (mt > 3) {
+                            var Pe = gr[mt];
+                            V += vt(t, l) & (1 << Pe) - 1,
+                            l += Pe
+                        }
+                        if (l > w) {
+                            a && G(0);
+                            break
+                        }
+                        n && s(u + 131072);
+                        for (var Wt = u + Zt; u < Wt; u += 4)
+                            e[u] = e[u - V],
+                            e[u + 1] = e[u + 1 - V],
+                            e[u + 2] = e[u + 2 - V],
+                            e[u + 3] = e[u + 3 - V];
+                        u = Wt
+                    }
+                }
+                r.l = f,
+                r.p = ne,
+                r.b = u,
+                r.f = o,
+                f && (o = 1, r.m = c, r.d = d, r.n = x)
+            } while (!o);
+            return u == e.length ? e : on(e, 0, u)
+        },
+        un = new q(0),
+        hn = function(t) {
+            (t[0] != 31 || t[1] != 139 || t[2] != 8) && G(6, "invalid gzip data");
+            var e = t[3],
+                r = 10;
+            e & 4 && (r += t[10] | (t[11] << 8) + 2);
+            for (var i = (e >> 3 & 1) + (e >> 4 & 1); i > 0; i -= !t[r++])
+                ;
+            return r + (e & 2)
+        },
+        fn = function(t) {
+            var e = t.length;
+            return (t[e - 4] | t[e - 3] << 8 | t[e - 2] << 16 | t[e - 1] << 24) >>> 0
+        },
+        dn = function(t) {
+            ((t[0] & 15) != 8 || t[0] >>> 4 > 7 || (t[0] << 8 | t[1]) % 31) && G(6, "invalid zlib data"),
+            t[1] & 32 && G(6, "invalid zlib data: preset dictionaries not supported")
         };
-      }
-      const leafcoords = deriveLeaf(new DataView(root_dir), { z: z2, x: x2, y });
-      if (leafcoords) {
-        const leafdir_entry = queryLeafdir(new DataView(root_dir), leafcoords.z, leafcoords.x, leafcoords.y);
-        if (leafdir_entry) {
-          let leaf_dir = yield cache.getArrayBuffer(source, leafdir_entry.offset, leafdir_entry.length, header);
-          if (header.specVersion === 1) {
-            leaf_dir = sortDir(leaf_dir);
-          }
-          let tile_entry = queryTile(new DataView(leaf_dir), z2, x2, y);
-          if (tile_entry) {
-            let resp = yield source.getBytes(tile_entry.offset, tile_entry.length, signal);
-            let tile_data = resp.data;
-            let view = new DataView(tile_data);
-            if (view.getUint8(0) == 31 && view.getUint8(1) == 139) {
-              tile_data = decompressSync(new Uint8Array(tile_data));
+    function cn(t, e) {
+        return _t(t, e)
+    }
+    function mn(t, e) {
+        return _t(t.subarray(hn(t), -8), e || new q(fn(t)))
+    }
+    function pn(t, e) {
+        return _t((dn(t), t.subarray(2, -4)), e)
+    }
+    function zt(t, e) {
+        return t[0] == 31 && t[1] == 139 && t[2] == 8 ? mn(t, e) : (t[0] & 15) != 8 || t[0] >> 4 > 7 || (t[0] << 8 | t[1]) % 31 ? cn(t, e) : pn(t, e)
+    }
+    var yn = typeof TextDecoder != "undefined" && new TextDecoder,
+        xn = 0;
+    try {
+        yn.decode(un, {
+            stream: !0
+        }),
+        xn = 1
+    } catch (t) {}
+    var kr = (t, e) => t * Math.pow(2, e),
+        Ee = (t, e) => Math.floor(t / Math.pow(2, e)),
+        tt = (t, e) => kr(t.getUint16(e + 1, !0), 8) + t.getUint8(e),
+        Lr = (t, e) => kr(t.getUint32(e + 2, !0), 16) + t.getUint16(e, !0),
+        gn = (t, e, r, i, n) => {
+            if (t != i.getUint8(n))
+                return t - i.getUint8(n);
+            let a = tt(i, n + 1);
+            if (e != a)
+                return e - a;
+            let s = tt(i, n + 4);
+            return r != s ? r - s : 0
+        },
+        bn = (t, e, r, i) => {
+            let n = Fr(t, e | 128, r, i);
+            return n ? {
+                z: e,
+                x: r,
+                y: i,
+                offset: n[0],
+                length: n[1],
+                is_dir: !0
+            } : null
+        },
+        Sr = (t, e, r, i) => {
+            let n = Fr(t, e, r, i);
+            return n ? {
+                z: e,
+                x: r,
+                y: i,
+                offset: n[0],
+                length: n[1],
+                is_dir: !1
+            } : null
+        },
+        Fr = (t, e, r, i) => {
+            let n = 0,
+                a = t.byteLength / 17 - 1;
+            for (; n <= a;) {
+                let s = a + n >> 1,
+                    o = gn(e, r, i, t, s * 17);
+                if (o > 0)
+                    n = s + 1;
+                else if (o < 0)
+                    a = s - 1;
+                else
+                    return [Lr(t, s * 17 + 7), t.getUint32(s * 17 + 13, !0)]
+            }
+            return null
+        },
+        wn = (t, e) => t.is_dir && !e.is_dir ? 1 : !t.is_dir && e.is_dir ? -1 : t.z !== e.z ? t.z - e.z : t.x !== e.x ? t.x - e.x : t.y - e.y,
+        Mr = (t, e) => {
+            let r = t.getUint8(e * 17);
+            return {
+                z: r & 127,
+                x: tt(t, e * 17 + 1),
+                y: tt(t, e * 17 + 4),
+                offset: Lr(t, e * 17 + 7),
+                length: t.getUint32(e * 17 + 13, !0),
+                is_dir: r >> 7 == 1
+            }
+        },
+        Cr = t => {
+            let e = [],
+                r = new DataView(t);
+            for (let i = 0; i < r.byteLength / 17; i++)
+                e.push(Mr(r, i));
+            return vn(e)
+        },
+        vn = t => {
+            t.sort(wn);
+            let e = new ArrayBuffer(17 * t.length),
+                r = new Uint8Array(e);
+            for (let i = 0; i < t.length; i++) {
+                let n = t[i],
+                    a = n.z;
+                n.is_dir && (a = a | 128),
+                r[i * 17] = a,
+                r[i * 17 + 1] = n.x & 255,
+                r[i * 17 + 2] = n.x >> 8 & 255,
+                r[i * 17 + 3] = n.x >> 16 & 255,
+                r[i * 17 + 4] = n.y & 255,
+                r[i * 17 + 5] = n.y >> 8 & 255,
+                r[i * 17 + 6] = n.y >> 16 & 255,
+                r[i * 17 + 7] = n.offset & 255,
+                r[i * 17 + 8] = Ee(n.offset, 8) & 255,
+                r[i * 17 + 9] = Ee(n.offset, 16) & 255,
+                r[i * 17 + 10] = Ee(n.offset, 24) & 255,
+                r[i * 17 + 11] = Ee(n.offset, 32) & 255,
+                r[i * 17 + 12] = Ee(n.offset, 48) & 255,
+                r[i * 17 + 13] = n.length & 255,
+                r[i * 17 + 14] = n.length >> 8 & 255,
+                r[i * 17 + 15] = n.length >> 16 & 255,
+                r[i * 17 + 16] = n.length >> 24 & 255
+            }
+            return e
+        },
+        _n = (t, e) => {
+            if (t.byteLength < 17)
+                return null;
+            let r = t.byteLength / 17,
+                i = Mr(t, r - 1);
+            if (i.is_dir) {
+                let n = i.z,
+                    a = e.z - n,
+                    s = Math.trunc(e.x / (1 << a)),
+                    o = Math.trunc(e.y / (1 << a));
+                return {
+                    z: n,
+                    x: s,
+                    y: o
+                }
+            }
+            return null
+        };
+    function zn(t) {
+        return Y(this, null, function* () {
+            let e = yield t.getBytes(0, 512e3),
+                r = new DataView(e.data),
+                i = r.getUint32(4, !0),
+                n = r.getUint16(8, !0),
+                a = new TextDecoder("utf-8"),
+                s = JSON.parse(a.decode(new DataView(e.data, 10, i))),
+                o = 0;
+            s.compression === "gzip" && (o = 2);
+            let l = 0;
+            "minzoom" in s && (l = +s.minzoom);
+            let u = 0;
+            "maxzoom" in s && (u = +s.maxzoom);
+            let f = 0,
+                d = 0,
+                c = 0,
+                x = -180,
+                w = -85,
+                z = 180,
+                h = 85;
+            if (s.bounds) {
+                let p = s.bounds.split(",");
+                x = +p[0],
+                w = +p[1],
+                z = +p[2],
+                h = +p[3]
+            }
+            if (s.center) {
+                let p = s.center.split(",");
+                f = +p[0],
+                d = +p[1],
+                c = +p[2]
             }
             return {
-              data: tile_data
-            };
-          }
-        }
-      }
-      return void 0;
-    });
-  }
-  var v2_default = {
-    getHeader,
-    getZxy
-  };
-  function toNum(low, high) {
-    return (high >>> 0) * 4294967296 + (low >>> 0);
-  }
-  function readVarintRemainder(l2, p2) {
-    const buf = p2.buf;
-    let h, b;
-    b = buf[p2.pos++];
-    h = (b & 112) >> 4;
-    if (b < 128)
-      return toNum(l2, h);
-    b = buf[p2.pos++];
-    h |= (b & 127) << 3;
-    if (b < 128)
-      return toNum(l2, h);
-    b = buf[p2.pos++];
-    h |= (b & 127) << 10;
-    if (b < 128)
-      return toNum(l2, h);
-    b = buf[p2.pos++];
-    h |= (b & 127) << 17;
-    if (b < 128)
-      return toNum(l2, h);
-    b = buf[p2.pos++];
-    h |= (b & 127) << 24;
-    if (b < 128)
-      return toNum(l2, h);
-    b = buf[p2.pos++];
-    h |= (b & 1) << 31;
-    if (b < 128)
-      return toNum(l2, h);
-    throw new Error("Expected varint not more than 10 bytes");
-  }
-  function readVarint(p2) {
-    const buf = p2.buf;
-    let val, b;
-    b = buf[p2.pos++];
-    val = b & 127;
-    if (b < 128)
-      return val;
-    b = buf[p2.pos++];
-    val |= (b & 127) << 7;
-    if (b < 128)
-      return val;
-    b = buf[p2.pos++];
-    val |= (b & 127) << 14;
-    if (b < 128)
-      return val;
-    b = buf[p2.pos++];
-    val |= (b & 127) << 21;
-    if (b < 128)
-      return val;
-    b = buf[p2.pos];
-    val |= (b & 15) << 28;
-    return readVarintRemainder(val, p2);
-  }
-  function rotate(n2, xy, rx, ry) {
-    if (ry == 0) {
-      if (rx == 1) {
-        xy[0] = n2 - 1 - xy[0];
-        xy[1] = n2 - 1 - xy[1];
-      }
-      const t2 = xy[0];
-      xy[0] = xy[1];
-      xy[1] = t2;
-    }
-  }
-  function zxyToTileId(z2, x2, y) {
-    let acc = 0;
-    let tz = 0;
-    while (tz < z2) {
-      acc += (1 << tz) * (1 << tz);
-      tz++;
-    }
-    const n2 = 1 << z2;
-    let rx = 0;
-    let ry = 0;
-    let d = 0;
-    const xy = [x2, y];
-    let s2 = n2 / 2 >> 0;
-    while (s2 > 0) {
-      rx = (xy[0] & s2) > 0 ? 1 : 0;
-      ry = (xy[1] & s2) > 0 ? 1 : 0;
-      d += s2 * s2 * (3 * rx ^ ry);
-      rotate(s2, xy, rx, ry);
-      s2 = s2 / 2 >> 0;
-    }
-    return acc + d;
-  }
-  var ENTRY_SIZE_BYTES = 32;
-  var Compression;
-  (function(Compression2) {
-    Compression2[Compression2["Unknown"] = 0] = "Unknown";
-    Compression2[Compression2["None"] = 1] = "None";
-    Compression2[Compression2["Gzip"] = 2] = "Gzip";
-    Compression2[Compression2["Brotli"] = 3] = "Brotli";
-    Compression2[Compression2["Zstd"] = 4] = "Zstd";
-  })(Compression || (Compression = {}));
-  function tryDecompress(buf, compression) {
-    if (compression === 1 || compression === 0) {
-      return buf;
-    } else if (compression === 2) {
-      return decompressSync(new Uint8Array(buf));
-    } else {
-      throw Error("Compression method not supported");
-    }
-  }
-  var TileType;
-  (function(TileType2) {
-    TileType2[TileType2["Unknown"] = 0] = "Unknown";
-    TileType2[TileType2["Mvt"] = 1] = "Mvt";
-    TileType2[TileType2["Png"] = 2] = "Png";
-    TileType2[TileType2["Jpeg"] = 3] = "Jpeg";
-    TileType2[TileType2["Webp"] = 4] = "Webp";
-  })(TileType || (TileType = {}));
-  var HEADER_SIZE_BYTES = 127;
-  function findTile(entries, tileId) {
-    let m = 0;
-    let n2 = entries.length - 1;
-    while (m <= n2) {
-      const k = n2 + m >> 1;
-      const cmp = tileId - entries[k].tileId;
-      if (cmp > 0) {
-        m = k + 1;
-      } else if (cmp < 0) {
-        n2 = k - 1;
-      } else {
-        return entries[k];
-      }
-    }
-    if (n2 >= 0) {
-      if (entries[n2].runLength === 0) {
-        return entries[n2];
-      }
-      if (tileId - entries[n2].tileId < entries[n2].runLength) {
-        return entries[n2];
-      }
-    }
-    return null;
-  }
-  var FetchSource = class {
-    constructor(url) {
-      this.url = url;
-    }
-    getKey() {
-      return this.url;
-    }
-    getBytes(offset, length, signal) {
-      return __async2(this, null, function* () {
-        let controller;
-        if (!signal) {
-          controller = new AbortController();
-          signal = controller.signal;
-        }
-        const resp = yield fetch(this.url, {
-          signal,
-          headers: { Range: "bytes=" + offset + "-" + (offset + length - 1) }
-        });
-        const contentLength = resp.headers.get("Content-Length");
-        if (!contentLength || +contentLength !== length) {
-          console.error("Content-Length mismatch indicates byte serving not supported; aborting.");
-          if (controller)
-            controller.abort();
-        }
-        const a2 = yield resp.arrayBuffer();
-        return {
-          data: a2,
-          etag: resp.headers.get("ETag") || void 0,
-          cacheControl: resp.headers.get("Cache-Control") || void 0,
-          expires: resp.headers.get("Expires") || void 0
-        };
-      });
-    }
-  };
-  function bytesToHeader(bytes, etag) {
-    const v = new DataView(bytes);
-    return {
-      specVersion: 3,
-      rootDirectoryOffset: Number(v.getBigUint64(8, true)),
-      rootDirectoryLength: Number(v.getBigUint64(16, true)),
-      jsonMetadataOffset: Number(v.getBigUint64(24, true)),
-      jsonMetadataLength: Number(v.getBigUint64(32, true)),
-      leafDirectoryOffset: Number(v.getBigUint64(40, true)),
-      leafDirectoryLength: Number(v.getBigUint64(48, true)),
-      tileDataOffset: Number(v.getBigUint64(56, true)),
-      tileDataLength: Number(v.getBigUint64(64, true)),
-      numAddressedTiles: Number(v.getBigUint64(72, true)),
-      numTileEntries: Number(v.getBigUint64(80, true)),
-      numTileContents: Number(v.getBigUint64(88, true)),
-      clustered: v.getUint8(96) === 1,
-      internalCompression: v.getUint8(97),
-      tileCompression: v.getUint8(98),
-      tileType: v.getUint8(99),
-      minZoom: v.getUint8(100),
-      maxZoom: v.getUint8(101),
-      minLon: v.getInt32(102, true) / 1e7,
-      minLat: v.getInt32(106, true) / 1e7,
-      maxLon: v.getInt32(110, true) / 1e7,
-      maxLat: v.getInt32(114, true) / 1e7,
-      centerZoom: v.getUint8(118),
-      centerLon: v.getInt32(119, true) / 1e7,
-      centerLat: v.getInt32(123, true) / 1e7,
-      etag
-    };
-  }
-  function deserializeIndex(buffer) {
-    const p2 = { buf: new Uint8Array(buffer), pos: 0 };
-    const numEntries = readVarint(p2);
-    const entries = [];
-    let lastId = 0;
-    for (let i2 = 0; i2 < numEntries; i2++) {
-      const v = readVarint(p2);
-      entries.push({ tileId: lastId + v, offset: 0, length: 0, runLength: 1 });
-      lastId += v;
-    }
-    for (let i2 = 0; i2 < numEntries; i2++) {
-      entries[i2].runLength = readVarint(p2);
-    }
-    for (let i2 = 0; i2 < numEntries; i2++) {
-      entries[i2].length = readVarint(p2);
-    }
-    for (let i2 = 0; i2 < numEntries; i2++) {
-      const v = readVarint(p2);
-      if (v === 0 && i2 > 0) {
-        entries[i2].offset = entries[i2 - 1].offset + entries[i2 - 1].length;
-      } else {
-        entries[i2].offset = v - 1;
-      }
-    }
-    return entries;
-  }
-  function detectVersion(a2) {
-    const v = new DataView(a2);
-    if (v.getUint16(2, true) === 2) {
-      console.warn("PMTiles spec version 2 has been deprecated; please see github.com/protomaps/PMTiles for tools to upgrade");
-      return 2;
-    } else if (v.getUint16(2, true) === 1) {
-      console.warn("PMTiles spec version 1 has been deprecated; please see github.com/protomaps/PMTiles for tools to upgrade");
-      return 1;
-    }
-    return 3;
-  }
-  var VersionMismatch = class extends Error {
-  };
-  function getHeaderAndRoot(source, prefetch) {
-    return __async2(this, null, function* () {
-      let resp = yield source.getBytes(0, 16384);
-      const v = new DataView(resp.data);
-      if (v.getUint16(0, true) !== 19792) {
-        throw new Error("Wrong magic number for PMTiles archive");
-      }
-      if (detectVersion(resp.data) < 3) {
-        return [yield v2_default.getHeader(source)];
-      }
-      const headerData = resp.data.slice(0, HEADER_SIZE_BYTES);
-      const header = bytesToHeader(headerData, resp.etag);
-      if (prefetch) {
-        const rootDirData = resp.data.slice(header.rootDirectoryOffset, header.rootDirectoryOffset + header.rootDirectoryLength);
-        const dirKey = source.getKey() + "|" + (header.etag || "") + "|" + header.rootDirectoryOffset + "|" + header.rootDirectoryLength;
-        const rootDir = deserializeIndex(tryDecompress(rootDirData, header.internalCompression));
-        return [header, [dirKey, ENTRY_SIZE_BYTES * rootDir.length, rootDir]];
-      }
-      return [header, void 0];
-    });
-  }
-  function getDirectory(source, offset, length, header) {
-    return __async2(this, null, function* () {
-      let resp = yield source.getBytes(offset, length);
-      if (header.etag && header.etag !== resp.etag) {
-        throw new VersionMismatch("ETag mismatch: " + header.etag);
-      }
-      const data = tryDecompress(resp.data, header.internalCompression);
-      const directory = deserializeIndex(data);
-      if (directory.length === 0) {
-        throw new Error("Empty directory is invalid");
-      }
-      return directory;
-    });
-  }
-  var SharedPromiseCache = class {
-    constructor(maxSizeBytes = 64e6, prefetch = true) {
-      this.cache = new Map();
-      this.sizeBytes = 0;
-      this.maxSizeBytes = maxSizeBytes;
-      this.counter = 1;
-      this.prefetch = prefetch;
-    }
-    getHeader(source) {
-      return __async2(this, null, function* () {
-        const cacheKey = source.getKey();
-        if (this.cache.has(cacheKey)) {
-          this.cache.get(cacheKey).lastUsed = this.counter++;
-          const data = yield this.cache.get(cacheKey).data;
-          return data;
-        }
-        const p2 = new Promise((resolve, reject) => {
-          getHeaderAndRoot(source, this.prefetch).then((res) => {
-            if (this.cache.has(cacheKey)) {
-              this.cache.get(cacheKey).size = HEADER_SIZE_BYTES;
-              this.sizeBytes += HEADER_SIZE_BYTES;
+                specVersion: r.getUint16(2, !0),
+                rootDirectoryOffset: 10 + i,
+                rootDirectoryLength: n * 17,
+                jsonMetadataOffset: 10,
+                jsonMetadataLength: i,
+                leafDirectoryOffset: 0,
+                leafDirectoryLength: void 0,
+                tileDataOffset: 0,
+                tileDataLength: void 0,
+                numAddressedTiles: 0,
+                numTileEntries: 0,
+                numTileContents: 0,
+                clustered: !1,
+                internalCompression: 1,
+                tileCompression: o,
+                tileType: 1,
+                minZoom: l,
+                maxZoom: u,
+                minLon: x,
+                minLat: w,
+                maxLon: z,
+                maxLat: h,
+                centerZoom: c,
+                centerLon: f,
+                centerLat: d,
+                etag: e.etag
             }
-            if (res[1]) {
-              this.cache.set(res[1][0], {
-                lastUsed: this.counter++,
-                size: res[1][1],
-                data: Promise.resolve(res[1][2])
-              });
+        })
+    }
+    function kn(t, e, r, i, n, a, s) {
+        return Y(this, null, function* () {
+            let o = yield r.getArrayBuffer(e, t.rootDirectoryOffset, t.rootDirectoryLength, t);
+            t.specVersion === 1 && (o = Cr(o));
+            let l = Sr(new DataView(o), i, n, a);
+            if (l) {
+                let d = (yield e.getBytes(l.offset, l.length, s)).data,
+                    c = new DataView(d);
+                return c.getUint8(0) == 31 && c.getUint8(1) == 139 && (d = zt(new Uint8Array(d))), {
+                    data: d
+                }
             }
-            resolve(res[0]);
-            this.prune();
-          }).catch((e2) => {
-            reject(e2);
-          });
-        });
-        this.cache.set(cacheKey, { lastUsed: this.counter++, data: p2, size: 0 });
-        return p2;
-      });
-    }
-    getDirectory(source, offset, length, header) {
-      return __async2(this, null, function* () {
-        const cacheKey = source.getKey() + "|" + (header.etag || "") + "|" + offset + "|" + length;
-        if (this.cache.has(cacheKey)) {
-          this.cache.get(cacheKey).lastUsed = this.counter++;
-          const data = yield this.cache.get(cacheKey).data;
-          return data;
-        }
-        const p2 = new Promise((resolve, reject) => {
-          getDirectory(source, offset, length, header).then((directory) => {
-            resolve(directory);
-            if (this.cache.has(cacheKey)) {
-              this.cache.get(cacheKey).size = ENTRY_SIZE_BYTES * directory.length;
-              this.sizeBytes += ENTRY_SIZE_BYTES * directory.length;
-            }
-            this.prune();
-          }).catch((e2) => {
-            reject(e2);
-          });
-        });
-        this.cache.set(cacheKey, { lastUsed: this.counter++, data: p2, size: 0 });
-        return p2;
-      });
-    }
-    getArrayBuffer(source, offset, length, header) {
-      return __async2(this, null, function* () {
-        const cacheKey = source.getKey() + "|" + (header.etag || "") + "|" + offset + "|" + length;
-        if (this.cache.has(cacheKey)) {
-          this.cache.get(cacheKey).lastUsed = this.counter++;
-          const data = yield this.cache.get(cacheKey).data;
-          return data;
-        }
-        const p2 = new Promise((resolve, reject) => {
-          source.getBytes(offset, length).then((resp) => {
-            if (header.etag && header.etag !== resp.etag) {
-              throw new VersionMismatch("ETag mismatch: " + header.etag);
-            }
-            resolve(resp.data);
-            if (this.cache.has(cacheKey)) {
-              this.cache.get(cacheKey).size = resp.data.byteLength;
-              this.sizeBytes += resp.data.byteLength;
-            }
-            this.prune();
-          }).catch((e2) => {
-            reject(e2);
-          });
-        });
-        this.cache.set(cacheKey, { lastUsed: this.counter++, data: p2, size: 0 });
-        return p2;
-      });
-    }
-    prune() {
-      while (this.sizeBytes > this.maxSizeBytes) {
-        let minUsed = Infinity;
-        let minKey = void 0;
-        this.cache.forEach((cache_value, key) => {
-          if (cache_value.lastUsed < minUsed) {
-            minUsed = cache_value.lastUsed;
-            minKey = key;
-          }
-        });
-        if (minKey) {
-          this.sizeBytes -= this.cache.get(minKey).size;
-          this.cache.delete(minKey);
-        }
-      }
-    }
-    invalidate(source) {
-      this.cache.delete(source.getKey());
-    }
-  };
-  var PMTiles = class {
-    constructor(source, cache) {
-      if (typeof source === "string") {
-        this.source = new FetchSource(source);
-      } else {
-        this.source = source;
-      }
-      if (cache) {
-        this.cache = cache;
-      } else {
-        this.cache = new SharedPromiseCache();
-      }
-    }
-    root_entries() {
-      return __async2(this, null, function* () {
-        const header = yield this.cache.getHeader(this.source);
-        if (header.specVersion < 3) {
-          return [];
-        }
-        let d_o = header.rootDirectoryOffset;
-        let d_l = header.rootDirectoryLength;
-        return yield this.cache.getDirectory(this.source, d_o, d_l, header);
-      });
-    }
-    getHeader() {
-      return __async2(this, null, function* () {
-        return yield this.cache.getHeader(this.source);
-      });
-    }
-    getZxyAttempt(z2, x2, y, signal) {
-      return __async2(this, null, function* () {
-        const tile_id = zxyToTileId(z2, x2, y);
-        const header = yield this.cache.getHeader(this.source);
-        if (header.specVersion < 3) {
-          return v2_default.getZxy(header, this.source, this.cache, z2, x2, y, signal);
-        }
-        if (z2 < header.minZoom || z2 > header.maxZoom) {
-          return void 0;
-        }
-        let d_o = header.rootDirectoryOffset;
-        let d_l = header.rootDirectoryLength;
-        for (let depth = 0; depth < 5; depth++) {
-          const directory = yield this.cache.getDirectory(this.source, d_o, d_l, header);
-          const entry = findTile(directory, tile_id);
-          if (entry) {
-            if (entry.runLength > 0) {
-              const resp = yield this.source.getBytes(header.tileDataOffset + entry.offset, entry.length, signal);
-              if (header.etag && header.etag !== resp.etag) {
-                throw new VersionMismatch("ETag mismatch: " + header.etag);
-              }
-              return {
-                data: tryDecompress(resp.data, header.tileCompression),
-                cacheControl: resp.cacheControl,
-                expires: resp.expires
-              };
-            } else {
-              d_o = header.leafDirectoryOffset + entry.offset;
-              d_l = entry.length;
-            }
-          } else {
-            return void 0;
-          }
-        }
-        throw Error("Maximum directory depth exceeded");
-      });
-    }
-    getZxy(z2, x2, y, signal) {
-      return __async2(this, null, function* () {
-        try {
-          return yield this.getZxyAttempt(z2, x2, y, signal);
-        } catch (e2) {
-          if (e2 instanceof VersionMismatch) {
-            this.cache.invalidate(this.source);
-            return yield this.getZxyAttempt(z2, x2, y, signal);
-          } else {
-            throw e2;
-          }
-        }
-      });
-    }
-    getMetadataAttempt() {
-      return __async2(this, null, function* () {
-        const header = yield this.cache.getHeader(this.source);
-        const resp = yield this.source.getBytes(header.jsonMetadataOffset, header.jsonMetadataLength);
-        if (header.etag && header.etag !== resp.etag) {
-          throw new VersionMismatch("Etag mismatch: " + header.etag);
-        }
-        const decompressed = tryDecompress(resp.data, header.internalCompression);
-        const dec = new TextDecoder("utf-8");
-        return JSON.parse(dec.decode(decompressed));
-      });
-    }
-    getMetadata() {
-      return __async2(this, null, function* () {
-        try {
-          return yield this.getMetadataAttempt();
-        } catch (e2) {
-          if (e2 instanceof VersionMismatch) {
-            this.cache.invalidate(this.source);
-            return yield this.getMetadataAttempt();
-          } else {
-            throw e2;
-          }
-        }
-      });
-    }
-  };
-
-  // src/tilecache.ts
-  var GeomType;
-  (function(GeomType2) {
-    GeomType2[GeomType2["Point"] = 1] = "Point";
-    GeomType2[GeomType2["Line"] = 2] = "Line";
-    GeomType2[GeomType2["Polygon"] = 3] = "Polygon";
-  })(GeomType || (GeomType = {}));
-  function toIndex(c2) {
-    return c2.x + ":" + c2.y + ":" + c2.z;
-  }
-  var loadGeomAndBbox = (pbf, geometry, scale) => {
-    pbf.pos = geometry;
-    var end = pbf.readVarint() + pbf.pos, cmd = 1, length = 0, x2 = 0, y = 0, x1 = Infinity, x22 = -Infinity, y1 = Infinity, y2 = -Infinity;
-    var lines = [];
-    var line = [];
-    while (pbf.pos < end) {
-      if (length <= 0) {
-        var cmdLen = pbf.readVarint();
-        cmd = cmdLen & 7;
-        length = cmdLen >> 3;
-      }
-      length--;
-      if (cmd === 1 || cmd === 2) {
-        x2 += pbf.readSVarint() * scale;
-        y += pbf.readSVarint() * scale;
-        if (x2 < x1)
-          x1 = x2;
-        if (x2 > x22)
-          x22 = x2;
-        if (y < y1)
-          y1 = y;
-        if (y > y2)
-          y2 = y;
-        if (cmd === 1) {
-          if (line.length > 0)
-            lines.push(line);
-          line = [];
-        }
-        line.push(new import_point_geometry.default(x2, y));
-      } else if (cmd === 7) {
-        if (line)
-          line.push(line[0].clone());
-      } else
-        throw new Error("unknown command " + cmd);
-    }
-    if (line)
-      lines.push(line);
-    return { geom: lines, bbox: { minX: x1, minY: y1, maxX: x22, maxY: y2 } };
-  };
-  function parseTile(buffer, tileSize) {
-    let v = new import_vector_tile.VectorTile(new import_pbf.default(buffer));
-    let result = new Map();
-    for (let [key, value] of Object.entries(v.layers)) {
-      let features = [];
-      let layer = value;
-      for (let i2 = 0; i2 < layer.length; i2++) {
-        let loaded = loadGeomAndBbox(layer.feature(i2)._pbf, layer.feature(i2)._geometry, tileSize / layer.extent);
-        let numVertices = 0;
-        for (let part of loaded.geom)
-          numVertices += part.length;
-        features.push({
-          id: layer.feature(i2).id,
-          geomType: layer.feature(i2).type,
-          geom: loaded.geom,
-          numVertices,
-          bbox: loaded.bbox,
-          props: layer.feature(i2).properties
-        });
-      }
-      result.set(key, features);
-    }
-    return result;
-  }
-  var PmtilesSource = class {
-    constructor(url, shouldCancelZooms) {
-      if (typeof url == "string") {
-        this.p = new PMTiles(url);
-      } else {
-        this.p = url;
-      }
-      this.controllers = [];
-      this.shouldCancelZooms = shouldCancelZooms;
-    }
-    get(c2, tileSize) {
-      return __async(this, null, function* () {
-        if (this.shouldCancelZooms) {
-          this.controllers = this.controllers.filter((cont) => {
-            if (cont[0] != c2.z) {
-              cont[1].abort();
-              return false;
-            }
-            return true;
-          });
-        }
-        const controller = new AbortController();
-        this.controllers.push([c2.z, controller]);
-        const signal = controller.signal;
-        let result = yield this.p.getZxy(c2.z, c2.x, c2.y, signal);
-        if (result) {
-          return parseTile(result.data, tileSize);
-        } else {
-          return new Map();
-        }
-      });
-    }
-  };
-  var ZxySource = class {
-    constructor(url, shouldCancelZooms) {
-      this.url = url;
-      this.controllers = [];
-      this.shouldCancelZooms = shouldCancelZooms;
-    }
-    get(c2, tileSize) {
-      return __async(this, null, function* () {
-        if (this.shouldCancelZooms) {
-          this.controllers = this.controllers.filter((cont) => {
-            if (cont[0] != c2.z) {
-              cont[1].abort();
-              return false;
-            }
-            return true;
-          });
-        }
-        let url = this.url.replace("{z}", c2.z.toString()).replace("{x}", c2.x.toString()).replace("{y}", c2.y.toString());
-        const controller = new AbortController();
-        this.controllers.push([c2.z, controller]);
-        const signal = controller.signal;
-        return new Promise((resolve, reject) => {
-          fetch(url, { signal }).then((resp) => {
-            return resp.arrayBuffer();
-          }).then((buffer) => {
-            let result = parseTile(buffer, tileSize);
-            resolve(result);
-          }).catch((e2) => {
-            reject(e2);
-          });
-        });
-      });
-    }
-  };
-  var R = 6378137;
-  var MAX_LATITUDE = 85.0511287798;
-  var MAXCOORD = R * Math.PI;
-  var project = (latlng) => {
-    let d = Math.PI / 180;
-    let constrained_lat = Math.max(Math.min(MAX_LATITUDE, latlng[0]), -MAX_LATITUDE);
-    let sin = Math.sin(constrained_lat * d);
-    return new import_point_geometry.default(R * latlng[1] * d, R * Math.log((1 + sin) / (1 - sin)) / 2);
-  };
-  function sqr(x2) {
-    return x2 * x2;
-  }
-  function dist2(v, w) {
-    return sqr(v.x - w.x) + sqr(v.y - w.y);
-  }
-  function distToSegmentSquared(p2, v, w) {
-    var l2 = dist2(v, w);
-    if (l2 === 0)
-      return dist2(p2, v);
-    var t2 = ((p2.x - v.x) * (w.x - v.x) + (p2.y - v.y) * (w.y - v.y)) / l2;
-    t2 = Math.max(0, Math.min(1, t2));
-    return dist2(p2, new import_point_geometry.default(v.x + t2 * (w.x - v.x), v.y + t2 * (w.y - v.y)));
-  }
-  function isInRing(point, ring) {
-    var inside = false;
-    for (var i2 = 0, j = ring.length - 1; i2 < ring.length; j = i2++) {
-      var xi = ring[i2].x, yi = ring[i2].y;
-      var xj = ring[j].x, yj = ring[j].y;
-      var intersect = yi > point.y != yj > point.y && point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi;
-      if (intersect)
-        inside = !inside;
-    }
-    return inside;
-  }
-  function isCCW(ring) {
-    var area = 0;
-    for (var i2 = 0; i2 < ring.length; i2++) {
-      let j = (i2 + 1) % ring.length;
-      area += ring[i2].x * ring[j].y;
-      area -= ring[j].x * ring[i2].y;
-    }
-    return area < 0;
-  }
-  function pointInPolygon(point, geom) {
-    var isInCurrentExterior = false;
-    for (let ring of geom) {
-      if (isCCW(ring)) {
-        if (isInRing(point, ring))
-          isInCurrentExterior = false;
-      } else {
-        if (isInCurrentExterior)
-          return true;
-        if (isInRing(point, ring))
-          isInCurrentExterior = true;
-      }
-    }
-    return isInCurrentExterior;
-  }
-  function pointMinDistToPoints(point, geom) {
-    let min = Infinity;
-    for (let l2 of geom) {
-      let dist = Math.sqrt(dist2(point, l2[0]));
-      if (dist < min)
-        min = dist;
-    }
-    return min;
-  }
-  function pointMinDistToLines(point, geom) {
-    let min = Infinity;
-    for (let l2 of geom) {
-      for (var i2 = 0; i2 < l2.length - 1; i2++) {
-        let dist = Math.sqrt(distToSegmentSquared(point, l2[i2], l2[i2 + 1]));
-        if (dist < min)
-          min = dist;
-      }
-    }
-    return min;
-  }
-  var TileCache = class {
-    constructor(source, tileSize) {
-      this.source = source;
-      this.cache = new Map();
-      this.inflight = new Map();
-      this.tileSize = tileSize;
-    }
-    queryFeatures(lng, lat, zoom, brushSize) {
-      let projected = project([lat, lng]);
-      var normalized = new import_point_geometry.default((projected.x + MAXCOORD) / (MAXCOORD * 2), 1 - (projected.y + MAXCOORD) / (MAXCOORD * 2));
-      if (normalized.x > 1)
-        normalized.x = normalized.x - Math.floor(normalized.x);
-      let on_zoom = normalized.mult(1 << zoom);
-      let tile_x = Math.floor(on_zoom.x);
-      let tile_y = Math.floor(on_zoom.y);
-      const idx = toIndex({ z: zoom, x: tile_x, y: tile_y });
-      let retval = [];
-      let entry = this.cache.get(idx);
-      if (entry) {
-        const center = new import_point_geometry.default((on_zoom.x - tile_x) * this.tileSize, (on_zoom.y - tile_y) * this.tileSize);
-        for (let [layer_name, layer_arr] of entry.data.entries()) {
-          for (let feature of layer_arr) {
-            if (feature.geomType == 1) {
-              if (pointMinDistToPoints(center, feature.geom) < brushSize) {
-                retval.push({ feature, layerName: layer_name });
-              }
-            } else if (feature.geomType == 2) {
-              if (pointMinDistToLines(center, feature.geom) < brushSize) {
-                retval.push({ feature, layerName: layer_name });
-              }
-            } else {
-              if (pointInPolygon(center, feature.geom)) {
-                retval.push({ feature, layerName: layer_name });
-              }
-            }
-          }
-        }
-      }
-      return retval;
-    }
-    get(c2) {
-      return __async(this, null, function* () {
-        const idx = toIndex(c2);
-        return new Promise((resolve, reject) => {
-          let entry = this.cache.get(idx);
-          if (entry) {
-            entry.used = performance.now();
-            resolve(entry.data);
-          } else {
-            let ifentry = this.inflight.get(idx);
-            if (ifentry) {
-              ifentry.push([resolve, reject]);
-            } else {
-              this.inflight.set(idx, []);
-              this.source.get(c2, this.tileSize).then((tile) => {
-                this.cache.set(idx, { used: performance.now(), data: tile });
-                let ifentry2 = this.inflight.get(idx);
-                if (ifentry2)
-                  ifentry2.forEach((f2) => f2[0](tile));
-                this.inflight.delete(idx);
-                resolve(tile);
-                if (this.cache.size >= 64) {
-                  let min_used = Infinity;
-                  let min_key = void 0;
-                  this.cache.forEach((value, key) => {
-                    if (value.used < min_used) {
-                      min_used = value.used;
-                      min_key = key;
+            let u = _n(new DataView(o), {
+                z: i,
+                x: n,
+                y: a
+            });
+            if (u) {
+                let f = bn(new DataView(o), u.z, u.x, u.y);
+                if (f) {
+                    let d = yield r.getArrayBuffer(e, f.offset, f.length, t);
+                    t.specVersion === 1 && (d = Cr(d));
+                    let c = Sr(new DataView(d), i, n, a);
+                    if (c) {
+                        let w = (yield e.getBytes(c.offset, c.length, s)).data,
+                            z = new DataView(w);
+                        return z.getUint8(0) == 31 && z.getUint8(1) == 139 && (w = zt(new Uint8Array(w))), {
+                            data: w
+                        }
                     }
-                  });
-                  if (min_key)
-                    this.cache.delete(min_key);
                 }
-              }).catch((e2) => {
-                let ifentry2 = this.inflight.get(idx);
-                if (ifentry2)
-                  ifentry2.forEach((f2) => f2[1](e2));
-                this.inflight.delete(idx);
-                reject(e2);
-              });
             }
-          }
-        });
-      });
+        })
     }
-  };
-
-  // src/view.ts
-  var transformGeom = (geom, scale, translate) => {
-    let retval = [];
-    for (let arr2 of geom) {
-      let loop = [];
-      for (let coord of arr2) {
-        loop.push(coord.clone().mult(scale).add(translate));
-      }
-      retval.push(loop);
-    }
-    return retval;
-  };
-  var wrap = (val, z2) => {
-    let dim = 1 << z2;
-    if (val < 0)
-      val = dim + val;
-    if (val >= dim)
-      val = val % dim;
-    return val;
-  };
-  var View = class {
-    constructor(tileCache, maxDataLevel, levelDiff) {
-      this.tileCache = tileCache;
-      this.maxDataLevel = maxDataLevel;
-      this.levelDiff = levelDiff;
-    }
-    dataTilesForBounds(display_zoom, bounds) {
-      let fractional = Math.pow(2, display_zoom) / Math.pow(2, Math.ceil(display_zoom));
-      let needed = [];
-      var scale = 1;
-      var dim = this.tileCache.tileSize;
-      if (display_zoom < this.levelDiff) {
-        scale = 1 / (1 << this.levelDiff - display_zoom) * fractional;
-        needed.push({
-          data_tile: { z: 0, x: 0, y: 0 },
-          origin: new import_point_geometry2.default(0, 0),
-          scale,
-          dim: dim * scale
-        });
-      } else if (display_zoom <= this.levelDiff + this.maxDataLevel) {
-        let f2 = 1 << this.levelDiff;
-        let basetile_size = 256 * fractional;
-        let data_zoom = Math.ceil(display_zoom) - this.levelDiff;
-        let mintile_x = Math.floor(bounds.minX / f2 / basetile_size);
-        let mintile_y = Math.floor(bounds.minY / f2 / basetile_size);
-        let maxtile_x = Math.floor(bounds.maxX / f2 / basetile_size);
-        let maxtile_y = Math.floor(bounds.maxY / f2 / basetile_size);
-        for (var tx = mintile_x; tx <= maxtile_x; tx++) {
-          for (var ty = mintile_y; ty <= maxtile_y; ty++) {
-            let origin = new import_point_geometry2.default(tx * f2 * basetile_size, ty * f2 * basetile_size);
-            needed.push({
-              data_tile: {
-                z: data_zoom,
-                x: wrap(tx, data_zoom),
-                y: wrap(ty, data_zoom)
-              },
-              origin,
-              scale: fractional,
-              dim: dim * fractional
-            });
-          }
-        }
-      } else {
-        let f2 = 1 << this.levelDiff;
-        scale = (1 << Math.ceil(display_zoom) - this.maxDataLevel - this.levelDiff) * fractional;
-        let mintile_x = Math.floor(bounds.minX / f2 / 256 / scale);
-        let mintile_y = Math.floor(bounds.minY / f2 / 256 / scale);
-        let maxtile_x = Math.floor(bounds.maxX / f2 / 256 / scale);
-        let maxtile_y = Math.floor(bounds.maxY / f2 / 256 / scale);
-        for (var tx = mintile_x; tx <= maxtile_x; tx++) {
-          for (var ty = mintile_y; ty <= maxtile_y; ty++) {
-            let origin = new import_point_geometry2.default(tx * f2 * 256 * scale, ty * f2 * 256 * scale);
-            needed.push({
-              data_tile: {
-                z: this.maxDataLevel,
-                x: wrap(tx, this.maxDataLevel),
-                y: wrap(ty, this.maxDataLevel)
-              },
-              origin,
-              scale,
-              dim: dim * scale
-            });
-          }
-        }
-      }
-      return needed;
-    }
-    dataTileForDisplayTile(display_tile) {
-      var data_tile;
-      var scale = 1;
-      var dim = this.tileCache.tileSize;
-      var origin;
-      if (display_tile.z < this.levelDiff) {
-        data_tile = { z: 0, x: 0, y: 0 };
-        scale = 1 / (1 << this.levelDiff - display_tile.z);
-        origin = new import_point_geometry2.default(0, 0);
-        dim = dim * scale;
-      } else if (display_tile.z <= this.levelDiff + this.maxDataLevel) {
-        let f2 = 1 << this.levelDiff;
-        data_tile = {
-          z: display_tile.z - this.levelDiff,
-          x: Math.floor(display_tile.x / f2),
-          y: Math.floor(display_tile.y / f2)
-        };
-        origin = new import_point_geometry2.default(data_tile.x * f2 * 256, data_tile.y * f2 * 256);
-      } else {
-        scale = 1 << display_tile.z - this.maxDataLevel - this.levelDiff;
-        let f2 = 1 << this.levelDiff;
-        data_tile = {
-          z: this.maxDataLevel,
-          x: Math.floor(display_tile.x / f2 / scale),
-          y: Math.floor(display_tile.y / f2 / scale)
-        };
-        origin = new import_point_geometry2.default(data_tile.x * f2 * scale * 256, data_tile.y * f2 * scale * 256);
-        dim = dim * scale;
-      }
-      return { data_tile, scale, origin, dim };
-    }
-    getBbox(display_zoom, bounds) {
-      return __async(this, null, function* () {
-        let needed = this.dataTilesForBounds(display_zoom, bounds);
-        let result = yield Promise.all(needed.map((tt) => this.tileCache.get(tt.data_tile)));
-        return result.map((data, i2) => {
-          let tt = needed[i2];
-          return {
-            data,
-            z: display_zoom,
-            data_tile: tt.data_tile,
-            scale: tt.scale,
-            dim: tt.dim,
-            origin: tt.origin
-          };
-        });
-      });
-    }
-    getDisplayTile(display_tile) {
-      return __async(this, null, function* () {
-        let tt = this.dataTileForDisplayTile(display_tile);
-        const data = yield this.tileCache.get(tt.data_tile);
-        return {
-          data,
-          z: display_tile.z,
-          data_tile: tt.data_tile,
-          scale: tt.scale,
-          origin: tt.origin,
-          dim: tt.dim
-        };
-      });
-    }
-    queryFeatures(lng, lat, display_zoom) {
-      let rounded_zoom = Math.round(display_zoom);
-      let data_zoom = Math.min(rounded_zoom - this.levelDiff, this.maxDataLevel);
-      let brush_size = 16 / (1 << rounded_zoom - data_zoom);
-      return this.tileCache.queryFeatures(lng, lat, data_zoom, brush_size);
-    }
-  };
-  var sourcesToViews = (options) => {
-    let sourceToViews = (o2) => {
-      let level_diff = o2.levelDiff === void 0 ? 2 : o2.levelDiff;
-      let maxDataZoom = o2.maxDataZoom || 14;
-      let source;
-      if (typeof o2.url === "string") {
-        if (o2.url.endsWith(".pmtiles")) {
-          source = new PmtilesSource(o2.url, true);
-        } else {
-          source = new ZxySource(o2.url, true);
-        }
-      } else {
-        source = new PmtilesSource(o2.url, true);
-      }
-      let cache = new TileCache(source, 256 * 1 << level_diff);
-      return new View(cache, maxDataZoom, level_diff);
+    var Tr = {
+        getHeader: zn,
+        getZxy: kn
     };
-    let sources = new Map();
-    if (options.sources) {
-      for (const key in options.sources) {
-        sources.set(key, sourceToViews(options.sources[key]));
-      }
-    } else {
-      sources.set("", sourceToViews(options));
+    function _e(t, e) {
+        return (e >>> 0) * 4294967296 + (t >>> 0)
     }
-    return sources;
-  };
-
-  // src/painter.ts
-  var import_point_geometry3 = __toModule(require_point_geometry());
-  function painter(ctx, z2, prepared_tilemap, label_data, rules, bbox, origin, clip, debug) {
-    let start = performance.now();
-    ctx.save();
-    ctx.miterLimit = 2;
-    for (var rule of rules) {
-      if (rule.minzoom && z2 < rule.minzoom)
-        continue;
-      if (rule.maxzoom && z2 > rule.maxzoom)
-        continue;
-      let prepared_tiles = prepared_tilemap.get(rule.dataSource || "");
-      if (!prepared_tiles)
-        continue;
-      for (let prepared_tile of prepared_tiles) {
-        var layer = prepared_tile.data.get(rule.dataLayer);
-        if (layer === void 0)
-          continue;
-        if (rule.symbolizer.before)
-          rule.symbolizer.before(ctx, prepared_tile.z);
-        let po = prepared_tile.origin;
-        let dim = prepared_tile.dim;
-        let ps = prepared_tile.scale;
-        ctx.save();
-        if (clip) {
-          ctx.beginPath();
-          let minX = Math.max(po.x - origin.x, bbox.minX - origin.x);
-          let minY = Math.max(po.y - origin.y, bbox.minY - origin.y);
-          let maxX = Math.min(po.x - origin.x + dim, bbox.maxX - origin.x);
-          let maxY = Math.min(po.y - origin.y + dim, bbox.maxY - origin.y);
-          ctx.rect(minX, minY, maxX - minX, maxY - minY);
-          ctx.clip();
+    function Ln(t, e) {
+        let r = e.buf,
+            i,
+            n;
+        if (n = r[e.pos++], i = (n & 112) >> 4, n < 128 || (n = r[e.pos++], i |= (n & 127) << 3, n < 128) || (n = r[e.pos++], i |= (n & 127) << 10, n < 128) || (n = r[e.pos++], i |= (n & 127) << 17, n < 128) || (n = r[e.pos++], i |= (n & 127) << 24, n < 128) || (n = r[e.pos++], i |= (n & 1) << 31, n < 128))
+            return _e(t, i);
+        throw new Error("Expected varint not more than 10 bytes")
+    }
+    function Re(t) {
+        let e = t.buf,
+            r,
+            i;
+        return i = e[t.pos++], r = i & 127, i < 128 || (i = e[t.pos++], r |= (i & 127) << 7, i < 128) || (i = e[t.pos++], r |= (i & 127) << 14, i < 128) || (i = e[t.pos++], r |= (i & 127) << 21, i < 128) ? r : (i = e[t.pos], r |= (i & 15) << 28, Ln(r, t))
+    }
+    function Sn(t, e, r, i) {
+        if (i == 0) {
+            r == 1 && (e[0] = t - 1 - e[0], e[1] = t - 1 - e[1]);
+            let n = e[0];
+            e[0] = e[1],
+            e[1] = n
         }
-        ctx.translate(po.x - origin.x, po.y - origin.y);
-        for (var feature of layer) {
-          let geom = feature.geom;
-          let fbox = feature.bbox;
-          if (fbox.maxX * ps + po.x < bbox.minX || fbox.minX * ps + po.x > bbox.maxX || fbox.minY * ps + po.y > bbox.maxY || fbox.maxY * ps + po.y < bbox.minY) {
-            continue;
-          }
-          if (rule.filter && !rule.filter(prepared_tile.z, feature))
-            continue;
-          if (ps != 1) {
-            geom = transformGeom(geom, ps, new import_point_geometry3.default(0, 0));
-          }
-          rule.symbolizer.draw(ctx, geom, prepared_tile.z, feature);
+    }
+    function Fn(t, e, r) {
+        if (t > 26)
+            throw Error("Tile zoom level exceeds max safe number limit (26)");
+        if (e > Math.pow(2, t) - 1 || r > Math.pow(2, t) - 1)
+            throw Error("tile x/y outside zoom level bounds");
+        let i = 0,
+            n = 0;
+        for (; n < t;)
+            i += Math.pow(2, n) * Math.pow(2, n),
+            n++;
+        let a = Math.pow(2, t),
+            s = 0,
+            o = 0,
+            l = 0,
+            u = [e, r],
+            f = a / 2;
+        for (; f > 0;)
+            s = (u[0] & f) > 0 ? 1 : 0,
+            o = (u[1] & f) > 0 ? 1 : 0,
+            l += f * f * (3 * s ^ o),
+            Sn(f, u, s, o),
+            f = f / 2;
+        return i + l
+    }
+    function Pr(t, e) {
+        return Y(this, null, function* () {
+            if (e === 1 || e === 0)
+                return t;
+            if (e === 2)
+                return zt(new Uint8Array(t));
+            throw Error("Compression method not supported")
+        })
+    }
+    var Mn = 127;
+    function Cn(t, e) {
+        let r = 0,
+            i = t.length - 1;
+        for (; r <= i;) {
+            let n = i + r >> 1,
+                a = e - t[n].tileId;
+            if (a > 0)
+                r = n + 1;
+            else if (a < 0)
+                i = n - 1;
+            else
+                return t[n]
         }
-        ctx.restore();
-      }
+        return i >= 0 && (t[i].runLength === 0 || e - t[i].tileId < t[i].runLength) ? t[i] : null
     }
-    if (clip) {
-      ctx.beginPath();
-      ctx.rect(bbox.minX - origin.x, bbox.minY - origin.y, bbox.maxX - bbox.minX, bbox.maxY - bbox.minY);
-      ctx.clip();
-    }
-    if (label_data) {
-      let matches = label_data.searchBbox(bbox, Infinity);
-      for (var label of matches) {
-        ctx.save();
-        ctx.translate(label.anchor.x - origin.x, label.anchor.y - origin.y);
-        label.draw(ctx);
-        ctx.restore();
-        if (debug) {
-          ctx.lineWidth = 0.5;
-          ctx.strokeStyle = debug;
-          ctx.fillStyle = debug;
-          ctx.globalAlpha = 1;
-          ctx.fillRect(label.anchor.x - origin.x - 2, label.anchor.y - origin.y - 2, 4, 4);
-          for (let bbox2 of label.bboxes) {
-            ctx.strokeRect(bbox2.minX - origin.x, bbox2.minY - origin.y, bbox2.maxX - bbox2.minX, bbox2.maxY - bbox2.minY);
-          }
-        }
-      }
-    }
-    ctx.restore();
-    return performance.now() - start;
-  }
-
-  // src/labeler.ts
-  var import_point_geometry4 = __toModule(require_point_geometry());
-  var import_rbush = __toModule(require_rbush_min());
-  var covering = (display_zoom, tile_width, bbox) => {
-    let res = 256;
-    let f2 = tile_width / res;
-    let minx = Math.floor(bbox.minX / res);
-    let miny = Math.floor(bbox.minY / res);
-    let maxx = Math.floor(bbox.maxX / res);
-    let maxy = Math.floor(bbox.maxY / res);
-    let leveldiff = Math.log2(f2);
-    let retval = [];
-    for (let x2 = minx; x2 <= maxx; x2++) {
-      let wrapped_x = x2 % (1 << display_zoom);
-      for (let y = miny; y <= maxy; y++) {
-        retval.push({
-          display: toIndex({ z: display_zoom, x: wrapped_x, y }),
-          key: toIndex({
-            z: display_zoom - leveldiff,
-            x: Math.floor(wrapped_x / f2),
-            y: Math.floor(y / f2)
-          })
-        });
-      }
-    }
-    return retval;
-  };
-  var Index = class {
-    constructor(dim, maxLabeledTiles) {
-      this.tree = new import_rbush.default();
-      this.current = new Map();
-      this.dim = dim;
-      this.maxLabeledTiles = maxLabeledTiles;
-    }
-    hasPrefix(tileKey) {
-      for (let key of this.current.keys()) {
-        if (key.startsWith(tileKey))
-          return true;
-      }
-      return false;
-    }
-    has(tileKey) {
-      return this.current.has(tileKey);
-    }
-    size() {
-      return this.current.size;
-    }
-    keys() {
-      return this.current.keys();
-    }
-    searchBbox(bbox, order) {
-      let labels = new Set();
-      for (let match of this.tree.search(bbox)) {
-        if (match.indexed_label.order <= order) {
-          labels.add(match.indexed_label);
-        }
-      }
-      return labels;
-    }
-    searchLabel(label, order) {
-      let labels = new Set();
-      for (let bbox of label.bboxes) {
-        for (let match of this.tree.search(bbox)) {
-          if (match.indexed_label.order <= order) {
-            labels.add(match.indexed_label);
-          }
-        }
-      }
-      return labels;
-    }
-    bboxCollides(bbox, order) {
-      for (let match of this.tree.search(bbox)) {
-        if (match.indexed_label.order <= order)
-          return true;
-      }
-      return false;
-    }
-    labelCollides(label, order) {
-      for (let bbox of label.bboxes) {
-        for (let match of this.tree.search(bbox)) {
-          if (match.indexed_label.order <= order)
-            return true;
-        }
-      }
-      return false;
-    }
-    deduplicationCollides(label) {
-      if (!label.deduplicationKey || !label.deduplicationDistance)
-        return false;
-      let dist = label.deduplicationDistance;
-      let test_bbox = {
-        minX: label.anchor.x - dist,
-        minY: label.anchor.y - dist,
-        maxX: label.anchor.x + dist,
-        maxY: label.anchor.y + dist
-      };
-      for (let collision of this.tree.search(test_bbox)) {
-        if (collision.indexed_label.deduplicationKey === label.deduplicationKey) {
-          if (collision.indexed_label.anchor.dist(label.anchor) < dist) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-    makeEntry(tileKey) {
-      if (this.current.get(tileKey)) {
-        console.log("consistency error 1");
-      }
-      let newSet = new Set();
-      this.current.set(tileKey, newSet);
-    }
-    insert(label, order, tileKey) {
-      let indexed_label = {
-        anchor: label.anchor,
-        bboxes: label.bboxes,
-        draw: label.draw,
-        order,
-        tileKey,
-        deduplicationKey: label.deduplicationKey,
-        deduplicationDistance: label.deduplicationDistance
-      };
-      let entry = this.current.get(tileKey);
-      if (!entry) {
-        let newSet = new Set();
-        this.current.set(tileKey, newSet);
-        entry = newSet;
-      }
-      entry.add(indexed_label);
-      var wrapsLeft = false;
-      var wrapsRight = false;
-      for (let bbox of label.bboxes) {
-        var b = bbox;
-        b.indexed_label = indexed_label;
-        this.tree.insert(b);
-        if (bbox.minX < 0)
-          wrapsLeft = true;
-        if (bbox.maxX > this.dim)
-          wrapsRight = true;
-      }
-      if (wrapsLeft || wrapsRight) {
-        var shift2 = wrapsLeft ? this.dim : -this.dim;
-        var new_bboxes = [];
-        for (let bbox of label.bboxes) {
-          new_bboxes.push({
-            minX: bbox.minX + shift2,
-            minY: bbox.minY,
-            maxX: bbox.maxX + shift2,
-            maxY: bbox.maxY
-          });
-        }
-        let duplicate_label = {
-          anchor: new import_point_geometry4.default(label.anchor.x + shift2, label.anchor.y),
-          bboxes: new_bboxes,
-          draw: label.draw,
-          order,
-          tileKey
-        };
-        let entry2 = this.current.get(tileKey);
-        if (entry2)
-          entry2.add(duplicate_label);
-        for (let bbox of new_bboxes) {
-          var b = bbox;
-          b.indexed_label = duplicate_label;
-          this.tree.insert(b);
-        }
-      }
-    }
-    pruneOrNoop(key_added) {
-      let added = key_added.split(":");
-      let max_key = void 0;
-      let max_dist = 0;
-      let keys_for_ds = 0;
-      for (var existing_key of this.current.keys()) {
-        let existing = existing_key.split(":");
-        if (existing[3] === added[3]) {
-          keys_for_ds++;
-          let dist = Math.sqrt(Math.pow(+existing[0] - +added[0], 2) + Math.pow(+existing[1] - +added[1], 2));
-          if (dist > max_dist) {
-            max_dist = dist;
-            max_key = existing_key;
-          }
-        }
-        if (max_key && keys_for_ds > this.maxLabeledTiles) {
-          this.pruneKey(max_key);
-        }
-      }
-    }
-    pruneKey(keyToRemove) {
-      let indexed_labels = this.current.get(keyToRemove);
-      if (!indexed_labels)
-        return;
-      let entries_to_delete = [];
-      for (let entry of this.tree.all()) {
-        if (indexed_labels.has(entry.indexed_label)) {
-          entries_to_delete.push(entry);
-        }
-      }
-      entries_to_delete.forEach((entry) => {
-        this.tree.remove(entry);
-      });
-      this.current.delete(keyToRemove);
-    }
-    removeLabel(labelToRemove) {
-      let entries_to_delete = [];
-      for (let entry of this.tree.all()) {
-        if (labelToRemove == entry.indexed_label) {
-          entries_to_delete.push(entry);
-        }
-      }
-      entries_to_delete.forEach((entry) => {
-        this.tree.remove(entry);
-      });
-      let c2 = this.current.get(labelToRemove.tileKey);
-      if (c2)
-        c2.delete(labelToRemove);
-    }
-  };
-  var Labeler = class {
-    constructor(z2, scratch, labelRules2, maxLabeledTiles, callback) {
-      this.index = new Index(256 * 1 << z2, maxLabeledTiles);
-      this.z = z2;
-      this.scratch = scratch;
-      this.labelRules = labelRules2;
-      this.callback = callback;
-    }
-    layout(prepared_tilemap) {
-      let start = performance.now();
-      let keys_adding = new Set();
-      for (let [k, prepared_tiles] of prepared_tilemap) {
-        for (let prepared_tile of prepared_tiles) {
-          let key2 = toIndex(prepared_tile.data_tile) + ":" + k;
-          if (!this.index.has(key2)) {
-            this.index.makeEntry(key2);
-            keys_adding.add(key2);
-          }
-        }
-      }
-      let tiles_invalidated = new Set();
-      for (let [order, rule] of this.labelRules.entries()) {
-        if (rule.visible == false)
-          continue;
-        if (rule.minzoom && this.z < rule.minzoom)
-          continue;
-        if (rule.maxzoom && this.z > rule.maxzoom)
-          continue;
-        let dsName = rule.dataSource || "";
-        let prepared_tiles = prepared_tilemap.get(dsName);
-        if (!prepared_tiles)
-          continue;
-        for (let prepared_tile of prepared_tiles) {
-          let key2 = toIndex(prepared_tile.data_tile) + ":" + dsName;
-          if (!keys_adding.has(key2))
-            continue;
-          let layer = prepared_tile.data.get(rule.dataLayer);
-          if (layer === void 0)
-            continue;
-          let feats = layer;
-          if (rule.sort)
-            feats.sort((a2, b) => {
-              if (rule.sort) {
-                return rule.sort(a2.props, b.props);
-              }
-              return 0;
-            });
-          let layout = {
-            index: this.index,
-            zoom: this.z,
-            scratch: this.scratch,
-            order,
-            overzoom: this.z - prepared_tile.data_tile.z
-          };
-          for (let feature of feats) {
-            if (rule.filter && !rule.filter(this.z, feature))
-              continue;
-            let transformed = transformGeom(feature.geom, prepared_tile.scale, prepared_tile.origin);
-            let labels = rule.symbolizer.place(layout, transformed, feature);
-            if (!labels)
-              continue;
-            for (let label of labels) {
-              var label_added = false;
-              if (label.deduplicationKey && this.index.deduplicationCollides(label)) {
-                continue;
-              }
-              if (this.index.labelCollides(label, Infinity)) {
-                if (!this.index.labelCollides(label, order)) {
-                  let conflicts = this.index.searchLabel(label, Infinity);
-                  for (let conflict of conflicts) {
-                    this.index.removeLabel(conflict);
-                    for (let bbox of conflict.bboxes) {
-                      this.findInvalidatedTiles(tiles_invalidated, prepared_tile.dim, bbox, key2);
-                    }
-                  }
-                  this.index.insert(label, order, key2);
-                  label_added = true;
-                }
-              } else {
-                this.index.insert(label, order, key2);
-                label_added = true;
-              }
-              if (label_added) {
-                for (let bbox of label.bboxes) {
-                  if (bbox.maxX > prepared_tile.origin.x + prepared_tile.dim || bbox.minX < prepared_tile.origin.x || bbox.minY < prepared_tile.origin.y || bbox.maxY > prepared_tile.origin.y + prepared_tile.dim) {
-                    this.findInvalidatedTiles(tiles_invalidated, prepared_tile.dim, bbox, key2);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      for (var key of keys_adding) {
-        this.index.pruneOrNoop(key);
-      }
-      if (tiles_invalidated.size > 0 && this.callback) {
-        this.callback(tiles_invalidated);
-      }
-      return performance.now() - start;
-    }
-    findInvalidatedTiles(tiles_invalidated, dim, bbox, key) {
-      let touched = covering(this.z, dim, bbox);
-      for (let s2 of touched) {
-        if (s2.key != key && this.index.hasPrefix(s2.key)) {
-          tiles_invalidated.add(s2.display);
-        }
-      }
-    }
-    add(prepared_tilemap) {
-      var all_added = true;
-      for (let [k, prepared_tiles] of prepared_tilemap) {
-        for (let prepared_tile of prepared_tiles) {
-          if (!this.index.has(toIndex(prepared_tile.data_tile) + ":" + k))
-            all_added = false;
-        }
-      }
-      if (all_added) {
-        return 0;
-      } else {
-        let timing = this.layout(prepared_tilemap);
-        return timing;
-      }
-    }
-  };
-  var Labelers = class {
-    constructor(scratch, labelRules2, maxLabeledTiles, callback) {
-      this.labelers = new Map();
-      this.scratch = scratch;
-      this.labelRules = labelRules2;
-      this.maxLabeledTiles = maxLabeledTiles;
-      this.callback = callback;
-    }
-    add(z2, prepared_tilemap) {
-      var labeler = this.labelers.get(z2);
-      if (labeler) {
-        return labeler.add(prepared_tilemap);
-      } else {
-        labeler = new Labeler(z2, this.scratch, this.labelRules, this.maxLabeledTiles, this.callback);
-        this.labelers.set(z2, labeler);
-        return labeler.add(prepared_tilemap);
-      }
-    }
-    getIndex(z2) {
-      let labeler = this.labelers.get(z2);
-      if (labeler)
-        return labeler.index;
-    }
-  };
-
-  // src/default_style/light.ts
-  var light = {
-    earth: "#FFFBF6",
-    glacier: "#ffffff",
-    residential: "#F4F4F8",
-    hospital: "#FFF6F6",
-    cemetery: "#EFF2EE",
-    school: "#F7F6FF",
-    industrial: "#FFF9EF",
-    wood: "#F4F9EF",
-    grass: "#EBF9E3",
-    park: "#E5F9D5",
-    water: "#B7DFF2",
-    sand: "#ebebeb",
-    buildings: "#F2EDE8",
-    highwayCasing: "#FFC3C3",
-    majorRoadCasing: "#FFB9B9",
-    mediumRoadCasing: "#FFCE8E",
-    minorRoadCasing: "#cccccc",
-    highway: "#FFCEBB",
-    majorRoad: "#FFE4B3",
-    mediumRoad: "#FFF2C8",
-    minorRoad: "#ffffff",
-    boundaries: "#9e9e9e",
-    mask: "#dddddd",
-    countryLabel: "#aaaaaa",
-    cityLabel: "#6C6C6C",
-    stateLabel: "#999999",
-    neighbourhoodLabel: "#888888",
-    landuseLabel: "#898989",
-    waterLabel: "#41ABDC",
-    naturalLabel: "#4B8F14",
-    roadsLabel: "#888888",
-    poisLabel: "#606060"
-  };
-
-  // src/default_style/dark.ts
-  var dark = {
-    earth: "#151515",
-    glacier: "#1c1c1c",
-    residential: "#252B2F",
-    hospital: "#3E2C2C",
-    cemetery: "#36483D",
-    school: "#2C3440",
-    industrial: "#33312C",
-    wood: "#3A3E38",
-    grass: "#4E604D",
-    park: "#2C4034",
-    water: "#4D5B73",
-    sand: "#777777",
-    buildings: "#464545",
-    highwayCasing: "#000000",
-    majorRoadCasing: "#1C1B1B",
-    mediumRoadCasing: "#3E3E3E",
-    minorRoadCasing: "#000000",
-    highway: "#5B5B5B",
-    majorRoad: "#595959",
-    mediumRoad: "#4F4F4F",
-    minorRoad: "#393939",
-    boundaries: "#666666",
-    mask: "#dddddd",
-    countryLabel: "#ffffff",
-    cityLabel: "#FFFFFF",
-    stateLabel: "#ffffff",
-    neighbourhoodLabel: "#FDFDFD",
-    landuseLabel: "#DDDDDD",
-    waterLabel: "#707E95",
-    naturalLabel: "#4c4c4c",
-    roadsLabel: "#C4C4C4",
-    poisLabel: "#959393"
-  };
-
-  // node_modules/color2k/dist/index.module.js
-  function t(t2, n2, r2) {
-    return Math.min(Math.max(t2, r2), n2);
-  }
-  var n = class extends Error {
-    constructor(t2) {
-      super(`Failed to parse color: "${t2}"`);
-    }
-  };
-  function r(r2) {
-    if (typeof r2 != "string")
-      throw new n(r2);
-    if (r2.trim().toLowerCase() === "transparent")
-      return [0, 0, 0, 0];
-    let e2 = r2.trim();
-    e2 = u.test(r2) ? function(t2) {
-      const r3 = t2.toLowerCase().trim(), e3 = o[function(t3) {
-        let n2 = 5381, r4 = t3.length;
-        for (; r4; )
-          n2 = 33 * n2 ^ t3.charCodeAt(--r4);
-        return (n2 >>> 0) % 2341;
-      }(r3)];
-      if (!e3)
-        throw new n(t2);
-      return `#${e3}`;
-    }(r2) : r2;
-    const f2 = s.exec(e2);
-    if (f2) {
-      const t2 = Array.from(f2).slice(1);
-      return [...t2.slice(0, 3).map((t3) => parseInt(_(t3, 2), 16)), parseInt(_(t2[3] || "f", 2), 16) / 255];
-    }
-    const p2 = i.exec(e2);
-    if (p2) {
-      const t2 = Array.from(p2).slice(1);
-      return [...t2.slice(0, 3).map((t3) => parseInt(t3, 16)), parseInt(t2[3] || "ff", 16) / 255];
-    }
-    const z2 = a.exec(e2);
-    if (z2) {
-      const t2 = Array.from(z2).slice(1);
-      return [...t2.slice(0, 3).map((t3) => parseInt(t3, 10)), parseFloat(t2[3] || "1")];
-    }
-    const h = c.exec(e2);
-    if (h) {
-      const [e3, o2, _2, s2] = Array.from(h).slice(1).map(parseFloat);
-      if (t(0, 100, o2) !== o2)
-        throw new n(r2);
-      if (t(0, 100, _2) !== _2)
-        throw new n(r2);
-      return [...l(e3, o2, _2), s2 || 1];
-    }
-    throw new n(r2);
-  }
-  var e = (t2) => parseInt(t2.replace(/_/g, ""), 36);
-  var o = "1q29ehhb 1n09sgk7 1kl1ekf_ _yl4zsno 16z9eiv3 1p29lhp8 _bd9zg04 17u0____ _iw9zhe5 _to73___ _r45e31e _7l6g016 _jh8ouiv _zn3qba8 1jy4zshs 11u87k0u 1ro9yvyo 1aj3xael 1gz9zjz0 _3w8l4xo 1bf1ekf_ _ke3v___ _4rrkb__ 13j776yz _646mbhl _nrjr4__ _le6mbhl 1n37ehkb _m75f91n _qj3bzfz 1939yygw 11i5z6x8 _1k5f8xs 1509441m 15t5lwgf _ae2th1n _tg1ugcv 1lp1ugcv 16e14up_ _h55rw7n _ny9yavn _7a11xb_ 1ih442g9 _pv442g9 1mv16xof 14e6y7tu 1oo9zkds 17d1cisi _4v9y70f _y98m8kc 1019pq0v 12o9zda8 _348j4f4 1et50i2o _8epa8__ _ts6senj 1o350i2o 1mi9eiuo 1259yrp0 1ln80gnw _632xcoy 1cn9zldc _f29edu4 1n490c8q _9f9ziet 1b94vk74 _m49zkct 1kz6s73a 1eu9dtog _q58s1rz 1dy9sjiq __u89jo3 _aj5nkwg _ld89jo3 13h9z6wx _qa9z2ii _l119xgq _bs5arju 1hj4nwk9 1qt4nwk9 1ge6wau6 14j9zlcw 11p1edc_ _ms1zcxe _439shk6 _jt9y70f _754zsow 1la40eju _oq5p___ _x279qkz 1fa5r3rv _yd2d9ip _424tcku _8y1di2_ _zi2uabw _yy7rn9h 12yz980_ __39ljp6 1b59zg0x _n39zfzp 1fy9zest _b33k___ _hp9wq92 1il50hz4 _io472ub _lj9z3eo 19z9ykg0 _8t8iu3a 12b9bl4a 1ak5yw0o _896v4ku _tb8k8lv _s59zi6t _c09ze0p 1lg80oqn 1id9z8wb _238nba5 1kq6wgdi _154zssg _tn3zk49 _da9y6tc 1sg7cv4f _r12jvtt 1gq5fmkz 1cs9rvci _lp9jn1c _xw1tdnb 13f9zje6 16f6973h _vo7ir40 _bt5arjf _rc45e4t _hr4e100 10v4e100 _hc9zke2 _w91egv_ _sj2r1kk 13c87yx8 _vqpds__ _ni8ggk8 _tj9yqfb 1ia2j4r4 _7x9b10u 1fc9ld4j 1eq9zldr _5j9lhpx _ez9zl6o _md61fzm".split(" ").reduce((t2, n2) => {
-    const r2 = e(n2.substring(0, 3)), o2 = e(n2.substring(3)).toString(16);
-    let _2 = "";
-    for (let t3 = 0; t3 < 6 - o2.length; t3++)
-      _2 += "0";
-    return t2[r2] = `${_2}${o2}`, t2;
-  }, {});
-  var _ = (t2, n2) => Array.from(Array(n2)).map(() => t2).join("");
-  var s = new RegExp(`^#${_("([a-f0-9])", 3)}([a-f0-9])?$`, "i");
-  var i = new RegExp(`^#${_("([a-f0-9]{2})", 3)}([a-f0-9]{2})?$`, "i");
-  var a = new RegExp(`^rgba?\\(\\s*(\\d+)\\s*${_(",\\s*(\\d+)\\s*", 2)}(?:,\\s*([\\d.]+))?\\s*\\)$`, "i");
-  var c = /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)$/i;
-  var u = /^[a-z]+$/i;
-  var f = (t2) => Math.round(255 * t2);
-  var l = (t2, n2, r2) => {
-    let e2 = r2 / 100;
-    if (n2 === 0)
-      return [e2, e2, e2].map(f);
-    const o2 = (t2 % 360 + 360) % 360 / 60, _2 = (1 - Math.abs(2 * e2 - 1)) * (n2 / 100), s2 = _2 * (1 - Math.abs(o2 % 2 - 1));
-    let i2 = 0, a2 = 0, c2 = 0;
-    o2 >= 0 && o2 < 1 ? (i2 = _2, a2 = s2) : o2 >= 1 && o2 < 2 ? (i2 = s2, a2 = _2) : o2 >= 2 && o2 < 3 ? (a2 = _2, c2 = s2) : o2 >= 3 && o2 < 4 ? (a2 = s2, c2 = _2) : o2 >= 4 && o2 < 5 ? (i2 = s2, c2 = _2) : o2 >= 5 && o2 < 6 && (i2 = _2, c2 = s2);
-    const u2 = e2 - _2 / 2;
-    return [i2 + u2, a2 + u2, c2 + u2].map(f);
-  };
-  function p(t2) {
-    const [n2, e2, o2, _2] = r(t2).map((t3, n3) => n3 === 3 ? t3 : t3 / 255), s2 = Math.max(n2, e2, o2), i2 = Math.min(n2, e2, o2), a2 = (s2 + i2) / 2;
-    if (s2 === i2)
-      return [0, 0, a2, _2];
-    const c2 = s2 - i2;
-    return [60 * (n2 === s2 ? (e2 - o2) / c2 + (e2 < o2 ? 6 : 0) : e2 === s2 ? (o2 - n2) / c2 + 2 : (n2 - e2) / c2 + 4), a2 > 0.5 ? c2 / (2 - s2 - i2) : c2 / (s2 + i2), a2, _2];
-  }
-  function z(n2, r2, e2, o2) {
-    return `hsla(${(n2 % 360).toFixed()}, ${t(0, 100, 100 * r2).toFixed()}%, ${t(0, 100, 100 * e2).toFixed()}%, ${parseFloat(t(0, 1, o2).toFixed(3))})`;
-  }
-
-  // src/symbolizer.ts
-  var import_point_geometry6 = __toModule(require_point_geometry());
-  var import_unitbezier = __toModule(require_unitbezier_d());
-  var import_polylabel = __toModule(require_polylabel());
-
-  // src/attribute.ts
-  var StringAttr = class {
-    constructor(c2, defaultValue) {
-      this.str = c2 != null ? c2 : defaultValue;
-      this.per_feature = typeof this.str == "function" && this.str.length == 2;
-    }
-    get(z2, f2) {
-      if (typeof this.str === "function") {
-        return this.str(z2, f2);
-      } else {
-        return this.str;
-      }
-    }
-  };
-  var NumberAttr = class {
-    constructor(c2, defaultValue = 1) {
-      this.value = c2 != null ? c2 : defaultValue;
-      this.per_feature = typeof this.value == "function" && this.value.length == 2;
-    }
-    get(z2, f2) {
-      if (typeof this.value == "function") {
-        return this.value(z2, f2);
-      } else {
-        return this.value;
-      }
-    }
-  };
-  var TextAttr = class {
-    constructor(options) {
-      var _a2;
-      this.label_props = (_a2 = options == null ? void 0 : options.label_props) != null ? _a2 : ["name"];
-      this.textTransform = options == null ? void 0 : options.textTransform;
-    }
-    get(z2, f2) {
-      let retval;
-      let label_props;
-      if (typeof this.label_props == "function") {
-        label_props = this.label_props(z2, f2);
-      } else {
-        label_props = this.label_props;
-      }
-      for (let property of label_props) {
-        if (f2.props.hasOwnProperty(property) && typeof f2.props[property] === "string") {
-          retval = f2.props[property];
-          break;
-        }
-      }
-      let transform;
-      if (typeof this.textTransform === "function") {
-        transform = this.textTransform(z2, f2);
-      } else {
-        transform = this.textTransform;
-      }
-      if (retval && transform === "uppercase")
-        retval = retval.toUpperCase();
-      else if (retval && transform === "lowercase")
-        retval = retval.toLowerCase();
-      else if (retval && transform === "capitalize") {
-        const wordsArray = retval.toLowerCase().split(" ");
-        const capsArray = wordsArray.map((word) => {
-          return word[0].toUpperCase() + word.slice(1);
-        });
-        retval = capsArray.join(" ");
-      }
-      return retval;
-    }
-  };
-  var FontAttr = class {
-    constructor(options) {
-      var _a2, _b2;
-      if (options == null ? void 0 : options.font) {
-        this.font = options.font;
-      } else {
-        this.family = (_a2 = options == null ? void 0 : options.fontFamily) != null ? _a2 : "sans-serif";
-        this.size = (_b2 = options == null ? void 0 : options.fontSize) != null ? _b2 : 12;
-        this.weight = options == null ? void 0 : options.fontWeight;
-        this.style = options == null ? void 0 : options.fontStyle;
-      }
-    }
-    get(z2, f2) {
-      if (this.font) {
-        if (typeof this.font === "function") {
-          return this.font(z2, f2);
-        } else {
-          return this.font;
-        }
-      } else {
-        var style = "";
-        if (this.style) {
-          if (typeof this.style === "function") {
-            style = this.style(z2, f2) + " ";
-          } else {
-            style = this.style + " ";
-          }
-        }
-        var weight = "";
-        if (this.weight) {
-          if (typeof this.weight === "function") {
-            weight = this.weight(z2, f2) + " ";
-          } else {
-            weight = this.weight + " ";
-          }
-        }
-        var size;
-        if (typeof this.size === "function") {
-          size = this.size(z2, f2);
-        } else {
-          size = this.size;
-        }
-        var family;
-        if (typeof this.family === "function") {
-          family = this.family(z2, f2);
-        } else {
-          family = this.family;
-        }
-        return `${style}${weight}${size}px ${family}`;
-      }
-    }
-  };
-  var ArrayAttr = class {
-    constructor(c2, defaultValue = []) {
-      this.value = c2 != null ? c2 : defaultValue;
-      this.per_feature = typeof this.value == "function" && this.value.length == 2;
-    }
-    get(z2, f2) {
-      if (typeof this.value == "function") {
-        return this.value(z2, f2);
-      } else {
-        return this.value;
-      }
-    }
-  };
-
-  // src/line.ts
-  var import_point_geometry5 = __toModule(require_point_geometry());
-  var linelabel = (pts, max_angle_delta, targetLen) => {
-    var chunks = [];
-    var a2, b, c2, i2 = 0, n2 = 0, d = 0;
-    var abmag = 0, bcmag = 0;
-    var abx = 0, aby = 0;
-    var bcx = 0, bcy = 0;
-    var dt = 0;
-    var i_start = 0;
-    var d_start = 0;
-    if (pts.length < 2)
-      return [];
-    if (pts.length === 2) {
-      d = Math.sqrt(Math.pow(pts[1].x - pts[0].x, 2) + Math.pow(pts[1].y - pts[0].y, 2));
-      return [
+    var Tn = class {
+        constructor(t)
         {
-          length: d,
-          beginIndex: 0,
-          beginDistance: 0,
-          endIndex: 2,
-          endDistance: d
+            this.url = t
         }
-      ];
-    }
-    abmag = Math.sqrt(Math.pow(pts[1].x - pts[0].x, 2) + Math.pow(pts[1].y - pts[0].y, 2));
-    for (i2 = 1, n2 = pts.length - 1; i2 < n2; i2++) {
-      a2 = pts[i2 - 1];
-      b = pts[i2];
-      c2 = pts[i2 + 1];
-      abx = b.x - a2.x;
-      aby = b.y - a2.y;
-      bcx = c2.x - b.x;
-      bcy = c2.y - b.y;
-      bcmag = Math.sqrt(bcx * bcx + bcy * bcy);
-      d += abmag;
-      dt = Math.acos((abx * bcx + aby * bcy) / (abmag * bcmag));
-      if (dt > max_angle_delta || d - d_start > targetLen) {
-        chunks.push({
-          length: d - d_start,
-          beginDistance: d_start,
-          beginIndex: i_start,
-          endIndex: i2 + 1,
-          endDistance: d
-        });
-        i_start = i2;
-        d_start = d;
-      }
-      abmag = bcmag;
-    }
-    if (i2 - i_start > 0) {
-      chunks.push({
-        length: d - d_start + bcmag,
-        beginIndex: i_start,
-        beginDistance: d_start,
-        endIndex: i2 + 1,
-        endDistance: d + bcmag
-      });
-    }
-    return chunks;
-  };
-  function simpleLabel(mls, minimum, repeatDistance, cellSize) {
-    let longestStart;
-    let longestEnd;
-    let longestLength = 0;
-    let candidates = [];
-    var lastLabeledDistance = -Infinity;
-    for (let ls of mls) {
-      let segments = linelabel(ls, Math.PI / 45, minimum);
-      for (let segment of segments) {
-        if (segment.length >= minimum + cellSize) {
-          let start = new import_point_geometry5.default(ls[segment.beginIndex].x, ls[segment.beginIndex].y);
-          let end = ls[segment.endIndex - 1];
-          let normalized = new import_point_geometry5.default((end.x - start.x) / segment.length, (end.y - start.y) / segment.length);
-          for (var i2 = cellSize; i2 < segment.length - minimum; i2 += repeatDistance) {
-            candidates.push({
-              start: start.add(normalized.mult(i2)),
-              end: start.add(normalized.mult(i2 + minimum))
-            });
-          }
+        getKey()
+        {
+            return this.url
         }
-      }
-    }
-    return candidates;
-  }
-  function lineCells(a2, b, length, spacing) {
-    let dx = b.x - a2.x;
-    let dy = b.y - a2.y;
-    let dist = Math.sqrt(Math.pow(b.x - a2.x, 2) + Math.pow(b.y - a2.y, 2));
-    let retval = [];
-    for (var i2 = 0; i2 < length + spacing; i2 += 2 * spacing) {
-      let factor = i2 * 1 / dist;
-      retval.push({ x: a2.x + factor * dx, y: a2.y + factor * dy });
-    }
-    return retval;
-  }
-
-  // src/text.ts
-  function linebreak(str, maxUnits) {
-    if (str.length <= maxUnits)
-      return [str];
-    let endIndex = maxUnits - 1;
-    let space_before = str.lastIndexOf(" ", endIndex);
-    let space_after = str.indexOf(" ", endIndex);
-    if (space_before == -1 && space_after == -1) {
-      return [str];
-    }
-    let first;
-    let after;
-    if (space_after == -1 || space_before >= 0 && endIndex - space_before < space_after - endIndex) {
-      first = str.substring(0, space_before);
-      after = str.substring(space_before + 1, str.length);
-    } else {
-      first = str.substring(0, space_after);
-      after = str.substring(space_after + 1, str.length);
-    }
-    return [first, ...linebreak(after, maxUnits)];
-  }
-  var CJK_CHARS = "\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303C\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\u3400-\u4DB5\u4E00-\u9FEA\uF900-\uFA6D\uFA70-\uFAD9\u2000";
-  var cjk_test = new RegExp("^[" + CJK_CHARS + "]+$");
-
-  // src/symbolizer.ts
-  var MAX_VERTICES_PER_DRAW_CALL = 5400;
-  var Justify;
-  (function(Justify2) {
-    Justify2[Justify2["Left"] = 1] = "Left";
-    Justify2[Justify2["Center"] = 2] = "Center";
-    Justify2[Justify2["Right"] = 3] = "Right";
-  })(Justify || (Justify = {}));
-  var TextPlacements;
-  (function(TextPlacements2) {
-    TextPlacements2[TextPlacements2["N"] = 1] = "N";
-    TextPlacements2[TextPlacements2["NE"] = 2] = "NE";
-    TextPlacements2[TextPlacements2["E"] = 3] = "E";
-    TextPlacements2[TextPlacements2["SE"] = 4] = "SE";
-    TextPlacements2[TextPlacements2["S"] = 5] = "S";
-    TextPlacements2[TextPlacements2["SW"] = 6] = "SW";
-    TextPlacements2[TextPlacements2["W"] = 7] = "W";
-    TextPlacements2[TextPlacements2["NW"] = 8] = "NW";
-  })(TextPlacements || (TextPlacements = {}));
-  var createPattern = (width, height, fn) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = width;
-    canvas.height = height;
-    if (ctx !== null)
-      fn(canvas, ctx);
-    return canvas;
-  };
-  var PolygonSymbolizer = class {
-    constructor(options) {
-      var _a2;
-      this.pattern = options.pattern;
-      this.fill = new StringAttr(options.fill, "black");
-      this.opacity = new NumberAttr(options.opacity, 1);
-      this.stroke = new StringAttr(options.stroke, "black");
-      this.width = new NumberAttr(options.width, 0);
-      this.per_feature = (_a2 = this.fill.per_feature || this.opacity.per_feature || this.stroke.per_feature || this.width.per_feature || options.per_feature) != null ? _a2 : false;
-      this.do_stroke = false;
-    }
-    before(ctx, z2) {
-      if (!this.per_feature) {
-        ctx.globalAlpha = this.opacity.get(z2);
-        ctx.fillStyle = this.fill.get(z2);
-        ctx.strokeStyle = this.stroke.get(z2);
-        let width = this.width.get(z2);
-        if (width > 0)
-          this.do_stroke = true;
-        ctx.lineWidth = width;
-      }
-      if (this.pattern) {
-        const patten = ctx.createPattern(this.pattern, "repeat");
-        if (patten)
-          ctx.fillStyle = patten;
-      }
-    }
-    draw(ctx, geom, z2, f2) {
-      var do_stroke = false;
-      if (this.per_feature) {
-        ctx.globalAlpha = this.opacity.get(z2, f2);
-        ctx.fillStyle = this.fill.get(z2, f2);
-        var width = this.width.get(z2, f2);
-        if (width) {
-          do_stroke = true;
-          ctx.strokeStyle = this.stroke.get(z2, f2);
-          ctx.lineWidth = width;
-        }
-      }
-      let drawPath = () => {
-        ctx.fill();
-        if (do_stroke || this.do_stroke) {
-          ctx.stroke();
-        }
-      };
-      var vertices_in_path = 0;
-      ctx.beginPath();
-      for (var poly of geom) {
-        if (vertices_in_path + poly.length > MAX_VERTICES_PER_DRAW_CALL) {
-          drawPath();
-          vertices_in_path = 0;
-          ctx.beginPath();
-        }
-        for (var p2 = 0; p2 < poly.length; p2++) {
-          let pt = poly[p2];
-          if (p2 == 0)
-            ctx.moveTo(pt.x, pt.y);
-          else
-            ctx.lineTo(pt.x, pt.y);
-        }
-        vertices_in_path += poly.length;
-      }
-      if (vertices_in_path > 0)
-        drawPath();
-    }
-  };
-  function arr(base, a2) {
-    return (z2) => {
-      let b = z2 - base;
-      if (b >= 0 && b < a2.length) {
-        return a2[b];
-      }
-      return 0;
-    };
-  }
-  function getStopIndex(input, stops) {
-    let idx = 0;
-    while (stops[idx + 1][0] < input)
-      idx++;
-    return idx;
-  }
-  function interpolate(factor, start, end) {
-    return factor * (end - start) + start;
-  }
-  function computeInterpolationFactor(z2, idx, base, stops) {
-    const difference = stops[idx + 1][0] - stops[idx][0];
-    const progress = z2 - stops[idx][0];
-    if (difference === 0)
-      return 0;
-    else if (base === 1)
-      return progress / difference;
-    else
-      return (Math.pow(base, progress) - 1) / (Math.pow(base, difference) - 1);
-  }
-  function exp(base, stops) {
-    return (z2) => {
-      if (stops.length < 1)
-        return 0;
-      if (z2 <= stops[0][0])
-        return stops[0][1];
-      if (z2 >= stops[stops.length - 1][0])
-        return stops[stops.length - 1][1];
-      const idx = getStopIndex(z2, stops);
-      const factor = computeInterpolationFactor(z2, idx, base, stops);
-      return interpolate(factor, stops[idx][1], stops[idx + 1][1]);
-    };
-  }
-  function step(output0, stops) {
-    return (z2) => {
-      if (stops.length < 1)
-        return 0;
-      let retval = output0;
-      for (let i2 = 0; i2 < stops.length; i2++) {
-        if (z2 >= stops[i2][0])
-          retval = stops[i2][1];
-      }
-      return retval;
-    };
-  }
-  function linear(stops) {
-    return exp(1, stops);
-  }
-  function cubicBezier(x1, y1, x2, y2, stops) {
-    return (z2) => {
-      if (stops.length < 1)
-        return 0;
-      const bezier = new import_unitbezier.default(x1, y1, x2, y2);
-      const idx = getStopIndex(z2, stops);
-      const factor = bezier.solve(computeInterpolationFactor(z2, idx, 1, stops));
-      return interpolate(factor, stops[idx][1], stops[idx + 1][1]);
-    };
-  }
-  var LineSymbolizer = class {
-    constructor(options) {
-      var _a2;
-      this.color = new StringAttr(options.color, "black");
-      this.width = new NumberAttr(options.width);
-      this.opacity = new NumberAttr(options.opacity);
-      this.dash = options.dash ? new ArrayAttr(options.dash) : null;
-      this.dashColor = new StringAttr(options.dashColor, "black");
-      this.dashWidth = new NumberAttr(options.dashWidth, 1);
-      this.lineCap = new StringAttr(options.lineCap, "butt");
-      this.lineJoin = new StringAttr(options.lineJoin, "miter");
-      this.skip = false;
-      this.per_feature = !!(((_a2 = this.dash) == null ? void 0 : _a2.per_feature) || this.color.per_feature || this.opacity.per_feature || this.width.per_feature || this.lineCap.per_feature || this.lineJoin.per_feature || options.per_feature);
-    }
-    before(ctx, z2) {
-      if (!this.per_feature) {
-        ctx.strokeStyle = this.color.get(z2);
-        ctx.lineWidth = this.width.get(z2);
-        ctx.globalAlpha = this.opacity.get(z2);
-        ctx.lineCap = this.lineCap.get(z2);
-        ctx.lineJoin = this.lineJoin.get(z2);
-      }
-    }
-    draw(ctx, geom, z2, f2) {
-      if (this.skip)
-        return;
-      let strokePath = () => {
-        if (this.per_feature) {
-          ctx.globalAlpha = this.opacity.get(z2, f2);
-          ctx.lineCap = this.lineCap.get(z2, f2);
-          ctx.lineJoin = this.lineJoin.get(z2, f2);
-        }
-        if (this.dash) {
-          ctx.save();
-          if (this.per_feature) {
-            ctx.lineWidth = this.dashWidth.get(z2, f2);
-            ctx.strokeStyle = this.dashColor.get(z2, f2);
-            ctx.setLineDash(this.dash.get(z2, f2));
-          } else {
-            ctx.setLineDash(this.dash.get(z2));
-          }
-          ctx.stroke();
-          ctx.restore();
-        } else {
-          ctx.save();
-          if (this.per_feature) {
-            ctx.lineWidth = this.width.get(z2, f2);
-            ctx.strokeStyle = this.color.get(z2, f2);
-          }
-          ctx.stroke();
-          ctx.restore();
-        }
-      };
-      var vertices_in_path = 0;
-      ctx.beginPath();
-      for (var ls of geom) {
-        if (vertices_in_path + ls.length > MAX_VERTICES_PER_DRAW_CALL) {
-          strokePath();
-          vertices_in_path = 0;
-          ctx.beginPath();
-        }
-        for (var p2 = 0; p2 < ls.length; p2++) {
-          let pt = ls[p2];
-          if (p2 == 0)
-            ctx.moveTo(pt.x, pt.y);
-          else
-            ctx.lineTo(pt.x, pt.y);
-        }
-        vertices_in_path += ls.length;
-      }
-      if (vertices_in_path > 0)
-        strokePath();
-    }
-  };
-  var IconSymbolizer = class {
-    constructor(options) {
-      this.name = options.name;
-      this.sheet = options.sheet;
-      this.dpr = window.devicePixelRatio;
-    }
-    place(layout, geom, feature) {
-      let pt = geom[0];
-      let a2 = new import_point_geometry6.default(geom[0][0].x, geom[0][0].y);
-      let loc = this.sheet.get(this.name);
-      let width = loc.w / this.dpr;
-      let height = loc.h / this.dpr;
-      let bbox = {
-        minX: a2.x - width / 2,
-        minY: a2.y - height / 2,
-        maxX: a2.x + width / 2,
-        maxY: a2.y + height / 2
-      };
-      let draw = (ctx) => {
-        ctx.globalAlpha = 1;
-        ctx.drawImage(this.sheet.canvas, loc.x, loc.y, loc.w, loc.h, -loc.w / 2 / this.dpr, -loc.h / 2 / this.dpr, loc.w / 2, loc.h / 2);
-      };
-      return [{ anchor: a2, bboxes: [bbox], draw }];
-    }
-  };
-  var CircleSymbolizer = class {
-    constructor(options) {
-      this.radius = new NumberAttr(options.radius, 3);
-      this.fill = new StringAttr(options.fill, "black");
-      this.stroke = new StringAttr(options.stroke, "white");
-      this.width = new NumberAttr(options.width, 0);
-      this.opacity = new NumberAttr(options.opacity);
-    }
-    draw(ctx, geom, z2, f2) {
-      ctx.globalAlpha = this.opacity.get(z2, f2);
-      let radius = this.radius.get(z2, f2);
-      let width = this.width.get(z2, f2);
-      if (width > 0) {
-        ctx.strokeStyle = this.stroke.get(z2, f2);
-        ctx.lineWidth = width;
-        ctx.beginPath();
-        ctx.arc(geom[0][0].x, geom[0][0].y, radius + width / 2, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-      ctx.fillStyle = this.fill.get(z2, f2);
-      ctx.beginPath();
-      ctx.arc(geom[0][0].x, geom[0][0].y, radius, 0, 2 * Math.PI);
-      ctx.fill();
-    }
-    place(layout, geom, feature) {
-      let pt = geom[0];
-      let a2 = new import_point_geometry6.default(geom[0][0].x, geom[0][0].y);
-      let radius = this.radius.get(layout.zoom, feature);
-      let bbox = {
-        minX: a2.x - radius,
-        minY: a2.y - radius,
-        maxX: a2.x + radius,
-        maxY: a2.y + radius
-      };
-      let draw = (ctx) => {
-        this.draw(ctx, [[new import_point_geometry6.default(0, 0)]], layout.zoom, feature);
-      };
-      return [{ anchor: a2, bboxes: [bbox], draw }];
-    }
-  };
-  var ShieldSymbolizer = class {
-    constructor(options) {
-      this.font = new FontAttr(options);
-      this.text = new TextAttr(options);
-      this.fill = new StringAttr(options.fill, "black");
-      this.background = new StringAttr(options.background, "white");
-      this.padding = new NumberAttr(options.padding, 0);
-    }
-    place(layout, geom, f2) {
-      let property = this.text.get(layout.zoom, f2);
-      if (!property)
-        return void 0;
-      let font = this.font.get(layout.zoom, f2);
-      layout.scratch.font = font;
-      let metrics = layout.scratch.measureText(property);
-      let width = metrics.width;
-      let ascent = metrics.actualBoundingBoxAscent;
-      let descent = metrics.actualBoundingBoxDescent;
-      let pt = geom[0];
-      let a2 = new import_point_geometry6.default(geom[0][0].x, geom[0][0].y);
-      let p2 = this.padding.get(layout.zoom, f2);
-      let bbox = {
-        minX: a2.x - width / 2 - p2,
-        minY: a2.y - ascent - p2,
-        maxX: a2.x + width / 2 + p2,
-        maxY: a2.y + descent + p2
-      };
-      let draw = (ctx) => {
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = this.background.get(layout.zoom, f2);
-        ctx.fillRect(-width / 2 - p2, -ascent - p2, width + 2 * p2, ascent + descent + 2 * p2);
-        ctx.fillStyle = this.fill.get(layout.zoom, f2);
-        ctx.font = font;
-        ctx.fillText(property, -width / 2, 0);
-      };
-      return [{ anchor: a2, bboxes: [bbox], draw }];
-    }
-  };
-  var FlexSymbolizer = class {
-    constructor(list) {
-      this.list = list;
-    }
-    place(layout, geom, feature) {
-      var labels = this.list[0].place(layout, geom, feature);
-      if (!labels)
-        return void 0;
-      var label = labels[0];
-      let anchor = label.anchor;
-      let bbox = label.bboxes[0];
-      let height = bbox.maxY - bbox.minY;
-      let draws = [{ draw: label.draw, translate: { x: 0, y: 0 } }];
-      let newGeom = [[new import_point_geometry6.default(geom[0][0].x, geom[0][0].y + height)]];
-      for (let i2 = 1; i2 < this.list.length; i2++) {
-        labels = this.list[i2].place(layout, newGeom, feature);
-        if (labels) {
-          label = labels[0];
-          bbox = mergeBbox(bbox, label.bboxes[0]);
-          draws.push({ draw: label.draw, translate: { x: 0, y: height } });
-        }
-      }
-      let draw = (ctx) => {
-        for (let sub of draws) {
-          ctx.save();
-          ctx.translate(sub.translate.x, sub.translate.y);
-          sub.draw(ctx);
-          ctx.restore();
-        }
-      };
-      return [{ anchor, bboxes: [bbox], draw }];
-    }
-  };
-  var mergeBbox = (b1, b2) => {
-    return {
-      minX: Math.min(b1.minX, b2.minX),
-      minY: Math.min(b1.minY, b2.minY),
-      maxX: Math.max(b1.maxX, b2.maxX),
-      maxY: Math.max(b1.maxY, b2.maxY)
-    };
-  };
-  var GroupSymbolizer = class {
-    constructor(list) {
-      this.list = list;
-    }
-    place(layout, geom, feature) {
-      let first = this.list[0];
-      if (!first)
-        return void 0;
-      var labels = first.place(layout, geom, feature);
-      if (!labels)
-        return void 0;
-      var label = labels[0];
-      let anchor = label.anchor;
-      let bbox = label.bboxes[0];
-      let draws = [label.draw];
-      for (let i2 = 1; i2 < this.list.length; i2++) {
-        labels = this.list[i2].place(layout, geom, feature);
-        if (!labels)
-          return void 0;
-        label = labels[0];
-        bbox = mergeBbox(bbox, label.bboxes[0]);
-        draws.push(label.draw);
-      }
-      let draw = (ctx) => {
-        draws.forEach((d) => d(ctx));
-      };
-      return [{ anchor, bboxes: [bbox], draw }];
-    }
-  };
-  var CenteredSymbolizer = class {
-    constructor(symbolizer) {
-      this.symbolizer = symbolizer;
-    }
-    place(layout, geom, feature) {
-      let a2 = geom[0][0];
-      let placed = this.symbolizer.place(layout, [[new import_point_geometry6.default(0, 0)]], feature);
-      if (!placed || placed.length == 0)
-        return void 0;
-      let first_label = placed[0];
-      let bbox = first_label.bboxes[0];
-      let width = bbox.maxX - bbox.minX;
-      let height = bbox.maxY - bbox.minY;
-      let centered = {
-        minX: a2.x - width / 2,
-        maxX: a2.x + width / 2,
-        minY: a2.y - height / 2,
-        maxY: a2.y + height / 2
-      };
-      let draw = (ctx) => {
-        ctx.translate(-width / 2, height / 2 - bbox.maxY);
-        first_label.draw(ctx, { justify: 2 });
-      };
-      return [{ anchor: a2, bboxes: [centered], draw }];
-    }
-  };
-  var Padding = class {
-    constructor(padding, symbolizer) {
-      this.padding = new NumberAttr(padding, 0);
-      this.symbolizer = symbolizer;
-    }
-    place(layout, geom, feature) {
-      let placed = this.symbolizer.place(layout, geom, feature);
-      if (!placed || placed.length == 0)
-        return void 0;
-      let padding = this.padding.get(layout.zoom, feature);
-      for (var label of placed) {
-        for (var bbox of label.bboxes) {
-          bbox.minX -= padding;
-          bbox.minY -= padding;
-          bbox.maxX += padding;
-          bbox.maxY += padding;
-        }
-      }
-      return placed;
-    }
-  };
-  var TextSymbolizer = class {
-    constructor(options) {
-      this.font = new FontAttr(options);
-      this.text = new TextAttr(options);
-      this.fill = new StringAttr(options.fill, "black");
-      this.stroke = new StringAttr(options.stroke, "black");
-      this.width = new NumberAttr(options.width, 0);
-      this.lineHeight = new NumberAttr(options.lineHeight, 1);
-      this.letterSpacing = new NumberAttr(options.letterSpacing, 0);
-      this.maxLineCodeUnits = new NumberAttr(options.maxLineChars, 15);
-      this.justify = options.justify;
-    }
-    place(layout, geom, feature) {
-      let property = this.text.get(layout.zoom, feature);
-      if (!property)
-        return void 0;
-      let font = this.font.get(layout.zoom, feature);
-      layout.scratch.font = font;
-      let letterSpacing = this.letterSpacing.get(layout.zoom, feature);
-      let lines = linebreak(property, this.maxLineCodeUnits.get(layout.zoom, feature));
-      var longestLine = "";
-      var longestLineLen = 0;
-      for (let line of lines) {
-        if (line.length > longestLineLen) {
-          longestLineLen = line.length;
-          longestLine = line;
-        }
-      }
-      let metrics = layout.scratch.measureText(longestLine);
-      let width = metrics.width + letterSpacing * (longestLineLen - 1);
-      let ascent = metrics.actualBoundingBoxAscent;
-      let descent = metrics.actualBoundingBoxDescent;
-      let lineHeight = (ascent + descent) * this.lineHeight.get(layout.zoom, feature);
-      let a2 = new import_point_geometry6.default(geom[0][0].x, geom[0][0].y);
-      let bbox = {
-        minX: a2.x,
-        minY: a2.y - ascent,
-        maxX: a2.x + width,
-        maxY: a2.y + descent + (lines.length - 1) * lineHeight
-      };
-      let draw = (ctx, extra) => {
-        ctx.globalAlpha = 1;
-        ctx.font = font;
-        ctx.fillStyle = this.fill.get(layout.zoom, feature);
-        let textStrokeWidth = this.width.get(layout.zoom, feature);
-        var y = 0;
-        for (let line of lines) {
-          var startX = 0;
-          if (this.justify == 2 || extra && extra.justify == 2) {
-            startX = (width - ctx.measureText(line).width) / 2;
-          } else if (this.justify == 3 || extra && extra.justify == 3) {
-            startX = width - ctx.measureText(line).width;
-          }
-          if (textStrokeWidth) {
-            ctx.lineWidth = textStrokeWidth * 2;
-            ctx.strokeStyle = this.stroke.get(layout.zoom, feature);
-            if (letterSpacing > 0) {
-              var xPos = startX;
-              for (var letter of line) {
-                ctx.strokeText(letter, xPos, y);
-                xPos += ctx.measureText(letter).width + letterSpacing;
-              }
-            } else {
-              ctx.strokeText(line, startX, y);
-            }
-          }
-          if (letterSpacing > 0) {
-            var xPos = startX;
-            for (var letter of line) {
-              ctx.fillText(letter, xPos, y);
-              xPos += ctx.measureText(letter).width + letterSpacing;
-            }
-          } else {
-            ctx.fillText(line, startX, y);
-          }
-          y += lineHeight;
-        }
-      };
-      return [{ anchor: a2, bboxes: [bbox], draw }];
-    }
-  };
-  var CenteredTextSymbolizer = class {
-    constructor(options) {
-      this.centered = new CenteredSymbolizer(new TextSymbolizer(options));
-    }
-    place(layout, geom, feature) {
-      return this.centered.place(layout, geom, feature);
-    }
-  };
-  var OffsetSymbolizer = class {
-    constructor(symbolizer, options) {
-      var _a2, _b2, _c;
-      this.symbolizer = symbolizer;
-      this.offsetX = new NumberAttr(options.offsetX, 0);
-      this.offsetY = new NumberAttr(options.offsetY, 0);
-      this.justify = (_a2 = options.justify) != null ? _a2 : void 0;
-      this.placements = (_b2 = options.placements) != null ? _b2 : [
-        2,
-        6,
-        8,
-        4,
-        1,
-        3,
-        5,
-        7
-      ];
-      this.ddValues = (_c = options.ddValues) != null ? _c : () => {
-        return {};
-      };
-    }
-    place(layout, geom, feature) {
-      if (feature.geomType !== GeomType.Point)
-        return void 0;
-      let anchor = geom[0][0];
-      let placed = this.symbolizer.place(layout, [[new import_point_geometry6.default(0, 0)]], feature);
-      if (!placed || placed.length == 0)
-        return void 0;
-      let first_label = placed[0];
-      let fb = first_label.bboxes[0];
-      let offsetXValue = this.offsetX;
-      let offsetYValue = this.offsetY;
-      let justifyValue = this.justify;
-      let placements = this.placements;
-      const {
-        offsetX: ddOffsetX,
-        offsetY: ddOffsetY,
-        justify: ddJustify,
-        placements: ddPlacements
-      } = this.ddValues(layout.zoom, feature) || {};
-      if (ddOffsetX)
-        offsetXValue = new NumberAttr(ddOffsetX, 0);
-      if (ddOffsetY)
-        offsetYValue = new NumberAttr(ddOffsetY, 0);
-      if (ddJustify)
-        justifyValue = ddJustify;
-      if (ddPlacements)
-        placements = ddPlacements;
-      const offsetX = offsetXValue.get(layout.zoom, feature);
-      const offsetY = offsetYValue.get(layout.zoom, feature);
-      let getBbox = (a2, o2) => {
-        return {
-          minX: a2.x + o2.x + fb.minX,
-          minY: a2.y + o2.y + fb.minY,
-          maxX: a2.x + o2.x + fb.maxX,
-          maxY: a2.y + o2.y + fb.maxY
-        };
-      };
-      var origin = new import_point_geometry6.default(offsetX, offsetY);
-      var justify;
-      let draw = (ctx) => {
-        ctx.translate(origin.x, origin.y);
-        first_label.draw(ctx, { justify });
-      };
-      const placeLabelInPoint = (a2, o2) => {
-        const bbox = getBbox(a2, o2);
-        if (!layout.index.bboxCollides(bbox, layout.order))
-          return [{ anchor, bboxes: [bbox], draw }];
-      };
-      for (let placement of placements) {
-        const xAxisOffset = this.computeXAxisOffset(offsetX, fb, placement);
-        const yAxisOffset = this.computeYAxisOffset(offsetY, fb, placement);
-        justify = this.computeJustify(justifyValue, placement);
-        origin = new import_point_geometry6.default(xAxisOffset, yAxisOffset);
-        return placeLabelInPoint(anchor, origin);
-      }
-      return void 0;
-    }
-    computeXAxisOffset(offsetX, fb, placement) {
-      const labelWidth = fb.maxX;
-      const labelHalfWidth = labelWidth / 2;
-      if ([1, 5].includes(placement))
-        return offsetX - labelHalfWidth;
-      if ([8, 7, 6].includes(placement))
-        return offsetX - labelWidth;
-      return offsetX;
-    }
-    computeYAxisOffset(offsetY, fb, placement) {
-      const labelHalfHeight = Math.abs(fb.minY);
-      const labelBottom = fb.maxY;
-      const labelCenterHeight = (fb.minY + fb.maxY) / 2;
-      if ([3, 7].includes(placement))
-        return offsetY - labelCenterHeight;
-      if ([8, 2, 1].includes(placement))
-        return offsetY - labelBottom;
-      if ([6, 4, 5].includes(placement))
-        return offsetY + labelHalfHeight;
-      return offsetY;
-    }
-    computeJustify(fixedJustify, placement) {
-      if (fixedJustify)
-        return fixedJustify;
-      if ([1, 5].includes(placement))
-        return 2;
-      if ([2, 3, 4].includes(placement))
-        return 1;
-      return 3;
-    }
-  };
-  var OffsetTextSymbolizer = class {
-    constructor(options) {
-      this.symbolizer = new OffsetSymbolizer(new TextSymbolizer(options), options);
-    }
-    place(layout, geom, feature) {
-      return this.symbolizer.place(layout, geom, feature);
-    }
-  };
-  var LineLabelPlacement;
-  (function(LineLabelPlacement2) {
-    LineLabelPlacement2[LineLabelPlacement2["Above"] = 1] = "Above";
-    LineLabelPlacement2[LineLabelPlacement2["Center"] = 2] = "Center";
-    LineLabelPlacement2[LineLabelPlacement2["Below"] = 3] = "Below";
-  })(LineLabelPlacement || (LineLabelPlacement = {}));
-  var LineLabelSymbolizer = class {
-    constructor(options) {
-      var _a2;
-      this.font = new FontAttr(options);
-      this.text = new TextAttr(options);
-      this.fill = new StringAttr(options.fill, "black");
-      this.stroke = new StringAttr(options.stroke, "black");
-      this.width = new NumberAttr(options.width, 0);
-      this.offset = new NumberAttr(options.offset, 0);
-      this.position = (_a2 = options.position) != null ? _a2 : 1;
-      this.maxLabelCodeUnits = new NumberAttr(options.maxLabelChars, 40);
-      this.repeatDistance = new NumberAttr(options.repeatDistance, 250);
-    }
-    place(layout, geom, feature) {
-      let name = this.text.get(layout.zoom, feature);
-      if (!name)
-        return void 0;
-      if (name.length > this.maxLabelCodeUnits.get(layout.zoom, feature))
-        return void 0;
-      let MIN_LABELABLE_DIM = 20;
-      let fbbox = feature.bbox;
-      if (fbbox.maxY - fbbox.minY < MIN_LABELABLE_DIM && fbbox.maxX - fbbox.minX < MIN_LABELABLE_DIM)
-        return void 0;
-      let font = this.font.get(layout.zoom, feature);
-      layout.scratch.font = font;
-      let metrics = layout.scratch.measureText(name);
-      let width = metrics.width;
-      let height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-      var repeatDistance = this.repeatDistance.get(layout.zoom, feature);
-      if (layout.overzoom > 4)
-        repeatDistance *= 1 << layout.overzoom - 4;
-      let cell_size = height * 2;
-      let label_candidates = simpleLabel(geom, width, repeatDistance, cell_size);
-      if (label_candidates.length == 0)
-        return void 0;
-      let labels = [];
-      for (let candidate of label_candidates) {
-        let dx = candidate.end.x - candidate.start.x;
-        let dy = candidate.end.y - candidate.start.y;
-        let cells = lineCells(candidate.start, candidate.end, width, cell_size / 2);
-        let bboxes = cells.map((c2) => {
-          return {
-            minX: c2.x - cell_size / 2,
-            minY: c2.y - cell_size / 2,
-            maxX: c2.x + cell_size / 2,
-            maxY: c2.y + cell_size / 2
-          };
-        });
-        let draw = (ctx) => {
-          ctx.globalAlpha = 1;
-          ctx.rotate(Math.atan2(dy, dx));
-          if (dx < 0) {
-            ctx.scale(-1, -1);
-            ctx.translate(-width, 0);
-          }
-          let heightPlacement = 0;
-          if (this.position === 3)
-            heightPlacement += height;
-          else if (this.position === 2)
-            heightPlacement += height / 2;
-          ctx.translate(0, heightPlacement - this.offset.get(layout.zoom, feature));
-          ctx.font = font;
-          let lineWidth = this.width.get(layout.zoom, feature);
-          if (lineWidth) {
-            ctx.lineWidth = lineWidth;
-            ctx.strokeStyle = this.stroke.get(layout.zoom, feature);
-            ctx.strokeText(name, 0, 0);
-          }
-          ctx.fillStyle = this.fill.get(layout.zoom, feature);
-          ctx.fillText(name, 0, 0);
-        };
-        labels.push({
-          anchor: candidate.start,
-          bboxes,
-          draw,
-          deduplicationKey: name,
-          deduplicationDistance: repeatDistance
-        });
-      }
-      return labels;
-    }
-  };
-  var PolygonLabelSymbolizer = class {
-    constructor(options) {
-      this.symbolizer = new TextSymbolizer(options);
-    }
-    place(layout, geom, feature) {
-      let fbbox = feature.bbox;
-      let area = (fbbox.maxY - fbbox.minY) * (fbbox.maxX - fbbox.minX);
-      if (area < 2e4)
-        return void 0;
-      let placed = this.symbolizer.place(layout, [[new import_point_geometry6.default(0, 0)]], feature);
-      if (!placed || placed.length == 0)
-        return void 0;
-      let first_label = placed[0];
-      let fb = first_label.bboxes[0];
-      let first_poly = geom[0];
-      let found = (0, import_polylabel.default)([first_poly.map((c2) => [c2.x, c2.y])]);
-      let a2 = new import_point_geometry6.default(found[0], found[1]);
-      let bbox = {
-        minX: a2.x - (fb.maxX - fb.minX) / 2,
-        minY: a2.y - (fb.maxY - fb.minY) / 2,
-        maxX: a2.x + (fb.maxX - fb.minX) / 2,
-        maxY: a2.y + (fb.maxY - fb.minY) / 2
-      };
-      let draw = (ctx) => {
-        ctx.translate(first_label.anchor.x - (fb.maxX - fb.minX) / 2, first_label.anchor.y);
-        first_label.draw(ctx);
-      };
-      return [{ anchor: a2, bboxes: [bbox], draw }];
-    }
-  };
-
-  // src/default_style/style.ts
-  var doShading = (params, shade) => {
-    let shadeHsl = p(shade);
-    let outParams = __spreadValues({}, params);
-    for (const [key, value] of Object.entries(params)) {
-      let o2 = p(value);
-      outParams[key] = z(shadeHsl[0], shadeHsl[1], o2[2], o2[3]);
-    }
-    return outParams;
-  };
-  var paintRules = (params, shade) => {
-    if (shade)
-      params = doShading(params, shade);
-    return [
-      {
-        dataLayer: "earth",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.earth
-        })
-      },
-      {
-        dataLayer: "natural",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.glacier
-        }),
-        filter: (z2, f2) => {
-          return f2.props.natural == "glacier";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.residential
-        }),
-        filter: (z2, f2) => {
-          return f2.props.landuse == "residential" || f2.props.place == "neighbourhood";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.hospital
-        }),
-        filter: (z2, f2) => {
-          return f2.props.amenity == "hospital";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.cemetery
-        }),
-        filter: (z2, f2) => {
-          return f2.props.landuse == "cemetery";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.school
-        }),
-        filter: (z2, f2) => {
-          return f2.props.amenity == "school" || f2.props.amenity == "kindergarten" || f2.props.amenity == "university" || f2.props.amenity == "college";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.industrial
-        }),
-        filter: (z2, f2) => {
-          return f2.props.landuse == "industrial";
-        }
-      },
-      {
-        dataLayer: "natural",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.wood
-        }),
-        filter: (z2, f2) => {
-          return f2.props.natural == "wood";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.grass
-        }),
-        filter: (z2, f2) => {
-          return f2.props.landuse == "grass";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.park
-        }),
-        filter: (z2, f2) => {
-          return f2.props.leisure == "park";
-        }
-      },
-      {
-        dataLayer: "water",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.water
-        })
-      },
-      {
-        dataLayer: "natural",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.sand
-        }),
-        filter: (z2, f2) => {
-          return f2.props.natural == "sand";
-        }
-      },
-      {
-        dataLayer: "buildings",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.buildings
-        })
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.highwayCasing,
-          width: exp(1.4, [
-            [5, 1.5],
-            [11, 4],
-            [16, 9],
-            [20, 40]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "highway";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.majorRoadCasing,
-          width: exp(1.4, [
-            [9, 3],
-            [12, 4],
-            [17, 8],
-            [20, 22]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "major_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.mediumRoadCasing,
-          width: exp(1.4, [
-            [13, 3],
-            [17, 6],
-            [20, 18]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "medium_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.minorRoadCasing,
-          width: exp(1.4, [
-            [14, 2],
-            [17, 5],
-            [20, 15]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "minor_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.minorRoad,
-          width: exp(1.4, [
-            [14, 1],
-            [17, 3],
-            [20, 13]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "minor_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.mediumRoad,
-          width: exp(1.4, [
-            [13, 2],
-            [17, 4],
-            [20, 15]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "medium_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.majorRoad,
-          width: exp(1.4, [
-            [9, 2],
-            [12, 3],
-            [17, 6],
-            [20, 20]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "major_road";
-        }
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new LineSymbolizer({
-          color: params.highway,
-          width: exp(1.4, [
-            [5, 0.5],
-            [11, 2.5],
-            [16, 7],
-            [20, 30]
-          ])
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "highway";
-        }
-      },
-      {
-        dataLayer: "boundaries",
-        symbolizer: new LineSymbolizer({
-          color: params.boundaries,
-          width: 2,
-          opacity: 0.4
-        })
-      },
-      {
-        dataLayer: "mask",
-        symbolizer: new PolygonSymbolizer({
-          fill: params.mask
-        })
-      }
-    ];
-  };
-  var labelRules = (params, shade, language1, language2) => {
-    if (shade)
-      params = doShading(params, shade);
-    var nametags = ["name"];
-    if (language1)
-      nametags = language1;
-    let languageStack = (symbolizer, fill) => {
-      if (!language2)
-        return symbolizer;
-      if (symbolizer instanceof OffsetTextSymbolizer) {
-        return new FlexSymbolizer([
-          symbolizer,
-          new OffsetTextSymbolizer({
-            fill,
-            label_props: language2
-          })
-        ]);
-      } else {
-        return new FlexSymbolizer([
-          symbolizer,
-          new CenteredTextSymbolizer({
-            fill,
-            label_props: language2
-          })
-        ]);
-      }
-    };
-    return [
-      {
-        dataLayer: "places",
-        symbolizer: languageStack(new CenteredTextSymbolizer({
-          label_props: nametags,
-          fill: params.countryLabel,
-          lineHeight: 1.5,
-          font: (z2, f2) => {
-            if (z2 < 6)
-              return "200 14px sans-serif";
-            return "200 20px sans-serif";
-          },
-          textTransform: "uppercase"
-        }), params.countryLabel),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "country";
-        }
-      },
-      {
-        dataLayer: "places",
-        symbolizer: languageStack(new CenteredTextSymbolizer({
-          label_props: nametags,
-          fill: params.stateLabel,
-          font: "300 16px sans-serif"
-        }), params.stateLabel),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "state";
-        }
-      },
-      {
-        id: "cities_high",
-        dataLayer: "places",
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "city";
-        },
-        minzoom: 7,
-        symbolizer: languageStack(new CenteredTextSymbolizer({
-          label_props: nametags,
-          fill: params.cityLabel,
-          font: (z2, f2) => {
-            if ((f2 == null ? void 0 : f2.props["pmap:rank"]) === 1) {
-              if (z2 > 8)
-                return "600 20px sans-serif";
-              return "600 12px sans-serif";
-            } else {
-              if (z2 > 8)
-                return "600 16px sans-serif";
-              return "600 10px sans-serif";
-            }
-          }
-        }), params.cityLabel),
-        sort: (a2, b) => {
-          return a2["pmap:rank"] - b["pmap:rank"];
-        }
-      },
-      {
-        id: "cities_low",
-        dataLayer: "places",
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "city";
-        },
-        maxzoom: 6,
-        symbolizer: new GroupSymbolizer([
-          new CircleSymbolizer({
-            radius: 2,
-            fill: params.cityLabel
-          }),
-          languageStack(new OffsetTextSymbolizer({
-            label_props: nametags,
-            fill: params.cityLabel,
-            offsetX: 2,
-            offsetY: 2,
-            font: (z2, f2) => {
-              if ((f2 == null ? void 0 : f2.props["pmap:rank"]) === 1) {
-                if (z2 > 8)
-                  return "600 20px sans-serif";
-                return "600 12px sans-serif";
-              } else {
-                if (z2 > 8)
-                  return "600 16px sans-serif";
-                return "600 10px sans-serif";
-              }
-            }
-          }), params.cityLabel)
-        ]),
-        sort: (a2, b) => {
-          return a2["pmap:rank"] - b["pmap:rank"];
-        }
-      },
-      {
-        id: "neighbourhood",
-        dataLayer: "places",
-        symbolizer: languageStack(new CenteredTextSymbolizer({
-          label_props: nametags,
-          fill: params.neighbourhoodLabel,
-          font: "500 10px sans-serif",
-          textTransform: "uppercase"
-        }), params.neighbourhoodLabel),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "neighbourhood";
-        }
-      },
-      {
-        dataLayer: "landuse",
-        symbolizer: languageStack(new PolygonLabelSymbolizer({
-          label_props: nametags,
-          fill: params.landuseLabel,
-          font: "300 12px sans-serif"
-        }), params.landuseLabel)
-      },
-      {
-        dataLayer: "water",
-        symbolizer: languageStack(new PolygonLabelSymbolizer({
-          label_props: nametags,
-          fill: params.waterLabel,
-          font: "italic 600 12px sans-serif"
-        }), params.waterLabel)
-      },
-      {
-        dataLayer: "natural",
-        symbolizer: languageStack(new PolygonLabelSymbolizer({
-          label_props: nametags,
-          fill: params.naturalLabel,
-          font: "italic 300 12px sans-serif"
-        }), params.naturalLabel)
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: languageStack(new LineLabelSymbolizer({
-          label_props: nametags,
-          fill: params.roadsLabel,
-          font: "500 12px sans-serif"
-        }), params.roadsLabel),
-        minzoom: 12
-      },
-      {
-        dataLayer: "roads",
-        symbolizer: new ShieldSymbolizer({
-          label_props: ["ref"],
-          font: "600 9px sans-serif",
-          background: params.highway,
-          padding: 2,
-          fill: params.neighbourhoodLabel
-        }),
-        filter: (z2, f2) => {
-          return f2.props["pmap:kind"] == "highway";
-        }
-      },
-      {
-        dataLayer: "pois",
-        symbolizer: new GroupSymbolizer([
-          new CircleSymbolizer({
-            radius: 2,
-            fill: params.poisLabel
-          }),
-          languageStack(new OffsetTextSymbolizer({
-            label_props: nametags,
-            fill: params.poisLabel,
-            offsetX: 2,
-            offsetY: 2,
-            font: "300 10px sans-serif"
-          }), params.poisLabel)
-        ])
-      }
-    ];
-  };
-
-  // src/xray.ts
-  var xray_symbolizers = (dataSource, dataLayer, color) => {
-    return [
-      {
-        dataSource,
-        dataLayer,
-        symbolizer: new CircleSymbolizer({
-          opacity: 0.2,
-          fill: color,
-          radius: 4
-        }),
-        filter: (z2, f2) => {
-          return f2.geomType == GeomType.Point;
-        }
-      },
-      {
-        dataSource,
-        dataLayer,
-        symbolizer: new LineSymbolizer({
-          opacity: 0.2,
-          color,
-          width: 2
-        }),
-        filter: (z2, f2) => {
-          return f2.geomType == GeomType.Line;
-        }
-      },
-      {
-        dataSource,
-        dataLayer,
-        symbolizer: new PolygonSymbolizer({
-          opacity: 0.2,
-          fill: color,
-          stroke: color,
-          width: 1
-        }),
-        filter: (z2, f2) => {
-          return f2.geomType == GeomType.Polygon;
-        }
-      }
-    ];
-  };
-  var xray_rules = (prepared_tilemap, xray) => {
-    var rules = [];
-    for (var [dataSource, tiles] of prepared_tilemap) {
-      for (var tile of tiles) {
-        for (var dataLayer of tile.data.keys()) {
-          if (dataSource === xray.dataSource && dataLayer === xray.dataLayer) {
-          } else {
-            rules = rules.concat(xray_symbolizers(dataSource, dataLayer, "steelblue"));
-          }
-        }
-      }
-    }
-    rules = rules.concat(xray_symbolizers(xray.dataSource || "", xray.dataLayer, "red"));
-    return rules;
-  };
-
-  // src/frontends/static.ts
-  var R2 = 6378137;
-  var MAX_LATITUDE2 = 85.0511287798;
-  var MAXCOORD2 = R2 * Math.PI;
-  var project2 = (latlng) => {
-    let d = Math.PI / 180;
-    let constrained_lat = Math.max(Math.min(MAX_LATITUDE2, latlng.y), -MAX_LATITUDE2);
-    let sin = Math.sin(constrained_lat * d);
-    return new import_point_geometry7.default(R2 * latlng.x * d, R2 * Math.log((1 + sin) / (1 - sin)) / 2);
-  };
-  var unproject = (point) => {
-    var d = 180 / Math.PI;
-    return {
-      lat: (2 * Math.atan(Math.exp(point.y / R2)) - Math.PI / 2) * d,
-      lng: point.x * d / R2
-    };
-  };
-  var instancedProject = (origin, display_zoom) => {
-    return (latlng) => {
-      let projected = project2(latlng);
-      let normalized = new import_point_geometry7.default((projected.x + MAXCOORD2) / (MAXCOORD2 * 2), 1 - (projected.y + MAXCOORD2) / (MAXCOORD2 * 2));
-      return normalized.mult((1 << display_zoom) * 256).sub(origin);
-    };
-  };
-  var instancedUnproject = (origin, display_zoom) => {
-    return (point) => {
-      let normalized = new import_point_geometry7.default(point.x, point.y).add(origin).div((1 << display_zoom) * 256);
-      let projected = new import_point_geometry7.default(normalized.x * (MAXCOORD2 * 2) - MAXCOORD2, (1 - normalized.y) * (MAXCOORD2 * 2) - MAXCOORD2);
-      return unproject(projected);
-    };
-  };
-  var getZoom = (degrees_lng, css_pixels) => {
-    let d = css_pixels * (360 / degrees_lng);
-    return Math.log2(d / 256);
-  };
-  var Static = class {
-    constructor(options) {
-      let theme = options.dark ? dark : light;
-      this.paint_rules = options.paint_rules || paintRules(theme, options.shade);
-      this.label_rules = options.label_rules || labelRules(theme, options.shade, options.language1, options.language2);
-      this.backgroundColor = options.backgroundColor;
-      this.views = sourcesToViews(options);
-      this.debug = options.debug || "";
-      this.xray = options.xray;
-    }
-    drawContext(ctx, width, height, latlng, display_zoom) {
-      return __async(this, null, function* () {
-        let center = project2(latlng);
-        let normalized_center = new import_point_geometry7.default((center.x + MAXCOORD2) / (MAXCOORD2 * 2), 1 - (center.y + MAXCOORD2) / (MAXCOORD2 * 2));
-        let origin = normalized_center.clone().mult(Math.pow(2, display_zoom) * 256).sub(new import_point_geometry7.default(width / 2, height / 2));
-        let bbox = {
-          minX: origin.x,
-          minY: origin.y,
-          maxX: origin.x + width,
-          maxY: origin.y + height
-        };
-        let promises = [];
-        for (const [k, v] of this.views) {
-          let promise = v.getBbox(display_zoom, bbox);
-          promises.push({ key: k, promise });
-        }
-        let tile_responses = yield Promise.all(promises.map((o2) => {
-          return o2.promise.then((v) => {
-            return { status: "fulfilled", value: v, key: o2.key };
-          }, (error) => {
-            return { status: "rejected", value: [], reason: error, key: o2.key };
-          });
-        }));
-        let prepared_tilemap = new Map();
-        for (const tile_response of tile_responses) {
-          if (tile_response.status === "fulfilled") {
-            prepared_tilemap.set(tile_response.key, tile_response.value);
-          }
-        }
-        let start = performance.now();
-        let labeler = new Labeler(display_zoom, ctx, this.label_rules, 16, void 0);
-        let layout_time = labeler.add(prepared_tilemap);
-        if (this.backgroundColor) {
-          ctx.save();
-          ctx.fillStyle = this.backgroundColor;
-          ctx.fillRect(0, 0, width, height);
-          ctx.restore();
-        }
-        let paint_rules = this.paint_rules;
-        if (this.xray) {
-          paint_rules = xray_rules(prepared_tilemap, this.xray);
-        }
-        let p2 = painter(ctx, display_zoom, prepared_tilemap, this.xray ? null : labeler.index, paint_rules, bbox, origin, true, this.debug);
-        if (this.debug) {
-          ctx.save();
-          ctx.translate(-origin.x, -origin.y);
-          ctx.strokeStyle = this.debug;
-          ctx.fillStyle = this.debug;
-          ctx.font = "12px sans-serif";
-          let idx = 0;
-          for (const [k, v] of prepared_tilemap) {
-            for (let prepared_tile of v) {
-              ctx.strokeRect(prepared_tile.origin.x, prepared_tile.origin.y, prepared_tile.dim, prepared_tile.dim);
-              let dt = prepared_tile.data_tile;
-              ctx.fillText(k + (k ? " " : "") + dt.z + " " + dt.x + " " + dt.y, prepared_tile.origin.x + 4, prepared_tile.origin.y + 14 * (1 + idx));
-            }
-            idx++;
-          }
-          ctx.restore();
-        }
-        return {
-          elapsed: performance.now() - start,
-          project: instancedProject(origin, display_zoom),
-          unproject: instancedUnproject(origin, display_zoom)
-        };
-      });
-    }
-    drawCanvas(_0, _1, _2) {
-      return __async(this, arguments, function* (canvas, latlng, display_zoom, options = {}) {
-        let dpr = window.devicePixelRatio;
-        let width = canvas.clientWidth;
-        let height = canvas.clientHeight;
-        if (!(canvas.width == width * dpr && canvas.height == height * dpr)) {
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-        }
-        if (options.lang)
-          canvas.lang = options.lang;
-        let ctx = canvas.getContext("2d");
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        return this.drawContext(ctx, width, height, latlng, display_zoom);
-      });
-    }
-    drawContextBounds(ctx, top_left, bottom_right, width, height) {
-      return __async(this, null, function* () {
-        let delta_degrees = bottom_right.x - top_left.x;
-        let center = new import_point_geometry7.default((top_left.x + bottom_right.x) / 2, (top_left.y + bottom_right.y) / 2);
-        return this.drawContext(ctx, width, height, center, getZoom(delta_degrees, width));
-      });
-    }
-    drawCanvasBounds(_0, _1, _2, _3) {
-      return __async(this, arguments, function* (canvas, top_left, bottom_right, width, options = {}) {
-        let delta_degrees = bottom_right.x - top_left.x;
-        let center = new import_point_geometry7.default((top_left.x + bottom_right.x) / 2, (top_left.y + bottom_right.y) / 2);
-        return this.drawCanvas(canvas, center, getZoom(delta_degrees, width), options);
-      });
-    }
-  };
-
-  // src/frontends/leaflet.ts
-  var import_point_geometry8 = __toModule(require_point_geometry());
-  var timer = (duration) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve();
-      }, duration);
-    });
-  };
-  var reflect = (promise) => {
-    return promise.then((v) => {
-      return { status: "fulfilled", value: v };
-    }, (error) => {
-      return { status: "rejected", reason: error };
-    });
-  };
-  var leafletLayer = (options = {}) => {
-    class LeafletLayer extends L.GridLayer {
-      constructor(options2 = {}) {
-        if (options2.noWrap && !options2.bounds)
-          options2.bounds = [
-            [-90, -180],
-            [90, 180]
-          ];
-        if (options2.attribution == null)
-          options2.attribution = '<a href="https://protomaps.com">Protomaps</a> \xA9 <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>';
-        super(options2);
-        let theme = options2.dark ? dark : light;
-        this.paint_rules = options2.paint_rules || paintRules(theme, options2.shade);
-        this.label_rules = options2.label_rules || labelRules(theme, options2.shade, options2.language1, options2.language2);
-        this.backgroundColor = options2.backgroundColor;
-        this.lastRequestedZ = void 0;
-        this.xray = options2.xray;
-        this.tasks = options2.tasks || [];
-        this.views = sourcesToViews(options2);
-        this.debug = options2.debug;
-        let scratch = document.createElement("canvas").getContext("2d");
-        this.scratch = scratch;
-        this.onTilesInvalidated = (tiles) => {
-          tiles.forEach((t2) => {
-            this.rerenderTile(t2);
-          });
-        };
-        this.labelers = new Labelers(this.scratch, this.label_rules, 16, this.onTilesInvalidated);
-        this.tile_size = 256 * window.devicePixelRatio;
-        this.tileDelay = options2.tileDelay || 0;
-        this.lang = options2.lang;
-        this.inspector = this.inspect(this);
-      }
-      setDefaultStyle(darkOption, shade, language1, language2) {
-        let theme = darkOption ? dark : light;
-        this.paint_rules = paintRules(theme, shade);
-        this.label_rules = labelRules(theme, shade, language1, language2);
-      }
-      renderTile(coords, element, key, done = () => {
-      }) {
-        return __async(this, null, function* () {
-          this.lastRequestedZ = coords.z;
-          let promises = [];
-          for (const [k, v] of this.views) {
-            let promise = v.getDisplayTile(coords);
-            promises.push({ key: k, promise });
-          }
-          let tile_responses = yield Promise.all(promises.map((o2) => {
-            return o2.promise.then((v) => {
-              return { status: "fulfilled", value: v, key: o2.key };
-            }, (error) => {
-              return { status: "rejected", reason: error, key: o2.key };
-            });
-          }));
-          let prepared_tilemap = new Map();
-          for (const tile_response of tile_responses) {
-            if (tile_response.status === "fulfilled") {
-              prepared_tilemap.set(tile_response.key, [tile_response.value]);
-            } else {
-              if (tile_response.reason.name === "AbortError") {
-              } else {
-                console.error(tile_response.reason);
-              }
-            }
-          }
-          if (element.key != key)
-            return;
-          if (this.lastRequestedZ !== coords.z)
-            return;
-          yield Promise.all(this.tasks.map(reflect));
-          if (element.key != key)
-            return;
-          if (this.lastRequestedZ !== coords.z)
-            return;
-          let layout_time = this.labelers.add(coords.z, prepared_tilemap);
-          if (element.key != key)
-            return;
-          if (this.lastRequestedZ !== coords.z)
-            return;
-          let label_data = this.labelers.getIndex(coords.z);
-          if (!this._map)
-            return;
-          let center = this._map.getCenter().wrap();
-          let pixelBounds = this._getTiledPixelBounds(center), tileRange = this._pxBoundsToTileRange(pixelBounds), tileCenter = tileRange.getCenter();
-          let priority = coords.distanceTo(tileCenter) * this.tileDelay;
-          yield timer(priority);
-          if (element.key != key)
-            return;
-          if (this.lastRequestedZ !== coords.z)
-            return;
-          let BUF = 16;
-          let bbox = {
-            minX: 256 * coords.x - BUF,
-            minY: 256 * coords.y - BUF,
-            maxX: 256 * (coords.x + 1) + BUF,
-            maxY: 256 * (coords.y + 1) + BUF
-          };
-          let origin = new import_point_geometry8.default(256 * coords.x, 256 * coords.y);
-          element.width = this.tile_size;
-          element.height = this.tile_size;
-          let ctx = element.getContext("2d");
-          ctx.setTransform(this.tile_size / 256, 0, 0, this.tile_size / 256, 0, 0);
-          ctx.clearRect(0, 0, 256, 256);
-          if (this.backgroundColor) {
-            ctx.save();
-            ctx.fillStyle = this.backgroundColor;
-            ctx.fillRect(0, 0, 256, 256);
-            ctx.restore();
-          }
-          var painting_time = 0;
-          let paint_rules = this.paint_rules;
-          if (this.xray) {
-            paint_rules = xray_rules(prepared_tilemap, this.xray);
-          }
-          painting_time = painter(ctx, coords.z, prepared_tilemap, this.xray ? null : label_data, paint_rules, bbox, origin, false, this.debug);
-          if (this.debug) {
-            ctx.save();
-            ctx.fillStyle = this.debug;
-            ctx.font = "600 12px sans-serif";
-            ctx.fillText(coords.z + " " + coords.x + " " + coords.y, 4, 14);
-            ctx.font = "12px sans-serif";
-            let ypos = 28;
-            for (let [k, v] of prepared_tilemap) {
-              let dt = v[0].data_tile;
-              ctx.fillText(k + (k ? " " : "") + dt.z + " " + dt.x + " " + dt.y, 4, ypos);
-              ypos += 14;
-            }
-            ctx.font = "600 10px sans-serif";
-            if (painting_time > 8) {
-              ctx.fillText(painting_time.toFixed() + " ms paint", 4, ypos);
-              ypos += 14;
-            }
-            if (layout_time > 8) {
-              ctx.fillText(layout_time.toFixed() + " ms layout", 4, ypos);
-            }
-            ctx.strokeStyle = this.debug;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(0, 256);
-            ctx.stroke();
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(256, 0);
-            ctx.stroke();
-            ctx.restore();
-          }
-          done();
-        });
-      }
-      rerenderTile(key) {
-        for (let unwrapped_k in this._tiles) {
-          let wrapped_coord = this._wrapCoords(this._keyToTileCoords(unwrapped_k));
-          if (key === this._tileCoordsToKey(wrapped_coord)) {
-            this.renderTile(wrapped_coord, this._tiles[unwrapped_k].el, key);
-          }
-        }
-      }
-      clearLayout() {
-        this.labelers = new Labelers(this.scratch, this.label_rules, 16, this.onTilesInvalidated);
-      }
-      rerenderTiles() {
-        for (let unwrapped_k in this._tiles) {
-          let wrapped_coord = this._wrapCoords(this._keyToTileCoords(unwrapped_k));
-          let key = this._tileCoordsToKey(wrapped_coord);
-          this.renderTile(wrapped_coord, this._tiles[unwrapped_k].el, key);
-        }
-      }
-      createTile(coords, showTile) {
-        let element = L.DomUtil.create("canvas", "leaflet-tile");
-        element.lang = this.lang;
-        let key = this._tileCoordsToKey(coords);
-        element.key = key;
-        this.renderTile(coords, element, key, () => {
-          showTile(null, element);
-        });
-        return element;
-      }
-      _removeTile(key) {
-        let tile = this._tiles[key];
-        if (!tile) {
-          return;
-        }
-        tile.el.removed = true;
-        tile.el.key = void 0;
-        L.DomUtil.removeClass(tile.el, "leaflet-tile-loaded");
-        tile.el.width = tile.el.height = 0;
-        L.DomUtil.remove(tile.el);
-        delete this._tiles[key];
-        this.fire("tileunload", {
-          tile: tile.el,
-          coords: this._keyToTileCoords(key)
-        });
-      }
-      queryFeatures(lng, lat) {
-        let featuresBySourceName = new Map();
-        for (var [sourceName, view] of this.views) {
-          featuresBySourceName.set(sourceName, view.queryFeatures(lng, lat, this._map.getZoom()));
-        }
-        return featuresBySourceName;
-      }
-      inspect(layer) {
-        return (ev) => {
-          let typeGlyphs = ["\u25CE", "\u27CD", "\u25FB"];
-          let wrapped = layer._map.wrapLatLng(ev.latlng);
-          let resultsBySourceName = layer.queryFeatures(wrapped.lng, wrapped.lat);
-          var content = "";
-          let firstRow = true;
-          for (var [sourceName, results] of resultsBySourceName) {
-            for (var result of results) {
-              if (this.xray && this.xray !== true) {
-                if (!((this.xray.dataSource || "") === sourceName && this.xray.dataLayer === result.layerName)) {
-                  continue;
+        getBytes(t, e, r)
+        {
+            return Y(this, null, function* () {
+                let i;
+                r || (i = new AbortController, r = i.signal);
+                let n = yield fetch(this.url, {
+                    signal: r,
+                    headers: {
+                        Range: "bytes=" + t + "-" + (t + e - 1)
+                    }
+                });
+                if (n.status === 416 && t === 0) {
+                    let o = n.headers.get("Content-Range");
+                    if (!o || !o.startsWith("bytes */"))
+                        throw Error("Missing content-length on 416 response");
+                    let l = +o.substr(8);
+                    n = yield fetch(this.url, {
+                        signal: r,
+                        headers: {
+                            Range: "bytes=0-" + (l - 1)
+                        }
+                    })
                 }
-              }
-              content = content + `<div style="margin-top:${firstRow ? 0 : 0.5}em">${typeGlyphs[result.feature.geomType - 1]} <b>${sourceName} ${sourceName ? "/" : ""} ${result.layerName}</b> ${result.feature.id || ""}</div>`;
-              for (const prop in result.feature.props) {
-                content = content + `<div style="font-size:0.9em">${prop} = ${result.feature.props[prop]}</div>`;
-              }
-              firstRow = false;
-            }
-          }
-          if (firstRow) {
-            content = "No features.";
-          }
-          L.popup().setLatLng(ev.latlng).setContent('<div style="max-height:400px;overflow-y:scroll;padding-right:8px">' + content + "</div>").openOn(layer._map);
-        };
-      }
-      addInspector(map) {
-        return map.on("click", this.inspector);
-      }
-      removeInspector(map) {
-        return map.off("click", this.inspector);
-      }
-    }
-    return new LeafletLayer(options);
-  };
-
-  // node_modules/potpack/index.mjs
-  function potpack(boxes) {
-    let area = 0;
-    let maxWidth = 0;
-    for (const box of boxes) {
-      area += box.w * box.h;
-      maxWidth = Math.max(maxWidth, box.w);
-    }
-    boxes.sort((a2, b) => b.h - a2.h);
-    const startWidth = Math.max(Math.ceil(Math.sqrt(area / 0.95)), maxWidth);
-    const spaces = [{ x: 0, y: 0, w: startWidth, h: Infinity }];
-    let width = 0;
-    let height = 0;
-    for (const box of boxes) {
-      for (let i2 = spaces.length - 1; i2 >= 0; i2--) {
-        const space = spaces[i2];
-        if (box.w > space.w || box.h > space.h)
-          continue;
-        box.x = space.x;
-        box.y = space.y;
-        height = Math.max(height, box.y + box.h);
-        width = Math.max(width, box.x + box.w);
-        if (box.w === space.w && box.h === space.h) {
-          const last = spaces.pop();
-          if (i2 < spaces.length)
-            spaces[i2] = last;
-        } else if (box.h === space.h) {
-          space.x += box.w;
-          space.w -= box.w;
-        } else if (box.w === space.w) {
-          space.y += box.h;
-          space.h -= box.h;
-        } else {
-          spaces.push({
-            x: space.x + box.w,
-            y: space.y,
-            w: space.w - box.w,
-            h: box.h
-          });
-          space.y += box.h;
-          space.h -= box.h;
+                if (n.status >= 300)
+                    throw Error("Bad response code: " + n.status);
+                let a = n.headers.get("Content-Length");
+                if (n.status === 200 && (!a || +a > e))
+                    throw i && i.abort(), Error("Server returned no content-length header or content-length exceeding request. Check that your storage backend supports HTTP Byte Serving.");
+                return {
+                    data: yield n.arrayBuffer(),
+                    etag: n.headers.get("ETag") || void 0,
+                    cacheControl: n.headers.get("Cache-Control") || void 0,
+                    expires: n.headers.get("Expires") || void 0
+                }
+            })
         }
-        break;
-      }
     }
-    return {
-      w: width,
-      h: height,
-      fill: area / (width * height) || 0
+    ;
+    function Q(t, e) {
+        let r = t.getUint32(e + 4, !0),
+            i = t.getUint32(e + 0, !0);
+        return r * Math.pow(2, 32) + i
+    }
+    function Pn(t, e) {
+        let r = new DataView(t),
+            i = r.getUint8(7);
+        if (i > 3)
+            throw Error(`Archive is spec version ${i} but this library supports up to spec version 3`);
+        return {
+            specVersion: i,
+            rootDirectoryOffset: Q(r, 8),
+            rootDirectoryLength: Q(r, 16),
+            jsonMetadataOffset: Q(r, 24),
+            jsonMetadataLength: Q(r, 32),
+            leafDirectoryOffset: Q(r, 40),
+            leafDirectoryLength: Q(r, 48),
+            tileDataOffset: Q(r, 56),
+            tileDataLength: Q(r, 64),
+            numAddressedTiles: Q(r, 72),
+            numTileEntries: Q(r, 80),
+            numTileContents: Q(r, 88),
+            clustered: r.getUint8(96) === 1,
+            internalCompression: r.getUint8(97),
+            tileCompression: r.getUint8(98),
+            tileType: r.getUint8(99),
+            minZoom: r.getUint8(100),
+            maxZoom: r.getUint8(101),
+            minLon: r.getInt32(102, !0) / 1e7,
+            minLat: r.getInt32(106, !0) / 1e7,
+            maxLon: r.getInt32(110, !0) / 1e7,
+            maxLat: r.getInt32(114, !0) / 1e7,
+            centerZoom: r.getUint8(118),
+            centerLon: r.getInt32(119, !0) / 1e7,
+            centerLat: r.getInt32(123, !0) / 1e7,
+            etag: e
+        }
+    }
+    function Dr(t) {
+        let e = {
+                buf: new Uint8Array(t),
+                pos: 0
+            },
+            r = Re(e),
+            i = [],
+            n = 0;
+        for (let a = 0; a < r; a++) {
+            let s = Re(e);
+            i.push({
+                tileId: n + s,
+                offset: 0,
+                length: 0,
+                runLength: 1
+            }),
+            n += s
+        }
+        for (let a = 0; a < r; a++)
+            i[a].runLength = Re(e);
+        for (let a = 0; a < r; a++)
+            i[a].length = Re(e);
+        for (let a = 0; a < r; a++) {
+            let s = Re(e);
+            s === 0 && a > 0 ? i[a].offset = i[a - 1].offset + i[a - 1].length : i[a].offset = s - 1
+        }
+        return i
+    }
+    function Dn(t) {
+        let e = new DataView(t);
+        return e.getUint16(2, !0) === 2 ? (console.warn("PMTiles spec version 2 has been deprecated; please see github.com/protomaps/PMTiles for tools to upgrade"), 2) : e.getUint16(2, !0) === 1 ? (console.warn("PMTiles spec version 1 has been deprecated; please see github.com/protomaps/PMTiles for tools to upgrade"), 1) : 3
+    }
+    var ze = class  extends Error{}
+    ;
+    function An(t, e, r, i) {
+        return Y(this, null, function* () {
+            let n = yield t.getBytes(0, 16384);
+            if (new DataView(n.data).getUint16(0, !0) !== 19792)
+                throw new Error("Wrong magic number for PMTiles archive");
+            if (Dn(n.data) < 3)
+                return [yield Tr.getHeader(t)];
+            let s = n.data.slice(0, Mn),
+                o = n.etag;
+            i && n.etag != i && (console.warn("ETag conflict detected; your HTTP server might not support content-based ETag headers. ETags disabled for " + t.getKey()), o = void 0);
+            let l = Pn(s, o);
+            if (r) {
+                let u = n.data.slice(l.rootDirectoryOffset, l.rootDirectoryOffset + l.rootDirectoryLength),
+                    f = t.getKey() + "|" + (l.etag || "") + "|" + l.rootDirectoryOffset + "|" + l.rootDirectoryLength,
+                    d = Dr(yield e(u, l.internalCompression));
+                return [l, [f, d.length, d]]
+            }
+            return [l, void 0]
+        })
+    }
+    function Bn(t, e, r, i, n) {
+        return Y(this, null, function* () {
+            let a = yield t.getBytes(r, i);
+            if (n.etag && n.etag !== a.etag)
+                throw new ze(a.etag);
+            let s = yield e(a.data, n.internalCompression),
+                o = Dr(s);
+            if (o.length === 0)
+                throw new Error("Empty directory is invalid");
+            return o
+        })
+    }
+    var En = class {
+            constructor(t=100, e=!0, r=Pr)
+            {
+                this.cache = new Map,
+                this.maxCacheEntries = t,
+                this.counter = 1,
+                this.prefetch = e,
+                this.decompress = r
+            }
+            getHeader(t, e)
+            {
+                return Y(this, null, function* () {
+                    let r = t.getKey();
+                    if (this.cache.has(r))
+                        return this.cache.get(r).lastUsed = this.counter++, yield this.cache.get(r).data;
+                    let i = new Promise((n, a) => {
+                        An(t, this.decompress, this.prefetch, e).then(s => {
+                            s[1] && this.cache.set(s[1][0], {
+                                lastUsed: this.counter++,
+                                data: Promise.resolve(s[1][2])
+                            }),
+                            n(s[0]),
+                            this.prune()
+                        }).catch(s => {
+                            a(s)
+                        })
+                    });
+                    return this.cache.set(r, {
+                        lastUsed: this.counter++,
+                        data: i
+                    }), i
+                })
+            }
+            getDirectory(t, e, r, i)
+            {
+                return Y(this, null, function* () {
+                    let n = t.getKey() + "|" + (i.etag || "") + "|" + e + "|" + r;
+                    if (this.cache.has(n))
+                        return this.cache.get(n).lastUsed = this.counter++, yield this.cache.get(n).data;
+                    let a = new Promise((s, o) => {
+                        Bn(t, this.decompress, e, r, i).then(l => {
+                            s(l),
+                            this.prune()
+                        }).catch(l => {
+                            o(l)
+                        })
+                    });
+                    return this.cache.set(n, {
+                        lastUsed: this.counter++,
+                        data: a
+                    }), a
+                })
+            }
+            getArrayBuffer(t, e, r, i)
+            {
+                return Y(this, null, function* () {
+                    let n = t.getKey() + "|" + (i.etag || "") + "|" + e + "|" + r;
+                    if (this.cache.has(n))
+                        return this.cache.get(n).lastUsed = this.counter++, yield this.cache.get(n).data;
+                    let a = new Promise((s, o) => {
+                        t.getBytes(e, r).then(l => {
+                            if (i.etag && i.etag !== l.etag)
+                                throw new ze(l.etag);
+                            s(l.data),
+                            this.cache.has(n),
+                            this.prune()
+                        }).catch(l => {
+                            o(l)
+                        })
+                    });
+                    return this.cache.set(n, {
+                        lastUsed: this.counter++,
+                        data: a
+                    }), a
+                })
+            }
+            prune()
+            {
+                if (this.cache.size >= this.maxCacheEntries) {
+                    let t = 1 / 0,
+                        e;
+                    this.cache.forEach((r, i) => {
+                        r.lastUsed < t && (t = r.lastUsed, e = i)
+                    }),
+                    e && this.cache.delete(e)
+                }
+            }
+            invalidate(t, e)
+            {
+                return Y(this, null, function* () {
+                    this.cache.delete(t.getKey()),
+                    yield this.getHeader(t, e)
+                })
+            }
+        }
+        ,
+        rt = class {
+            constructor(t, e, r)
+            {
+                typeof t == "string" ? this.source = new Tn(t) : this.source = t,
+                r ? this.decompress = r : this.decompress = Pr,
+                e ? this.cache = e : this.cache = new En
+            }
+            getHeader()
+            {
+                return Y(this, null, function* () {
+                    return yield this.cache.getHeader(this.source)
+                })
+            }
+            getZxyAttempt(t, e, r, i)
+            {
+                return Y(this, null, function* () {
+                    let n = Fn(t, e, r),
+                        a = yield this.cache.getHeader(this.source);
+                    if (a.specVersion < 3)
+                        return Tr.getZxy(a, this.source, this.cache, t, e, r, i);
+                    if (t < a.minZoom || t > a.maxZoom)
+                        return;
+                    let s = a.rootDirectoryOffset,
+                        o = a.rootDirectoryLength;
+                    for (let l = 0; l <= 3; l++) {
+                        let u = yield this.cache.getDirectory(this.source, s, o, a),
+                            f = Cn(u, n);
+                        if (f)
+                            if (f.runLength > 0) {
+                                let d = yield this.source.getBytes(a.tileDataOffset + f.offset, f.length, i);
+                                if (a.etag && a.etag !== d.etag)
+                                    throw new ze(d.etag);
+                                return {
+                                    data: yield this.decompress(d.data, a.tileCompression),
+                                    cacheControl: d.cacheControl,
+                                    expires: d.expires
+                                }
+                            } else
+                                s = a.leafDirectoryOffset + f.offset,
+                                o = f.length;
+                        else
+                            return
+                    }
+                    throw Error("Maximum directory depth exceeded")
+                })
+            }
+            getZxy(t, e, r, i)
+            {
+                return Y(this, null, function* () {
+                    try {
+                        return yield this.getZxyAttempt(t, e, r, i)
+                    } catch (n) {
+                        if (n instanceof ze)
+                            return this.cache.invalidate(this.source, n.message), yield this.getZxyAttempt(t, e, r, i);
+                        throw n
+                    }
+                })
+            }
+            getMetadataAttempt()
+            {
+                return Y(this, null, function* () {
+                    let t = yield this.cache.getHeader(this.source),
+                        e = yield this.source.getBytes(t.jsonMetadataOffset, t.jsonMetadataLength);
+                    if (t.etag && t.etag !== e.etag)
+                        throw new ze(e.etag);
+                    let r = yield this.decompress(e.data, t.internalCompression),
+                        i = new TextDecoder("utf-8");
+                    return JSON.parse(i.decode(r))
+                })
+            }
+            getMetadata()
+            {
+                return Y(this, null, function* () {
+                    try {
+                        return yield this.getMetadataAttempt()
+                    } catch (t) {
+                        if (t instanceof ze)
+                            return this.cache.invalidate(this.source, t.message), yield this.getMetadataAttempt();
+                        throw t
+                    }
+                })
+            }
+        }
+        ;
+    var ee;
+    (function(i) {
+        i[i.Point = 1] = "Point",
+        i[i.Line = 2] = "Line",
+        i[i.Polygon = 3] = "Polygon"
+    })(ee || (ee = {}));
+    function oe(t) {
+        return t.x + ":" + t.y + ":" + t.z
+    }
+    var Rn = (t, e, r) => {
+        t.pos = e;
+        for (var i = t.readVarint() + t.pos, n = 1, a = 0, s = 0, o = 0, l = 1 / 0, u = -1 / 0, f = 1 / 0, d = -1 / 0, c = [], x = []; t.pos < i;) {
+            if (a <= 0) {
+                var w = t.readVarint();
+                n = w & 7,
+                a = w >> 3
+            }
+            if (a--, n === 1 || n === 2)
+                s += t.readSVarint() * r,
+                o += t.readSVarint() * r,
+                s < l && (l = s),
+                s > u && (u = s),
+                o < f && (f = o),
+                o > d && (d = o),
+                n === 1 && (x.length > 0 && c.push(x), x = []),
+                x.push(new ke.default(s, o));
+            else if (n === 7)
+                x && x.push(x[0].clone());
+            else
+                throw new Error("unknown command " + n)
+        }
+        return x && c.push(x), {
+            geom: c,
+            bbox: {
+                minX: l,
+                minY: f,
+                maxX: u,
+                maxY: d
+            }
+        }
     };
-  }
-
-  // src/task.ts
-  var Font = (name, url, weight) => {
-    let ff = new FontFace(name, "url(" + url + ")", { weight });
-    document.fonts.add(ff);
-    return ff.load();
-  };
-  var mkimg = (src) => __async(void 0, null, function* () {
-    return new Promise((resolve, reject) => {
-      let img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject("Invalid SVG");
-      img.src = src;
-    });
-  });
-  var MISSING = `
+    function Er(t, e) {
+        let r = new Ar.VectorTile(new Br.default(t)),
+            i = new Map;
+        for (let [n, a] of Object.entries(r.layers)) {
+            let s = [],
+                o = a;
+            for (let l = 0; l < o.length; l++) {
+                let u = Rn(o.feature(l)._pbf, o.feature(l)._geometry, e / o.extent),
+                    f = 0;
+                for (let d of u.geom)
+                    f += d.length;
+                s.push({
+                    id: o.feature(l).id,
+                    geomType: o.feature(l).type,
+                    geom: u.geom,
+                    numVertices: f,
+                    bbox: u.bbox,
+                    props: o.feature(l).properties
+                })
+            }
+            i.set(n, s)
+        }
+        return i
+    }
+    var Oe = class {
+            constructor(e, r)
+            {
+                typeof e == "string" ? this.p = new rt(e) : this.p = e,
+                this.controllers = [],
+                this.shouldCancelZooms = r
+            }
+            get(e, r)
+            {
+                return O(this, null, function* () {
+                    this.shouldCancelZooms && (this.controllers = this.controllers.filter(s => s[0] != e.z ? (s[1].abort(), !1) : !0));
+                    let i = new AbortController;
+                    this.controllers.push([e.z, i]);
+                    let n = i.signal,
+                        a = yield this.p.getZxy(e.z, e.x, e.y, n);
+                    return a ? Er(a.data, r) : new Map
+                })
+            }
+        }
+        ,
+        it = class {
+            constructor(e, r)
+            {
+                this.url = e,
+                this.controllers = [],
+                this.shouldCancelZooms = r
+            }
+            get(e, r)
+            {
+                return O(this, null, function* () {
+                    this.shouldCancelZooms && (this.controllers = this.controllers.filter(s => s[0] != e.z ? (s[1].abort(), !1) : !0));
+                    let i = this.url.replace("{z}", e.z.toString()).replace("{x}", e.x.toString()).replace("{y}", e.y.toString()),
+                        n = new AbortController;
+                    this.controllers.push([e.z, n]);
+                    let a = n.signal;
+                    return new Promise((s, o) => {
+                        fetch(i, {
+                            signal: a
+                        }).then(l => l.arrayBuffer()).then(l => {
+                            let u = Er(l, r);
+                            s(u)
+                        }).catch(l => {
+                            o(l)
+                        })
+                    })
+                })
+            }
+        }
+        ,
+        kt = 6378137,
+        Rr = 85.0511287798,
+        nt = kt * Math.PI,
+        On = t => {
+            let e = Math.PI / 180,
+                r = Math.max(Math.min(Rr, t[0]), -Rr),
+                i = Math.sin(r * e);
+            return new ke.default(kt * t[1] * e, kt * Math.log((1 + i) / (1 - i)) / 2)
+        };
+    function Or(t) {
+        return t * t
+    }
+    function at(t, e) {
+        return Or(t.x - e.x) + Or(t.y - e.y)
+    }
+    function In(t, e, r) {
+        var i = at(e, r);
+        if (i === 0)
+            return at(t, e);
+        var n = ((t.x - e.x) * (r.x - e.x) + (t.y - e.y) * (r.y - e.y)) / i;
+        return n = Math.max(0, Math.min(1, n)), at(t, new ke.default(e.x + n * (r.x - e.x), e.y + n * (r.y - e.y)))
+    }
+    function Lt(t, e) {
+        for (var r = !1, i = 0, n = e.length - 1; i < e.length; n = i++) {
+            var a = e[i].x,
+                s = e[i].y,
+                o = e[n].x,
+                l = e[n].y,
+                u = s > t.y != l > t.y && t.x < (o - a) * (t.y - s) / (l - s) + a;
+            u && (r = !r)
+        }
+        return r
+    }
+    function Ir(t) {
+        for (var e = 0, r = 0; r < t.length; r++) {
+            let i = (r + 1) % t.length;
+            e += t[r].x * t[i].y,
+            e -= t[i].x * t[r].y
+        }
+        return e < 0
+    }
+    function Xr(t, e) {
+        var r = !1;
+        for (let i of e)
+            if (Ir(i))
+                Lt(t, i) && (r = !1);
+            else {
+                if (r)
+                    return !0;
+                Lt(t, i) && (r = !0)
+            }
+        return r
+    }
+    function Vr(t, e) {
+        let r = 1 / 0;
+        for (let i of e) {
+            let n = Math.sqrt(at(t, i[0]));
+            n < r && (r = n)
+        }
+        return r
+    }
+    function Yr(t, e) {
+        let r = 1 / 0;
+        for (let n of e)
+            for (var i = 0; i < n.length - 1; i++) {
+                let a = Math.sqrt(In(t, n[i], n[i + 1]));
+                a < r && (r = a)
+            }
+        return r
+    }
+    var st = class {
+        constructor(e, r)
+        {
+            this.source = e,
+            this.cache = new Map,
+            this.inflight = new Map,
+            this.tileSize = r
+        }
+        queryFeatures(e, r, i, n)
+        {
+            let a = On([r, e]);
+            var s = new ke.default((a.x + nt) / (nt * 2), 1 - (a.y + nt) / (nt * 2));
+            s.x > 1 && (s.x = s.x - Math.floor(s.x));
+            let o = s.mult(1 << i),
+                l = Math.floor(o.x),
+                u = Math.floor(o.y),
+                f = oe({
+                    z: i,
+                    x: l,
+                    y: u
+                }),
+                d = [],
+                c = this.cache.get(f);
+            if (c) {
+                let x = new ke.default((o.x - l) * this.tileSize, (o.y - u) * this.tileSize);
+                for (let [w, z] of c.data.entries())
+                    for (let h of z)
+                        h.geomType == 1 ? Vr(x, h.geom) < n && d.push({
+                            feature: h,
+                            layerName: w
+                        }) : h.geomType == 2 ? Yr(x, h.geom) < n && d.push({
+                            feature: h,
+                            layerName: w
+                        }) : Xr(x, h.geom) && d.push({
+                            feature: h,
+                            layerName: w
+                        })
+            }
+            return d
+        }
+        get(e)
+        {
+            return O(this, null, function* () {
+                let r = oe(e);
+                return new Promise((i, n) => {
+                    let a = this.cache.get(r);
+                    if (a)
+                        a.used = performance.now(),
+                        i(a.data);
+                    else {
+                        let s = this.inflight.get(r);
+                        s ? s.push([i, n]) : (this.inflight.set(r, []), this.source.get(e, this.tileSize).then(o => {
+                            this.cache.set(r, {
+                                used: performance.now(),
+                                data: o
+                            });
+                            let l = this.inflight.get(r);
+                            if (l && l.forEach(u => u[0](o)), this.inflight.delete(r), i(o), this.cache.size >= 64) {
+                                let u = 1 / 0,
+                                    f;
+                                this.cache.forEach((d, c) => {
+                                    d.used < u && (u = d.used, f = c)
+                                }),
+                                f && this.cache.delete(f)
+                            }
+                        }).catch(o => {
+                            let l = this.inflight.get(r);
+                            l && l.forEach(u => u[1](o)),
+                            this.inflight.delete(r),
+                            n(o)
+                        }))
+                    }
+                })
+            })
+        }
+    }
+    ;
+    var Ie = (t, e, r) => {
+            let i = [];
+            for (let n of t) {
+                let a = [];
+                for (let s of n)
+                    a.push(s.clone().mult(e).add(r));
+                i.push(a)
+            }
+            return i
+        },
+        Xe = (t, e) => {
+            let r = 1 << e;
+            return t < 0 && (t = r + t), t >= r && (t = t % r), t
+        },
+        St = class {
+            constructor(e, r, i)
+            {
+                this.tileCache = e,
+                this.maxDataLevel = r,
+                this.levelDiff = i
+            }
+            dataTilesForBounds(e, r)
+            {
+                let i = Math.pow(2, e) / Math.pow(2, Math.ceil(e)),
+                    n = [];
+                var a = 1,
+                    s = this.tileCache.tileSize;
+                if (e < this.levelDiff)
+                    a = 1 / (1 << this.levelDiff - e) * i,
+                    n.push({
+                        data_tile: {
+                            z: 0,
+                            x: 0,
+                            y: 0
+                        },
+                        origin: new pe.default(0, 0),
+                        scale: a,
+                        dim: s * a
+                    });
+                else if (e <= this.levelDiff + this.maxDataLevel) {
+                    let u = 1 << this.levelDiff,
+                        f = 256 * i,
+                        d = Math.ceil(e) - this.levelDiff,
+                        c = Math.floor(r.minX / u / f),
+                        x = Math.floor(r.minY / u / f),
+                        w = Math.floor(r.maxX / u / f),
+                        z = Math.floor(r.maxY / u / f);
+                    for (var o = c; o <= w; o++)
+                        for (var l = x; l <= z; l++) {
+                            let h = new pe.default(o * u * f, l * u * f);
+                            n.push({
+                                data_tile: {
+                                    z: d,
+                                    x: Xe(o, d),
+                                    y: Xe(l, d)
+                                },
+                                origin: h,
+                                scale: i,
+                                dim: s * i
+                            })
+                        }
+                } else {
+                    let u = 1 << this.levelDiff;
+                    a = (1 << Math.ceil(e) - this.maxDataLevel - this.levelDiff) * i;
+                    let f = Math.floor(r.minX / u / 256 / a),
+                        d = Math.floor(r.minY / u / 256 / a),
+                        c = Math.floor(r.maxX / u / 256 / a),
+                        x = Math.floor(r.maxY / u / 256 / a);
+                    for (var o = f; o <= c; o++)
+                        for (var l = d; l <= x; l++) {
+                            let h = new pe.default(o * u * 256 * a, l * u * 256 * a);
+                            n.push({
+                                data_tile: {
+                                    z: this.maxDataLevel,
+                                    x: Xe(o, this.maxDataLevel),
+                                    y: Xe(l, this.maxDataLevel)
+                                },
+                                origin: h,
+                                scale: a,
+                                dim: s * a
+                            })
+                        }
+                }
+                return n
+            }
+            dataTileForDisplayTile(e)
+            {
+                var r,
+                    i = 1,
+                    n = this.tileCache.tileSize,
+                    a;
+                if (e.z < this.levelDiff)
+                    r = {
+                        z: 0,
+                        x: 0,
+                        y: 0
+                    },
+                    i = 1 / (1 << this.levelDiff - e.z),
+                    a = new pe.default(0, 0),
+                    n = n * i;
+                else if (e.z <= this.levelDiff + this.maxDataLevel) {
+                    let s = 1 << this.levelDiff;
+                    r = {
+                        z: e.z - this.levelDiff,
+                        x: Math.floor(e.x / s),
+                        y: Math.floor(e.y / s)
+                    },
+                    a = new pe.default(r.x * s * 256, r.y * s * 256)
+                } else {
+                    i = 1 << e.z - this.maxDataLevel - this.levelDiff;
+                    let s = 1 << this.levelDiff;
+                    r = {
+                        z: this.maxDataLevel,
+                        x: Math.floor(e.x / s / i),
+                        y: Math.floor(e.y / s / i)
+                    },
+                    a = new pe.default(r.x * s * i * 256, r.y * s * i * 256),
+                    n = n * i
+                }
+                return {
+                    data_tile: r,
+                    scale: i,
+                    origin: a,
+                    dim: n
+                }
+            }
+            getBbox(e, r)
+            {
+                return O(this, null, function* () {
+                    let i = this.dataTilesForBounds(e, r);
+                    return (yield Promise.all(i.map(a => this.tileCache.get(a.data_tile)))).map((a, s) => {
+                        let o = i[s];
+                        return {
+                            data: a,
+                            z: e,
+                            data_tile: o.data_tile,
+                            scale: o.scale,
+                            dim: o.dim,
+                            origin: o.origin
+                        }
+                    })
+                })
+            }
+            getDisplayTile(e)
+            {
+                return O(this, null, function* () {
+                    let r = this.dataTileForDisplayTile(e);
+                    return {
+                        data: yield this.tileCache.get(r.data_tile),
+                        z: e.z,
+                        data_tile: r.data_tile,
+                        scale: r.scale,
+                        origin: r.origin,
+                        dim: r.dim
+                    }
+                })
+            }
+            queryFeatures(e, r, i)
+            {
+                let n = Math.round(i),
+                    a = Math.min(n - this.levelDiff, this.maxDataLevel),
+                    s = 16 / (1 << n - a);
+                return this.tileCache.queryFeatures(e, r, a, s)
+            }
+        }
+        ,
+        Ve = t => {
+            let e = i => {
+                    let n = i.levelDiff === void 0 ? 2 : i.levelDiff,
+                        a = i.maxDataZoom || 14,
+                        s;
+                    typeof i.url == "string" ? i.url.endsWith(".pmtiles") ? s = new Oe(i.url, !0) : s = new it(i.url, !0) : s = new Oe(i.url, !0);
+                    let o = new st(s, 256 * 1 << n);
+                    return new St(o, a, n)
+                },
+                r = new Map;
+            if (t.sources)
+                for (let i in t.sources)
+                    r.set(i, e(t.sources[i]));
+            else
+                r.set("", e(t));
+            return r
+        };
+    var Ur = N(re());
+    function Ye(t, e, r, i, n, a, s, o, l) {
+        let u = performance.now();
+        t.save(),
+        t.miterLimit = 2;
+        for (var f of n) {
+            if (f.minzoom && e < f.minzoom || f.maxzoom && e > f.maxzoom)
+                continue;
+            let w = r.get(f.dataSource || "");
+            if (!!w)
+                for (let z of w) {
+                    var d = z.data.get(f.dataLayer);
+                    if (d === void 0)
+                        continue;
+                    f.symbolizer.before && f.symbolizer.before(t, z.z);
+                    let h = z.origin,
+                        m = z.dim,
+                        p = z.scale;
+                    if (t.save(), o) {
+                        t.beginPath();
+                        let b = Math.max(h.x - s.x, a.minX - s.x),
+                            y = Math.max(h.y - s.y, a.minY - s.y),
+                            g = Math.min(h.x - s.x + m, a.maxX - s.x),
+                            v = Math.min(h.y - s.y + m, a.maxY - s.y);
+                        t.rect(b, y, g - b, v - y),
+                        t.clip()
+                    }
+                    t.translate(h.x - s.x, h.y - s.y);
+                    for (var c of d) {
+                        let b = c.geom,
+                            y = c.bbox;
+                        y.maxX * p + h.x < a.minX || y.minX * p + h.x > a.maxX || y.minY * p + h.y > a.maxY || y.maxY * p + h.y < a.minY || f.filter && !f.filter(z.z, c) || (p != 1 && (b = Ie(b, p, new Ur.default(0, 0))), f.symbolizer.draw(t, b, z.z, c))
+                    }
+                    t.restore()
+                }
+        }
+        if (o && (t.beginPath(), t.rect(a.minX - s.x, a.minY - s.y, a.maxX - a.minX, a.maxY - a.minY), t.clip()), i) {
+            let w = i.searchBbox(a, 1 / 0);
+            for (var x of w)
+                if (t.save(), t.translate(x.anchor.x - s.x, x.anchor.y - s.y), x.draw(t), t.restore(), l) {
+                    t.lineWidth = .5,
+                    t.strokeStyle = l,
+                    t.fillStyle = l,
+                    t.globalAlpha = 1,
+                    t.fillRect(x.anchor.x - s.x - 2, x.anchor.y - s.y - 2, 4, 4);
+                    for (let z of x.bboxes)
+                        t.strokeRect(z.minX - s.x, z.minY - s.y, z.maxX - z.minX, z.maxY - z.minY)
+                }
+        }
+        return t.restore(), performance.now() - u
+    }
+    var Nr = N(re()),
+        qr = N(jr());
+    var Zr = (t, e, r) => {
+            let i = 256,
+                n = e / i,
+                a = Math.floor(r.minX / i),
+                s = Math.floor(r.minY / i),
+                o = Math.floor(r.maxX / i),
+                l = Math.floor(r.maxY / i),
+                u = Math.log2(n),
+                f = [];
+            for (let d = a; d <= o; d++) {
+                let c = d % (1 << t);
+                for (let x = s; x <= l; x++)
+                    f.push({
+                        display: oe({
+                            z: t,
+                            x: c,
+                            y: x
+                        }),
+                        key: oe({
+                            z: t - u,
+                            x: Math.floor(c / n),
+                            y: Math.floor(x / n)
+                        })
+                    })
+            }
+            return f
+        },
+        Ct = class {
+            constructor(e, r)
+            {
+                this.tree = new qr.default,
+                this.current = new Map,
+                this.dim = e,
+                this.maxLabeledTiles = r
+            }
+            hasPrefix(e)
+            {
+                for (let r of this.current.keys())
+                    if (r.startsWith(e))
+                        return !0;
+                return !1
+            }
+            has(e)
+            {
+                return this.current.has(e)
+            }
+            size()
+            {
+                return this.current.size
+            }
+            keys()
+            {
+                return this.current.keys()
+            }
+            searchBbox(e, r)
+            {
+                let i = new Set;
+                for (let n of this.tree.search(e))
+                    n.indexed_label.order <= r && i.add(n.indexed_label);
+                return i
+            }
+            searchLabel(e, r)
+            {
+                let i = new Set;
+                for (let n of e.bboxes)
+                    for (let a of this.tree.search(n))
+                        a.indexed_label.order <= r && i.add(a.indexed_label);
+                return i
+            }
+            bboxCollides(e, r)
+            {
+                for (let i of this.tree.search(e))
+                    if (i.indexed_label.order <= r)
+                        return !0;
+                return !1
+            }
+            labelCollides(e, r)
+            {
+                for (let i of e.bboxes)
+                    for (let n of this.tree.search(i))
+                        if (n.indexed_label.order <= r)
+                            return !0;
+                return !1
+            }
+            deduplicationCollides(e)
+            {
+                if (!e.deduplicationKey || !e.deduplicationDistance)
+                    return !1;
+                let r = e.deduplicationDistance,
+                    i = {
+                        minX: e.anchor.x - r,
+                        minY: e.anchor.y - r,
+                        maxX: e.anchor.x + r,
+                        maxY: e.anchor.y + r
+                    };
+                for (let n of this.tree.search(i))
+                    if (n.indexed_label.deduplicationKey === e.deduplicationKey && n.indexed_label.anchor.dist(e.anchor) < r)
+                        return !0;
+                return !1
+            }
+            makeEntry(e)
+            {
+                this.current.get(e) && console.log("consistency error 1");
+                let r = new Set;
+                this.current.set(e, r)
+            }
+            insert(e, r, i)
+            {
+                let n = {
+                        anchor: e.anchor,
+                        bboxes: e.bboxes,
+                        draw: e.draw,
+                        order: r,
+                        tileKey: i,
+                        deduplicationKey: e.deduplicationKey,
+                        deduplicationDistance: e.deduplicationDistance
+                    },
+                    a = this.current.get(i);
+                if (!a) {
+                    let d = new Set;
+                    this.current.set(i, d),
+                    a = d
+                }
+                a.add(n);
+                var s = !1,
+                    o = !1;
+                for (let d of e.bboxes) {
+                    var l = d;
+                    l.indexed_label = n,
+                    this.tree.insert(l),
+                    d.minX < 0 && (s = !0),
+                    d.maxX > this.dim && (o = !0)
+                }
+                if (s || o) {
+                    var u = s ? this.dim : -this.dim,
+                        f = [];
+                    for (let x of e.bboxes)
+                        f.push({
+                            minX: x.minX + u,
+                            minY: x.minY,
+                            maxX: x.maxX + u,
+                            maxY: x.maxY
+                        });
+                    let d = {
+                            anchor: new Nr.default(e.anchor.x + u, e.anchor.y),
+                            bboxes: f,
+                            draw: e.draw,
+                            order: r,
+                            tileKey: i
+                        },
+                        c = this.current.get(i);
+                    c && c.add(d);
+                    for (let x of f) {
+                        var l = x;
+                        l.indexed_label = d,
+                        this.tree.insert(l)
+                    }
+                }
+            }
+            pruneOrNoop(e)
+            {
+                let r = e.split(":"),
+                    i,
+                    n = 0,
+                    a = 0;
+                for (var s of this.current.keys()) {
+                    let o = s.split(":");
+                    if (o[3] === r[3]) {
+                        a++;
+                        let l = Math.sqrt(Math.pow(+o[0] - +r[0], 2) + Math.pow(+o[1] - +r[1], 2));
+                        l > n && (n = l, i = s)
+                    }
+                    i && a > this.maxLabeledTiles && this.pruneKey(i)
+                }
+            }
+            pruneKey(e)
+            {
+                let r = this.current.get(e);
+                if (!r)
+                    return;
+                let i = [];
+                for (let n of this.tree.all())
+                    r.has(n.indexed_label) && i.push(n);
+                i.forEach(n => {
+                    this.tree.remove(n)
+                }),
+                this.current.delete(e)
+            }
+            removeLabel(e)
+            {
+                let r = [];
+                for (let n of this.tree.all())
+                    e == n.indexed_label && r.push(n);
+                r.forEach(n => {
+                    this.tree.remove(n)
+                });
+                let i = this.current.get(e.tileKey);
+                i && i.delete(e)
+            }
+        }
+        ,
+        Ue = class {
+            constructor(e, r, i, n, a)
+            {
+                this.index = new Ct(256 * 1 << e, n),
+                this.z = e,
+                this.scratch = r,
+                this.labelRules = i,
+                this.callback = a
+            }
+            layout(e)
+            {
+                let r = performance.now(),
+                    i = new Set;
+                for (let [o, l] of e)
+                    for (let u of l) {
+                        let f = oe(u.data_tile) + ":" + o;
+                        this.index.has(f) || (this.index.makeEntry(f), i.add(f))
+                    }
+                let n = new Set;
+                for (let [o, l] of this.labelRules.entries()) {
+                    if (l.visible == !1 || l.minzoom && this.z < l.minzoom || l.maxzoom && this.z > l.maxzoom)
+                        continue;
+                    let u = l.dataSource || "",
+                        f = e.get(u);
+                    if (!!f)
+                        for (let d of f) {
+                            let c = oe(d.data_tile) + ":" + u;
+                            if (!i.has(c))
+                                continue;
+                            let x = d.data.get(l.dataLayer);
+                            if (x === void 0)
+                                continue;
+                            let w = x;
+                            l.sort && w.sort((h, m) => l.sort ? l.sort(h.props, m.props) : 0);
+                            let z = {
+                                index: this.index,
+                                zoom: this.z,
+                                scratch: this.scratch,
+                                order: o,
+                                overzoom: this.z - d.data_tile.z
+                            };
+                            for (let h of w) {
+                                if (l.filter && !l.filter(this.z, h))
+                                    continue;
+                                let m = Ie(h.geom, d.scale, d.origin),
+                                    p = l.symbolizer.place(z, m, h);
+                                if (!!p)
+                                    for (let b of p) {
+                                        var a = !1;
+                                        if (!(b.deduplicationKey && this.index.deduplicationCollides(b))) {
+                                            if (this.index.labelCollides(b, 1 / 0)) {
+                                                if (!this.index.labelCollides(b, o)) {
+                                                    let y = this.index.searchLabel(b, 1 / 0);
+                                                    for (let g of y) {
+                                                        this.index.removeLabel(g);
+                                                        for (let v of g.bboxes)
+                                                            this.findInvalidatedTiles(n, d.dim, v, c)
+                                                    }
+                                                    this.index.insert(b, o, c),
+                                                    a = !0
+                                                }
+                                            } else
+                                                this.index.insert(b, o, c),
+                                                a = !0;
+                                            if (a)
+                                                for (let y of b.bboxes)
+                                                    (y.maxX > d.origin.x + d.dim || y.minX < d.origin.x || y.minY < d.origin.y || y.maxY > d.origin.y + d.dim) && this.findInvalidatedTiles(n, d.dim, y, c)
+                                        }
+                                    }
+                            }
+                        }
+                }
+                for (var s of i)
+                    this.index.pruneOrNoop(s);
+                return n.size > 0 && this.callback && this.callback(n), performance.now() - r
+            }
+            findInvalidatedTiles(e, r, i, n)
+            {
+                let a = Zr(this.z, r, i);
+                for (let s of a)
+                    s.key != n && this.index.hasPrefix(s.key) && e.add(s.display)
+            }
+            add(e)
+            {
+                var r = !0;
+                for (let [i, n] of e)
+                    for (let a of n)
+                        this.index.has(oe(a.data_tile) + ":" + i) || (r = !1);
+                return r ? 0 : this.layout(e)
+            }
+        }
+        ,
+        je = class {
+            constructor(e, r, i, n)
+            {
+                this.labelers = new Map,
+                this.scratch = e,
+                this.labelRules = r,
+                this.maxLabeledTiles = i,
+                this.callback = n
+            }
+            add(e, r)
+            {
+                var i = this.labelers.get(e);
+                return i || (i = new Ue(e, this.scratch, this.labelRules, this.maxLabeledTiles, this.callback), this.labelers.set(e, i)), i.add(r)
+            }
+            getIndex(e)
+            {
+                let r = this.labelers.get(e);
+                if (r)
+                    return r.index
+            }
+        }
+        ;
+    var Le = {
+        earth: "#FFFBF6",
+        glacier: "#ffffff",
+        residential: "#F4F4F8",
+        hospital: "#FFF6F6",
+        cemetery: "#EFF2EE",
+        school: "#F7F6FF",
+        industrial: "#FFF9EF",
+        wood: "#F4F9EF",
+        grass: "#EBF9E3",
+        park: "#E5F9D5",
+        water: "#B7DFF2",
+        sand: "#ebebeb",
+        buildings: "#F2EDE8",
+        highwayCasing: "#FFC3C3",
+        majorRoadCasing: "#FFB9B9",
+        mediumRoadCasing: "#FFCE8E",
+        minorRoadCasing: "#cccccc",
+        highway: "#FFCEBB",
+        majorRoad: "#FFE4B3",
+        mediumRoad: "#FFF2C8",
+        minorRoad: "#ffffff",
+        boundaries: "#9e9e9e",
+        mask: "#dddddd",
+        countryLabel: "#aaaaaa",
+        cityLabel: "#6C6C6C",
+        stateLabel: "#999999",
+        neighbourhoodLabel: "#888888",
+        landuseLabel: "#898989",
+        waterLabel: "#41ABDC",
+        naturalLabel: "#4B8F14",
+        roadsLabel: "#888888",
+        poisLabel: "#606060"
+    };
+    var Se = {
+        earth: "#151515",
+        glacier: "#1c1c1c",
+        residential: "#252B2F",
+        hospital: "#3E2C2C",
+        cemetery: "#36483D",
+        school: "#2C3440",
+        industrial: "#33312C",
+        wood: "#3A3E38",
+        grass: "#4E604D",
+        park: "#2C4034",
+        water: "#4D5B73",
+        sand: "#777777",
+        buildings: "#464545",
+        highwayCasing: "#000000",
+        majorRoadCasing: "#1C1B1B",
+        mediumRoadCasing: "#3E3E3E",
+        minorRoadCasing: "#000000",
+        highway: "#5B5B5B",
+        majorRoad: "#595959",
+        mediumRoad: "#4F4F4F",
+        minorRoad: "#393939",
+        boundaries: "#666666",
+        mask: "#dddddd",
+        countryLabel: "#ffffff",
+        cityLabel: "#FFFFFF",
+        stateLabel: "#ffffff",
+        neighbourhoodLabel: "#FDFDFD",
+        landuseLabel: "#DDDDDD",
+        waterLabel: "#707E95",
+        naturalLabel: "#4c4c4c",
+        roadsLabel: "#C4C4C4",
+        poisLabel: "#959393"
+    };
+    function Ne(t, e, r) {
+        return Math.min(Math.max(t, r), e)
+    }
+    var Fe = class  extends Error{
+        constructor(e)
+        {
+            super(`Failed to parse color: "${e}"`)
+        }
+    }
+    ;
+    function Xn(t) {
+        if (typeof t != "string")
+            throw new Fe(t);
+        if (t.trim().toLowerCase() === "transparent")
+            return [0, 0, 0, 0];
+        let e = t.trim();
+        e = qn.test(t) ? function(s) {
+            let o = s.toLowerCase().trim(),
+                l = Vn[function(u) {
+                    let f = 5381,
+                        d = u.length;
+                    for (; d;)
+                        f = 33 * f ^ u.charCodeAt(--d);
+                    return (f >>> 0) % 2341
+                }(o)];
+            if (!l)
+                throw new Fe(s);
+            return `#${l}`
+        }(t) : t;
+        let r = Yn.exec(e);
+        if (r) {
+            let s = Array.from(r).slice(1);
+            return [...s.slice(0, 3).map(o => parseInt(qe(o, 2), 16)), parseInt(qe(s[3] || "f", 2), 16) / 255]
+        }
+        let i = Un.exec(e);
+        if (i) {
+            let s = Array.from(i).slice(1);
+            return [...s.slice(0, 3).map(o => parseInt(o, 16)), parseInt(s[3] || "ff", 16) / 255]
+        }
+        let n = jn.exec(e);
+        if (n) {
+            let s = Array.from(n).slice(1);
+            return [...s.slice(0, 3).map(o => parseInt(o, 10)), parseFloat(s[3] || "1")]
+        }
+        let a = Nn.exec(e);
+        if (a) {
+            let [s, o, l, u] = Array.from(a).slice(1).map(parseFloat);
+            if (Ne(0, 100, o) !== o)
+                throw new Fe(t);
+            if (Ne(0, 100, l) !== l)
+                throw new Fe(t);
+            return [...Zn(s, o, l), u || 1]
+        }
+        throw new Fe(t)
+    }
+    var Wr = t => parseInt(t.replace(/_/g, ""), 36),
+        Vn = "1q29ehhb 1n09sgk7 1kl1ekf_ _yl4zsno 16z9eiv3 1p29lhp8 _bd9zg04 17u0____ _iw9zhe5 _to73___ _r45e31e _7l6g016 _jh8ouiv _zn3qba8 1jy4zshs 11u87k0u 1ro9yvyo 1aj3xael 1gz9zjz0 _3w8l4xo 1bf1ekf_ _ke3v___ _4rrkb__ 13j776yz _646mbhl _nrjr4__ _le6mbhl 1n37ehkb _m75f91n _qj3bzfz 1939yygw 11i5z6x8 _1k5f8xs 1509441m 15t5lwgf _ae2th1n _tg1ugcv 1lp1ugcv 16e14up_ _h55rw7n _ny9yavn _7a11xb_ 1ih442g9 _pv442g9 1mv16xof 14e6y7tu 1oo9zkds 17d1cisi _4v9y70f _y98m8kc 1019pq0v 12o9zda8 _348j4f4 1et50i2o _8epa8__ _ts6senj 1o350i2o 1mi9eiuo 1259yrp0 1ln80gnw _632xcoy 1cn9zldc _f29edu4 1n490c8q _9f9ziet 1b94vk74 _m49zkct 1kz6s73a 1eu9dtog _q58s1rz 1dy9sjiq __u89jo3 _aj5nkwg _ld89jo3 13h9z6wx _qa9z2ii _l119xgq _bs5arju 1hj4nwk9 1qt4nwk9 1ge6wau6 14j9zlcw 11p1edc_ _ms1zcxe _439shk6 _jt9y70f _754zsow 1la40eju _oq5p___ _x279qkz 1fa5r3rv _yd2d9ip _424tcku _8y1di2_ _zi2uabw _yy7rn9h 12yz980_ __39ljp6 1b59zg0x _n39zfzp 1fy9zest _b33k___ _hp9wq92 1il50hz4 _io472ub _lj9z3eo 19z9ykg0 _8t8iu3a 12b9bl4a 1ak5yw0o _896v4ku _tb8k8lv _s59zi6t _c09ze0p 1lg80oqn 1id9z8wb _238nba5 1kq6wgdi _154zssg _tn3zk49 _da9y6tc 1sg7cv4f _r12jvtt 1gq5fmkz 1cs9rvci _lp9jn1c _xw1tdnb 13f9zje6 16f6973h _vo7ir40 _bt5arjf _rc45e4t _hr4e100 10v4e100 _hc9zke2 _w91egv_ _sj2r1kk 13c87yx8 _vqpds__ _ni8ggk8 _tj9yqfb 1ia2j4r4 _7x9b10u 1fc9ld4j 1eq9zldr _5j9lhpx _ez9zl6o _md61fzm".split(" ").reduce((t, e) => {
+            let r = Wr(e.substring(0, 3)),
+                i = Wr(e.substring(3)).toString(16),
+                n = "";
+            for (let a = 0; a < 6 - i.length; a++)
+                n += "0";
+            return t[r] = `${n}${i}`, t
+        }, {}),
+        qe = (t, e) => Array.from(Array(e)).map(() => t).join(""),
+        Yn = new RegExp(`^#${qe("([a-f0-9])", 3)}([a-f0-9])?$`, "i"),
+        Un = new RegExp(`^#${qe("([a-f0-9]{2})", 3)}([a-f0-9]{2})?$`, "i"),
+        jn = new RegExp(`^rgba?\\(\\s*(\\d+)\\s*${qe(",\\s*(\\d+)\\s*", 2)}(?:,\\s*([\\d.]+))?\\s*\\)$`, "i"),
+        Nn = /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)$/i,
+        qn = /^[a-z]+$/i,
+        $r = t => Math.round(255 * t),
+        Zn = (t, e, r) => {
+            let i = r / 100;
+            if (e === 0)
+                return [i, i, i].map($r);
+            let n = (t % 360 + 360) % 360 / 60,
+                a = (1 - Math.abs(2 * i - 1)) * (e / 100),
+                s = a * (1 - Math.abs(n % 2 - 1)),
+                o = 0,
+                l = 0,
+                u = 0;
+            n >= 0 && n < 1 ? (o = a, l = s) : n >= 1 && n < 2 ? (o = s, l = a) : n >= 2 && n < 3 ? (l = a, u = s) : n >= 3 && n < 4 ? (l = s, u = a) : n >= 4 && n < 5 ? (o = s, u = a) : n >= 5 && n < 6 && (o = a, u = s);
+            let f = i - a / 2;
+            return [o + f, l + f, u + f].map($r)
+        };
+    function Tt(t) {
+        let [e, r, i, n] = Xn(t).map((u, f) => f === 3 ? u : u / 255),
+            a = Math.max(e, r, i),
+            s = Math.min(e, r, i),
+            o = (a + s) / 2;
+        if (a === s)
+            return [0, 0, o, n];
+        let l = a - s;
+        return [60 * (e === a ? (r - i) / l + (r < i ? 6 : 0) : r === a ? (i - e) / l + 2 : (e - r) / l + 4), o > .5 ? l / (2 - a - s) : l / (a + s), o, n]
+    }
+    function Hr(t, e, r, i) {
+        return `hsla(${(t % 360).toFixed()}, ${Ne(0, 100, 100 * e).toFixed()}%, ${Ne(0, 100, 100 * r).toFixed()}%, ${parseFloat(Ne(0, 1, i).toFixed(3))})`
+    }
+    var Z = N(re()),
+        ri = N(Kr()),
+        ii = N(Qr());
+    var I = class {
+            constructor(e, r)
+            {
+                this.str = e != null ? e : r,
+                this.per_feature = typeof this.str == "function" && this.str.length == 2
+            }
+            get(e, r)
+            {
+                return typeof this.str == "function" ? this.str(e, r) : this.str
+            }
+        }
+        ,
+        B = class {
+            constructor(e, r=1)
+            {
+                this.value = e != null ? e : r,
+                this.per_feature = typeof this.value == "function" && this.value.length == 2
+            }
+            get(e, r)
+            {
+                return typeof this.value == "function" ? this.value(e, r) : this.value
+            }
+        }
+        ,
+        Ze = class {
+            constructor(e)
+            {
+                var r;
+                this.label_props = (r = e == null ? void 0 : e.label_props) != null ? r : ["name"],
+                this.textTransform = e == null ? void 0 : e.textTransform
+            }
+            get(e, r)
+            {
+                let i,
+                    n;
+                typeof this.label_props == "function" ? n = this.label_props(e, r) : n = this.label_props;
+                for (let s of n)
+                    if (r.props.hasOwnProperty(s) && typeof r.props[s] == "string") {
+                        i = r.props[s];
+                        break
+                    }
+                let a;
+                return typeof this.textTransform == "function" ? a = this.textTransform(e, r) : a = this.textTransform, i && a === "uppercase" ? i = i.toUpperCase() : i && a === "lowercase" ? i = i.toLowerCase() : i && a === "capitalize" && (i = i.toLowerCase().split(" ").map(l => l[0].toUpperCase() + l.slice(1)).join(" ")), i
+            }
+        }
+        ,
+        We = class {
+            constructor(e)
+            {
+                var r,
+                    i;
+                (e == null ? void 0 : e.font) ? this.font = e.font : (this.family = (r = e == null ? void 0 : e.fontFamily) != null ? r : "sans-serif", this.size = (i = e == null ? void 0 : e.fontSize) != null ? i : 12, this.weight = e == null ? void 0 : e.fontWeight, this.style = e == null ? void 0 : e.fontStyle)
+            }
+            get(e, r)
+            {
+                if (this.font)
+                    return typeof this.font == "function" ? this.font(e, r) : this.font;
+                var i = "";
+                this.style && (typeof this.style == "function" ? i = this.style(e, r) + " " : i = this.style + " ");
+                var n = "";
+                this.weight && (typeof this.weight == "function" ? n = this.weight(e, r) + " " : n = this.weight + " ");
+                var a;
+                typeof this.size == "function" ? a = this.size(e, r) : a = this.size;
+                var s;
+                return typeof this.family == "function" ? s = this.family(e, r) : s = this.family, `${i}${n}${a}px ${s}`
+            }
+        }
+        ,
+        Bt = class {
+            constructor(e, r=[])
+            {
+                this.value = e != null ? e : r,
+                this.per_feature = typeof this.value == "function" && this.value.length == 2
+            }
+            get(e, r)
+            {
+                return typeof this.value == "function" ? this.value(e, r) : this.value
+            }
+        }
+        ;
+    var Et = N(re()),
+        Jn = (t, e, r) => {
+            var i = [],
+                n,
+                a,
+                s,
+                o = 0,
+                l = 0,
+                u = 0,
+                f = 0,
+                d = 0,
+                c = 0,
+                x = 0,
+                w = 0,
+                z = 0,
+                h = 0,
+                m = 0,
+                p = 0;
+            if (t.length < 2)
+                return [];
+            if (t.length === 2)
+                return u = Math.sqrt(Math.pow(t[1].x - t[0].x, 2) + Math.pow(t[1].y - t[0].y, 2)), [{
+                    length: u,
+                    beginIndex: 0,
+                    beginDistance: 0,
+                    endIndex: 2,
+                    endDistance: u
+                }];
+            for (f = Math.sqrt(Math.pow(t[1].x - t[0].x, 2) + Math.pow(t[1].y - t[0].y, 2)), o = 1, l = t.length - 1; o < l; o++)
+                n = t[o - 1],
+                a = t[o],
+                s = t[o + 1],
+                c = a.x - n.x,
+                x = a.y - n.y,
+                w = s.x - a.x,
+                z = s.y - a.y,
+                d = Math.sqrt(w * w + z * z),
+                u += f,
+                h = Math.acos((c * w + x * z) / (f * d)),
+                (h > e || u - p > r) && (i.push({
+                    length: u - p,
+                    beginDistance: p,
+                    beginIndex: m,
+                    endIndex: o + 1,
+                    endDistance: u
+                }), m = o, p = u),
+                f = d;
+            return o - m > 0 && i.push({
+                length: u - p + d,
+                beginIndex: m,
+                beginDistance: p,
+                endIndex: o + 1,
+                endDistance: u + d
+            }), i
+        };
+    function ei(t, e, r, i) {
+        let n,
+            a,
+            s = 0,
+            o = [];
+        var l = -1 / 0;
+        for (let f of t) {
+            let d = Jn(f, Math.PI / 45, e);
+            for (let c of d)
+                if (c.length >= e + i) {
+                    let x = new Et.default(f[c.beginIndex].x, f[c.beginIndex].y),
+                        w = f[c.endIndex - 1],
+                        z = new Et.default((w.x - x.x) / c.length, (w.y - x.y) / c.length);
+                    for (var u = i; u < c.length - e; u += r)
+                        o.push({
+                            start: x.add(z.mult(u)),
+                            end: x.add(z.mult(u + e))
+                        })
+                }
+        }
+        return o
+    }
+    function ti(t, e, r, i) {
+        let n = e.x - t.x,
+            a = e.y - t.y,
+            s = Math.sqrt(Math.pow(e.x - t.x, 2) + Math.pow(e.y - t.y, 2)),
+            o = [];
+        for (var l = 0; l < r + i; l += 2 * i) {
+            let u = l * 1 / s;
+            o.push({
+                x: t.x + u * n,
+                y: t.y + u * a
+            })
+        }
+        return o
+    }
+    function Rt(t, e) {
+        if (t.length <= e)
+            return [t];
+        let r = e - 1,
+            i = t.lastIndexOf(" ", r),
+            n = t.indexOf(" ", r);
+        if (i == -1 && n == -1)
+            return [t];
+        let a,
+            s;
+        return n == -1 || i >= 0 && r - i < n - r ? (a = t.substring(0, i), s = t.substring(i + 1, t.length)) : (a = t.substring(0, n), s = t.substring(n + 1, t.length)), [a, ...Rt(s, e)]
+    }
+    var Gn = "\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303C\u3220-\u3229\u3248-\u324F\u3251-\u325F\u3280-\u3289\u32B1-\u32BF\u3400-\u4DB5\u4E00-\u9FEA\uF900-\uFA6D\uFA70-\uFAD9\u2000",
+        qa = new RegExp("^[" + Gn + "]+$");
+    var ni = 5400,
+        X;
+    (function(i) {
+        i[i.Left = 1] = "Left",
+        i[i.Center = 2] = "Center",
+        i[i.Right = 3] = "Right"
+    })(X || (X = {}));
+    var P;
+    (function(l) {
+        l[l.N = 1] = "N",
+        l[l.NE = 2] = "NE",
+        l[l.E = 3] = "E",
+        l[l.SE = 4] = "SE",
+        l[l.S = 5] = "S",
+        l[l.SW = 6] = "SW",
+        l[l.W = 7] = "W",
+        l[l.NW = 8] = "NW"
+    })(P || (P = {}));
+    var Ot = (t, e, r) => {
+            let i = document.createElement("canvas"),
+                n = i.getContext("2d");
+            return i.width = t, i.height = e, n !== null && r(i, n), i
+        },
+        A = class {
+            constructor(e)
+            {
+                var r;
+                this.pattern = e.pattern,
+                this.fill = new I(e.fill, "black"),
+                this.opacity = new B(e.opacity, 1),
+                this.stroke = new I(e.stroke, "black"),
+                this.width = new B(e.width, 0),
+                this.per_feature = (r = this.fill.per_feature || this.opacity.per_feature || this.stroke.per_feature || this.width.per_feature || e.per_feature) != null ? r : !1,
+                this.do_stroke = !1
+            }
+            before(e, r)
+            {
+                if (!this.per_feature) {
+                    e.globalAlpha = this.opacity.get(r),
+                    e.fillStyle = this.fill.get(r),
+                    e.strokeStyle = this.stroke.get(r);
+                    let i = this.width.get(r);
+                    i > 0 && (this.do_stroke = !0),
+                    e.lineWidth = i
+                }
+                if (this.pattern) {
+                    let i = e.createPattern(this.pattern, "repeat");
+                    i && (e.fillStyle = i)
+                }
+            }
+            draw(e, r, i, n)
+            {
+                var a = !1;
+                if (this.per_feature) {
+                    e.globalAlpha = this.opacity.get(i, n),
+                    e.fillStyle = this.fill.get(i, n);
+                    var s = this.width.get(i, n);
+                    s && (a = !0, e.strokeStyle = this.stroke.get(i, n), e.lineWidth = s)
+                }
+                let o = () => {
+                    e.fill(),
+                    (a || this.do_stroke) && e.stroke()
+                };
+                var l = 0;
+                e.beginPath();
+                for (var u of r) {
+                    l + u.length > ni && (o(), l = 0, e.beginPath());
+                    for (var f = 0; f < u.length; f++) {
+                        let d = u[f];
+                        f == 0 ? e.moveTo(d.x, d.y) : e.lineTo(d.x, d.y)
+                    }
+                    l += u.length
+                }
+                l > 0 && o()
+            }
+        }
+        ;
+    function de(t, e) {
+        return r => {
+            let i = r - t;
+            return i >= 0 && i < e.length ? e[i] : 0
+        }
+    }
+    function ai(t, e) {
+        let r = 0;
+        for (; e[r + 1][0] < t;)
+            r++;
+        return r
+    }
+    function si(t, e, r) {
+        return t * (r - e) + e
+    }
+    function oi(t, e, r, i) {
+        let n = i[e + 1][0] - i[e][0],
+            a = t - i[e][0];
+        return n === 0 ? 0 : r === 1 ? a / n : (Math.pow(r, a) - 1) / (Math.pow(r, n) - 1)
+    }
+    function j(t, e) {
+        return r => {
+            if (e.length < 1)
+                return 0;
+            if (r <= e[0][0])
+                return e[0][1];
+            if (r >= e[e.length - 1][0])
+                return e[e.length - 1][1];
+            let i = ai(r, e),
+                n = oi(r, i, t, e);
+            return si(n, e[i][1], e[i + 1][1])
+        }
+    }
+    function Qn(t, e) {
+        return r => {
+            if (e.length < 1)
+                return 0;
+            let i = t;
+            for (let n = 0; n < e.length; n++)
+                r >= e[n][0] && (i = e[n][1]);
+            return i
+        }
+    }
+    function ea(t) {
+        return j(1, t)
+    }
+    function ta(t, e, r, i, n) {
+        return a => {
+            if (n.length < 1)
+                return 0;
+            let s = new ri.default(t, e, r, i),
+                o = ai(a, n),
+                l = s.solve(oi(a, o, 1, n));
+            return si(l, n[o][1], n[o + 1][1])
+        }
+    }
+    var C = class {
+            constructor(e)
+            {
+                var r;
+                this.color = new I(e.color, "black"),
+                this.width = new B(e.width),
+                this.opacity = new B(e.opacity),
+                this.dash = e.dash ? new Bt(e.dash) : null,
+                this.dashColor = new I(e.dashColor, "black"),
+                this.dashWidth = new B(e.dashWidth, 1),
+                this.lineCap = new I(e.lineCap, "butt"),
+                this.lineJoin = new I(e.lineJoin, "miter"),
+                this.skip = !1,
+                this.per_feature = !!(((r = this.dash) == null ? void 0 : r.per_feature) || this.color.per_feature || this.opacity.per_feature || this.width.per_feature || this.lineCap.per_feature || this.lineJoin.per_feature || e.per_feature)
+            }
+            before(e, r)
+            {
+                this.per_feature || (e.strokeStyle = this.color.get(r), e.lineWidth = this.width.get(r), e.globalAlpha = this.opacity.get(r), e.lineCap = this.lineCap.get(r), e.lineJoin = this.lineJoin.get(r))
+            }
+            draw(e, r, i, n)
+            {
+                if (this.skip)
+                    return;
+                let a = () => {
+                    this.per_feature && (e.globalAlpha = this.opacity.get(i, n), e.lineCap = this.lineCap.get(i, n), e.lineJoin = this.lineJoin.get(i, n)),
+                    this.dash ? (e.save(), this.per_feature ? (e.lineWidth = this.dashWidth.get(i, n), e.strokeStyle = this.dashColor.get(i, n), e.setLineDash(this.dash.get(i, n))) : e.setLineDash(this.dash.get(i)), e.stroke(), e.restore()) : (e.save(), this.per_feature && (e.lineWidth = this.width.get(i, n), e.strokeStyle = this.color.get(i, n)), e.stroke(), e.restore())
+                };
+                var s = 0;
+                e.beginPath();
+                for (var o of r) {
+                    s + o.length > ni && (a(), s = 0, e.beginPath());
+                    for (var l = 0; l < o.length; l++) {
+                        let u = o[l];
+                        l == 0 ? e.moveTo(u.x, u.y) : e.lineTo(u.x, u.y)
+                    }
+                    s += o.length
+                }
+                s > 0 && a()
+            }
+        }
+        ,
+        li = class {
+            constructor(e)
+            {
+                this.name = e.name,
+                this.sheet = e.sheet,
+                this.dpr = window.devicePixelRatio
+            }
+            place(e, r, i)
+            {
+                let n = r[0],
+                    a = new Z.default(r[0][0].x, r[0][0].y),
+                    s = this.sheet.get(this.name),
+                    o = s.w / this.dpr,
+                    l = s.h / this.dpr,
+                    u = {
+                        minX: a.x - o / 2,
+                        minY: a.y - l / 2,
+                        maxX: a.x + o / 2,
+                        maxY: a.y + l / 2
+                    };
+                return [{
+                    anchor: a,
+                    bboxes: [u],
+                    draw: d => {
+                        d.globalAlpha = 1,
+                        d.drawImage(this.sheet.canvas, s.x, s.y, s.w, s.h, -s.w / 2 / this.dpr, -s.h / 2 / this.dpr, s.w / 2, s.h / 2)
+                    }
+                }]
+            }
+        }
+        ,
+        te = class {
+            constructor(e)
+            {
+                this.radius = new B(e.radius, 3),
+                this.fill = new I(e.fill, "black"),
+                this.stroke = new I(e.stroke, "white"),
+                this.width = new B(e.width, 0),
+                this.opacity = new B(e.opacity)
+            }
+            draw(e, r, i, n)
+            {
+                e.globalAlpha = this.opacity.get(i, n);
+                let a = this.radius.get(i, n),
+                    s = this.width.get(i, n);
+                s > 0 && (e.strokeStyle = this.stroke.get(i, n), e.lineWidth = s, e.beginPath(), e.arc(r[0][0].x, r[0][0].y, a + s / 2, 0, 2 * Math.PI), e.stroke()),
+                e.fillStyle = this.fill.get(i, n),
+                e.beginPath(),
+                e.arc(r[0][0].x, r[0][0].y, a, 0, 2 * Math.PI),
+                e.fill()
+            }
+            place(e, r, i)
+            {
+                let n = r[0],
+                    a = new Z.default(r[0][0].x, r[0][0].y),
+                    s = this.radius.get(e.zoom, i),
+                    o = {
+                        minX: a.x - s,
+                        minY: a.y - s,
+                        maxX: a.x + s,
+                        maxY: a.y + s
+                    };
+                return [{
+                    anchor: a,
+                    bboxes: [o],
+                    draw: u => {
+                        this.draw(u, [[new Z.default(0, 0)]], e.zoom, i)
+                    }
+                }]
+            }
+        }
+        ,
+        lt = class {
+            constructor(e)
+            {
+                this.font = new We(e),
+                this.text = new Ze(e),
+                this.fill = new I(e.fill, "black"),
+                this.background = new I(e.background, "white"),
+                this.padding = new B(e.padding, 0)
+            }
+            place(e, r, i)
+            {
+                let n = this.text.get(e.zoom, i);
+                if (!n)
+                    return;
+                let a = this.font.get(e.zoom, i);
+                e.scratch.font = a;
+                let s = e.scratch.measureText(n),
+                    o = s.width,
+                    l = s.actualBoundingBoxAscent,
+                    u = s.actualBoundingBoxDescent,
+                    f = r[0],
+                    d = new Z.default(r[0][0].x, r[0][0].y),
+                    c = this.padding.get(e.zoom, i),
+                    x = {
+                        minX: d.x - o / 2 - c,
+                        minY: d.y - l - c,
+                        maxX: d.x + o / 2 + c,
+                        maxY: d.y + u + c
+                    };
+                return [{
+                    anchor: d,
+                    bboxes: [x],
+                    draw: z => {
+                        z.globalAlpha = 1,
+                        z.fillStyle = this.background.get(e.zoom, i),
+                        z.fillRect(-o / 2 - c, -l - c, o + 2 * c, l + u + 2 * c),
+                        z.fillStyle = this.fill.get(e.zoom, i),
+                        z.font = a,
+                        z.fillText(n, -o / 2, 0)
+                    }
+                }]
+            }
+        }
+        ,
+        $e = class {
+            constructor(e)
+            {
+                this.list = e
+            }
+            place(e, r, i)
+            {
+                var n = this.list[0].place(e, r, i);
+                if (!n)
+                    return;
+                var a = n[0];
+                let s = a.anchor,
+                    o = a.bboxes[0],
+                    l = o.maxY - o.minY,
+                    u = [{
+                        draw: a.draw,
+                        translate: {
+                            x: 0,
+                            y: 0
+                        }
+                    }],
+                    f = [[new Z.default(r[0][0].x, r[0][0].y + l)]];
+                for (let c = 1; c < this.list.length; c++)
+                    n = this.list[c].place(e, f, i),
+                    n && (a = n[0], o = ui(o, a.bboxes[0]), u.push({
+                        draw: a.draw,
+                        translate: {
+                            x: 0,
+                            y: l
+                        }
+                    }));
+                return [{
+                    anchor: s,
+                    bboxes: [o],
+                    draw: c => {
+                        for (let x of u)
+                            c.save(),
+                            c.translate(x.translate.x, x.translate.y),
+                            x.draw(c),
+                            c.restore()
+                    }
+                }]
+            }
+        }
+        ,
+        ui = (t, e) => ({
+            minX: Math.min(t.minX, e.minX),
+            minY: Math.min(t.minY, e.minY),
+            maxX: Math.max(t.maxX, e.maxX),
+            maxY: Math.max(t.maxY, e.maxY)
+        }),
+        ye = class {
+            constructor(e)
+            {
+                this.list = e
+            }
+            place(e, r, i)
+            {
+                let n = this.list[0];
+                if (!n)
+                    return;
+                var a = n.place(e, r, i);
+                if (!a)
+                    return;
+                var s = a[0];
+                let o = s.anchor,
+                    l = s.bboxes[0],
+                    u = [s.draw];
+                for (let d = 1; d < this.list.length; d++) {
+                    if (a = this.list[d].place(e, r, i), !a)
+                        return;
+                    s = a[0],
+                    l = ui(l, s.bboxes[0]),
+                    u.push(s.draw)
+                }
+                return [{
+                    anchor: o,
+                    bboxes: [l],
+                    draw: d => {
+                        u.forEach(c => c(d))
+                    }
+                }]
+            }
+        }
+        ,
+        It = class {
+            constructor(e)
+            {
+                this.symbolizer = e
+            }
+            place(e, r, i)
+            {
+                let n = r[0][0],
+                    a = this.symbolizer.place(e, [[new Z.default(0, 0)]], i);
+                if (!a || a.length == 0)
+                    return;
+                let s = a[0],
+                    o = s.bboxes[0],
+                    l = o.maxX - o.minX,
+                    u = o.maxY - o.minY,
+                    f = {
+                        minX: n.x - l / 2,
+                        maxX: n.x + l / 2,
+                        minY: n.y - u / 2,
+                        maxY: n.y + u / 2
+                    };
+                return [{
+                    anchor: n,
+                    bboxes: [f],
+                    draw: c => {
+                        c.translate(-l / 2, u / 2 - o.maxY),
+                        s.draw(c, {
+                            justify: 2
+                        })
+                    }
+                }]
+            }
+        }
+        ,
+        hi = class {
+            constructor(e, r)
+            {
+                this.padding = new B(e, 0),
+                this.symbolizer = r
+            }
+            place(e, r, i)
+            {
+                let n = this.symbolizer.place(e, r, i);
+                if (!n || n.length == 0)
+                    return;
+                let a = this.padding.get(e.zoom, i);
+                for (var s of n)
+                    for (var o of s.bboxes)
+                        o.minX -= a,
+                        o.minY -= a,
+                        o.maxX += a,
+                        o.maxY += a;
+                return n
+            }
+        }
+        ,
+        He = class {
+            constructor(e)
+            {
+                this.font = new We(e),
+                this.text = new Ze(e),
+                this.fill = new I(e.fill, "black"),
+                this.stroke = new I(e.stroke, "black"),
+                this.width = new B(e.width, 0),
+                this.lineHeight = new B(e.lineHeight, 1),
+                this.letterSpacing = new B(e.letterSpacing, 0),
+                this.maxLineCodeUnits = new B(e.maxLineChars, 15),
+                this.justify = e.justify
+            }
+            place(e, r, i)
+            {
+                let n = this.text.get(e.zoom, i);
+                if (!n)
+                    return;
+                let a = this.font.get(e.zoom, i);
+                e.scratch.font = a;
+                let s = this.letterSpacing.get(e.zoom, i),
+                    o = Rt(n, this.maxLineCodeUnits.get(e.zoom, i));
+                var l = "",
+                    u = 0;
+                for (let p of o)
+                    p.length > u && (u = p.length, l = p);
+                let f = e.scratch.measureText(l),
+                    d = f.width + s * (u - 1),
+                    c = f.actualBoundingBoxAscent,
+                    x = f.actualBoundingBoxDescent,
+                    w = (c + x) * this.lineHeight.get(e.zoom, i),
+                    z = new Z.default(r[0][0].x, r[0][0].y),
+                    h = {
+                        minX: z.x,
+                        minY: z.y - c,
+                        maxX: z.x + d,
+                        maxY: z.y + x + (o.length - 1) * w
+                    };
+                return [{
+                    anchor: z,
+                    bboxes: [h],
+                    draw: (p, b) => {
+                        p.globalAlpha = 1,
+                        p.font = a,
+                        p.fillStyle = this.fill.get(e.zoom, i);
+                        let y = this.width.get(e.zoom, i);
+                        var g = 0;
+                        for (let S of o) {
+                            var v = 0;
+                            if (this.justify == 2 || b && b.justify == 2 ? v = (d - p.measureText(S).width) / 2 : (this.justify == 3 || b && b.justify == 3) && (v = d - p.measureText(S).width), y)
+                                if (p.lineWidth = y * 2, p.strokeStyle = this.stroke.get(e.zoom, i), s > 0) {
+                                    var _ = v;
+                                    for (var k of S)
+                                        p.strokeText(k, _, g),
+                                        _ += p.measureText(k).width + s
+                                } else
+                                    p.strokeText(S, v, g);
+                            if (s > 0) {
+                                var _ = v;
+                                for (var k of S)
+                                    p.fillText(k, _, g),
+                                    _ += p.measureText(k).width + s
+                            } else
+                                p.fillText(S, v, g);
+                            g += w
+                        }
+                    }
+                }]
+            }
+        }
+        ,
+        U = class {
+            constructor(e)
+            {
+                this.centered = new It(new He(e))
+            }
+            place(e, r, i)
+            {
+                return this.centered.place(e, r, i)
+            }
+        }
+        ,
+        Xt = class {
+            constructor(e, r)
+            {
+                var i,
+                    n,
+                    a;
+                this.symbolizer = e,
+                this.offsetX = new B(r.offsetX, 0),
+                this.offsetY = new B(r.offsetY, 0),
+                this.justify = (i = r.justify) != null ? i : void 0,
+                this.placements = (n = r.placements) != null ? n : [2, 6, 8, 4, 1, 3, 5, 7],
+                this.ddValues = (a = r.ddValues) != null ? a : () => ({})
+            }
+            place(e, r, i)
+            {
+                if (i.geomType !== ee.Point)
+                    return;
+                let n = r[0][0],
+                    a = this.symbolizer.place(e, [[new Z.default(0, 0)]], i);
+                if (!a || a.length == 0)
+                    return;
+                let s = a[0],
+                    o = s.bboxes[0],
+                    l = this.offsetX,
+                    u = this.offsetY,
+                    f = this.justify,
+                    d = this.placements,
+                    {offsetX: c, offsetY: x, justify: w, placements: z} = this.ddValues(e.zoom, i) || {};
+                c && (l = new B(c, 0)),
+                x && (u = new B(x, 0)),
+                w && (f = w),
+                z && (d = z);
+                let h = l.get(e.zoom, i),
+                    m = u.get(e.zoom, i),
+                    p = (_, k) => ({
+                        minX: _.x + k.x + o.minX,
+                        minY: _.y + k.y + o.minY,
+                        maxX: _.x + k.x + o.maxX,
+                        maxY: _.y + k.y + o.maxY
+                    });
+                var b = new Z.default(h, m),
+                    y;
+                let g = _ => {
+                        _.translate(b.x, b.y),
+                        s.draw(_, {
+                            justify: y
+                        })
+                    },
+                    v = (_, k) => {
+                        let S = p(_, k);
+                        if (!e.index.bboxCollides(S, e.order))
+                            return [{
+                                anchor: n,
+                                bboxes: [S],
+                                draw: g
+                            }]
+                    };
+                for (let _ of d) {
+                    let k = this.computeXAxisOffset(h, o, _),
+                        S = this.computeYAxisOffset(m, o, _);
+                    return y = this.computeJustify(f, _), b = new Z.default(k, S), v(n, b)
+                }
+            }
+            computeXAxisOffset(e, r, i)
+            {
+                let n = r.maxX,
+                    a = n / 2;
+                return [1, 5].includes(i) ? e - a : [8, 7, 6].includes(i) ? e - n : e
+            }
+            computeYAxisOffset(e, r, i)
+            {
+                let n = Math.abs(r.minY),
+                    a = r.maxY,
+                    s = (r.minY + r.maxY) / 2;
+                return [3, 7].includes(i) ? e - s : [8, 2, 1].includes(i) ? e - a : [6, 4, 5].includes(i) ? e + n : e
+            }
+            computeJustify(e, r)
+            {
+                return e || ([1, 5].includes(r) ? 2 : [2, 3, 4].includes(r) ? 1 : 3)
+            }
+        }
+        ,
+        le = class {
+            constructor(e)
+            {
+                this.symbolizer = new Xt(new He(e), e)
+            }
+            place(e, r, i)
+            {
+                return this.symbolizer.place(e, r, i)
+            }
+        }
+        ,
+        Me;
+    (function(i) {
+        i[i.Above = 1] = "Above",
+        i[i.Center = 2] = "Center",
+        i[i.Below = 3] = "Below"
+    })(Me || (Me = {}));
+    var ce = class {
+            constructor(e)
+            {
+                var r;
+                this.font = new We(e),
+                this.text = new Ze(e),
+                this.fill = new I(e.fill, "black"),
+                this.stroke = new I(e.stroke, "black"),
+                this.width = new B(e.width, 0),
+                this.offset = new B(e.offset, 0),
+                this.position = (r = e.position) != null ? r : 1,
+                this.maxLabelCodeUnits = new B(e.maxLabelChars, 40),
+                this.repeatDistance = new B(e.repeatDistance, 250)
+            }
+            place(e, r, i)
+            {
+                let n = this.text.get(e.zoom, i);
+                if (!n || n.length > this.maxLabelCodeUnits.get(e.zoom, i))
+                    return;
+                let a = 20,
+                    s = i.bbox;
+                if (s.maxY - s.minY < a && s.maxX - s.minX < a)
+                    return;
+                let o = this.font.get(e.zoom, i);
+                e.scratch.font = o;
+                let l = e.scratch.measureText(n),
+                    u = l.width,
+                    f = l.actualBoundingBoxAscent + l.actualBoundingBoxDescent;
+                var d = this.repeatDistance.get(e.zoom, i);
+                e.overzoom > 4 && (d *= 1 << e.overzoom - 4);
+                let c = f * 2,
+                    x = ei(r, u, d, c);
+                if (x.length == 0)
+                    return;
+                let w = [];
+                for (let z of x) {
+                    let h = z.end.x - z.start.x,
+                        m = z.end.y - z.start.y,
+                        b = ti(z.start, z.end, u, c / 2).map(g => ({
+                            minX: g.x - c / 2,
+                            minY: g.y - c / 2,
+                            maxX: g.x + c / 2,
+                            maxY: g.y + c / 2
+                        })),
+                        y = g => {
+                            g.globalAlpha = 1,
+                            g.rotate(Math.atan2(m, h)),
+                            h < 0 && (g.scale(-1, -1), g.translate(-u, 0));
+                            let v = 0;
+                            this.position === 3 ? v += f : this.position === 2 && (v += f / 2),
+                            g.translate(0, v - this.offset.get(e.zoom, i)),
+                            g.font = o;
+                            let _ = this.width.get(e.zoom, i);
+                            _ && (g.lineWidth = _, g.strokeStyle = this.stroke.get(e.zoom, i), g.strokeText(n, 0, 0)),
+                            g.fillStyle = this.fill.get(e.zoom, i),
+                            g.fillText(n, 0, 0)
+                        };
+                    w.push({
+                        anchor: z.start,
+                        bboxes: b,
+                        draw: y,
+                        deduplicationKey: n,
+                        deduplicationDistance: d
+                    })
+                }
+                return w
+            }
+        }
+        ,
+        ue = class {
+            constructor(e)
+            {
+                this.symbolizer = new He(e)
+            }
+            place(e, r, i)
+            {
+                let n = i.bbox;
+                if ((n.maxY - n.minY) * (n.maxX - n.minX) < 2e4)
+                    return;
+                let s = this.symbolizer.place(e, [[new Z.default(0, 0)]], i);
+                if (!s || s.length == 0)
+                    return;
+                let o = s[0],
+                    l = o.bboxes[0],
+                    u = r[0],
+                    f = (0, ii.default)([u.map(w => [w.x, w.y])]),
+                    d = new Z.default(f[0], f[1]),
+                    c = {
+                        minX: d.x - (l.maxX - l.minX) / 2,
+                        minY: d.y - (l.maxY - l.minY) / 2,
+                        maxX: d.x + (l.maxX - l.minX) / 2,
+                        maxY: d.y + (l.maxY - l.minY) / 2
+                    };
+                return [{
+                    anchor: d,
+                    bboxes: [c],
+                    draw: w => {
+                        w.translate(o.anchor.x - (l.maxX - l.minX) / 2, o.anchor.y),
+                        o.draw(w)
+                    }
+                }]
+            }
+        }
+        ;
+    var fi = (t, e) => {
+            let r = Tt(e),
+                i = er({}, t);
+            for (let [n, a] of Object.entries(t)) {
+                let s = Tt(a);
+                i[n] = Hr(r[0], r[1], s[2], s[3])
+            }
+            return i
+        },
+        Ce = (t, e) => (e && (t = fi(t, e)), [{
+            dataLayer: "earth",
+            symbolizer: new A({
+                fill: t.earth
+            })
+        }, {
+            dataLayer: "natural",
+            symbolizer: new A({
+                fill: t.glacier
+            }),
+            filter: (r, i) => i.props.natural == "glacier"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.residential
+            }),
+            filter: (r, i) => i.props.landuse == "residential" || i.props.place == "neighbourhood"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.hospital
+            }),
+            filter: (r, i) => i.props.amenity == "hospital"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.cemetery
+            }),
+            filter: (r, i) => i.props.landuse == "cemetery"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.school
+            }),
+            filter: (r, i) => i.props.amenity == "school" || i.props.amenity == "kindergarten" || i.props.amenity == "university" || i.props.amenity == "college"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.industrial
+            }),
+            filter: (r, i) => i.props.landuse == "industrial"
+        }, {
+            dataLayer: "natural",
+            symbolizer: new A({
+                fill: t.wood
+            }),
+            filter: (r, i) => i.props.natural == "wood"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.grass
+            }),
+            filter: (r, i) => i.props.landuse == "grass"
+        }, {
+            dataLayer: "landuse",
+            symbolizer: new A({
+                fill: t.park
+            }),
+            filter: (r, i) => i.props.leisure == "park"
+        }, {
+            dataLayer: "water",
+            symbolizer: new A({
+                fill: t.water
+            })
+        }, {
+            dataLayer: "natural",
+            symbolizer: new A({
+                fill: t.sand
+            }),
+            filter: (r, i) => i.props.natural == "sand"
+        }, {
+            dataLayer: "buildings",
+            symbolizer: new A({
+                fill: t.buildings
+            })
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.highwayCasing,
+                width: j(1.4, [[5, 1.5], [11, 4], [16, 9], [20, 40]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "highway"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.majorRoadCasing,
+                width: j(1.4, [[9, 3], [12, 4], [17, 8], [20, 22]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "major_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.mediumRoadCasing,
+                width: j(1.4, [[13, 3], [17, 6], [20, 18]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "medium_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.minorRoadCasing,
+                width: j(1.4, [[14, 2], [17, 5], [20, 15]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "minor_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.minorRoad,
+                width: j(1.4, [[14, 1], [17, 3], [20, 13]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "minor_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.mediumRoad,
+                width: j(1.4, [[13, 2], [17, 4], [20, 15]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "medium_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.majorRoad,
+                width: j(1.4, [[9, 2], [12, 3], [17, 6], [20, 20]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "major_road"
+        }, {
+            dataLayer: "roads",
+            symbolizer: new C({
+                color: t.highway,
+                width: j(1.4, [[5, .5], [11, 2.5], [16, 7], [20, 30]])
+            }),
+            filter: (r, i) => i.props["pmap:kind"] == "highway"
+        }, {
+            dataLayer: "boundaries",
+            symbolizer: new C({
+                color: t.boundaries,
+                width: 2,
+                opacity: .4
+            })
+        }, {
+            dataLayer: "mask",
+            symbolizer: new A({
+                fill: t.mask
+            })
+        }]),
+        Te = (t, e, r, i) => {
+            e && (t = fi(t, e));
+            var n = ["name"];
+            r && (n = r);
+            let a = (s, o) => i ? s instanceof le ? new $e([s, new le({
+                fill: o,
+                label_props: i
+            })]) : new $e([s, new U({
+                fill: o,
+                label_props: i
+            })]) : s;
+            return [{
+                dataLayer: "places",
+                symbolizer: a(new U({
+                    label_props: n,
+                    fill: t.countryLabel,
+                    lineHeight: 1.5,
+                    font: (s, o) => s < 6 ? "200 14px sans-serif" : "200 20px sans-serif",
+                    textTransform: "uppercase"
+                }), t.countryLabel),
+                filter: (s, o) => o.props["pmap:kind"] == "country"
+            }, {
+                dataLayer: "places",
+                symbolizer: a(new U({
+                    label_props: n,
+                    fill: t.stateLabel,
+                    font: "300 16px sans-serif"
+                }), t.stateLabel),
+                filter: (s, o) => o.props["pmap:kind"] == "state"
+            }, {
+                id: "cities_high",
+                dataLayer: "places",
+                filter: (s, o) => o.props["pmap:kind"] == "city",
+                minzoom: 7,
+                symbolizer: a(new U({
+                    label_props: n,
+                    fill: t.cityLabel,
+                    font: (s, o) => (o == null ? void 0 : o.props["pmap:rank"]) === 1 ? s > 8 ? "600 20px sans-serif" : "600 12px sans-serif" : s > 8 ? "600 16px sans-serif" : "600 10px sans-serif"
+                }), t.cityLabel),
+                sort: (s, o) => s["pmap:rank"] - o["pmap:rank"]
+            }, {
+                id: "cities_low",
+                dataLayer: "places",
+                filter: (s, o) => o.props["pmap:kind"] == "city",
+                maxzoom: 6,
+                symbolizer: new ye([new te({
+                    radius: 2,
+                    fill: t.cityLabel
+                }), a(new le({
+                    label_props: n,
+                    fill: t.cityLabel,
+                    offsetX: 2,
+                    offsetY: 2,
+                    font: (s, o) => (o == null ? void 0 : o.props["pmap:rank"]) === 1 ? s > 8 ? "600 20px sans-serif" : "600 12px sans-serif" : s > 8 ? "600 16px sans-serif" : "600 10px sans-serif"
+                }), t.cityLabel)]),
+                sort: (s, o) => s["pmap:rank"] - o["pmap:rank"]
+            }, {
+                id: "neighbourhood",
+                dataLayer: "places",
+                symbolizer: a(new U({
+                    label_props: n,
+                    fill: t.neighbourhoodLabel,
+                    font: "500 10px sans-serif",
+                    textTransform: "uppercase"
+                }), t.neighbourhoodLabel),
+                filter: (s, o) => o.props["pmap:kind"] == "neighbourhood"
+            }, {
+                dataLayer: "landuse",
+                symbolizer: a(new ue({
+                    label_props: n,
+                    fill: t.landuseLabel,
+                    font: "300 12px sans-serif"
+                }), t.landuseLabel)
+            }, {
+                dataLayer: "water",
+                symbolizer: a(new ue({
+                    label_props: n,
+                    fill: t.waterLabel,
+                    font: "italic 600 12px sans-serif"
+                }), t.waterLabel)
+            }, {
+                dataLayer: "natural",
+                symbolizer: a(new ue({
+                    label_props: n,
+                    fill: t.naturalLabel,
+                    font: "italic 300 12px sans-serif"
+                }), t.naturalLabel)
+            }, {
+                dataLayer: "roads",
+                symbolizer: a(new ce({
+                    label_props: n,
+                    fill: t.roadsLabel,
+                    font: "500 12px sans-serif"
+                }), t.roadsLabel),
+                minzoom: 12
+            }, {
+                dataLayer: "roads",
+                symbolizer: new lt({
+                    label_props: ["ref"],
+                    font: "600 9px sans-serif",
+                    background: t.highway,
+                    padding: 2,
+                    fill: t.neighbourhoodLabel
+                }),
+                filter: (s, o) => o.props["pmap:kind"] == "highway"
+            }, {
+                dataLayer: "pois",
+                symbolizer: new ye([new te({
+                    radius: 2,
+                    fill: t.poisLabel
+                }), a(new le({
+                    label_props: n,
+                    fill: t.poisLabel,
+                    offsetX: 2,
+                    offsetY: 2,
+                    font: "300 10px sans-serif"
+                }), t.poisLabel)])
+            }]
+        };
+    var di = (t, e, r) => [{
+            dataSource: t,
+            dataLayer: e,
+            symbolizer: new te({
+                opacity: .2,
+                fill: r,
+                radius: 4
+            }),
+            filter: (i, n) => n.geomType == ee.Point
+        }, {
+            dataSource: t,
+            dataLayer: e,
+            symbolizer: new C({
+                opacity: .2,
+                color: r,
+                width: 2
+            }),
+            filter: (i, n) => n.geomType == ee.Line
+        }, {
+            dataSource: t,
+            dataLayer: e,
+            symbolizer: new A({
+                opacity: .2,
+                fill: r,
+                stroke: r,
+                width: 1
+            }),
+            filter: (i, n) => n.geomType == ee.Polygon
+        }],
+        ut = (t, e) => {
+            var r = [];
+            for (var [i, n] of t)
+                for (var a of n)
+                    for (var s of a.data.keys())
+                        i === e.dataSource && s === e.dataLayer || (r = r.concat(di(i, s, "steelblue")));
+            return r = r.concat(di(e.dataSource || "", e.dataLayer, "red")), r
+        };
+    var Ke = 6378137,
+        ci = 85.0511287798,
+        H = Ke * Math.PI,
+        mi = t => {
+            let e = Math.PI / 180,
+                r = Math.max(Math.min(ci, t.y), -ci),
+                i = Math.sin(r * e);
+            return new he.default(Ke * t.x * e, Ke * Math.log((1 + i) / (1 - i)) / 2)
+        },
+        ra = t => {
+            var e = 180 / Math.PI;
+            return {
+                lat: (2 * Math.atan(Math.exp(t.y / Ke)) - Math.PI / 2) * e,
+                lng: t.x * e / Ke
+            }
+        },
+        ia = (t, e) => r => {
+            let i = mi(r);
+            return new he.default((i.x + H) / (H * 2), 1 - (i.y + H) / (H * 2)).mult((1 << e) * 256).sub(t)
+        },
+        na = (t, e) => r => {
+            let i = new he.default(r.x, r.y).add(t).div((1 << e) * 256),
+                n = new he.default(i.x * (H * 2) - H, (1 - i.y) * (H * 2) - H);
+            return ra(n)
+        },
+        Vt = (t, e) => {
+            let r = e * (360 / t);
+            return Math.log2(r / 256)
+        },
+        pi = class {
+            constructor(e)
+            {
+                let r = e.dark ? Se : Le;
+                this.paint_rules = e.paint_rules || Ce(r, e.shade),
+                this.label_rules = e.label_rules || Te(r, e.shade, e.language1, e.language2),
+                this.backgroundColor = e.backgroundColor,
+                this.views = Ve(e),
+                this.debug = e.debug || "",
+                this.xray = e.xray
+            }
+            drawContext(e, r, i, n, a)
+            {
+                return O(this, null, function* () {
+                    let s = mi(n),
+                        l = new he.default((s.x + H) / (H * 2), 1 - (s.y + H) / (H * 2)).clone().mult(Math.pow(2, a) * 256).sub(new he.default(r / 2, i / 2)),
+                        u = {
+                            minX: l.x,
+                            minY: l.y,
+                            maxX: l.x + r,
+                            maxY: l.y + i
+                        },
+                        f = [];
+                    for (let [p, b] of this.views) {
+                        let y = b.getBbox(a, u);
+                        f.push({
+                            key: p,
+                            promise: y
+                        })
+                    }
+                    let d = yield Promise.all(f.map(p => p.promise.then(b => ({
+                            status: "fulfilled",
+                            value: b,
+                            key: p.key
+                        }), b => ({
+                            status: "rejected",
+                            value: [],
+                            reason: b,
+                            key: p.key
+                        })))),
+                        c = new Map;
+                    for (let p of d)
+                        p.status === "fulfilled" && c.set(p.key, p.value);
+                    let x = performance.now(),
+                        w = new Ue(a, e, this.label_rules, 16, void 0),
+                        z = w.add(c);
+                    this.backgroundColor && (e.save(), e.fillStyle = this.backgroundColor, e.fillRect(0, 0, r, i), e.restore());
+                    let h = this.paint_rules;
+                    this.xray && (h = ut(c, this.xray));
+                    let m = Ye(e, a, c, this.xray ? null : w.index, h, u, l, !0, this.debug);
+                    if (this.debug) {
+                        e.save(),
+                        e.translate(-l.x, -l.y),
+                        e.strokeStyle = this.debug,
+                        e.fillStyle = this.debug,
+                        e.font = "12px sans-serif";
+                        let p = 0;
+                        for (let [b, y] of c) {
+                            for (let g of y) {
+                                e.strokeRect(g.origin.x, g.origin.y, g.dim, g.dim);
+                                let v = g.data_tile;
+                                e.fillText(b + (b ? " " : "") + v.z + " " + v.x + " " + v.y, g.origin.x + 4, g.origin.y + 14 * (1 + p))
+                            }
+                            p++
+                        }
+                        e.restore()
+                    }
+                    return {
+                        elapsed: performance.now() - x,
+                        project: ia(l, a),
+                        unproject: na(l, a)
+                    }
+                })
+            }
+            drawCanvas(a, s, o)
+            {
+                return O(this, arguments, function* (e, r, i, n={}) {
+                    let l = window.devicePixelRatio,
+                        u = e.clientWidth,
+                        f = e.clientHeight;
+                    e.width == u * l && e.height == f * l || (e.width = u * l, e.height = f * l),
+                    n.lang && (e.lang = n.lang);
+                    let d = e.getContext("2d");
+                    return d.setTransform(l, 0, 0, l, 0, 0), this.drawContext(d, u, f, r, i)
+                })
+            }
+            drawContextBounds(e, r, i, n, a)
+            {
+                return O(this, null, function* () {
+                    let s = i.x - r.x,
+                        o = new he.default((r.x + i.x) / 2, (r.y + i.y) / 2);
+                    return this.drawContext(e, n, a, o, Vt(s, n))
+                })
+            }
+            drawCanvasBounds(s, o, l, u)
+            {
+                return O(this, arguments, function* (e, r, i, n, a={}) {
+                    let f = i.x - r.x,
+                        d = new he.default((r.x + i.x) / 2, (r.y + i.y) / 2);
+                    return this.drawCanvas(e, d, Vt(f, n), a)
+                })
+            }
+        }
+        ;
+    var yi = N(re());
+    var aa = t => new Promise((e, r) => {
+            setTimeout(() => {
+                e()
+            }, t)
+        }),
+        sa = t => t.then(e => ({
+            status: "fulfilled",
+            value: e
+        }), e => ({
+            status: "rejected",
+            reason: e
+        })),
+        oa = (t={}) => {
+            class e extends L.GridLayer {
+                constructor(i={})
+                {
+                    i.noWrap && !i.bounds && (i.bounds = [[-90, -180], [90, 180]]),
+                    i.attribution == null && (i.attribution = '<a href="https://protomaps.com">Protomaps</a> \xA9 <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'),
+                    super(i);
+                    let n = i.dark ? Se : Le;
+                    this.paint_rules = i.paint_rules || Ce(n, i.shade),
+                    this.label_rules = i.label_rules || Te(n, i.shade, i.language1, i.language2),
+                    this.backgroundColor = i.backgroundColor,
+                    this.lastRequestedZ = void 0,
+                    this.xray = i.xray,
+                    this.tasks = i.tasks || [],
+                    this.views = Ve(i),
+                    this.debug = i.debug;
+                    let a = document.createElement("canvas").getContext("2d");
+                    this.scratch = a,
+                    this.onTilesInvalidated = s => {
+                        s.forEach(o => {
+                            this.rerenderTile(o)
+                        })
+                    },
+                    this.labelers = new je(this.scratch, this.label_rules, 16, this.onTilesInvalidated),
+                    this.tile_size = 256 * window.devicePixelRatio,
+                    this.tileDelay = i.tileDelay || 3,
+                    this.lang = i.lang,
+                    this.inspector = this.inspect(this)
+                }
+                setDefaultStyle(i, n, a, s)
+                {
+                    let o = i ? Se : Le;
+                    this.paint_rules = Ce(o, n),
+                    this.label_rules = Te(o, n, a, s)
+                }
+                renderTile(i, n, a, s=() => {})
+                {
+                    return O(this, null, function* () {
+                        this.lastRequestedZ = i.z;
+                        let o = [];
+                        for (let [_, k] of this.views) {
+                            let S = k.getDisplayTile(i);
+                            o.push({
+                                key: _,
+                                promise: S
+                            })
+                        }
+                        let l = yield Promise.all(o.map(_ => _.promise.then(k => ({
+                                status: "fulfilled",
+                                value: k,
+                                key: _.key
+                            }), k => ({
+                                status: "rejected",
+                                reason: k,
+                                key: _.key
+                            })))),
+                            u = new Map;
+                        for (let _ of l)
+                            _.status === "fulfilled" ? u.set(_.key, [_.value]) : _.reason.name === "AbortError" || console.error(_.reason);
+                        if (n.key != a || this.lastRequestedZ !== i.z || (yield Promise.all(this.tasks.map(sa)), n.key != a) || this.lastRequestedZ !== i.z)
+                            return;
+                        let f = this.labelers.add(i.z, u);
+                        if (n.key != a || this.lastRequestedZ !== i.z)
+                            return;
+                        let d = this.labelers.getIndex(i.z);
+                        if (!this._map)
+                            return;
+                        let c = this._map.getCenter().wrap(),
+                            x = this._getTiledPixelBounds(c),
+                            w = this._pxBoundsToTileRange(x),
+                            z = w.getCenter(),
+                            h = i.distanceTo(z) * this.tileDelay;
+                        if (yield aa(h), n.key != a || this.lastRequestedZ !== i.z)
+                            return;
+                        let m = 16,
+                            p = {
+                                minX: 256 * i.x - m,
+                                minY: 256 * i.y - m,
+                                maxX: 256 * (i.x + 1) + m,
+                                maxY: 256 * (i.y + 1) + m
+                            },
+                            b = new yi.default(256 * i.x, 256 * i.y);
+                        n.width = this.tile_size,
+                        n.height = this.tile_size;
+                        let y = n.getContext("2d");
+                        y.setTransform(this.tile_size / 256, 0, 0, this.tile_size / 256, 0, 0),
+                        y.clearRect(0, 0, 256, 256),
+                        this.backgroundColor && (y.save(), y.fillStyle = this.backgroundColor, y.fillRect(0, 0, 256, 256), y.restore());
+                        var g = 0;
+                        let v = this.paint_rules;
+                        if (this.xray && (v = ut(u, this.xray)), g = Ye(y, i.z, u, this.xray ? null : d, v, p, b, !1, this.debug), this.debug) {
+                            y.save(),
+                            y.fillStyle = this.debug,
+                            y.font = "600 12px sans-serif",
+                            y.fillText(i.z + " " + i.x + " " + i.y, 4, 14),
+                            y.font = "12px sans-serif";
+                            let _ = 28;
+                            for (let [k, S] of u) {
+                                let D = S[0].data_tile;
+                                y.fillText(k + (k ? " " : "") + D.z + " " + D.x + " " + D.y, 4, _),
+                                _ += 14
+                            }
+                            y.font = "600 10px sans-serif",
+                            g > 8 && (y.fillText(g.toFixed() + " ms paint", 4, _), _ += 14),
+                            f > 8 && y.fillText(f.toFixed() + " ms layout", 4, _),
+                            y.strokeStyle = this.debug,
+                            y.lineWidth = .5,
+                            y.beginPath(),
+                            y.moveTo(0, 0),
+                            y.lineTo(0, 256),
+                            y.stroke(),
+                            y.lineWidth = .5,
+                            y.beginPath(),
+                            y.moveTo(0, 0),
+                            y.lineTo(256, 0),
+                            y.stroke(),
+                            y.restore()
+                        }
+                        s()
+                    })
+                }
+                rerenderTile(i)
+                {
+                    for (let n in this._tiles) {
+                        let a = this._wrapCoords(this._keyToTileCoords(n));
+                        i === this._tileCoordsToKey(a) && this.renderTile(a, this._tiles[n].el, i)
+                    }
+                }
+                clearLayout()
+                {
+                    this.labelers = new je(this.scratch, this.label_rules, 16, this.onTilesInvalidated)
+                }
+                rerenderTiles()
+                {
+                    for (let i in this._tiles) {
+                        let n = this._wrapCoords(this._keyToTileCoords(i)),
+                            a = this._tileCoordsToKey(n);
+                        this.renderTile(n, this._tiles[i].el, a)
+                    }
+                }
+                createTile(i, n)
+                {
+                    let a = L.DomUtil.create("canvas", "leaflet-tile");
+                    a.lang = this.lang;
+                    let s = this._tileCoordsToKey(i);
+                    return a.key = s, this.renderTile(i, a, s, () => {
+                        n(null, a)
+                    }), a
+                }
+                _removeTile(i)
+                {
+                    let n = this._tiles[i];
+                    !n || (n.el.removed = !0, n.el.key = void 0, L.DomUtil.removeClass(n.el, "leaflet-tile-loaded"), n.el.width = n.el.height = 0, L.DomUtil.remove(n.el), delete this._tiles[i], this.fire("tileunload", {
+                        tile: n.el,
+                        coords: this._keyToTileCoords(i)
+                    }))
+                }
+                queryFeatures(i, n)
+                {
+                    let a = new Map;
+                    for (var [s, o] of this.views)
+                        a.set(s, o.queryFeatures(i, n, this._map.getZoom()));
+                    return a
+                }
+                inspect(i)
+                {
+                    return n => {
+                        let a = ["\u25CE", "\u27CD", "\u25FB"],
+                            s = i._map.wrapLatLng(n.latlng),
+                            o = i.queryFeatures(s.lng, s.lat);
+                        var l = "";
+                        let u = !0;
+                        for (var [f, d] of o)
+                            for (var c of d)
+                                if (!(this.xray && this.xray !== !0 && !((this.xray.dataSource || "") === f && this.xray.dataLayer === c.layerName))) {
+                                    l = l + `<div style="margin-top:${u ? 0 : .5}em">${a[c.feature.geomType - 1]} <b>${f} ${f ? "/" : ""} ${c.layerName}</b> ${c.feature.id || ""}</div>`;
+                                    for (let x in c.feature.props)
+                                        l = l + `<div style="font-size:0.9em">${x} = ${c.feature.props[x]}</div>`;
+                                    u = !1
+                                }
+                        u && (l = "No features."),
+                        L.popup().setLatLng(n.latlng).setContent('<div style="max-height:400px;overflow-y:scroll;padding-right:8px">' + l + "</div>").openOn(i._map)
+                    }
+                }
+                addInspector(i)
+                {
+                    return i.on("click", this.inspector)
+                }
+                removeInspector(i)
+                {
+                    return i.off("click", this.inspector)
+                }
+            }
+            return new e(t)
+        };
+    function Yt(t) {
+        let e = 0,
+            r = 0;
+        for (let o of t)
+            e += o.w * o.h,
+            r = Math.max(r, o.w);
+        t.sort((o, l) => l.h - o.h);
+        let i = Math.max(Math.ceil(Math.sqrt(e / .95)), r),
+            n = [{
+                x: 0,
+                y: 0,
+                w: i,
+                h: 1 / 0
+            }],
+            a = 0,
+            s = 0;
+        for (let o of t)
+            for (let l = n.length - 1; l >= 0; l--) {
+                let u = n[l];
+                if (!(o.w > u.w || o.h > u.h)) {
+                    if (o.x = u.x, o.y = u.y, s = Math.max(s, o.y + o.h), a = Math.max(a, o.x + o.w), o.w === u.w && o.h === u.h) {
+                        let f = n.pop();
+                        l < n.length && (n[l] = f)
+                    } else
+                        o.h === u.h ? (u.x += o.w, u.w -= o.w) : o.w === u.w ? (u.y += o.h, u.h -= o.h) : (n.push({
+                            x: u.x + o.w,
+                            y: u.y,
+                            w: u.w - o.w,
+                            h: o.h
+                        }), u.y += o.h, u.h -= o.h);
+                    break
+                }
+            }
+        return {
+            w: a,
+            h: s,
+            fill: e / (a * s) || 0
+        }
+    }
+    var Ut = (t, e, r) => {
+            let i = new FontFace(t, "url(" + e + ")", {
+                weight: r
+            });
+            return document.fonts.add(i), i.load()
+        },
+        xi = t => O(void 0, null, function* () {
+            return new Promise((e, r) => {
+                let i = new Image;
+                i.onload = () => e(i),
+                i.onerror = () => r("Invalid SVG"),
+                i.src = t
+            })
+        }),
+        la = `
 <svg width="20px" height="20px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <rect width="50" height="50" fill="#cccccc"/>
     <g transform="translate(5,5)">
         <path fill="none" stroke="#666666" stroke-width="7" d="m11,12a8.5,8 0 1,1 17,0q0,4-4,6t-4.5,4.5-.4,4v.2m0,3v7"/>
     </g>
 </svg>
-`;
-  var Sheet = class {
-    constructor(src) {
-      this.src = src;
-      this.canvas = document.createElement("canvas");
-      this.mapping = new Map();
-      this.missingBox = { x: 0, y: 0, w: 0, h: 0 };
-    }
-    load() {
-      return __async(this, null, function* () {
-        let src = this.src;
-        let scale = window.devicePixelRatio;
-        if (src.endsWith(".html")) {
-          let c2 = yield fetch(src);
-          src = yield c2.text();
-        }
-        let tree = new window.DOMParser().parseFromString(src, "text/html");
-        let icons = Array.from(tree.body.children);
-        let missingImg = yield mkimg("data:image/svg+xml;base64," + btoa(MISSING));
-        let boxes = [
-          {
-            w: missingImg.width * scale,
-            h: missingImg.height * scale,
-            img: missingImg,
-            id: ""
-          }
-        ];
-        let serializer = new XMLSerializer();
-        for (let ps of icons) {
-          var svg64 = btoa(serializer.serializeToString(ps));
-          var image64 = "data:image/svg+xml;base64," + svg64;
-          let img = yield mkimg(image64);
-          boxes.push({
-            w: img.width * scale,
-            h: img.height * scale,
-            img,
-            id: ps.id
-          });
-        }
-        let packresult = potpack(boxes);
-        this.canvas.width = packresult.w;
-        this.canvas.height = packresult.h;
-        let ctx = this.canvas.getContext("2d");
-        if (ctx) {
-          for (let box of boxes) {
-            if (box.x !== void 0 && box.y !== void 0) {
-              ctx.drawImage(box.img, box.x, box.y, box.w, box.h);
-              if (box.id)
-                this.mapping.set(box.id, {
-                  x: box.x,
-                  y: box.y,
-                  w: box.w,
-                  h: box.h
-                });
-              else
-                this.missingBox = { x: box.x, y: box.y, w: box.w, h: box.h };
-            }
-          }
-        }
-        return this;
-      });
-    }
-    get(name) {
-      let result = this.mapping.get(name);
-      if (!result)
-        result = this.missingBox;
-      return result;
-    }
-  };
+`
 
-  // src/compat/json_style.ts
-  function number(val, defaultValue) {
-    return typeof val === "number" ? val : defaultValue;
-  }
-  function filterFn(arr2) {
-    if (arr2.includes("$type")) {
-      return (z2) => true;
-    } else if (arr2[0] == "==") {
-      return (z2, f2) => f2.props[arr2[1]] === arr2[2];
-    } else if (arr2[0] == "!=") {
-      return (z2, f2) => f2.props[arr2[1]] !== arr2[2];
-    } else if (arr2[0] == "!") {
-      let sub = filterFn(arr2[1]);
-      return (z2, f2) => !sub(z2, f2);
-    } else if (arr2[0] === "<") {
-      return (z2, f2) => number(f2.props[arr2[1]], Infinity) < arr2[2];
-    } else if (arr2[0] === "<=") {
-      return (z2, f2) => number(f2.props[arr2[1]], Infinity) <= arr2[2];
-    } else if (arr2[0] === ">") {
-      return (z2, f2) => number(f2.props[arr2[1]], -Infinity) > arr2[2];
-    } else if (arr2[0] === ">=") {
-      return (z2, f2) => number(f2.props[arr2[1]], -Infinity) >= arr2[2];
-    } else if (arr2[0] === "in") {
-      return (z2, f2) => arr2.slice(2, arr2.length).includes(f2.props[arr2[1]]);
-    } else if (arr2[0] === "!in") {
-      return (z2, f2) => !arr2.slice(2, arr2.length).includes(f2.props[arr2[1]]);
-    } else if (arr2[0] === "has") {
-      return (z2, f2) => f2.props.hasOwnProperty(arr2[1]);
-    } else if (arr2[0] === "!has") {
-      return (z2, f2) => !f2.props.hasOwnProperty(arr2[1]);
-    } else if (arr2[0] === "all") {
-      let parts = arr2.slice(1, arr2.length).map((e2) => filterFn(e2));
-      return (z2, f2) => parts.every((p2) => {
-        return p2(z2, f2);
-      });
-    } else if (arr2[0] === "any") {
-      let parts = arr2.slice(1, arr2.length).map((e2) => filterFn(e2));
-      return (z2, f2) => parts.some((p2) => {
-        return p2(z2, f2);
-      });
-    } else {
-      console.log("Unimplemented filter: ", arr2[0]);
-      return (f2) => false;
-    }
-  }
-  function numberFn(obj) {
-    if (obj.base && obj.stops) {
-      return (z2) => {
-        return exp(obj.base, obj.stops)(z2 - 1);
-      };
-    } else if (obj[0] == "interpolate" && obj[1][0] == "exponential" && obj[2] == "zoom") {
-      let slice = obj.slice(3);
-      let stops = [];
-      for (var i2 = 0; i2 < slice.length; i2 += 2) {
-        stops.push([slice[i2], slice[i2 + 1]]);
-      }
-      return (z2) => {
-        return exp(obj[1][1], stops)(z2 - 1);
-      };
-    } else if (obj[0] == "step" && obj[1][0] == "get") {
-      let slice = obj.slice(2);
-      let prop = obj[1][1];
-      return (z2, f2) => {
-        let val = f2 == null ? void 0 : f2.props[prop];
-        if (typeof val === "number") {
-          if (val < slice[1])
-            return slice[0];
-          for (i2 = 1; i2 < slice.length; i2 += 2) {
-            if (val <= slice[i2])
-              return slice[i2 + 1];
-          }
+
+
+
+
+
+        ,
+        gi = class {
+            constructor(e)
+            {
+                this.src = e,
+                this.canvas = document.createElement("canvas"),
+                this.mapping = new Map,
+                this.missingBox = {
+                    x: 0,
+                    y: 0,
+                    w: 0,
+                    h: 0
+                }
+            }
+            load()
+            {
+                return O(this, null, function* () {
+                    let e = this.src,
+                        r = window.devicePixelRatio;
+                    e.endsWith(".html") && (e = yield (yield fetch(e)).text());
+                    let i = new window.DOMParser().parseFromString(e, "text/html"),
+                        n = Array.from(i.body.children),
+                        a = yield xi("data:image/svg+xml;base64," + btoa(la)),
+                        s = [{
+                            w: a.width * r,
+                            h: a.height * r,
+                            img: a,
+                            id: ""
+                        }],
+                        o = new XMLSerializer;
+                    for (let c of n) {
+                        var l = btoa(o.serializeToString(c)),
+                            u = "data:image/svg+xml;base64," + l;
+                        let x = yield xi(u);
+                        s.push({
+                            w: x.width * r,
+                            h: x.height * r,
+                            img: x,
+                            id: c.id
+                        })
+                    }
+                    let f = Yt(s);
+                    this.canvas.width = f.w,
+                    this.canvas.height = f.h;
+                    let d = this.canvas.getContext("2d");
+                    if (d)
+                        for (let c of s)
+                            c.x !== void 0 && c.y !== void 0 && (d.drawImage(c.img, c.x, c.y, c.w, c.h), c.id ? this.mapping.set(c.id, {
+                                x: c.x,
+                                y: c.y,
+                                w: c.w,
+                                h: c.h
+                            }) : this.missingBox = {
+                                x: c.x,
+                                y: c.y,
+                                w: c.w,
+                                h: c.h
+                            });
+                    return this
+                })
+            }
+            get(e)
+            {
+                let r = this.mapping.get(e);
+                return r || (r = this.missingBox), r
+            }
         }
-        return slice[slice.length - 1];
-      };
-    } else {
-      console.log("Unimplemented numeric fn: ", obj);
-      return (z2) => 1;
+        ;
+    function ht(t, e) {
+        return typeof t == "number" ? t : e
     }
-  }
-  function numberOrFn(obj, defaultValue = 0) {
-    if (!obj)
-      return defaultValue;
-    if (typeof obj == "number") {
-      return obj;
+    function Je(t) {
+        if (t.includes("$type"))
+            return e => !0;
+        if (t[0] == "==")
+            return (e, r) => r.props[t[1]] === t[2];
+        if (t[0] == "!=")
+            return (e, r) => r.props[t[1]] !== t[2];
+        if (t[0] == "!") {
+            let e = Je(t[1]);
+            return (r, i) => !e(r, i)
+        } else {
+            if (t[0] === "<")
+                return (e, r) => ht(r.props[t[1]], 1 / 0) < t[2];
+            if (t[0] === "<=")
+                return (e, r) => ht(r.props[t[1]], 1 / 0) <= t[2];
+            if (t[0] === ">")
+                return (e, r) => ht(r.props[t[1]], -1 / 0) > t[2];
+            if (t[0] === ">=")
+                return (e, r) => ht(r.props[t[1]], -1 / 0) >= t[2];
+            if (t[0] === "in")
+                return (e, r) => t.slice(2, t.length).includes(r.props[t[1]]);
+            if (t[0] === "!in")
+                return (e, r) => !t.slice(2, t.length).includes(r.props[t[1]]);
+            if (t[0] === "has")
+                return (e, r) => r.props.hasOwnProperty(t[1]);
+            if (t[0] === "!has")
+                return (e, r) => !r.props.hasOwnProperty(t[1]);
+            if (t[0] === "all") {
+                let e = t.slice(1, t.length).map(r => Je(r));
+                return (r, i) => e.every(n => n(r, i))
+            } else if (t[0] === "any") {
+                let e = t.slice(1, t.length).map(r => Je(r));
+                return (r, i) => e.some(n => n(r, i))
+            } else
+                return console.log("Unimplemented filter: ", t[0]), e => !1
+        }
     }
-    return (z2, f2) => f2 ? numberFn(obj)(z2, f2) : defaultValue;
-  }
-  function widthFn(width_obj, gap_obj) {
-    let w = numberOrFn(width_obj, 1);
-    let g = numberOrFn(gap_obj);
-    return (z2, f2) => {
-      let tmp = typeof w == "number" ? w : w(z2, f2);
-      if (g) {
-        return tmp + (typeof g == "number" ? g : g(z2, f2));
-      }
-      return tmp;
+    function ft(t) {
+        if (t.base && t.stops)
+            return r => j(t.base, t.stops)(r - 1);
+        if (t[0] == "interpolate" && t[1][0] == "exponential" && t[2] == "zoom") {
+            let r = t.slice(3),
+                i = [];
+            for (var e = 0; e < r.length; e += 2)
+                i.push([r[e], r[e + 1]]);
+            return n => j(t[1][1], i)(n - 1)
+        } else if (t[0] == "step" && t[1][0] == "get") {
+            let r = t.slice(2),
+                i = t[1][1];
+            return (n, a) => {
+                let s = a == null ? void 0 : a.props[i];
+                if (typeof s == "number") {
+                    if (s < r[1])
+                        return r[0];
+                    for (e = 1; e < r.length; e += 2)
+                        if (s <= r[e])
+                            return r[e + 1]
+                }
+                return r[r.length - 1]
+            }
+        } else
+            return console.log("Unimplemented numeric fn: ", t), r => 1
+    }
+    function jt(t, e=0) {
+        return t ? typeof t == "number" ? t : (r, i) => i ? ft(t)(r, i) : e : e
+    }
+    function Nt(t, e) {
+        let r = jt(t, 1),
+            i = jt(e);
+        return (n, a) => {
+            let s = typeof r == "number" ? r : r(n, a);
+            return i ? s + (typeof i == "number" ? i : i(n, a)) : s
+        }
+    }
+    function qt(t, e) {
+        let r = [];
+        for (let o of t["text-font"])
+            e.hasOwnProperty(o) && r.push(e[o]);
+        r.length === 0 && r.push({
+            face: "sans-serif"
+        });
+        let i = t["text-size"];
+        var n = "";
+        r.length && r[0].weight && (n = r[0].weight + " ");
+        var a = "";
+        if (r.length && r[0].style && (a = r[0].style + " "), typeof i == "number")
+            return o => `${a}${n}${i}px ${r.map(l => l.face).join(", ")}`;
+        if (i.stops) {
+            var s = 1.4;
+            i.base ? s = i.base : i.base = s;
+            let o = ft(i);
+            return (l, u) => `${a}${n}${o(l, u)}px ${r.map(f => f.face).join(", ")}`
+        } else if (i[0] == "step") {
+            let o = ft(i);
+            return (l, u) => `${a}${n}${o(l, u)}px ${r.map(f => f.face).join(", ")}`
+        } else
+            return console.log("Can't parse font: ", t), o => "12px sans-serif"
+    }
+    function ua(t, e) {
+        let r = [],
+            i = [],
+            n = new Map;
+        for (var a of t.layers) {
+            if (n.set(a.id, a), a.layout && a.layout.visibility == "none")
+                continue;
+            if (a.ref) {
+                let u = n.get(a.ref);
+                a.type = u.type,
+                a.filter = u.filter,
+                a.source = u.source,
+                a["source-layer"] = u["source-layer"]
+            }
+            let l = a["source-layer"];
+            var s,
+                o = void 0;
+            a.filter && (o = Je(a.filter)),
+            a.type == "fill" ? r.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new A({
+                    fill: a.paint["fill-color"],
+                    opacity: a.paint["fill-opacity"]
+                })
+            }) : a.type == "fill-extrusion" ? r.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new A({
+                    fill: a.paint["fill-extrusion-color"],
+                    opacity: a.paint["fill-extrusion-opacity"]
+                })
+            }) : a.type == "line" ? a.paint["line-dasharray"] ? r.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new C({
+                    width: Nt(a.paint["line-width"], a.paint["line-gap-width"]),
+                    dash: a.paint["line-dasharray"],
+                    dashColor: a.paint["line-color"]
+                })
+            }) : r.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new C({
+                    color: a.paint["line-color"],
+                    width: Nt(a.paint["line-width"], a.paint["line-gap-width"])
+                })
+            }) : a.type == "symbol" ? a.layout["symbol-placement"] == "line" ? i.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new ce({
+                    font: qt(a.layout, e),
+                    fill: a.paint["text-color"],
+                    width: a.paint["text-halo-width"],
+                    stroke: a.paint["text-halo-color"],
+                    textTransform: a.layout["text-transform"],
+                    label_props: a.layout["text-field"] ? [a.layout["text-field"]] : void 0
+                })
+            }) : i.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new U({
+                    font: qt(a.layout, e),
+                    fill: a.paint["text-color"],
+                    stroke: a.paint["text-halo-color"],
+                    width: a.paint["text-halo-width"],
+                    textTransform: a.layout["text-transform"],
+                    label_props: a.layout["text-field"] ? [a.layout["text-field"]] : void 0
+                })
+            }) : a.type == "circle" && r.push({
+                dataLayer: a["source-layer"],
+                filter: o,
+                symbolizer: new te({
+                    radius: a.paint["circle-radius"],
+                    fill: a.paint["circle-color"],
+                    stroke: a.paint["circle-stroke-color"],
+                    width: a.paint["circle-stroke-width"]
+                })
+            })
+        }
+        return i.reverse(), {
+            paint_rules: r,
+            label_rules: i,
+            tasks: []
+        }
+    }
+    var ha = t => {
+        let e = Ot(4, 4, s => {
+            var o = s.getContext("2d");
+            o && (o.beginPath(), o.rect(0, 0, 1, 1), o.rect(2, 2, 1, 1), o.fillStyle = "black", o.fill())
+        });
+        var r = "black";
+        t === "lite" && (r = "#d9d9d9");
+        let i = ["name:en", "name"],
+            n = [{
+                dataLayer: "earth",
+                symbolizer: new A({
+                    fill: "white"
+                })
+            }, {
+                dataLayer: "landuse",
+                symbolizer: new A({
+                    pattern: e
+                }),
+                filter: (s, o) => o.props.leisure == "park"
+            }, {
+                dataLayer: "water",
+                symbolizer: new A({
+                    fill: r
+                })
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "#dddddd"
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "minor_road"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "white",
+                    width: de(16, [7, 9, 17, 20])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "medium_road"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "#cccccc",
+                    width: de(10, [.2, .2, .2, .4, .8, 1.5, 4, 7, 13, 16])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "medium_road"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "white",
+                    width: de(11, [1.25, 5, 5, 5, 8, 11, 18, 22, 30])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "major_road"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "black",
+                    width: de(9, [.15, .5, .7, 1, 1.5, 1.9, 5, 7, 12, 18, 26])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "major_road"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "white",
+                    width: de(7, [2.25, 3.25, 4.25, 5, 6, 7, 8, 9, 11, 14, 24, 42, 49])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "highway"
+            }, {
+                dataLayer: "roads",
+                symbolizer: new C({
+                    color: "black",
+                    width: de(6, [.1, 1.5, 1.5, 1.5, 2, 2.5, 3, 3, 4, 6, 9, 15, 28, 35])
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "highway"
+            }, {
+                dataLayer: "transit",
+                symbolizer: new C({
+                    color: "#888888",
+                    dashColor: "#888888",
+                    dash: [1, 4],
+                    dashWidth: 3
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "railway",
+                minzoom: 14
+            }, {
+                dataLayer: "transit",
+                symbolizer: new C({
+                    color: "#888888"
+                }),
+                filter: (s, o) => o.props["pmap:kind"] === "railway",
+                minzoom: 14
+            }, {
+                dataLayer: "buildings",
+                symbolizer: new C({
+                    color: "#888888",
+                    width: .5
+                })
+            }, {
+                dataLayer: "boundaries",
+                symbolizer: new C({
+                    color: "black",
+                    width: 1
+                }),
+                maxzoom: 6
+            }, {
+                dataLayer: "boundaries",
+                symbolizer: new C({
+                    color: "white",
+                    width: 2.5,
+                    dash: [3, 1],
+                    dashWidth: .3,
+                    dashColor: "black"
+                }),
+                minzoom: 7
+            }],
+            a = [{
+                dataLayer: "places",
+                symbolizer: new U({
+                    label_props: i,
+                    fill: "black",
+                    stroke: "white",
+                    width: 1.5,
+                    fontFamily: "Inter",
+                    fontWeight: 300,
+                    fontSize: 15,
+                    justify: X.Center
+                }),
+                filter: (s, o) => o.props["pmap:kind"] == "country"
+            }, {
+                dataLayer: "places",
+                symbolizer: new U({
+                    label_props: i,
+                    fill: "black",
+                    stroke: "white",
+                    width: 2,
+                    fontFamily: "Inter",
+                    fontWeight: 300,
+                    fontSize: 12,
+                    justify: X.Center
+                }),
+                filter: (s, o) => o.props["pmap:kind"] == "state"
+            }, {
+                dataLayer: "places",
+                symbolizer: new ye([new te({
+                    radius: 2,
+                    fill: "black",
+                    stroke: "white",
+                    width: 2
+                }), new le({
+                    label_props: i,
+                    offsetX: 3,
+                    fill: "black",
+                    stroke: "white",
+                    width: 1.5,
+                    fontFamily: "Inter",
+                    fontWeight: 600,
+                    fontSize: (s, o) => o.props["pmap:rank"] == 1 ? 15 : 13
+                })]),
+                sort: (s, o) => s["pmap:rank"] - o["pmap:rank"],
+                filter: (s, o) => o.props["pmap:kind"] == "city",
+                maxzoom: 8
+            }, {
+                dataLayer: "places",
+                symbolizer: new U({
+                    label_props: i,
+                    justify: X.Center,
+                    fill: "black",
+                    stroke: "white",
+                    width: 2,
+                    fontFamily: "Inter",
+                    fontWeight: 600,
+                    fontSize: (s, o) => o.props["pmap:rank"] == 1 ? 15 : 13
+                }),
+                sort: (s, o) => s["pmap:rank"] - o["pmap:rank"],
+                filter: (s, o) => o.props["pmap:kind"] == "city",
+                minzoom: 9
+            }, {
+                dataLayer: "water",
+                symbolizer: new ue({
+                    label_props: i,
+                    fill: "white",
+                    stroke: "black",
+                    width: 3,
+                    font: "italic 400 12px Inter"
+                })
+            }, {
+                dataLayer: "landuse",
+                symbolizer: new ue({
+                    fill: "black",
+                    stroke: "white",
+                    width: 2,
+                    font: "italic 400 12px Inter"
+                })
+            }, {
+                dataLayer: "physical_point",
+                symbolizer: new U({
+                    label_props: i,
+                    fill: "white",
+                    stroke: "black",
+                    width: 3,
+                    font: "italic 600 12px Inter",
+                    textTransform: "uppercase",
+                    justify: X.Center
+                }),
+                filter: (s, o) => ["ocean", "sea"].includes(o.props.place)
+            }, {
+                dataLayer: "roads",
+                symbolizer: new ce({
+                    fill: "black",
+                    stroke: "white",
+                    width: 2,
+                    font: "600 14px Inter",
+                    offset: 4
+                })
+            }];
+        return {
+            tasks: [Ut("Inter", "https://cdn.protomaps.com/fonts/woff2/Inter.var.woff2", "100 900")],
+            paint_rules: n,
+            label_rules: a,
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.'
+        }
     };
-  }
-  function getFont(obj, fontsubmap) {
-    let fontfaces = [];
-    for (let wanted_face of obj["text-font"]) {
-      if (fontsubmap.hasOwnProperty(wanted_face)) {
-        fontfaces.push(fontsubmap[wanted_face]);
-      }
-    }
-    if (fontfaces.length === 0)
-      fontfaces.push({ face: "sans-serif" });
-    let text_size = obj["text-size"];
-    var weight = "";
-    if (fontfaces.length && fontfaces[0].weight)
-      weight = fontfaces[0].weight + " ";
-    var style = "";
-    if (fontfaces.length && fontfaces[0].style)
-      style = fontfaces[0].style + " ";
-    if (typeof text_size == "number") {
-      return (z2) => `${style}${weight}${text_size}px ${fontfaces.map((f2) => f2.face).join(", ")}`;
-    } else if (text_size.stops) {
-      var base = 1.4;
-      if (text_size.base)
-        base = text_size.base;
-      let t2 = numberFn(text_size);
-      return (z2, f2) => {
-        return `${style}${weight}${t2(z2, f2)}px ${fontfaces.map((f3) => f3.face).join(", ")}`;
-      };
-    } else if (text_size[0] == "step") {
-      let t2 = numberFn(text_size);
-      return (z2, f2) => {
-        return `${style}${weight}${t2(z2, f2)}px ${fontfaces.map((f3) => f3.face).join(", ")}`;
-      };
-    } else {
-      console.log("Can't parse font: ", obj);
-      return (z2) => "12px sans-serif";
-    }
-  }
-  function json_style(obj, fontsubmap) {
-    let paint_rules = [];
-    let label_rules = [];
-    let refs = new Map();
-    for (var layer of obj.layers) {
-      refs.set(layer.id, layer);
-      if (layer.layout && layer.layout.visibility == "none") {
-        continue;
-      }
-      if (layer.ref) {
-        let referenced = refs.get(layer.ref);
-        layer.type = referenced.type;
-        layer.filter = referenced.filter;
-        layer.source = referenced["source"];
-        layer["source-layer"] = referenced["source-layer"];
-      }
-      let sourceLayer = layer["source-layer"];
-      var symbolizer;
-      var filter = void 0;
-      if (layer.filter) {
-        filter = filterFn(layer.filter);
-      }
-      if (layer.type == "fill") {
-        paint_rules.push({
-          dataLayer: layer["source-layer"],
-          filter,
-          symbolizer: new PolygonSymbolizer({
-            fill: layer.paint["fill-color"],
-            opacity: layer.paint["fill-opacity"]
-          })
-        });
-      } else if (layer.type == "fill-extrusion") {
-        paint_rules.push({
-          dataLayer: layer["source-layer"],
-          filter,
-          symbolizer: new PolygonSymbolizer({
-            fill: layer.paint["fill-extrusion-color"],
-            opacity: layer.paint["fill-extrusion-opacity"]
-          })
-        });
-      } else if (layer.type == "line") {
-        if (layer.paint["line-dasharray"]) {
-          paint_rules.push({
-            dataLayer: layer["source-layer"],
-            filter,
-            symbolizer: new LineSymbolizer({
-              width: widthFn(layer.paint["line-width"], layer.paint["line-gap-width"]),
-              dash: layer.paint["line-dasharray"],
-              dashColor: layer.paint["line-color"]
-            })
-          });
-        } else {
-          paint_rules.push({
-            dataLayer: layer["source-layer"],
-            filter,
-            symbolizer: new LineSymbolizer({
-              color: layer.paint["line-color"],
-              width: widthFn(layer.paint["line-width"], layer.paint["line-gap-width"])
-            })
-          });
-        }
-      } else if (layer.type == "symbol") {
-        if (layer.layout["symbol-placement"] == "line") {
-          label_rules.push({
-            dataLayer: layer["source-layer"],
-            filter,
-            symbolizer: new LineLabelSymbolizer({
-              font: getFont(layer.layout, fontsubmap),
-              fill: layer.paint["text-color"],
-              width: layer.paint["text-halo-width"],
-              stroke: layer.paint["text-halo-color"],
-              textTransform: layer.layout["text-transform"],
-              label_props: layer.layout["text-field"] ? [layer.layout["text-field"]] : void 0
-            })
-          });
-        } else {
-          label_rules.push({
-            dataLayer: layer["source-layer"],
-            filter,
-            symbolizer: new CenteredTextSymbolizer({
-              font: getFont(layer.layout, fontsubmap),
-              fill: layer.paint["text-color"],
-              stroke: layer.paint["text-halo-color"],
-              width: layer.paint["text-halo-width"],
-              textTransform: layer.layout["text-transform"],
-              label_props: layer.layout["text-field"] ? [layer.layout["text-field"]] : void 0
-            })
-          });
-        }
-      } else if (layer.type == "circle") {
-        paint_rules.push({
-          dataLayer: layer["source-layer"],
-          filter,
-          symbolizer: new CircleSymbolizer({
-            radius: layer.paint["circle-radius"],
-            fill: layer.paint["circle-color"],
-            stroke: layer.paint["circle-stroke-color"],
-            width: layer.paint["circle-stroke-width"]
-          })
-        });
-      }
-    }
-    label_rules.reverse();
-    return { paint_rules, label_rules, tasks: [] };
-  }
-  return src_exports;
+    return fa;
 })();
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
