@@ -1,0 +1,34 @@
+{
+	"version": 8,
+	"id": "esri-world-imagery",
+	"name": "ESRI World Imagery",
+	"sources": {
+		"satellite": {
+			"url": "services/maps/esri-world-imagery-tiles.json",
+			"type": "raster"
+		}
+	},
+	"layers": [
+		{
+			"id": "Satellite",
+			"type": "raster",
+			"source": "satellite",
+			"layout": {
+				"visibility": "visible"
+			},
+			"paint": {
+				"raster-opacity": 1
+			},
+			"filter": [
+				"all"
+			]
+		}
+	],
+	"bearing": 0,
+	"pitch": 0,
+	"center": [
+		0,
+		0
+	],
+	"zoom": 1
+}
