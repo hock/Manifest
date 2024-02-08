@@ -1,8 +1,10 @@
-
 .DS_Store
 node_modules/
 tools/private
+dist/
+src/services/json/
 package-lock.json
-src/services/keys.json
-dist/services/protomaps.pmtiles
-dist/services/keys.json
+Gruntfile.js
+.stylelintrc.json
+src/tools/protomaps.pmtiles
+Gruntfile.js
