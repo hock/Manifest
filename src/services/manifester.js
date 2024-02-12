@@ -18,7 +18,7 @@ app.listen(mserver.port, () => { console.log(`Server running at ${mserver.name}:
 
 app.get('/', (req, res) => {
 	console.log("Requested {/}");
-	res.send("Manifest Web Service v<%= mversion %>"); 
+	res.send("Manifest Web Service v${mserver.version}"); 
 });
 
 app.get('/marinetraffic/', async (req, res) => {});
@@ -27,7 +27,7 @@ app.get('/maptiler/:type', async (req, res) => {
 	console.log("Requested Map Tile: "+req.params.type);	
 	
 	const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key), {
-		headers: {'Referer': 'https://service.supplystudies.com/)',}
+		headers: {'Referer': 'https://service.supplystudies.com/',}
 	});
 	const data = await response.json();
 	
