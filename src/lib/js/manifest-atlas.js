@@ -459,28 +459,26 @@ class ManifestAtlas {
 		return newRadius;
 	}
 
-	async switchBasemap(map, tile) {
-		console.log(tile);
+	SwitchBasemap(map, tile) {
 		let style = MI.Atlas.tiletypes[tile.toUpperCase()];
 		let def = MI.Atlas.layerdefs[tile.toLowerCase()];
 		
-		await until(_ => MI.Atlas.glMapLoaded === true);
+		if (MI.Atlas.glMapLoaded) {
+		    const layers = map.getStyle().layers;
+		    const sources = map.getStyle().sources;
+		    const filteredLayers = layers.filter(obj => { return obj.source !== undefined ? obj.source.includes('mlayer-') : false; });
 
-	    const layers = map.getStyle().layers;
-	    const sources = map.getStyle().sources;
-	    const filteredLayers = layers.filter(obj => { return obj.source !== undefined ? obj.source.includes('mlayer-') : false; });
-
-		const filteredSources = {};
-		for (let src of (Object.keys(sources))) { if (src.substr(0, 6) === 'mlayer') { filteredSources[src] = sources[src]; }}
+			const filteredSources = {};
+			for (let src of (Object.keys(sources))) { if (src.substr(0, 6) === 'mlayer') { filteredSources[src] = sources[src]; }}
 	
-	    fetch(style).then(r => r.json()).then(s => {
-	        const newStyle = s;
-	        newStyle.layers = [...newStyle.layers, ...filteredLayers];
-	        newStyle.sources = Object.assign(newStyle.sources, filteredSources); 
-	        map.setStyle(newStyle);
-			console.log(def);
-			document.querySelectorAll('.leaflet-control-attribution').forEach(el => { el.innerHTML = def.layer.options.attribution; });
-		});
+		    fetch(style).then(r => r.json()).then(s => {
+		        const newStyle = s;
+		        newStyle.layers = [...newStyle.layers, ...filteredLayers];
+		        newStyle.sources = Object.assign(newStyle.sources, filteredSources); 
+		        map.setStyle(newStyle);
+				document.querySelectorAll('.leaflet-control-attribution').forEach(el => { el.innerHTML = def.layer.options.attribution; });
+			});
+		}
 	}
 	
 	ProcessDataLayerFromElement(el, clear=false) {
