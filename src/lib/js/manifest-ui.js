@@ -25,6 +25,7 @@ class ManifestUI {
 				
 		document.getElementById('load-samples-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-samples').value); });	
 		document.getElementById('basemap-chooser').addEventListener('change', (e) => { 
+			console.log(document.getElementById('basemap-chooser').value);
 			this.SetBasemap(document.getElementById('basemap-chooser').value); 
 		});
 		document.getElementById('viz-choices').addEventListener('change', (e) => { MI.Visualization.Set(document.getElementById('viz-choices').value); });
@@ -285,6 +286,7 @@ class ManifestUI {
 	}
 
 	SetBasemap(tile) {
+		console.log(tile);
 	    MI.Atlas.switchBasemap(MI.Atlas.glMap, tile);
 	}
 	
