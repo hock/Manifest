@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
 	const development = { 
-		baseurl: 'https://service.supplystudies.com/manifest/', 
+		baseurl: 'https://manifest.supplystudies.com/dev/', 
 		serverurl: 'https://service.supplystudies.com/manifest/', 
 		css_path: 'css/Manifest-main.min.css', css_editpath: 'css/Manifest-edit.min.css', css_staticpath: 'css/Manifest-static.min.css',
 		js_mainpath: 'js/Manifest-main.min.js', js_editpath: 'js/Manifest-edit.min.js', js_staticpath: 'js/Manifest-static.min.js', js_datapath: 'js/Manifest-data.min.js', js_libpath: 'js/Manifest-lib.min.js',

@@ -6,9 +6,13 @@ const aprsfi = require('./json/aprsfi.json');
 const maptiler = require('./json/maptiler.json');
 
 const app = express();
-const cors = require('cors')
 
-app.use(cors())
+const cors = require('cors')
+const corsOptions = {
+  origin: 'https://manifest.supplystudies.com'
+}
+
+app.use(cors(corsOptions));
 app.listen(mserver.port, mserver.name, () => { console.log(`Server running at ${mserver.name}:${mserver.port}/`); });
 
 
@@ -22,7 +26,9 @@ app.get('/marinetraffic/', async (req, res) => {});
 app.get('/maptiler/:type', async (req, res) => {
 	console.log("Requested Map Tile: "+req.params.type);	
 	
-	const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key);
+	const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key), {
+		headers: {'Origin': 'https://service.supplystudies.com/)',}
+	});
 	const data = await response.json();
 	
 	console.log(data);

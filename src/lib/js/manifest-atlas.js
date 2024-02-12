@@ -460,6 +460,7 @@ class ManifestAtlas {
 	}
 
 	async switchBasemap(map, tile) {
+		console.log(tile);
 		let style = MI.Atlas.tiletypes[tile.toUpperCase()];
 		let def = MI.Atlas.layerdefs[tile.toLowerCase()];
 		
