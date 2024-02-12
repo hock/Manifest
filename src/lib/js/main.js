@@ -139,8 +139,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	
 	function ManifestTests() {
 		MI.Interface.ShowMessage('Welcome to Manifest!');
-		MI.Interface.AddDataLayer('services/data/sample/roads.geojson');
-		MI.Interface.AddDataLayer('services/data/sample/countries.pmtiles');
+		MI.Atlas.glMap.on('load', (e) => { 
+			MI.Interface.AddDataLayer('services/data/sample/roads.geojson');
+			MI.Interface.AddDataLayer('services/data/sample/countries.pmtiles');
+		});		
+		
 		MI.Messenger.AddObject(353136000);
 		//setInterval(TestLoad, 5000);
 	}

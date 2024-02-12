@@ -89,27 +89,11 @@ class ManifestAtlas {
 				  	});	
 				}
 			}
-			/*
-			this.glMap.addSource("we-map-1927-source", {
-			        "type": "image",
-			        "url": "./json/samples/westernelectric/we-map-1927.png",
-			        "coordinates": [
-			            [-180, 85],
-			            [180, 85],
-			            [180, -85],
-			            [-180, -85]
-			        ]
-			    });
-			this.glMap.addLayer({
-				    "id": "overlay",
-				    "source": "we-map-1927-source",
-				    "type": "raster",
-				    "paint": {
-				        "raster-opacity": 1
-				    }
-				});
-			*/
+			/* this.glMap.addSource("we-map-1927-source", { "type": "image", "url": "./json/samples/westernelectric/we-map-1927.png", "coordinates": [ [-180, 85], [180, 85], [180, -85], [-180, -85] ] }); this.glMap.addLayer({ "id": "overlay", "source": "we-map-1927-source", "type": "raster", "paint": { "raster-opacity": 1 } }); */
 			
+			document.querySelectorAll('#datalayers input[type=checkbox]').forEach(el => { 
+				MI.Atlas.ProcessDataLayerFromElement(el);
+			}); 
 			MI.Atlas.glMapLoaded = true;
 		});		
 
