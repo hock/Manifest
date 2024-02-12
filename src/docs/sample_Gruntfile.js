@@ -1,25 +1,25 @@
 module.exports = function(grunt) {
-	const production = { 
-		baseurl: 'https://manifest.supplystudies.com/dev/', 
-		serverurl: 'https://manifest.supplystudies.com/services/', 
+	const development = { 
+		baseurl: 'https://service.supplystudies.com/manifest/', 
+		serverurl: 'https://service.supplystudies.com/manifest/', 
 		css_path: 'css/Manifest-main.min.css', css_editpath: 'css/Manifest-edit.min.css', css_staticpath: 'css/Manifest-static.min.css',
 		js_mainpath: 'js/Manifest-main.min.js', js_editpath: 'js/Manifest-edit.min.js', js_staticpath: 'js/Manifest-static.min.js', js_datapath: 'js/Manifest-data.min.js', js_libpath: 'js/Manifest-lib.min.js',
-
+		src: 'src', dist: '/var/www/manifest.supplystudies.com/dev/',
 		livereload: ''
 	}
-	const development = { 
+	const local = { 
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
 		serverurl: 'http://hockbook.local:3000/', 
 		css_path: 'css/Manifest-main.css', css_editpath: 'css/Manifest-edit.css', css_staticpath: 'css/Manifest-static.css',
 		js_mainpath: 'js/Manifest-main.js', js_editpath: 'js/Manifest-edit.js', js_staticpath: 'js/Manifest-static.js', js_datapath: 'js/Manifest-data.js', js_libpath: 'js/Manifest-lib.js',
-
+		src: 'src', dist: 'dist',
 		livereload: ''
 	}
-	const target = development;
-	const version = '0.3';
+	const target = local;
+	const version = '0.3.1';
 	
 	grunt.initConfig({
-	  mdist: 'dist', msrc: 'src', 
+	  mdist: target.dist, msrc: target.src, 
 	  mversion: target.version,
 	  mbaseurl: target.baseurl,
 	  mserverurl: target.serverurl,
@@ -115,10 +115,6 @@ module.exports = function(grunt) {
 			js_services: {
 				src: ['<%= msrc %>/services/manifester.js',],
 				dest: '<%= mdist %>/services/manifester.js'
-			},
-			js_dev_services: {
-				src: ['<%= msrc %>/services/services.js',],
-				dest: '<%= mdist %>/services/services.js'
 			},
 			css_main: {
 				src: ['<%= msrc %>/lib/css/fonts.css','<%= msrc %>/lib/css/fa.css','<%= msrc %>/lib/css/leaflet.css','<%= msrc %>/lib/css/visualize.css','<%= msrc %>/lib/css/manifest.css'],
