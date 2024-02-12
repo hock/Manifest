@@ -13,7 +13,7 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions));
-app.listen(mserver.port, mserver.name, () => { console.log(`Server running at ${mserver.name}:${mserver.port}/`); });
+app.listen(mserver.port () => { console.log(`Server running at ${mserver.name}:${mserver.port}/`); });
 
 
 app.get('/', (req, res) => {
