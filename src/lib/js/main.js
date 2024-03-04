@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
 		let hash = location.hash.substr(1).split("-"), hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
-		console.log(hashid);
 		if (hashtype === "collection") { LoadCollection(hashid, true); }
 		else { 
 			if (hashtype === 'gsheet' && hashid.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) { hashid = hashid.substring(39).split('/')[0]; }

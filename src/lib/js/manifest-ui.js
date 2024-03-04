@@ -3,33 +3,8 @@ class ManifestUI {
 		this.interval = null;
 		this.filter = {clear: true, term: null};
 		this.active_element = null; this.paneldisplay = {};
-		this.observer = new IntersectionObserver((entries) => { 	
-		    entries.forEach((entry) => {
-				let elemid = entry.target.id.split('-').pop();
-			    if (entry.isIntersecting) {
-					if (!MI.Interface.paneldisplay[elemid]) { MI.Interface.paneldisplay[elemid] = 0;}
-					MI.Interface.paneldisplay[elemid]++;	
-				} else { 
-					if (!MI.Interface.paneldisplay[elemid]) { MI.Interface.paneldisplay[elemid] = 0;} else { MI.Interface.paneldisplay[elemid]--; }
-				}
-			   
-				MI.Interface.active_element = Object.keys(MI.Interface.paneldisplay).reduce(function(a, b){ return MI.Interface.paneldisplay[a] > MI.Interface.paneldisplay[b] ? a : b; });
-				if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }
-				
-				console.log(MI.Interface.paneldisplay);
-				console.log(MI.Interface.active_element);
-				
-				/*
-				document.getElementById(entry.target.id).id.split('-')[0] === 'mdetails' &&
-				document.getElementById('mheader-'+entry.target.id.split('-').pop()).previousSibling) {
-					console.log(document.getElementById('mheader-'+entry.target.id.split('-').pop()).previousSibling);
-					MI.Interface.active_element = document.getElementById('mheader-'+entry.target.id.split('-').pop()).previousSibling.id.split('-').pop();
-					if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }
-					
-				}*/
-				
-			});
-		}); 
+		this.observer = this.SetupObserver();
+
 		document.getElementById('fullscreen-menu').addEventListener('click', (e) => { MI.Interface.ToggleFullscreen(); });
 		document.getElementById('mapcapture').addEventListener('click', (e) => { MI.ExportManifest(null, document.title, 'map'); });
 		document.getElementById('minfo').addEventListener('click', (e) => { MI.Interface.ShowLauncher(); });
@@ -126,6 +101,23 @@ class ManifestUI {
 		
 	} 
 	
+	SetupObserver() {
+		let io = new IntersectionObserver((entries) => { 	
+				    entries.forEach((entry) => {
+						let elemid = entry.target.id.split('-').pop();
+					    if (entry.isIntersecting) {
+							if (!MI.Interface.paneldisplay[elemid]) { MI.Interface.paneldisplay[elemid] = 0;}
+							MI.Interface.paneldisplay[elemid]++;	
+						} else { 
+							if (!MI.Interface.paneldisplay[elemid]) { MI.Interface.paneldisplay[elemid] = 0;} else { MI.Interface.paneldisplay[elemid]--; }
+						}
+			   
+						MI.Interface.active_element = Object.keys(MI.Interface.paneldisplay).reduce(function(a, b){ return MI.Interface.paneldisplay[a] > MI.Interface.paneldisplay[b] ? a : b; });
+						if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }
+					});
+				}); 
+		return io;
+	}
 	//storymap
 	SetupStoryTrigger(selector){
 		let els = document.querySelectorAll(selector);
