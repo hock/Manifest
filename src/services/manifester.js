@@ -18,7 +18,7 @@ app.listen(mserver.port, () => { console.log(`Server running at ${mserver.name}:
 
 app.get('/', (req, res) => {
 	console.log('Requested {/}');
-	res.send('Manifest Web Service v${mserver.version}'); 
+	res.send(`Manifest Web Service v${mserver.version}`); 
 });
 
 app.get('/marinetraffic/', async (req, res) => {});
