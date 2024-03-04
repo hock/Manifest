@@ -17,12 +17,12 @@ class ManifestSupplyChain {
 		
 		let mheader = document.createElement('div');
 		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;
+		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;		
+		let url = d.details.url.split('#')[0]+window.location.search+'#'+d.details.url.split('#')[1];
 		
-		//document.getElementById('loader').style.backgroundColor = fillcolor;
 		mheader.innerHTML = `
 		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
-			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${d.details.url}">${d.properties.title}</a>
+			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${url}">${d.properties.title}</a>
 			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${textcolor};"></i>
 		</div>`;
 						
@@ -51,7 +51,7 @@ class ManifestSupplyChain {
 		
 		let supplycat = document.createElement('div');
 		supplycat.id = 'supplycat-'+id; supplycat.classList.add('supplycatgroup');
-		supplycat.innerHTML = `<span class="supplyrow"><label class="supplycatheader"><input type="checkbox" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span>`;
+		supplycat.innerHTML = `<span class="supplyrow"><label for="chain-${id}" class="supplycatheader"><input type="checkbox" id="chain-${id}" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span>`;
 		document.getElementById('supplycategories').append(supplycat);	
 		
 		document.getElementById('supplytoggle-'+id).addEventListener('click', (e) => { 
@@ -66,40 +66,42 @@ class ManifestSupplyChain {
 		supplycatsub.id = 'supplycatsub-'+id; supplycatsub.classList.add('supplycatsub', 'closed'); 
 		
 		supplycatsub.innerHTML += 
-			`<span class="supplyrow"><label id="nodeheader-${id}" class="nodelineheader nodes"><input type="checkbox" value="nodes-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Nodes for ${d.properties.title}</label></span>`;
+			`<span class="supplyrow"><label id="nodeheader-${id}" for="nodes-${id}" class="nodelineheader nodes"><input id="nodes-${id}" type="checkbox" value="nodes-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Nodes for ${d.properties.title}</label></span>`;
 		supplycatsub.innerHTML += 
-			`<span class="supplyrow"><label id="lineheader-${id}" class="nodelineheader lines"><input type="checkbox" value="lines-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Lines for ${d.properties.title} </label></span>`;
+			`<span class="supplyrow"><label id="lineheader-${id}" for="lines-${id}" class="nodelineheader lines"><input id="lines-${id}" type="checkbox" value="lines-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Lines for ${d.properties.title} </label></span>`;
 		
 		// TODO: Shouldn't show this if all nodes are categorized. 
 		if (Object.entries(supplycatmap).length > 1) {
-			supplycatsub.innerHTML += `<span class="supplyrow"><label class="supplycat"><input type="checkbox" value="cat-${id}-uncategorized" checked><span class="supplycatcheckmark"><i class="fas"></i></span> Uncategorized Nodes</label></span>`;			
+			supplycatsub.innerHTML += `<span class="supplyrow"><label for="cat-${id}-uncategorized" class="supplycat"><input id="cat-${id}-uncategorized" type="checkbox" value="cat-${id}-uncategorized" checked><span class="supplycatcheckmark"><i class="fas"></i></span> Uncategorized Nodes</label></span>`;			
 		}	 
 		for (const [key, value] of Object.entries(supplycatmap)) {
-			supplycatsub.innerHTML += `<span class="supplyrow"><label class="supplycat"><input type="checkbox" value="cat-${id}-${key}" checked><span class="supplycatcheckmark"><i class="fas"></i></span> ${key}</label></span>`;
+			supplycatsub.innerHTML += `<span class="supplyrow"><label for="cat-${id}-${key}" class="supplycat"><input id="cat-${id}-${key}" type="checkbox" value="cat-${id}-${key}" checked><span class="supplycatcheckmark"><i class="fas"></i></span> ${key}</label></span>`;
 			supplycats[key] = [];
 		}
 		supplycatsub.innerHTML += '</span>';
 		MI.supplychains[index].categories = supplycats;
 		document.getElementById('supplycat-'+id).append(supplycatsub);	
 	
-		document.querySelectorAll('#supplycategories #supplycat-'+id+' .supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.getElementById('supplycat-'+id).querySelectorAll('.supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
 			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
 			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
 		});
-		document.querySelectorAll('#supplycategories #supplycat-'+id+' .nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.getElementById('supplycat-'+id).querySelectorAll('.nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
 			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
 			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
 		});
-		document.querySelectorAll('#supplycategories #supplycat-'+id+' .supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
+		document.getElementById('supplycat-'+id).querySelectorAll('.supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
 			MI.Interface.filter.clear = false;
 			MI.Interface.Search(document.getElementById('searchbar').value, true);
 		});});
 		
+		document.getElementById('manifestlist').querySelectorAll('#mdetails-'+id+',#mlist-'+id).forEach(el => { MI.Interface.observer.observe(el); });
+		
 		// Finalize UI
-		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
-		let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
-	
-		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) { 
+		let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
+		let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { if (el.style.display !== 'none') { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;}});
+		
+		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) { 
 			MI.Interface.ClearSearch(); MI.Interface.Search(); 
 		}
 			
@@ -113,6 +115,7 @@ class ManifestSupplyChain {
 	Map(index) {
 		let d = MI.supplychains[index];
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
+		let nodelist = [];
 		
 		for (let [i, ft] of d.features.entries()) {
 			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
@@ -121,7 +124,7 @@ class ManifestSupplyChain {
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
 	
 			const expandedProperties = { categories: ft.properties.category.split(',') };	
-							
+			if (ft.properties.images.length === 1 && ft.properties.images[0].URL === '') { ft.properties.images = []; }				
 			ft.properties = Object.assign(ft.properties, expandedProperties);
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			
@@ -130,7 +133,7 @@ class ManifestSupplyChain {
 				else { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
 			}
 			if (ft.geometry.type === 'Point') { 
-				let point = this.SetupPoint(ft, d, index); points.features.push(point);
+				let pointblob = this.SetupPoint(ft, d, index); nodelist.push(pointblob.li); points.features.push(pointblob.ft);
 			} else { 
 				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, d, index) : this.SetupLine(ft, d, index); 
 					
@@ -141,9 +144,22 @@ class ManifestSupplyChain {
 				}
 			}	
 		}
-		document.querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
-		document.querySelectorAll('#mlist-'+d.details.id+' li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
-		document.querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
+		document.getElementById('mlist-'+d.details.id).innerHTML = nodelist.join('');
+		
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
+		document.getElementById('mdetails-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-left').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), -1); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-right').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), 1); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-spot').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { 
+				e.stopPropagation();
+				document.getElementById('full-modal').style.backgroundImage = 'url('+el.src+')';
+				document.getElementById('fullscreen-modal').classList.toggle('closed');
+		});});
+
 		if (lines.features.length === 0) { document.querySelectorAll('.nodelineheader.lines').forEach(el => { 
 			let inputs = el.querySelectorAll('input');
 			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
@@ -219,7 +235,6 @@ class ManifestSupplyChain {
 		MI.Interface.RefreshMeasureList();
 		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .mdetail_title'); }
 		
-		document.getElementById('sidepanel').scrollTo(0, 0);		
 		return d;
 	}
 		
@@ -231,8 +246,7 @@ class ManifestSupplyChain {
 		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
-		
-		
+			
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
@@ -245,89 +259,42 @@ class ManifestSupplyChain {
 			setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
 		}
 		Object.assign(ft.properties, setup);
-	
-		let li = document.createElement('li'); li.id = 'local_'+ft.properties.lid; li.classList.add('scref-'+d.details.id);
 		
-		li.innerHTML = `
-		<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
-		<h5 class="mdetail_title">${ft.properties.title}</h5>
-		<div class="pdetails">
-			<p class="placename" style="color: ${d.details.style.darkerColor}";>${ft.properties.placename}</p>
-			<p class="category"> ${ft.properties.categories.map(cat => '<a class="cat-link" data-cat="cat-'+d.details.id+'-'+cat+'">'+cat+'</a>').join(" ")}</p>
-			<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? new Date(Number(m.mvalue)*1000).toDateString() : '<span class="mtype">'+m.mtype+'</span>'+m.mvalue+''+m.munit).join(", ")}</p>
-
-		</div> 
-		<div class="featuredimages">${ft.properties.images.map(img => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? '<iframe class="ftimg" src="'+img.URL+'?modestbranding=1&enablejsapi=1&rel=0&fs=0&color=white&controls=0" width="560" height="315" loading="lazy" frameborder="0"></iframe>' : '<img class="ftimg" loading="lazy" src="'+img.URL+'" title="'+(img.caption ? img.caption : ft.properties.title)+'" alt="'+(img.caption ? img.caption+'"/>' : ft.properties.title+' image"/>') ) : "").join("")}</div>
-		<div class="description">${ManifestUtilities.Linkify(ft.properties.description)}</div>
-		<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
-			<summary>Notes</summary>
-			<ol>
-				${ft.properties.sources.map(src => src ? '<li>'+ManifestUtilities.Linkify(src)+'</li>' : "").join("")}
-				${ManifestUtilities.Linkify(ft.properties.notes)}
-			</ol>
-		</details>`;
+		let li = 
+		`<li id="local_${ft.properties.lid}" class="scref-${d.details.id}">
+			<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
+			<h5 class="mdetail_title">${ft.properties.title}</h5>
+			<div class="pdetails">
+				${ ft.properties.placename !== '' ? `<p class="placename" style="color: ${d.details.style.darkerColor};">${ft.properties.placename}</p>` : ''}
+				${ ft.properties.categories.length !== 0 ? `<p class="category"> ${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join(" ")}</p>` : ''}
+				${ ft.properties.measures.length !== 0 ? `<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? new Date(Number(m.mvalue)*1000).toDateString() : `<span class="mtype">${m.mtype}</span>${m.mvalue}${m.munit}`).join(", ")}</p>` : ''}
+			</div> 
+				
+			${ft.properties.images.length !== 0 ? `<div class="featuredimages ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
+				
+				${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
+				`<iframe class="ftimg" src="${img.URL}?modestbranding=1&enablejsapi=1&rel=0&fs=0&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
+				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 
+				
+				${ft.properties.images.length > 1 ? 
+				`<div class="images-controls">
+					<button id="imgbutton-left_${ft.properties.lid}" class="images-button images-display-left"><i class="fas fa-caret-left"></i></button>
+					<div class="images-box">${(ft.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${ft.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
+					<button id="imgbutton-right_${ft.properties.lid}" class="images-button images-display-right"><i class="fas fa-caret-right"></i></button>
+				</div>` : ''} 
+			</div>` : ''}
+								  	
+			<div class="description">${ft.properties.description !== '' ? ManifestUtilities.Linkify(ft.properties.description) : ''}</div>
+			<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
+				<summary>Notes</summary>
+				<ol>
+					${ft.properties.sources.map(src => src ? `<li>${ManifestUtilities.Linkify(src)}</li>` : '').join("")}
+					${ManifestUtilities.Linkify(ft.properties.notes)}
+				</ol>
+			</details>
+		</li>`;
 		
-		document.getElementById('mlist-'+d.details.id).append(li);			
-		document.querySelectorAll('#local_'+ft.properties.lid+' .pdetails p, #local_'+ft.properties.lid+' div.featuredimages', '#local_'+ft.properties.lid+' p.description')
-			.forEach(el => { if (!el.textContent.replace(/\s/g, '').length && el.children.length === 0) {
-				el.remove();
-	  	} }); 
-		
-		this.SetupImages(ft);
-		return ft;
-	}
-
-	SetupImages(ft) {
-		if (ft.properties.images.length > 1) {
-			document.querySelectorAll('#local_'+ft.properties.lid+' div.featuredimages')
-				.forEach(el => { 
-					el.setAttribute('data-index',0);
-					el.classList.add('multiple');
-					
-					let imagescontrols = document.createElement('div');
-					imagescontrols.classList.add('images-controls');
-					el.appendChild(imagescontrols); 
-					
-					let leftbutton = document.createElement('button');
-					leftbutton.classList.add('images-button', 'images-display-left');
-					leftbutton.innerHTML = '<i class="fas fa-caret-left"></i>';
-					leftbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, -1); });
-					imagescontrols.appendChild(leftbutton); 
-					
-					let imagebox = document.createElement('div');
-					imagebox.classList.add('images-box');
-					imagescontrols.appendChild(imagebox); 
-					
-					for (let i in ft.properties.images) {
-						let imagespot = document.createElement('div');
-						imagespot.classList.add('images-spot');
-						imagespot.innerHTML = '<i class="far fa-circle"></i>';
-						imagespot.setAttribute('data-lid', ft.properties.lid);
-						imagespot.setAttribute('data-index', Number(i)+1);
-						imagebox.appendChild(imagespot); 
-					}
-					
-					let imagesspots = Array.from(imagebox.children);
-					imagesspots.forEach(function(spot){
-					    spot.addEventListener('click', (e) => { 
-							e.stopPropagation(); 
-							MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index);  });
-					});
-					
-					let rightbutton = document.createElement('button');
-					rightbutton.classList.add('images-button', 'images-display-right');
-					rightbutton.innerHTML = '<i class="fas fa-caret-right"></i>';
-					rightbutton.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(ft.properties.lid, 1); });
-					imagescontrols.appendChild(rightbutton); 
-			}); 
-			MI.Interface.ImageScroll(ft.properties.lid, 1);
-		}
-		if (ft.properties.images.length > 0) {
-			document.querySelectorAll('#local_'+ft.properties.lid+' .ftimg').forEach(el => { el.addEventListener('click', (e) => { 
-					document.getElementById('full-modal').style.backgroundImage = 'url('+el.src+')';
-					document.getElementById('fullscreen-modal').classList.toggle('closed');
-			});});
-		}
+		return {'li':li, 'ft':ft};
 	}
 	
 	SetupLine(ft, d, index) {		
@@ -345,7 +312,7 @@ class ManifestSupplyChain {
 		let sign = Number(Math.sign(multipass[0][0][0] - multipass[0][1][0])), breakstart = 0, breakend = multipass.length, checksign = 0;
         for (let i = 0; i < multipass[0].length-1; i++) {		
 			checksign = Math.sign(multipass[0][i][0] - multipass[0][i+1][0]);	
-			if (checksign != sign && multipass[0][i][0] != multipass[0][i+1][0]) {
+			if (checksign !== sign && multipass[0][i][0] !== multipass[0][i+1][0]) {
 				if (breakstart === 0) { breakstart = i;} breakend = i;
 			}  
 		}
@@ -465,7 +432,7 @@ class ManifestSupplyChain {
 			while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
 		
 			let next = document.getElementById('mheader-'+id).nextElementSibling;
-			while (next) { if (next.classList.contains('mheader')) break; next = next.nextElementSibling; }
+			while (next) { if (next.classList.contains('mheader')) { break; } next = next.nextElementSibling; }
 		
 			if (!next) {
 				offset = 0;		
@@ -475,8 +442,8 @@ class ManifestSupplyChain {
 			 }
 			targetid = next.id.split('-')[1];	
 		}
-
-		document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id+', #supplycat-'+id).forEach(el => { el.remove(); }); 
+		
+		['mheader-'+id,'mdetails-'+id,'mlist-'+id,'supplycat-'+id,].map(document.getElementById, document).forEach(el => { el.remove(); }); 
 
 		for (let s in MI.supplychains) {
 			if (MI.supplychains[s].details.id === id) {
@@ -495,18 +462,13 @@ class ManifestSupplyChain {
 			}
 		}
 
-		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
-		let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
-
 		if (MI.supplychains.length !== 0) {
-			if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); }
-			else { document.getElementById('sidepanel').scrollTo(0, document.getElementById('mdetails-'+targetid).offsetTop + (-1*offset)); }
-			if (MI.Visualization.type === 'textview') { 
-				document.getElementById('textview').scrollTo(0, document.getElementById('blob-'+targetid).offsetTop + (-1*offset));}
+			MI.Interface.ShowHeader(targetid, true);
+			if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); } 
 		}
 		else if (document.getElementById('minfodetail').classList.contains('closed')) { 
 			MI.Interface.ShowLauncher(); 
-			MI.Visualization.Set('map');			
+			MI.Visualization.Set('map', MI.Interface.active_element);			
 		}
 	
 		for (let i in MI.Atlas.map._layers) { 
@@ -529,7 +491,8 @@ class ManifestSupplyChain {
 	
 		MI.Interface.RefreshMeasureList(); 
 		if (document.getElementById('blob-'+id)) { document.getElementById('blob-'+id).remove(); }
-		MI.Visualization.Set(MI.Visualization.type);			
+
+		MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);			
 		MI.Interface.SetDocumentTitle();	
 	}
 	
@@ -543,7 +506,7 @@ class ManifestSupplyChain {
 				while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
 		
 				let next = document.getElementById('mheader-'+id).nextElementSibling;
-				while (next) { if (next.classList.contains('mheader')) break; next = next.nextElementSibling; }
+				while (next) { if (next.classList.contains('mheader')) { break; } next = next.nextElementSibling; }
 		
 				if (!next) {
 					offset = 0;	next = prev = document.getElementById('mheader-'+id).previousElementSibling; 
@@ -555,20 +518,40 @@ class ManifestSupplyChain {
 		let mlayer; for (let l of MI.Atlas.maplayer) { if (Number(l.id) === Number(id)) { mlayer = l; } }
 		if (hide) {
 			if (type === 'chain') { 
-				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
+				document.getElementById('manifestlist').querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'none'; }); 
 				MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); MI.Atlas.map.removeLayer(mlayer.points); 
 				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = false; });
-				if (document.getElementsByClassName('pop-intro').length > 0) { MI.Atlas.SetActivePoint(null, true);}
+				//if (document.getElementsByClassName('pop-intro').length > 0) { MI.Atlas.SetActivePoint(null, true);}
+			
+				if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { 
+					let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { 
+						el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
+					let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { if (el.style.display !== 'none') { 
+						el.style.bottom = roffset+'px'; roffset += el.offsetHeight;}});
+					MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); } 
+				else { MI.Interface.ShowHeader(targetid); }
+	
 			}
 			if (type === 'nodes') { MI.Atlas.map.removeLayer(mlayer.points); }
 			if (type === 'lines') { MI.Atlas.map.removeLayer(mlayer.lines); MI.Atlas.map.removeLayer(mlayer.arrows); }
 			
 		} else { 
-			document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
 			if (type === 'chain') { 
-				document.querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id).forEach(el => { el.style.display = 'block'; }); 
+				document.getElementById('manifestlist').querySelectorAll('#mheader-'+id+', #mdetails-'+id+', #mlist-'+id+', #mlist-'+id+' li').forEach(el => { el.style.display = 'block'; }); 
 				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); MI.Atlas.map.addLayer(mlayer.points); 
-				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = true; });}
+				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = true; });
+							
+				if (!MI.options.storyMap) { 
+					if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { 
+						let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { 
+							el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
+						let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { if (el.style.display !== 'none') { 
+							el.style.bottom = roffset+'px'; roffset += el.offsetHeight;}});
+						MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); 
+					} 
+					else { MI.Interface.ShowHeader(id); }
+				}
+			}
 			if (type === 'nodes') { MI.Atlas.map.addLayer(mlayer.points); }
 			if (type === 'lines') { 
 				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); 
@@ -577,16 +560,7 @@ class ManifestSupplyChain {
 			}
 		}
 	
-		let moffset = 0; document.querySelectorAll('.mheader').forEach(el => { el.style.top = moffset+'px'; moffset += el.offsetHeight; });		
-		let roffset = 0; Array.from(document.querySelectorAll('.mheader')).reverse().forEach(el => { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;});
-		if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { 
-			MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); 
-		}
-		else { 
-			targetid = targetid === 0 ? id : targetid;
-			document.getElementById('sidepanel').scrollTo(0, document.getElementById('mdetails-'+targetid).offsetTop + (-1*offset)); 
-		}		
-		
+		if (!MI.options.storyMap) { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }			
 		MI.Atlas.Refresh();
 	}
 }

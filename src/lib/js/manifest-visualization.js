@@ -4,21 +4,26 @@ class ManifestVisualization {
 		this.last_active = null;
 		this.interval = 0;
 		this.listview = null;
+		this.active_scid = null;
 	}
 	
-	Set(type, refresh=true) {
-		MI.Visualization.Clear();
+	Set(type, scid, refresh=false) {
+		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {
+			MI.Visualization.active_scid = scid; 
+			
+			MI.Visualization.Clear();
 		
-		this.type = type; document.getElementById('viz-choices').value = type;
-		['map','forcegraph','flow','chord','listview','textview'].forEach(t => { document.body.classList.remove(t); }); document.body.classList.add(this.type);
-		switch(type) {
-			case 'map': MI.Visualization.MapViz(); break;
-			case 'forcegraph': MI.Visualization.Graph(refresh, type); break;			
-			case 'flow': MI.Visualization.Graph(refresh, type); break;			
-			case 'chord': MI.Visualization.Graph(refresh, type); break;	
-			case 'listview': MI.Visualization.ListViz(); break;			
-			case 'textview': MI.Visualization.TextViz(); break;
-		  	default: console.log('Visualization type not supported...');
+			this.type = type; document.getElementById('viz-choices').value = type;
+			['map','forcegraph','flow','chord','listview','textview'].forEach(t => { document.body.classList.remove(t); }); document.body.classList.add(this.type);
+			switch(type) {
+				case 'map': MI.Visualization.MapViz(); break;
+				case 'forcegraph': MI.Visualization.Graph(type); break;			
+				case 'flow': MI.Visualization.Graph(type); break;			
+				case 'chord': MI.Visualization.Graph(type); break;	
+				case 'listview': MI.Visualization.ListViz(); break;			
+				case 'textview': MI.Visualization.TextViz(); break;
+			  	default: console.log('Visualization type not supported...');
+			}
 		}
 	}
 	
@@ -31,7 +36,7 @@ class ManifestVisualization {
 		else if (MI.supplychains.length !== 0) { MI.Atlas.MapPointClick(MI.Atlas.active_point); }
 	}
 	
-	Graph(refresh, type) {
+	Graph(type) {
 		document.querySelectorAll('#vizwrap, #listview, #textview').forEach(el => { el.classList.add('closed'); }); 
 		document.getElementById('vizwrap').classList.remove('closed');
 		
@@ -39,30 +44,33 @@ class ManifestVisualization {
 		MI.Atlas.DisplayLayers(false);
 		this.Resize();
 
-		if (refresh === true) { document.querySelectorAll('.viz').forEach(el => { el.remove(); }); }
+		document.querySelectorAll('.viz').forEach(el => { el.remove(); }); 
 		
 		if (MI.supplychains.length > 0) {
 			let graph = {nodes:[],links:[]};				
 		
 			for (let i in MI.supplychains) {
-				if (MI.supplychains[i].graph != undefined) { if (MI.supplychains[i].graph.links.length !== 0) {
-					let sgraph = this.GraphCopy(MI.supplychains[i].graph); 
-					let ngraph = {nodes: [], links:[]};
+				if (MI.supplychains[i].graph !== undefined && document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { 
+					if (MI.supplychains[i].graph.links.length !== 0) {
+						let sgraph = this.GraphCopy(MI.supplychains[i].graph); 
+						let ngraph = {nodes: [], links:[]};
 					
-					if (sgraph.nodes.length >= 100) {
-						sgraph.nodes = sgraph.nodes.sort((a, b) => (Number(a.id.split('-')[1]) > Number(b.id.split('-')[1])) ? 1 : -1);
-						ngraph.nodes = sgraph.nodes.slice(0,100);
-						for (let l of sgraph.links) {
-							if (Number(l.source.split('-')[1]) < 100 && Number(l.target.split('-')[1]) < 100) { ngraph.links[ngraph.links.length] = l; }
-						}
-						MI.Interface.ShowMessage('Rendering first 100 nodes of "'+MI.supplychains[i].properties.title+'" ('+Number(sgraph.nodes.length-100)+' not shown).');
-					} else { ngraph = sgraph; }
+						if (sgraph.nodes.length >= 100) {
+							sgraph.nodes = sgraph.nodes.sort((a, b) => (Number(a.id.split('-')[1]) > Number(b.id.split('-')[1])) ? 1 : -1);
+							ngraph.nodes = sgraph.nodes.slice(0,100);
+							for (let l of sgraph.links) {
+								if (Number(l.source.split('-')[1]) < 100 && Number(l.target.split('-')[1]) < 100) { ngraph.links[ngraph.links.length] = l; }
+							}
+							MI.Interface.ShowMessage('Rendering first 100 nodes of "'+MI.supplychains[i].properties.title+'" ('+Number(sgraph.nodes.length-100)+' not shown).');
+						} else { ngraph = sgraph; }
 
-					graph.nodes = graph.nodes.concat(ngraph.nodes);
-					graph.links = graph.links.concat(ngraph.links);
-				} else {
-					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an unconnected graph).');
-				}} 
+						graph.nodes = graph.nodes.concat(ngraph.nodes);
+						graph.links = graph.links.concat(ngraph.links);
+						graph.canvascolor = sgraph.canvascolor;
+					} else {
+						MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[i].properties.title+'" (an unconnected graph).');
+					}
+				} 
 			}
 			if (type === 'forcegraph') { this.forcegraph = new ForceGraph(graph);  this.forcegraph.Run(); 
 			} else if (type === 'flow') { this.sankeydiagram = new SankeyDiagram(graph);
@@ -76,6 +84,8 @@ class ManifestVisualization {
 					
 		for (let sc of MI.supplychains) { if (!(document.getElementById('blob-'+sc.details.id))) {		
 			let scblob = document.createElement('div');
+			let rawjson = sc.mtype === 'smap' ? MI._smapToManifest(sc) : sc.mtype === 'gsheet' ? MI._gsheetToManifest(sc) : sc.raw;
+			
 			scblob.id = 'blob-'+sc.details.id;
 			scblob.classList.add('blob');
 			scblob.innerHTML = `
@@ -86,17 +96,17 @@ class ManifestVisualization {
 					<i class="far fa-file-alt"></i> <a class="download-markdown" id="download-${sc.details.id}">Download Markdown</a> | 
 					<i class="far fa-file-code"></i> <a class="download-json" id="download-${sc.details.id}">Download JSON</a>
 				</p>
-				<pre class="container">${MI.Visualization.HighlightSyntax(JSON.stringify(sc.raw, null, 2))}</pre>`;
+				<pre class="container">${MI.Visualization.HighlightSyntax(JSON.stringify(rawjson, null, 2))}</pre>`;
 			document.getElementById('textview').appendChild(scblob);
 		} }
 		
 		document.querySelectorAll('.download-json').forEach(el => { el.addEventListener('click', (e) => {
-			let did = el.id.split('-')[1];
-			for (let s in MI.supplychains) { if (MI.supplychains[s].details.id == did) { MI.ExportManifest(MI.supplychains[s], did, 'json'); } }
+			let did = Number(el.id.split('-')[1]);
+			for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === did) { MI.ExportManifest(MI.supplychains[s], did, 'json'); } }
 		 });}); 
 		document.querySelectorAll('.download-markdown').forEach(el => { el.addEventListener('click', (e) => {
-			let did = el.id.split('-')[1];
-			for (let s in MI.supplychains) { if (MI.supplychains[s].details.id == did) { MI.ExportManifest(MI.Visualization.ManifestMarkdown(did), did, 'markdown'); } }
+			let did = Number(el.id.split('-')[1]);
+			for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === did) { MI.ExportManifest(MI.Visualization.ManifestMarkdown(did), did, 'markdown'); } }
 		});}); 
 	}
 	
@@ -142,7 +152,7 @@ class ManifestVisualization {
 	ManifestMarkdown(id) {
 		let md = '';
 		for (let s in MI.supplychains) {
-			if (MI.supplychains[s].details.id == id) {
+			if (MI.supplychains[s].details.id === id) {
 				md += '# '+MI.supplychains[s].properties.title + '\n';
 				md += ''+MI.supplychains[s].properties.description.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n\n';
 		
@@ -150,12 +160,12 @@ class ManifestVisualization {
 					for (let ft of MI.supplychains[s].features) {
 						// TODO For now we purposefully ignore lines.. If we have detailed line information we can reconsider this.
 						if (ft.geometry.type === 'Point') {
-							md += (ft.properties.title != undefined && ft.properties.title != '') ? '### '+ft.properties.title + '\n' : '';
-							md += (ft.properties.placename != undefined && ft.properties.placename != '') ? ''+ft.properties.placename + '\n' : '';
-							md += (ft.properties.category != undefined && ft.properties.category != '') ? ''+ft.properties.category + '\n' : '';
-							md += (ft.properties.description != undefined && ft.properties.description != '') ? ''+ft.properties.description.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
-							md += (ft.properties.sources != undefined && ft.properties.sources != '') ? ''+'* '+ft.properties.sources.join('\n* ') + '\n' : '';
-							md += (ft.properties.notes != undefined && ft.properties.notes != '') ? ''+ft.properties.notes.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
+							md += (ft.properties.title !== undefined && ft.properties.title !== '') ? '### '+ft.properties.title + '\n' : '';
+							md += (ft.properties.placename !== undefined && ft.properties.placename !== '') ? ''+ft.properties.placename + '\n' : '';
+							md += (ft.properties.category !== undefined && ft.properties.category !== '') ? ''+ft.properties.category + '\n' : '';
+							md += (ft.properties.description !== undefined && ft.properties.description !== '') ? ''+ft.properties.description.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
+							md += (ft.properties.sources !== undefined && ft.properties.sources !== '') ? ''+'* '+ft.properties.sources.join('\n* ') + '\n' : '';
+							md += (ft.properties.notes !== undefined && ft.properties.notes !== '') ? ''+ft.properties.notes.replace(/(<([^>]+)>)/gi, '').replace(/(\r\n|\n|\r)/gm,'') + '\n' : '';
 			
 							md += '\n';
 						}
@@ -168,7 +178,7 @@ class ManifestVisualization {
 	}	
 	
 	HighlightSyntax(json) {
-	    if (typeof json != 'string') { json = JSON.stringify(json, undefined, 2); }
+	    if (typeof json !== 'string') { json = JSON.stringify(json, undefined, 2); }
 	    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
 	        let cls = 'number';
@@ -200,10 +210,17 @@ class ManifestVisualization {
 	}
 	GraphCopy(graph) {
 		let ngraph = {nodes:[],links:[]};
+		ngraph.canvascolor = graph.nodes[0].fillColor;
+		let color_range = [
+			tinycolor(ngraph.canvascolor).darken(25).toString(),tinycolor(ngraph.canvascolor).darken(20).toString(),tinycolor(ngraph.canvascolor).darken(15).toString(),tinycolor(ngraph.canvascolor).darken(10).toString(),tinycolor(ngraph.canvascolor).darken(5).toString(),tinycolor(ngraph.canvascolor).toString(),tinycolor(ngraph.canvascolor).brighten(5).toString(),tinycolor(ngraph.canvascolor).brighten(10).toString(),tinycolor(ngraph.canvascolor).brighten(15).toString(),tinycolor(ngraph.canvascolor).brighten(20).toString(),tinycolor(ngraph.canvascolor).brighten(25).toString()];
+		let color_index = 0;	
 		
 		for (let node of graph.nodes) {
-			let nnode = { group: node.group, id: node.id, name: node.name, ref: node.ref, fillColor: node.fillColor, color: node.color};
-			ngraph.nodes.push(nnode);
+			let nnode = { group: node.group, id: node.id, name: node.name, ref: node.ref, linkcount: node.links.length, fillColor: color_range[color_index], color: tinycolor(color_range[color_index]).brighten(20).toString()};
+			if ( node.links.length !== 0) {
+				ngraph.nodes.push(nnode);
+			}
+			color_index++; if (color_index >= color_range.length) {color_index = 0;}
 		}
 		for (let link of graph.links) {
 			let nlink = { source: link.source, target: link.target, color: link.color, fillColor: link.fillColor};
@@ -211,7 +228,7 @@ class ManifestVisualization {
 		}		
 		return ngraph;
 	}
-}
+}   
 
 // Force Directed Graph
 class ForceGraph {
@@ -220,46 +237,54 @@ class ForceGraph {
 		MI.Visualization.interval = null;
 		this.svg = d3.select('svg').attr('width', this.width).attr('height', this.height);
 		this.viz = this.svg.append('g').attr('class', 'viz forcegraph');
-		
-		this.simulation = d3.forceSimulation().alphaTarget(0.3)
-		
+				
+		this.simulation = d3.forceSimulation(this.graph.nodes)
 		.force('center', d3.forceCenter((this.width+this.xoffset)/2, this.height/2))
-	    .force('x', d3.forceX(d => { return this._divide(d.ref.properties.index+1).xoffset * this.width + this.xoffset;}).strength(0.4))
-		.force('y', d3.forceY(d => { return this._divide(d.ref.properties.index+1).yoffset * this.height;}).strength(0.4))
+		.force('radial', d3.forceRadial((this.width+this.xoffset)/8, (this.width+this.xoffset)/2, this.height/2).strength(0.8))
+		.force('y', d3.forceY(this.height / 2).strength(0.4))
 		.force('collision', d3.forceCollide().radius(d => { 
 			let collision = Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value))*2 + 
-				(Number(document.getElementById('viz-slider').value)/10); 
-					return collision; }).strength(0.1))
-		.force('link', d3.forceLink().id(d => d.id).strength(1).distance(d => { return Number(document.getElementById('viz-slider').value); }))
+				d.linkcount * 2; 
+					return collision; }).strength(0.4))
+		.force('link', d3.forceLink(this.graph.links).id(n => { return n.id;}).strength(1).distance(d => { return Math.max(d.source.linkcount,d.target.linkcount) * 2; }))
 	    .force('charge', d3.forceManyBody().strength(d => { 
-			let charge = -350 - (10 * Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)) + 
-				Number(document.getElementById('viz-slider').value)*10);
-					return charge; }));
+			let charge = -50 * (Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value))+d.linkcount);
+			return charge; }))
+		.on('tick', e => this._tick());
 		
+		this.viz.append("rect").attr('width', '100%').attr('height', '100%').attr('fill', this.graph.canvascolor).attr('opacity','0.1');
 		this.defs = this.svg.append('svg:defs');
+		
+		this.groups = this.viz.append('g').attr('class', 'groups');
 		
 		this.link = this.viz.append('g').attr('class', 'link').selectAll('path.link').data(this.graph.links).enter().append('path')
 			.attr('opacity', 0.2).attr('stroke-width', 2).attr('stroke', d => d.color).style('fill', 'none');
 		this.arrow = this.viz.append('g').attr('class', 'arrow').selectAll('path.arrow').data(this.graph.links).enter().append('path')
-			.attr('stroke-width', 0).style('fill', 'none').attr('marker-end', d => this._marker(d.color));
-		this.groups = this.viz.append('g').attr('class', 'groups');
-		this.node = this.viz.append('g').attr('class', 'nodes').selectAll('circle').data(this.graph.nodes).enter().append('circle') 
-			.attr('cx', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).x) 
-			.attr('cy', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).y) 		
-			.attr('r', d => MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)) 
-			.style('fill', d => d.fillColor).style('stroke', d => d.color)
-			.call(d3.drag().on('start', d => this._dragstarted(d)).on('drag', d => this._dragged(d)).on('end', d => this._dragended(d)));
-
-		this.graph.nodes.forEach(d => { d.x = d.cx = MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).x; 
-			d.y = d.cy = MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).y; });
-		
+			.attr('stroke-width', 0).attr('opacity', 0.5).style('fill', 'none').attr('marker-end', d => this._marker(d.color));
+	
 		this.label = this.viz.append('g').attr('class', 'labels').selectAll('text').data(this.graph.nodes).enter().append('text').attr('pointer-events', 'none')
-			.attr('fill', d => { if (d.ref != undefined) {return d.ref.properties.basestyle.color; } })	
+			.attr('fill', d => { if (d.ref !== undefined) {return d.ref.properties.basestyle.color; } })	
 			.attr('x', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).x) 
 			.attr('y', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).y) 	
 			.attr('stroke','#000000').attr('stroke-width','0.2')
 			.attr('font-family', '"Roboto", Arial, Helvetica, sans-serif')
 			.text(d => d.name);
+				
+		this.node = this.viz.append('g').attr('class', 'nodes').selectAll('circle').data(this.graph.nodes).enter().append('circle') 
+			.attr('cx', d => (this.width+this.xoffset)/2) 
+			.attr('cy', d => this.height/2) 		
+			.attr('r', d => MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)) 
+			.style('fill', d => d.fillColor).style('stroke', d => d.color)
+			.on("mouseover", (d,i) => { 
+				d3.select('#viztooltip')
+				.style('display','block').style("left", (d3.event.pageX + 10) + "px").style("top", (d3.event.pageY - 15) + "px")
+				.style('background-color',d.color).style('border-color',d.fillColor).style('color',tinycolor.mostReadable(d.fillColor, [tinycolor(d.fillColor).darken(50), tinycolor(d.fillColor).brighten(50)]).toHexString())
+				.html('<h3>'+d.ref.properties.title+'<h3>'+d.ref.properties.description);})
+			.on("mousemove", (d,i) => { 
+				d3.select('#viztooltip').style("left", (d3.event.pageX + 10) + "px")
+					.style("top", (d3.event.pageY - 15) + "px");})
+	        .on("mouseout", (d,i) => { d3.select('#viztooltip').style('display','none'); })
+			.call(d3.drag().on('start', d => this._dragstarted(d)).on('drag', d => this._dragged(d)).on('end', d => this._dragended(d)));
 			
 		this.groupIds = d3.set(this.graph.nodes.map(n => +n.group)).values()
 			.map( groupId => { return { groupId : groupId, count : this.graph.nodes.filter(n => Number(n.group) === Number(groupId)).length }; }) 
@@ -269,9 +294,8 @@ class ForceGraph {
 			.attr('stroke', d => { for (let i in MI.supplychains) { if (Number(MI.supplychains[i].details.id) === Number(d)) { 
 				return MI.supplychains[i].details.style.color; } } })
 			.style('stroke-dasharray','3,3').style('stroke-opacity','0.5')
-			.attr('fill', d => { for (let i in MI.supplychains) { if (Number(MI.supplychains[i].details.id) === Number(d)) { 
-				return MI.supplychains[i].details.style.fillColor; } } })
-			.attr('fill-opacity', 0);
+			.attr('fill', '#21222c')
+			.attr('fill-opacity', 1);
  		this.groups.selectAll('path').call(d3.drag()
 			.on('start', d => this._group_dragstarted(d)).on('drag', d => this._group_dragged(d)).on('end', d => this._group_dragended(d)) );
 		
@@ -299,33 +323,19 @@ class ForceGraph {
 	get ypos() { return this.height / 2; }
 	
 	Run() {			
-		this.simulation.nodes(this.graph.nodes).on('tick', e => this._tick());
- 		this.simulation.force('link').links(this.graph.links);
-		this._countdown();
+		this.simulation.alphaDecay(0.3);
 	}
 	
 	_update() {
- 		this.simulation.force('link', d3.forceLink().distance(d => Number(document.getElementById('viz-slider').value)).links(this.graph.links))
-		.force('center', d3.forceCenter((this.width+this.xoffset)/2, this.height/2))
-	    .force('x', d3.forceX(d => { return this._divide(d.ref.properties.index+1).xoffset * this.width + this.xoffset;}).strength(0.4))
-		.force('y', d3.forceY(d => { return this._divide(d.ref.properties.index+1).yoffset * this.height;}).strength(0.4))
-		.force('collision', d3.forceCollide().radius(d => { 
-			let collision = Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value))*2 + 
-				(Number(document.getElementById('viz-slider').value)/10); 
-					return collision; }).strength(0.1))
-		.force('charge', d3.forceManyBody().strength(d => { 
-			let charge = -350 - (10 * Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)) + 
-				Number(document.getElementById('viz-slider').value)*10);
-					return charge; }))
-		.alphaTarget(0.3).restart();
-		this._countdown();
+		this.simulation.force('center', d3.forceCenter((this.width+this.xoffset)/2, this.height/2))
+		.force('radial', d3.forceRadial((this.width+this.xoffset)/8, (this.width+this.xoffset)/2, this.height/2).strength(0.8))
+		.force('y', d3.forceY(this.height / 2).strength(0.4))
+		.alpha(0.5).restart();
 	}
 	
 	_tick() {
-		this.node.attr('cx', d => Math.max(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value), 
-				Math.min(this.width + this.xoffset - MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value), d.x)))
-			.attr('cy', d => Math.max(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value), 
-				Math.min(this.height - MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value), d.y)))		
+		this.node.attr('cx', d => Math.min(Math.max(d.x,MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+10),this.width+this.xoffset-10-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)))
+			.attr('cy', d => Math.min(Math.max(d.y,MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+10),this.height-10-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)))		
 			.attr('opacity', d => { if (d.ref.properties.hidden) {return 0.1; } else { return 1;} });
 		
 		this.arrow.attr('d', d => {	
@@ -339,78 +349,44 @@ class ForceGraph {
 			let dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, dr = Math.sqrt(dx * dx + dy * dy);
 				return [ 'M',d.source.x,d.source.y, 'A',Math.max(0,dr),Math.max(0,dr),0,0,1,d.target.x,d.target.y].join(' ');});
 
-		this.label.attr('x', d => d.x+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value) + 
-			(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize)) )
-			.attr('y', d => d.y+(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value) + 
-				(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize)))/2 );
-			 
+		this.label.attr('x', d => Math.min(Math.max(d.x,d.x+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.width+this.xoffset-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))))
+			.attr('y', d => Math.min(Math.max(d.y,d.y+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.height-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))));	
+				
 		this._updategroups();		
 	}
 	
 	_updategroups() {
 		let polygon, centroid;
-		this.groupIds.forEach(groupId => { let path = this.paths.filter(d => { return d == groupId;}).attr('transform', 'scale(1) translate(0,0)').attr('d', d => {
+		this.groupIds.forEach(groupId => { let path = this.paths.filter(d => { return d === groupId;}).attr('transform', 'scale(1) translate(0,0)').attr('d', d => {
 			polygon = this.polygonGenerator(d);          
 			centroid = d3.polygonCentroid(polygon);
 			return this.valueline( polygon.map(point => [ point[0] - centroid[0], point[1] - centroid[1] ]) );
 		});
-		d3.select(path.node().parentNode).attr('transform', 'translate('  + centroid[0] + ',' + (centroid[1]) + ') scale(' + '1.2' + ')');
+		d3.select(path.node().parentNode).attr('transform', 'translate('  + centroid[0] + ',' + (centroid[1]) + ') scale(' + '1.8' + ')');
 	}); }
 	
 	_countdown() {
 		MI.Visualization.Clear();
-		MI.Visualization.interval = setTimeout(e => {this.simulation.stop(); }, 3000);
+		MI.Visualization.interval = setTimeout(e => {this.simulation.stop(); }, 10000);
 	}
 
 	_marker(color) {
-		this.defs.append('svg:marker').attr('id', color.replace('#', '')).attr('viewBox', '0 -5 10 10').attr('refX', 5)
-			.attr('markerWidth', 9).attr('markerHeight', 9).attr('orient', 'auto').attr('markerUnits', 'userSpaceOnUse').append('svg:path')
+		this.defs.append('svg:marker').attr('id', color.replace('#', '')).attr('viewBox', '0 -5 10 10').attr('refX', 3.33)
+			.attr('markerWidth', 6).attr('markerHeight', 6).attr('orient', 'auto').attr('markerUnits', 'userSpaceOnUse').append('svg:path')
 			.attr('d', 'M0,-5L10,0L0,5').style('fill', color);
 		return 'url(' + color + ')';
 	}
-	
-	_divide(index) {
-		let cuts = MI.supplychains.length, x = cuts, y = Math.floor(Math.sqrt(cuts));
-		while (x%y) { y--; }
-
-		let rowCount = y, colCount = Math.floor(cuts/y);
-		let row = Math.floor((index-1) / colCount) + 1, col = (index-1) % colCount+1;
-		let colpunit = 100 / (colCount+1), rowpunit = 100 / (rowCount+1);
-		let rowp = rowpunit * (row), colp = colpunit * (col);
-		
-		return {xoffset: colp/100, yoffset: rowp/100};
-	} 
 
 	_dragstarted(d) {
 		MI.Visualization.Clear();
-		if (d.ref != undefined) { MI.Atlas.MapPointClick(d.ref.properties.lid); MI.Atlas.active_point = d.ref.properties.lid; }
-		if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
+		if (d.ref !== undefined) { MI.Atlas.MapPointClick(d.ref.properties.lid); MI.Atlas.active_point = d.ref.properties.lid; }
+		if (!d3.event.active) { this.simulation.alpha(0.1).alphaDecay(0).restart(); }
 		d.fx = d.x; d.fy = d.y;
 	}
 	_dragged(d) { d.fx = d3.event.x; d.fy = d3.event.y; }
-	_dragended(d) { if (!d3.event.active) { this._countdown(); } d.fx = null; d.fy = null; }
+	_dragended(d) { if (!d3.event.active) { this.simulation.alphaDecay(0.3); } d.fx = null; d.fy = null; }
 	
-	_group_dragstarted(groupId) {
-		MI.Visualization.Clear();
-		if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
-		MI.Interface.ShowHeader(groupId);
-		this.paths.filter(d => Number(d) === Number(groupId)).style('stroke-width', 3);
-	}
 
-	_group_dragged(groupId) {
-		this.simulation.force('center',  null)
-	    .force('x', d3.forceX(d => Number(d.group) === Number(groupId) ? d3.event.sourceEvent.clientX : 
-			this._divide(d.ref.properties.index+1).xoffset * this.width + this.xoffset).strength(0.4))
-	    .force('y', d3.forceY(d => Number(d.group) === Number(groupId) ? d3.event.sourceEvent.clientY : 
-			this._divide(d.ref.properties.index+1).yoffset * this.height).strength(0.4));
-		
-		this.node.filter(d => Number(d.group) === Number(groupId)).each(d => { d.x += d3.event.x; d.y += d3.event.y; });
-	}
-
-	_group_dragended(groupId) {
-		if (!d3.event.active) { this._countdown(); }
-		this.paths.filter(d => Number(d) === Number(groupId)).style('stroke-width', 1);
-	}
 	 
 }
 
@@ -427,7 +403,9 @@ class SankeyDiagram {
 			};
 		});
 
-		this.sankey = d3.sankeyCircular().nodeWidth(30).nodePaddingRatio(Number(document.getElementById('viz-slider').value)/100)
+		// TODO Phasing out viz slider
+		let slide = Number(document.getElementById('viz-slider').value)/100; slide = 1;
+		this.sankey = d3.sankeyCircular().nodeWidth(30).nodePaddingRatio(1)
 			.size([width, height]).nodeId(d => d.label).nodeAlign(d3.sankeyCenter).iterations(32).circularLinkGap(2);
 	
 		this.viz = d3.select('svg').append('g').attr('class', 'viz sankeydiagram')
@@ -446,12 +424,12 @@ class SankeyDiagram {
 		let depthExtent = d3.extent(sankeyData.nodes, d => d.depth);
 
 		this.nodes = this.nodewrap.data(sankeyData.nodes).enter().append('g').call(d3.drag().subject(d => d)
-			.on('start', (d) => { if (d.ref != undefined) { MI.Atlas.MapPointClick(d.ref.properties.lid); MI.Atlas.active_point = d.ref.properties.lid; }})
+			.on('start', (d) => { if (d.ref !== undefined) { MI.Atlas.MapPointClick(d.ref.properties.lid); MI.Atlas.active_point = d.ref.properties.lid; }})
 			.on('drag', (d, i, n) => { this._dragmove(d, i, n);}))
 			.on('mouseover', (d) => {
 				let thisName = d.name;
 				this.nodes.selectAll('rect').style('opacity', d => this._highlightNodes(d, thisName));
-				d3.selectAll('.sankey-link').style('opacity', l => { return l.source.name == thisName || l.target.name == thisName ? 1 : 0.3; });
+				d3.selectAll('.sankey-link').style('opacity', l => { return l.source.name === thisName || l.target.name === thisName ? 1 : 0.3; });
 				this.nodes.selectAll('text') .style('opacity', d => this._highlightNodes(d, thisName) );
 			})
 			.on('mouseout', function (d) {
@@ -483,12 +461,12 @@ class SankeyDiagram {
     _highlightNodes(node, name) {
 		if ((d3.event.type !== 'drag')) {
 			let opacity = 0.1;
-			if (node.name == name) { opacity = 1; }
+			if (node.name === name) { opacity = 1; }
 			node.sourceLinks.forEach(function (link) {
-				if (link.target.name == name) { opacity = 1; }
+				if (link.target.name === name) { opacity = 1; }
 			});
 			node.targetLinks.forEach(function (link) {
-				if (link.source.name == name) { opacity = 1; }
+				if (link.source.name === name) { opacity = 1; }
 			});
 			return opacity;
 		}
@@ -535,7 +513,10 @@ class SankeyDiagram {
 	_update() {
 		let width = this.width - this.margin.left - this.margin.right, height = this.height - this.margin.top - this.margin.bottom;
 		
-		this.sankey.nodePaddingRatio(Number(document.getElementById('viz-slider').value)/100).size([width, height]);
+		// TODO Phasing out viz slider
+		let slide = Number(document.getElementById('viz-slider').value)/100; slide = 1;
+		
+		this.sankey.nodePaddingRatio(slide).size([width, height]);
 		this.viz.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 		
 		this.graph.links.forEach(x => { x.value = Number(MI.Atlas.GetScaledRadius(x.source.ref, document.getElementById('measure-choices').value));});
@@ -565,17 +546,17 @@ class ChordDiagram {
 	_drawChord() {
 		this.adjacency = this._matrix(this.graph.nodes, this.graph.links);
 		
-		this.chord = d3.chord().padAngle(Number(document.getElementById('viz-slider').value)/1000).sortChords(d3.descending);
-		this.arc = d3.arc().innerRadius(this.innerRadius).outerRadius(this.outerRadius);
+		this.chord = d3.chord().padAngle(0.03).sortChords(d3.descending);
+		this.arc = d3.arc().innerRadius(this.innerRadius).outerRadius(this.outerRadius+20);
 		this.ribbon = d3.ribbon().radius(this.innerRadius);
 		
 		this.viz = d3.select('svg').append('g').attr('class', 'viz chorddiagram').attr('transform', 'translate(' + (this.xpos) + ',' + (this.height/2) + ')') .datum(this.chord(this.adjacency.matrix));
 		
 		this.outerArcs = this.viz.selectAll('g.group').data(chords => chords.groups).enter().append('g').attr('class', 'group') 
-			.on('mouseover', this._fade(0.1)) .on('mouseout', this._fade(this.opacityDefault));
+			.on('mouseover', this._fade(0.05,0)).on('mouseout', this._fade(this.opacityDefault,0));
 
 		this.outerArcs.append('path').attr('id', d => 'group' + d.index).attr('d', this.arc).attr('stroke', (d,i) => { return this.adjacency.nodes[d.index].color; }) 
-			.on('click', (d,i) => { if (this.adjacency.nodes[d.index].ref != undefined) { MI.Atlas.MapPointClick(this.adjacency.nodes[d.index].ref.properties.lid); MI.Atlas.active_point = this.adjacency.nodes[d.index].ref.properties.lid; }})
+			.on('click', (d,i) => { if (this.adjacency.nodes[d.index].ref !== undefined) { MI.Atlas.MapPointClick(this.adjacency.nodes[d.index].ref.properties.lid); MI.Atlas.active_point = this.adjacency.nodes[d.index].ref.properties.lid; }})
 			.attr('opacity', (d,i) => { if (this.adjacency.nodes[d.index].ref.properties.hidden) {return 0.1; } else { return 1;} })
 			.attr('stroke-width', 1).attr('stroke-opacity', 0.8) .style('fill', (d,i) => { return this.adjacency.nodes[d.index].fillColor; })
 			.style('cursor','pointer');
@@ -583,7 +564,7 @@ class ChordDiagram {
 		this.outerArcs.append('text') .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; }).attr('class', 'titles')
 			.attr('text-anchor', d => { return d.angle > Math.PI ? 'end' : null; })
 			.attr('transform', d => { 
-				return 'rotate(' + (d.angle * 180 / Math.PI - 90) + ')' + 'translate(' + (this.outerRadius + 10) + ')' + (d.angle > Math.PI ? 'rotate(180)' : ''); }) 
+				return 'rotate(' + (d.angle * 180 / Math.PI - 90) + ')' + 'translate(' + (this.outerRadius + 30) + ')' + (d.angle > Math.PI ? 'rotate(180)' : ''); }) 
 			.style('fill', (d,i) => { return this.adjacency.nodes[d.index].color; })
 			.text((d,i) => { return this.adjacency.nodes[d.index].name; }).style('cursor','pointer').style('font-size', '12px') 
 			.attr('opacity', (d,i) => { if (this.adjacency.nodes[d.index].ref.properties.hidden) {return 0.1; } else { return 1;} });
@@ -593,20 +574,11 @@ class ChordDiagram {
 			.attr('stroke', (d,i) => { return this.adjacency.nodes[d.source.index].fillColor; }).attr('stroke-width', 1)
 			.attr('stroke-opacity', 0.4).attr('d', this.ribbon);		
 	}
-	_fade(opacity) {
+	_fade(opacity, duration) {
 	    return (d,i) => {
-	      this.viz.selectAll('path.chord').filter(d => d.source.index != i && d.target.index != i).transition().style('opacity', opacity); 
+	      this.viz.selectAll('path.chord').filter(d => d.source.index !== i && d.target.index !== i).transition().duration(duration).style('opacity', opacity).style('stroke-opacity', opacity/2);
 	  };
 	}
-
-	_mouseoverChord(d,i) {		
-		this.viz.selectAll('path.chord').transition().style('opacity', 0.1);
-		d3.select(this).transition().style('opacity', 1);
-	}
-
-	_mouseoutChord(d) {
-		this.viz.selectAll('path.chord').transition().style('opacity', this.opacityDefault);
-	}    
 	  
 	_matrix(nodes, edges) {		
 		let matrix = [];

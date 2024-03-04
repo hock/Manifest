@@ -65,7 +65,7 @@ function Start() {
 		 }); });	
 		document.querySelectorAll('.geocoderinput').forEach(el => { el.addEventListener('keydown', (e) => { 
 			let inputvalue = el.value;
-			if (inputvalue !== '') { if (typeof inputvalue.split(',')[1] != 'undefined') { UpdateChooserMarker(inputvalue.split(',')[0], inputvalue.split(',')[1], marker);}}
+			if (inputvalue !== '') { if (typeof inputvalue.split(',')[1] !== 'undefined') { UpdateChooserMarker(inputvalue.split(',')[0], inputvalue.split(',')[1], marker);}}
 		}); });				
 	});
 }
@@ -75,8 +75,8 @@ function OpenMap(map, marker, input) {
 	document.getElementById('map_chooser_wrap').classList.remove('closed');
 	let mapCenter = [40.730610,-73.935242], inputvalue = input.value;
 	
-	if (inputvalue != '') {
-		if (inputvalue.split(',')[1] != undefined) {
+	if (inputvalue !== '') {
+		if (inputvalue.split(',')[1] !== undefined) {
 			map.setView(new L.LatLng(inputvalue.split(',')[0], inputvalue.split(',')[1]), 3, {'animate': false});
 			UpdateChooserMarker(inputvalue.split(',')[0], inputvalue.split(',')[1], marker);			
 		} else { 

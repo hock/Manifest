@@ -10,10 +10,10 @@
 	<!-- build:process -->
 	<base href="<%= baseurl %>">	
 	<link rel="stylesheet" href="<%= css_editpath %>"> 
+	<meta property="og:url" content="<%= baseurl %>edit/">	
+	<link rel="canonical" href="<%= baseurl %>edit/">
 	<!-- /build -->
 
-	<meta property="og:url" content="https://manifest.supplystudies.com/edit/">	
-	<link rel="canonical" href="https://manifest.supplystudies.com/edit/">
 	<!-- build:section layout.header --><!-- /build -->
 </head>
 
@@ -27,7 +27,7 @@
 	<section id="editor_intro">
 		<h1>Creating Manifests</h1>
 		
-		<p class="biggertext callout">This page contains information on creating Manifest Documents, including a simple proof-of-concept editor and a note on supported file formats. At this time the best way to create Manifest Documents is to use the Google Sheets template we provide. <br><br>For more information on how to create a Manifest Document, please <strong><a href="https://github.com/hock/Manifest/wiki/Creating-Manifests">follow this guide</a></strong>.</p>
+		<p class="biggertext callout">This page contains information on creating Manifest Documents, including a simple proof-of-concept editor and a note on supported file formats. At this time the best way to create Manifest Documents is to use the Google Sheets template we provide. <br><br>For more information on how to create a Manifest Document, please <strong><a href="https://github.com/hock/Manifest/wiki/2.-Creating-Manifests">follow this guide</a></strong>.</p>
 		
 	</section>
     <section id="editor_wrap">
@@ -39,15 +39,12 @@
 			</div>
 	
 	    	<button id='save-manifest-btn'><i class="fas fa-save"></i>Save & Download</button>
-		</section>
-		
+		</section> 
     </section>
 	
 	<section id="editor_overview">
 		<div class="edit_callout"><h3>Manifest File Format</h3> 
-			<p>Manifest documents are JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This schema proposes a standard file format for the critical study of supply chains and other logistical networks. While this is the preferred mechanism for <em>modeling</em> supply chains within Manifest, the format is still in active development and we don't recommend using it directly. If you are looking to create your own Manifest document, we suggest following the guide for <strong><a href="https://github.com/hock/Manifest/wiki/Creating-Manifests">creating Manifest in Google Sheets</a></strong>.</p>
-			<h3>Google Sheets</h3> 
-			<p>If you would like to create your own Manifest document, we provide a simple <a href="https://docs.google.com/spreadsheets/d/1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo/">Google Spreadsheet template</a> that can be loaded into Manifest by making the sheet public and <a href="https://manifest.supplystudies.com/#gsheet-1-MV6VSxuafS7h7_QkRbHXSjOyu07vzmnyGsAS21MLTo">passing its ID to Manifest</a>.</p>
+			<p>Manifest documents are JSON files that correspond to the <a href="https://github.com/hock/Manifest/tree/master/src/lib/json/schema">Manifest Schema</a>. This schema proposes a standard file format for the critical study of supply chains and other logistical networks. While this is the preferred mechanism for <em>modeling</em> supply chains within Manifest, the format is still in active development and we don't recommend using it directly.</p><p>If you are looking to create your own Manifest document, we suggest following the guide for <strong><a href="https://github.com/hock/Manifest/wiki/2.-Creating-Manifests">Creating Manifests</a></strong> and working with our <a href="https://bit.ly/manifest-template">Google Sheet Template</a>.</p>
 			<h3>Other formats</h3>
 			<p>Manifest also supports the <a href="data/#smap">SMAP geojson files</a> that were originally created for the <a href="https://supplystudies.com/sourcemap/">Sourcemap project</a>.</p>
 		</div>

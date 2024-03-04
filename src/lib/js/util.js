@@ -13,14 +13,9 @@ class ManifestUtilities {
 		    }
 		};
 		this.markdowner.addExtension(customClassExt);
-		
-		String.prototype.hashCode = function() {
-		  let hash = 0, i, chr;
-		  if (this.length === 0) return hash;
-		  for (let i = 0; i < this.length; i++) { chr = this.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; }
-		  return Math.abs(hash);
-		};
 	}
+	static Hash(str) { let hash = 0, i, chr; if (str.length === 0) { return hash; } for (let i = 0; i < str.length; i++) { 
+		chr = str.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; } return Math.abs(hash); }
 	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
 	static URLMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(https?:\/\/[^\s"]+)/gi; }
 	static ManifestMatch() { return /(?![^<]*>|[^<>]*<\/(?!(?:p|pre|li|span)>))(manifest?:\/\/[^\s"]+)/gi; }
@@ -30,8 +25,8 @@ class ManifestUtilities {
 function until(conditionFunction) {
 
   const poll = resolve => {
-    if(conditionFunction()) resolve();
-    else setTimeout(_ => poll(resolve), 400);
+    if (conditionFunction()) { resolve(); }
+    else { setTimeout(_ => poll(resolve), 400); }
   };
 
   return new Promise(poll);

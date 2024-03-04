@@ -10,11 +10,14 @@
 	<!-- build:process -->
 	<base href="<%= baseurl %>">
 	<link rel="stylesheet" href="<%= css_path %>"> 
-	<script src="<%= livereload %>"></script> 
+	<meta property="og:url" content="<%= baseurl %>">	
+	<link rel="canonical" href="<%= baseurl %>">
+	<script> 
+		const mversion = "<%= version %>";		
+		//if (<%= livereload %>) {//	console.log("live reload");//	}
+	</script>
 	<!-- /build -->
 
-	<meta property="og:url" content="https://manifest.supplystudies.com/">	
-	<link rel="canonical" href="https://manifest.supplystudies.com/">
 	<!-- build:section layout.header --><!-- /build -->	
 </head>
 
@@ -35,8 +38,8 @@
 				<option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
 				<option id="flow-viz-choice" value="flow">Flow</option>
 				<option id="chord-viz-choice" value="chord">Chord</option>
-				<option id="listview-viz-choice" value="listview">List</option>
-				<option id="textview-viz-choice" value="textview">Raw</option>
+				<option id="listview-viz-choice" value="listview">Sheet</option>
+				<option id="textview-viz-choice" value="textview">Data</option>
 			</select>
 		</nav>
 		<nav class="vizmenu-entry">
@@ -46,12 +49,12 @@
 		<div class="clear"></div>
 	</section>
 	
-	<main class="view-wrapper">
+	<main id="view-wrapper" class="view-wrapper">
 		<div id="vizwrap" class="vizwrap closed">
 			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill="#21222c"></rect></svg>
 			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();">		
 		</div>
-		
+		<div id="viztooltip"></div>
 		<div class="searchwidget">
 			<i class="fas fa-search"></i> 
 			<input type="text" placeholder="Filter by..." id="searchbar"> 
@@ -67,15 +70,15 @@
 			<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
 			
 			<div id="basemapselect">
-				<h3><label for="basemap">Map Baselayer</label></h3>
+				<h3><label for="basemap-chooser">Map Baselayer</label></h3>
 				<select name="basemap" id="basemap-chooser"></select>
 			</div>
 			<div id="datalayers">
 				<h3>Data Layers</h3> 
 				<p id="datalayers-description">Add Pmtiles, Geojson, or Shapefiles.</p>
-				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
-				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
-				<div class="layerrow"><label class="layercontainer"><input type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
+				<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
+				<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
+				<div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
 				<div id="userdatalayers"></div>
 				<div id="load-datalayers-row">
 					<input type="text" id="load-datalayers-input"><button id="load-datalayers-btn"><i class="fas fa-plus-circle"></i></button>

@@ -17,9 +17,9 @@
 	#minfodetail { padding: 0rem 1rem 1rem 1rem; margin: 2.1rem -1rem -1rem -1rem; font-size:1rem;}
 	#minfodetail.is-dragover { filter: brightness(70%); }
 	#minfodetail #minfomenu { border-top:1px solid #eee; border-bottom:1px solid #eee; padding:0.5rem 0;}
-	#minfodetail #minfomenu .hb-menu-item { display:block; padding:0.25rem 0.25rem; cursor: pointer; color:#333; text-decoration:none;}
-	#minfodetail #minfomenu .hb-menu-item:hover { background:#eee; color:#111; }
-	#minfodetail #minfomenu .hb-menu-item i { margin:0 1rem; color:#5e45ec;}
+	#minfodetail #minfomenu .minfo-menu-item { display:block; padding:0.25rem 0.25rem; cursor: pointer; color:#333; text-decoration:none;}
+	#minfodetail #minfomenu .minfo-menu-item:hover { background:#eee; color:#111; }
+	#minfodetail #minfomenu .minfo-menu-item i { margin:0 1rem; color:#5e45ec;}
 	#minfodetail #minfomenu .spacer { height:1rem; }
 	#minfodetail #minfomenu i {display:inline-block; width:1rem;}
 	
@@ -46,17 +46,17 @@
 	body.editor #editor_holder div[data-schemapath=root] > .je-object__title button { display:none;}
 	body.editor #editor_holder .json-editor-btn-edit_properties span {display:none;}
 
-	body.editor #editor_holder div[data-schemapath=root\.nodes] { min-height:5rem;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] select { font-size:2rem;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] div[data-schemaid=arr_item] { padding-bottom:0.5rem; border-bottom:1px solid #fff;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] div[data-schemaid=arr_item] > .je-object__title > label:before { content:"\f041"; margin-right:0.5rem; font-family: FontAwesome; }
+	body.editor #editor_holder div[data-schemapath="root.nodes"] { min-height:5rem;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] select { font-size:2rem;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] div[data-schemaid=arr_item] { padding-bottom:0.5rem; border-bottom:1px solid #fff;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] div[data-schemaid=arr_item] > .je-object__title > label:before { content:"\f041"; margin-right:0.5rem; font-family: FontAwesome; }
 	body.editor .je-modal { border:1px solid #ccc; border-radius:0.25rem; padding:0.5rem; box-shadow:rgba(100,100,100,0.4) 0.05rem 0.05rem;}
 	body.editor .je-modal .property-selector-input { font-size:1rem;}
 	body.editor #editor_overview .edit_callout { font-size:1.2rem; padding:2rem 2rem 0.5rem 2rem; margin:0 0 0.5rem 0; }
 	body.editor #editor_holder label { text-transform:none; }
 
-	body.editor #editor_holder div[data-schemapath=root\.summary] > h3.je-header, body.editor #editor_holder div[data-schemapath=root\.summary] > .je-object__controls { display:none;}
-	body.editor #editor_holder div[data-schemapath=root\.location] > h3.je-header, body.editor #editor_holder div[data-schemapath=root\.location] > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.summary"] > h3.je-header, body.editor #editor_holder div[data-schemapath="root.summary"] > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.location"] > h3.je-header, body.editor #editor_holder div[data-schemapath="root.location"] > .je-object__controls { display:none;}
 
 	body.editor .je-object__container > .je-indented-panel { margin-left:0;}
 	body.editor .je-indented-panel .je-indented-panel {border:2px solid rgba(218, 222, 228, 0.3); border-radius:0.25rem; padding:0.25rem; 
@@ -72,34 +72,34 @@
 	body.editor #editor_holder p.je-form-input-label { font-size:0.8rem; color:#999; margin:0.25rem 0;}
 	body.editor .editor-statusbar { display:none;}
 
-	body.editor #editor_holder div[data-schemapath=root\.nodes] p { font-size:0.8rem; color:#999; margin:0.25rem 0;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] div[data-schematype=array] .je-indented-panel { border:0; padding:0; margin:0;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] p { font-size:0.8rem; color:#999; margin:0.25rem 0;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] div[data-schematype=array] .je-indented-panel { border:0; padding:0; margin:0;}
 
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Overview > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Overview > .row > .je-object__container > .je-object__controls { display:none;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Location > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Location > .row > .je-object__container > .je-object__controls { display:none;}	
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Attributes > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Attributes > .row > .je-object__container > .je-object__controls { display:none;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Measures > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Measures > .row > .je-object__container > .je-object__controls { display:none;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Notes > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Notes > .row > .je-object__container > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Overview > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Overview > .row > .je-object__container > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Location > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Location > .row > .je-object__container > .je-object__controls { display:none;}	
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Attributes > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Attributes > .row > .je-object__container > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Measures > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Measures > .row > .je-object__container > .je-object__controls { display:none;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Notes > .row > .je-object__container > .je-header, body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Notes > .row > .je-object__container > .je-object__controls { display:none;}
 	
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Overview,
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Attributes,
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Location,
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Measures,
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Notes { min-height:30rem; }
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Overview,
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Attributes,
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Location,
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Measures,
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Notes { min-height:30rem; }
 
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-child-editor-holder .json-editor-btn-add { margin-bottom:1rem; }	
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-child-editor-holder .json-editor-btn-add { margin-bottom:1rem; }	
 	body.editor #editor_holder .je-tab--top { padding:0.25rem 0.5rem;}
 
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .json-editor-btn-collapse { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.25 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #999; border-color: #999; display:inline-block; }	
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .json-editor-btn-add  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #4d34db; border-color: #4d34db; display:inline-block; }	
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .json-editor-btn-delete  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: red; border-color: red; display:inline-block; }
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-collapse { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.25 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #999; border-color: #999; display:inline-block; }	
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-add  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #4d34db; border-color: #4d34db; display:inline-block; }	
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-delete  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: red; border-color: red; display:inline-block; }
 	
 	body.editor .je-table input { }
 	body.editor div[data-theme="html"] .je-form-input-label { font-weight:normal; }
 	body.editor div[data-theme="html"] .je-table { margin-bottom: 0.5rem; border: none; }	
-	body.editor #editor_holder div[data-schemapath=root\.nodes] td {padding-right:0.5rem;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Measures td { width:30%;}
-	body.editor #editor_holder div[data-schemapath=root\.nodes] .je-indented-panel#Notes td { width:50%;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] td {padding-right:0.5rem;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Measures td { width:30%;}
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-indented-panel#Notes td { width:50%;}
 	
 	body.editor .CodeMirror { font-size:1rem;}
 	
@@ -233,8 +233,8 @@
 	  transition: opacity 100ms;
 	}
 	body.textpage .ft-slide-arrow:hover, body.textpage .ft-slide-arrow:focus{opacity:1;}
-	body.textpage #ft-slide-arrow-prev{left:0;padding-left:0.25rem;border-radius:0 2rem 2rem 0;}
-	body.textpage #ft-slide-arrow-next{right:0;padding-left:0.75rem;border-radius:2rem 0 0 2rem;}
+	body.textpage #ft-slide-arrow-prev{left:0;padding-left:0.25rem;border-radius:0 2rem 2rem 0; cursor:pointer;}
+	body.textpage #ft-slide-arrow-next{right:0;padding-left:0.75rem;border-radius:2rem 0 0 2rem; cursor:pointer;}
 	
 	.dataviewer div.dot { 
 		cursor:pointer; height:1rem; width:1rem; border-radius:1rem; border:0.2rem solid; margin:0 0.2rem 0 0rem; float:left; text-align:center; font-size:0.8rem;
@@ -324,6 +324,10 @@
 	
 }
 /* Compressed/Mobile Styles */
+@media only screen and (max-width:1220px) { 
+	body.textpage .text-menu { display:none;}
+}
+
 @media only screen and (max-width: 920px) and (orientation: portrait) { 
 	body {  display: flex; flex-flow: column wrap; width:100vw; min-width:100vw; max-width:100vw; }
 	

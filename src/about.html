@@ -10,10 +10,10 @@
 	<!-- build:process -->
 	<base href="<%= baseurl %>">	
 	<link rel="stylesheet" href="<%= css_staticpath %>"> 
+	<meta property="og:url" content="<%= baseurl %>about/">	
+	<link rel="canonical" href="<%= baseurl %>about/">
 	<!-- /build -->
 
-	<meta property="og:url" content="https://manifest.supplystudies.com/about/">	
-	<link rel="canonical" href="https://manifest.supplystudies.com/about/">
 	<!-- build:section layout.header --><!-- /build -->
 </head>
 
@@ -36,7 +36,7 @@
 		  <button class="ft-slide-arrow" id="ft-slide-arrow-prev"> &#8249; </button>
 		  <button class="ft-slide-arrow" id="ft-slide-arrow-next"> &#8250; </button>
   
-		  <ul class="ft-slides-container" id="ft-slides-container">
+		  <ul class="ft-slides-container" id="ft-slides-container" data-index="1" data-min="1" data-max="11">
 		    <li class="ft-slide">
 				<div class="featured-caption">Overview of Manifest interface, with Manifest document and map visualization.</div>
 				<div class="featured-image"><img src="./images/features/1.png" loading="lazy" alt="Manifest Interface"></div>

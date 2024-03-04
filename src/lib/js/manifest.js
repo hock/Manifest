@@ -22,9 +22,34 @@ class Manifest {
 		this.Messenger = new ManifestMessenger(this.Atlas);
 		this.Util = new ManifestUtilities();
 	}
+	Start(delay=false) {
+	//	MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
+		MI.Atlas.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
+		
+		if (!(MI.initialized) || MI.Atlas.active_point === null) { MI.Atlas.SetView(MI.options.view); }
+		if (MI.supplychains.length > 0) {
+			if (!(MI.initialized || delay)) { MI.Interface.CleanupInterface(); }   
+		}
 
+		// Do Testing
+		if (MI.options.demoMode) { MI.ManifestTests(); }
+	}
+	
+	ManifestTests() {
+		MI.Interface.ShowMessage('Welcome to Manifest!');
+		MI.Atlas.glMap.on('load', (e) => { 
+			//MI.Interface.AddDataLayer('services/data/sample/roads.geojson');
+			//MI.Interface.AddDataLayer('services/data/sample/countries.pmtiles');
+			MI.Atlas.Play("tour"); // tour or highlight
+		});		
+		
+		MI.Messenger.AddObject(353136000);
+		//setInterval(TestLoad, 5000);
+	}
+	
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
+		console.log(d);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 		options = Object.assign(options, MI.options);
 		
@@ -36,9 +61,8 @@ class Manifest {
 			case 'yeti': this.Supplychain.Map(this.Supplychain.Setup(this.FormatYETI(d, options))); break;
 			case 'gsheet': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
-		}		
-		this.Visualization.Set(MI.Visualization.type);	
-		if (options.start) { MI.Atlas.SetView(MI.options.view);}	
+		}			
+		MI.Start(options.delay);	
 	}
 
 	/** Format a Manifest file so Manifest can understand it */
@@ -333,13 +357,13 @@ class Manifest {
 	}
 
 	LoadManifestFile(filedata, filename) {
-		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === filename.hashCode()) { return false; }}
+		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === ManifestUtilities.Hash(filename)) { return false; }}
 		
 	    if (!filedata) { return false; }
 
 	    let reader = new FileReader();
 		reader.filename = filename;
-	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: e.target.filename.hashCode(), url: '', start:MI.supplychains.length === 0}); };
+	    reader.onload = function(e) { MI.Process('manifest', JSON.parse(e.target.result), {id: ManifestUtilities.Hash(e.target.filename), url: '', start:MI.supplychains.length === 0}); };
 	    reader.readAsText(filedata);
 		document.getElementById('file-input').value = "";
 		return true;
@@ -374,6 +398,7 @@ class Manifest {
 		
 	}
 	 ExportManifest(d, filename, format) {
+		 console.log("export manifest");
 		let a = document.createElement('a');
 		
 		if (format === 'map') {
@@ -400,7 +425,7 @@ class Manifest {
 		for (let node of d.graph.nodes) {
 			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
 			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
-				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates.reverse().join(',')},
+				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates[1]+','+node.ref.geometry.coordinates[0]},
 				attributes:{destinationindex:[],image:node.ref.properties.images,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
 			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
 			s.nodes[Number(node.id.split('-')[1])] = n;
@@ -523,7 +548,6 @@ class ManifestMessenger {
 			document.querySelectorAll('.liveobject').forEach(el => { el.addEventListener('click', (e) => { 
 				let ll = el.id.substring(3).split('|');
 				MI.Atlas.SetActivePoint(null, true);
-				console.log(ll);
 				MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng(new L.latLng(ll[0],ll[1]))); 
 				
 			});});

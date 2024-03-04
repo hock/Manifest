@@ -1,11 +1,32 @@
 module.exports = function(grunt) {
+	let pkg = grunt.file.readJSON('package.json');
+	pkg.version = pkg.version.split(".");
+	let subversion = pkg.version.pop();
+	subversion++;
+	if (subversion >= 1000) { 
+		let version = pkg.version.pop(); 
+		version++; subversion = 0; 
+		pkg.version.push(version);
+	}
+	pkg.version.push(subversion);
+	pkg.version = pkg.version.join(".");
+	grunt.file.write('package.json', JSON.stringify(pkg, null, 2));
+	
 	const development = { 
 		baseurl: 'https://manifest.supplystudies.com/dev/', 
 		serverurl: 'https://service.supplystudies.com/manifest/', 
-		css_path: 'css/Manifest-main.min.css', css_editpath: 'css/Manifest-edit.min.css', css_staticpath: 'css/Manifest-static.min.css',
-		js_mainpath: 'js/Manifest-main.min.js', js_editpath: 'js/Manifest-edit.min.js', js_staticpath: 'js/Manifest-static.min.js', js_datapath: 'js/Manifest-data.min.js', js_libpath: 'js/Manifest-lib.min.js',
+		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
+		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
 		src: 'src', dist: '/var/www/manifest.supplystudies.com/dev/',
-		livereload: ''
+		livereload: false
+	}
+	const local_min = { 
+		baseurl: 'http://hockbook.local/Manifest/dist/', 
+		serverurl: 'http://hockbook.local:3000/', 
+		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
+		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
+		src: 'src', dist: 'dist',
+		livereload: false
 	}
 	const local = { 
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
@@ -13,10 +34,10 @@ module.exports = function(grunt) {
 		css_path: 'css/Manifest-main.css', css_editpath: 'css/Manifest-edit.css', css_staticpath: 'css/Manifest-static.css',
 		js_mainpath: 'js/Manifest-main.js', js_editpath: 'js/Manifest-edit.js', js_staticpath: 'js/Manifest-static.js', js_datapath: 'js/Manifest-data.js', js_libpath: 'js/Manifest-lib.js',
 		src: 'src', dist: 'dist',
-		livereload: ''
+		livereload: true
 	}
 	const target = local;
-	const version = '0.3.1';
+	target.version = pkg.version;
 	
 	grunt.initConfig({
 	  mdist: target.dist, msrc: target.src, 
@@ -63,29 +84,35 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-			
+		less: {
+		  target: {
+		    files: {
+		      '<%= mdist %>/css/fonts.css': '<%= msrc %>/lib/less/fonts.less', '<%= mdist %>/css/fa.css': '<%= msrc %>/lib/less/fa.less', '<%= mdist %>/css/leaflet.css': '<%= msrc %>/lib/less/leaflet.less', '<%= mdist %>/css/visualize.css': '<%= msrc %>/lib/less/visualize.less', '<%= mdist %>/css/manifest.css': '<%= msrc %>/lib/less/manifest.less', '<%= mdist %>/css/simplemde.css': '<%= msrc %>/lib/less/simplemde.less', '<%= mdist %>/css/editor.css': '<%= msrc %>/lib/less/editor.less'
+		    }
+		  }
+		},	
+		
 		cssmin: {
 		  target: {
 		    files: [{
 		      expand: true,
 		      src: ['<%= mdist %>/css/Manifest-main.css','<%= mdist %>/css/Manifest-edit.css','<%= mdist %>/css/Manifest-static.css'],
-		      ext: '.min.css'
+		      ext: '.'+pkg.version+'.min.css'
 		    }]
 		  }
 		},
 		
-		jshint: { js: ['<%= msrc %>/lib/js/*.js'], options: { 'esversion': 8 } },
+		jshint: { js: ['<%= msrc %>/lib/js/*.js'], options: { 'jshintrc': true } },
 
 		uglify: {
-			options: { banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n', sourceMap: true, sourceMapIn: function(path) { return path + ".map";} },
+			options: { banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n', sourceMap: true, sourceMapIn: function(path) { return path + ".map";} },
 			js: {
 				files : {
-				'<%= mdist %>/js/<%= pkg.name %>-lib.min.js' : '<%= mdist %>/js/<%= pkg.name %>-lib.js',
-				'<%= mdist %>/js/<%= pkg.name %>-main.min.js' : '<%= mdist %>/js/<%= pkg.name %>-main.js',
-				'<%= mdist %>/js/<%= pkg.name %>-static.min.js' : '<%= mdist %>/js/<%= pkg.name %>-static.js',
-				'<%= mdist %>/js/<%= pkg.name %>-data.min.js' : '<%= mdist %>/js/<%= pkg.name %>-data.js',
-				'<%= mdist %>/js/<%= pkg.name %>-edit.min.js' : '<%= mdist %>/js/<%= pkg.name %>-edit.js',
-				'<%= mdist %>/services/manifester.min.js' : '<%= mdist %>/services/manifester.js'				
+				'<%= mdist %>/js/<%= pkg.name %>-lib.<%= pkg.version %>.min.js' : '<%= mdist %>/js/<%= pkg.name %>-lib.js',
+				'<%= mdist %>/js/<%= pkg.name %>-main.<%= pkg.version %>.min.js' : '<%= mdist %>/js/<%= pkg.name %>-main.js',
+				'<%= mdist %>/js/<%= pkg.name %>-static.<%= pkg.version %>.min.js' : '<%= mdist %>/js/<%= pkg.name %>-static.js',
+				'<%= mdist %>/js/<%= pkg.name %>-data.<%= pkg.version %>.min.js' : '<%= mdist %>/js/<%= pkg.name %>-data.js',
+				'<%= mdist %>/js/<%= pkg.name %>-edit.<%= pkg.version %>.min.js' : '<%= mdist %>/js/<%= pkg.name %>-edit.js'
 				}
 			}
 		},
@@ -117,15 +144,15 @@ module.exports = function(grunt) {
 				dest: '<%= mdist %>/services/manifester.js'
 			},
 			css_main: {
-				src: ['<%= msrc %>/lib/css/fonts.css','<%= msrc %>/lib/css/fa.css','<%= msrc %>/lib/css/leaflet.css','<%= msrc %>/lib/css/visualize.css','<%= msrc %>/lib/css/manifest.css'],
+				src: ['<%= mdist %>/css/fonts.css','<%= mdist %>/css/fa.css','<%= mdist %>/css/leaflet.css','<%= mdist %>/css/visualize.css','<%= mdist %>/css/manifest.css'],
 				dest: '<%= mdist %>/css/<%= pkg.name %>-main.css'
 			},
 			css_edit: {
-				src: ['<%= msrc %>/lib/css/fonts.css','<%= msrc %>/lib/css/fa.css','<%= msrc %>/lib/css/leaflet.css','<%= msrc %>/lib/css/visualize.css','<%= msrc %>/lib/css/simplemde.css','<%= msrc %>/lib/css/editor.css'],
+				src: ['<%= mdist %>/css/fonts.css','<%= mdist %>/css/fa.css','<%= mdist %>/css/leaflet.css','<%= mdist %>/css/visualize.css','<%= mdist %>/css/simplemde.css','<%= mdist %>/css/editor.css'],
 				dest: '<%= mdist %>/css/<%= pkg.name %>-edit.css'
 			},
 			css_static: {
-				src: ['<%= msrc %>/lib/css/fonts.css','<%= msrc %>/lib/css/fa.css','<%= msrc %>/lib/css/editor.css'],
+				src: ['<%= mdist %>/css/fonts.css','<%= mdist %>/css/fa.css','<%= mdist %>/css/editor.css'],
 				dest: '<%= mdist %>/css/<%= pkg.name %>-static.css'
 			}
 		},
@@ -133,7 +160,8 @@ module.exports = function(grunt) {
   		  html: { files: ['<%= msrc %>/**/*.html'], tasks: ['htmlbuild'], options: { livereload:true } },
 		  js: { files: ['<%= msrc %>/lib/**/*.js'], tasks: ['jshint', 'concat'], options: { livereload:true } },
 		  srv: { files: ['<%= msrc %>/services/*.js'], tasks: ['concat'], options: { livereload:true } },
-		  css: { files: ['<%= msrc %>/lib/**/*.css'], tasks: ['concat'], options: { livereload:true } },
+		  less: { files: ['<%= msrc %>/lib/less/*.less'], tasks: ['less'], options: { livereload:true } },		
+		  css: { files: ['<%= mdist %>/css/*.css'], tasks: ['concat'], options: { livereload:true } },
 		  copy: { files: ['<%= msrc %>/lib/**/*.json'], tasks: ['copy'], options: { livereload:true } }
 		}
 	});
@@ -142,11 +170,12 @@ module.exports = function(grunt) {
 grunt.loadNpmTasks('grunt-contrib-copy');
 grunt.loadNpmTasks('grunt-html-build');
 grunt.loadNpmTasks('grunt-contrib-cssmin');
+grunt.loadNpmTasks('grunt-contrib-less');
 grunt.loadNpmTasks('grunt-contrib-uglify');
 grunt.loadNpmTasks('grunt-contrib-jshint');
 grunt.loadNpmTasks('grunt-contrib-concat');
 grunt.loadNpmTasks('grunt-contrib-watch');
 
 // Set tasks
-grunt.registerTask('default', ['copy','htmlbuild', 'concat', 'cssmin', 'uglify']);
+grunt.registerTask('default', ['copy','htmlbuild','less','concat','cssmin','uglify']);
 };

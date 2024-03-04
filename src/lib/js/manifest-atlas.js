@@ -9,6 +9,8 @@ class ManifestAtlas {
 		this.active_point = null;
 		this.homecontrol = null;
 		this.glMapLoaded = false;
+		this.playlist = {index: 0, list: [], runtime: null};
+		
 		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
 		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
 		this.baselayer = options.map ? options.map : 'default';
@@ -91,7 +93,7 @@ class ManifestAtlas {
 			}
 			/* this.glMap.addSource("we-map-1927-source", { "type": "image", "url": "./json/samples/westernelectric/we-map-1927.png", "coordinates": [ [-180, 85], [180, 85], [180, -85], [-180, -85] ] }); this.glMap.addLayer({ "id": "overlay", "source": "we-map-1927-source", "type": "raster", "paint": { "raster-opacity": 1 } }); */
 			
-			document.querySelectorAll('#datalayers input[type=checkbox]').forEach(el => { 
+			document.getElementById('datalayers').querySelectorAll('input[type=checkbox]').forEach(el => { 
 				MI.Atlas.ProcessDataLayerFromElement(el);
 			}); 
 			MI.Atlas.glMapLoaded = true;
@@ -101,16 +103,50 @@ class ManifestAtlas {
 	
 	Refresh() { this.map._renderer._redraw(); }
 	
+	Play(mode) {
+		console.log("play");
+		for (let i in MI.Atlas.map._layers) { 
+			//console.log(MI.Atlas.map._layers[i]);
+			
+			if (MI.Atlas.map._layers[i].feature && MI.Atlas.map._layers[i].feature.geometry && MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
+				//MI.Atlas.map._layers[i].setStyle({fillColor: MI.Atlas.map._layers[i].feature.properties.style.highlightColor});		
+			
+				//console.log(MI.Atlas.map._layers[i].feature);
+				MI.Atlas.playlist.list.push(MI.Atlas.map._layers[i]);
+			}
+		}
+		MI.Atlas.playlist.list = MI.Atlas.playlist.list.sort(
+		    (p1, p2) => (p1.feature.properties.lid > p2.feature.properties.lid) ? 1 : (p1.feature.properties.lid < p2.feature.properties.lid) ? -1 : 0);
+		
+		MI.Atlas.playlist.runtime = setInterval(MI.Atlas.PlayStep, 10000, mode);
+	}
+	PlayStep(mode) {
+		if (mode === 'tour') {
+			let ft = MI.Atlas.playlist.list[MI.Atlas.playlist.index].feature;
+	
+			MI.Atlas.map.flyTo(MI.Atlas.GetOffsetLatlng(ft.properties.latlng, 12), 12, {
+				animate: true, duration: 5}); 	
+			let offset = 0;
+			if (document.getElementById('local_'+ft.properties.lid).parentElement) {
+				let prev = document.getElementById('local_'+ft.properties.lid).parentElement.previousElementSibling;
+				while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
+			}
+			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+ft.properties.lid).offsetTop + (-1*offset), behavior: 'smooth'});	
+			
+			MI.Atlas.playlist.list[MI.Atlas.playlist.index].setStyle({fillColor: MI.Atlas.playlist.list[MI.Atlas.playlist.index].feature.properties.style.highlightColor});	
+		} else { // mode === highlight
+			MI.Atlas.playlist.list[MI.Atlas.playlist.index].setStyle({fillColor: MI.Atlas.playlist.list[MI.Atlas.playlist.index].feature.properties.style.highlightColor});	
+		}
+		MI.Atlas.playlist.index++;
+	}
+	
 	PopupOpen(e) {		
 		this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
-		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
 
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
-
-		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});			
-		
+		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});				
 	}
 	
 	PopupClose(e) {
@@ -135,13 +171,19 @@ class ManifestAtlas {
 		let popupContent, tooltipTitle, fid = feature.properties.lid;		
 				
 		popupContent = `
-		<div id="intro-content">
 		<h2 id="popup-${fid}" class="poptitle">
-			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
+			<div id="intro-logo" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></div> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">Manifest</span>
 		</h2>
-		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>
-		</div><div id="intro-readme"><div id="intro-content-log">${MI.Util.markdowner.makeHtml(MI.changelog)}</div></div><div class='clear'></div>`;
+		<div id="intro-version">v${mversion}</div>
+		<div id="intro-content">
+		
+		<div id="intro-main">
+		
+		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>		
+		</div>
+		<div id="intro-readme"><div id="intro-content-log">${MI.Util.markdowner.makeHtml(MI.changelog)}</div></div>
+		</div>`;
 		layer.bindPopup(popupContent, { className: 'pop-intro'});
 		
 		tooltipTitle = feature.properties.title; 
@@ -158,10 +200,10 @@ class ManifestAtlas {
 	
 	/** Render points by setting up a GeoJSON feature for display **/
 	RenderPoint(feature, layer) {
+		if (feature.properties.lid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
+		
 		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
-
-		if (fid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
 
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
@@ -259,30 +301,30 @@ class ManifestAtlas {
 				}
 			} 
 		} 
-		if (document.getElementById('searchbar').value !== '' || document.querySelectorAll('#supplycategories .supplycat input:not(:checked)').length > 0) {
+		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) {
 			 this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase()); 
-		 }
+		}
 	}
 	
 	/** The UI side of the focus function, scrolls the user interface to a point based on map (or functional) action **/
 	MapPointClick(node, speed='smooth') {
 		if (node === null) { return; }
-		let id;		
-		if ( typeof node === 'object' ) {
-			// TEMP if (node._popup._source.options.fillOpacity === 0.1) { return; }
-			id = node._popup._source.feature.properties.lid;
-		} else { id = node; if (document.getElementById('local_'+id)) {document.getElementById('local_'+id).click();} else { return; } }
+		let id = null;		
+		
+		if (typeof node === 'object') { id = node._popup._source.feature.properties.lid; 
+		} else { id = node; if (document.getElementById('local_'+id)) { MI.Atlas.PointFocus(id); /* replacing: document.getElementById('local_'+id).click();*/ } else { return; } }
 	
-		if (!document.body.classList.contains('fullscreen')) {
-			let offset = 0;
+		let offset = 0;
+		
+		if (document.getElementById('local_'+id) && document.getElementById('local_'+id).parentElement) {
 			let prev = document.getElementById('local_'+id).parentElement.previousElementSibling;
 			while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
-			
-			if (!MI.initialized) {
-				document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
-			} else {
-				document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+id).offsetTop + (-1*offset), behavior: speed});	
-			}
+		} else { MI.Atlas.active_point.closePopup(); return;}
+		
+		if (!MI.initialized) {
+			document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
+		} else {
+			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+id).offsetTop + (-1*offset), behavior: speed});	
 		}
 	}
 	
@@ -352,12 +394,12 @@ class ManifestAtlas {
 	}
 	
 	UpdateCluster(s, ft) {
-		if (!ft && !MI.Atlas.active_point || MI.Visualization.type !== 'map') { return; } else { if (!ft) { ft = MI.Atlas.active_point._popup._source.feature; }}	
+		if (!ft && !MI.Atlas.active_point || MI.Visualization.type !== 'map') { return; } else { if (!ft && MI.Atlas.active_point._popup._source) { ft = MI.Atlas.active_point._popup._source.feature; }}	
 		let ccount = 0, maxcount = 1;
 		
 		let closedcats = [];
-		document.querySelectorAll('#supplycategories .supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
-		document.querySelectorAll('.clusterbox').forEach(el => { 
+		document.getElementById('supplycategories').querySelectorAll('.supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
+		document.getElementById('map').querySelectorAll('.clusterbox').forEach(el => { 
 			let text = el.textContent.toLowerCase();
 	        if (text.indexOf(s) !== -1 && !(closedcats.some(text.includes.bind(text)))) { el.style.display = 'block'; } else { el.style.display = 'none'; }		
 	    });	
@@ -366,8 +408,8 @@ class ManifestAtlas {
 		for (let i in ft.properties.clustered) { if (!ft.properties.clustered[i].properties.hidden) { ccount++; } maxcount++; }
 
 		if (ccount === 0) { MI.Atlas.active_point.closePopup(); return; }
-		else if (ccount === maxcount) { document.querySelectorAll('.cluster-count').forEach(el => { el.textContent = maxcount; }); } 
-		else { document.querySelectorAll('.cluster-count').forEach(el => { el.textContent = ccount+'/'+maxcount; }); }
+		else if (ccount === maxcount) { document.getElementById('map').querySelectorAll('.cluster-count').forEach(el => { el.textContent = maxcount; }); } 
+		else { document.getElementById('map').querySelectorAll('.cluster-count').forEach(el => { el.textContent = ccount+'/'+maxcount; }); }
 		if (this.active_point) { this.MapPointClick(this.active_point); }
 		
 	}
@@ -404,13 +446,14 @@ class ManifestAtlas {
 	}
 	
 	/** A centering function that focuses on the first point of a supply chain **/
-	SetView(type='interest') {
+	SetView(type='interest', init=false) {
 		if (type === 'interest') {
-			const mlistId = document.getElementsByClassName('mlist')[document.getElementsByClassName('mlist').length-1].id.split('-')[1];
-			const nodeId = document.getElementsByClassName('mlist')[document.getElementsByClassName('mlist').length-1].childNodes[0].id.split('_')[1];
+			let index = MI.initialized ? document.getElementsByClassName('mlist').length-1 : 0;
+			const mlistId = document.getElementsByClassName('mlist')[index].id.split('-')[1];
+			const nodeId = document.getElementsByClassName('mlist')[index].childNodes[0].id.split('_')[1];
+
 			if (MI.Visualization.type === 'map') {
 				if (!MI.options.storyMap) {
-					MI.Interface.ShowHeader(mlistId);
 					MI.Atlas.PointFocus(nodeId, true);	
 				}
 			}	
@@ -424,9 +467,11 @@ class ManifestAtlas {
 	
 	DisplayLayers(show=true) {
 		if (show) {   
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.remove('closed'); }); }
+			document.getElementById('map').querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container').forEach(el => { el.classList.remove('closed'); }); 
+			document.getElementById('mapcapture').classList.remove('closed'); }
 		else { if (this.active_point !== null && this.active_point.closePopup) { this.active_point.closePopup(); } 
-			document.querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container, #mapcapture').forEach(el => { el.classList.add('closed'); }); }	
+			document.getElementById('map').querySelectorAll('.leaflet-overlay-pane, .leaflet-control-container').forEach(el => { el.classList.add('closed'); }); 
+			document.getElementById('mapcapture').classList.add('closed'); }	
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {
@@ -460,7 +505,7 @@ class ManifestAtlas {
 		        newStyle.layers = [...newStyle.layers, ...filteredLayers];
 		        newStyle.sources = Object.assign(newStyle.sources, filteredSources); 
 		        map.setStyle(newStyle);
-				document.querySelectorAll('.leaflet-control-attribution').forEach(el => { el.innerHTML = def.layer.options.attribution; });
+				document.getElementById('map').querySelectorAll('.leaflet-control-attribution').forEach(el => { el.innerHTML = def.layer.options.attribution; });
 			});
 		}
 	}
@@ -581,7 +626,7 @@ class ManifestAtlas {
 	GetTileImage(lat, lon, zoom) {
 	    let xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 	    let ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * (1<<zoom) ));
-		return 'https://tiles.stadiamaps.com/tiles/stamen_toner/'+zoom+'/'+xtile+'/'+ytile+'@2x.png';
+		return 'https://api.maptiler.com/maps/toner-v2/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr'; 
 	}
 	
 	/** Cycle through the colors for supply chains randomly **/

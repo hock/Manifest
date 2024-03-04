@@ -9,7 +9,7 @@ const app = express();
 
 const cors = require('cors')
 const corsOptions = {
-  origin: 'https://manifest.supplystudies.com'
+  origin: ['https://manifest.supplystudies.com','http://localhost','http://hockbook.local']
 }
 
 app.use(cors(corsOptions));
@@ -30,9 +30,7 @@ app.get('/maptiler/:type', async (req, res) => {
 		headers: {'Referer': 'https://service.supplystudies.com/',}
 	});
 	const data = await response.json();
-	
-	console.log(data);
-	
+		
 	res.send(data);
 });
 
@@ -80,7 +78,14 @@ app.get('/gsheet/:sheetID', async (req, res) => {
 	    { spreadsheetId: req.params.sheetID, fields: "sheets/properties/title" },
 	    (error, result) => { if (error) { 
 			console.log('The API returned an error: ' + error); 
-			res.status(500).send('The API returned an error: ' + error);
+			
+			if (error.message === 'Requested entity was not found.') {
+				res.status(500).send('We couldn\'t find a Google Sheet with that ID!');
+			} else if (error.message === 'The caller does not have permission') {
+				res.status(500).send(`This Google Sheet is not publicly accessible.<br>If this is your sheet, please go to [File] > [Share] > [Share With Others] in your Google Sheet and change the Viewing permissions to "Anyone with the link".`);
+			} else {
+			 	res.status(500).send('The API returned an error: ' + error);
+			}
 			return; }
 	      googleSheetsInstance.spreadsheets.values.batchGet(
 	        { spreadsheetId: req.params.sheetID, ranges: result.data.sheets.map(e => e.properties.title) },

@@ -101,6 +101,11 @@ body.light .vizmenu-label {color:#999;}
   border-radius: 0.25rem;
 }
 
+#viztooltip { 
+	display:none; font-size:0.8rem; padding:1rem; background:#fff; border:2px solid #fff; border-radius:0.5rem; max-height:22rem; width:18rem; overflow:scroll; position: absolute; z-index: 10000; 
+	h3 { margin:0; padding:0;}
+}
+
 /* Force Graph */
 .forcegraph line {
   stroke: #999;
@@ -502,7 +507,7 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	border-radius:0;
 	background:none;
 }
-.storymap .view-wrapper {
+.storymap #view-wrapper {
 	width:100%;
 	left:0;
 	right:auto;
@@ -539,9 +544,9 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 @media only screen and (max-width: 920px) and (orientation: portrait) { 
 	.vizwrap{position:relative;top:3.5rem;height:60%;width:100%;display:block;}
 	.vizwrap.closed { display:none; }
-	.view-wrapper.top .vizwrap { height:0;}
-	.view-wrapper.middle .vizwrap { height:60%;}
-	.view-wrapper.bottom .vizwrap { height:calc(100% - 6.9rem);}
+	#view-wrapper.top .vizwrap { height:0;}
+	#view-wrapper.middle .vizwrap { height:60%;}
+	#view-wrapper.bottom .vizwrap { height:calc(100% - 6.9rem);}
 	
 	.vizsvg {position:relative;height:100%;width:100%;display:block;}
 	.vizmenu, body.light .vizmenu { background:none; border:none; }
@@ -554,7 +559,7 @@ body.light.storymap #manifestlist .mheader .mtitle:hover {
 	
 	.vizmenu #measure-choices { margin-right:0;}
 	.vizmenu-label { display:none;}
-		
+	#viztooltip { display:none;}
 	#textview, #listview {font-size:1rem;top:3.5rem;height:calc(100% - 3.5rem);width:calc(100% - 2rem);position:absolute;padding:0.2rem 1rem;}
 	#datalist {
 	    margin: 1rem 0.5rem;

@@ -3391,7 +3391,7 @@
 		  		
 				// Refresh points
 		  		for (var id in MI.Atlas.map._renderer._layers) {
-					if (MI.Atlas.map._renderer._layers[id].feature.geometry.type === 'Point' && !MI.Atlas.map._renderer._layers[id].feature.properties.angle) {
+					if (MI.Atlas.map._renderer._layers[id].feature.geometry && MI.Atlas.map._renderer._layers[id].feature.geometry.type === 'Point' && !MI.Atlas.map._renderer._layers[id].feature.properties.angle) {
 		  				MI.Atlas.map._renderer._layers[id]._reset();
 					} 
 		  		}
