@@ -23,7 +23,6 @@ function Start() {
 }
 
 function SlideTo(index) {
-	console.log("sliding to "+index);
 	const slidesContainer = document.getElementById('ft-slides-container');
 	const slide = document.querySelector('.ft-slide');
 
