@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 		id: 'development',
 		baseurl: 'https://manifest.supplystudies.com/dev/', 
 		serverurl: 'https://service.supplystudies.com/manifest/', 
-		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
+		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_printpath: 'css/Manifest-print.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
 		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
 		src: 'src', dist: '/var/www/manifest.supplystudies.com/dev/'
 	}
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		id: 'local_min',
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
 		serverurl: 'http://hockbook.local:3000/', 
-		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
+		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_printpath: 'css/Manifest-print.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
 		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
 		src: 'src', dist: 'dist'
 	}
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 		id: 'local',
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
 		serverurl: 'http://hockbook.local:3000/', 
-		css_path: 'css/Manifest-main.css', css_editpath: 'css/Manifest-edit.css', css_staticpath: 'css/Manifest-static.css',
+		css_path: 'css/Manifest-main.css', css_printpath: 'css/Manifest-print.css', css_editpath: 'css/Manifest-edit.css', css_staticpath: 'css/Manifest-static.css',
 		js_mainpath: 'js/Manifest-main.js', js_editpath: 'js/Manifest-edit.js', js_staticpath: 'js/Manifest-static.js', js_datapath: 'js/Manifest-data.js', js_libpath: 'js/Manifest-lib.js',
 		src: 'src', dist: 'dist'	
 	}
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
 					data: {
 						baseurl: target.baseurl,
 						version: target.version,
-						css_path: target.css_path, css_editpath: target.css_editpath, css_staticpath: target.css_staticpath,
+						css_path: target.css_path, css_printpath: target.css_printpath, css_editpath: target.css_editpath, css_staticpath: target.css_staticpath,
 						js_mainpath: target.js_mainpath, js_editpath: target.js_editpath, js_staticpath: target.js_staticpath, js_datapath: target.js_datapath, js_libpath: target.js_libpath,
 						target: target.id
 					}
@@ -87,7 +87,7 @@ module.exports = function(grunt) {
 		less: {
 		  target: {
 		    files: {
-		      '<%= mdist %>/css/fonts.css': '<%= msrc %>/lib/less/fonts.less', '<%= mdist %>/css/fa.css': '<%= msrc %>/lib/less/fa.less', '<%= mdist %>/css/leaflet.css': '<%= msrc %>/lib/less/leaflet.less', '<%= mdist %>/css/visualize.css': '<%= msrc %>/lib/less/visualize.less', '<%= mdist %>/css/manifest.css': '<%= msrc %>/lib/less/manifest.less', '<%= mdist %>/css/simplemde.css': '<%= msrc %>/lib/less/simplemde.less', '<%= mdist %>/css/editor.css': '<%= msrc %>/lib/less/editor.less'
+		      '<%= mdist %>/css/fonts.css': '<%= msrc %>/lib/less/fonts.less', '<%= mdist %>/css/fa.css': '<%= msrc %>/lib/less/fa.less', '<%= mdist %>/css/leaflet.css': '<%= msrc %>/lib/less/leaflet.less', '<%= mdist %>/css/visualize.css': '<%= msrc %>/lib/less/visualize.less', '<%= mdist %>/css/manifest.css': '<%= msrc %>/lib/less/manifest.less', '<%= mdist %>/css/print.css': '<%= msrc %>/lib/less/print.less', '<%= mdist %>/css/simplemde.css': '<%= msrc %>/lib/less/simplemde.less', '<%= mdist %>/css/editor.css': '<%= msrc %>/lib/less/editor.less'
 		    }
 		  }
 		},	
@@ -96,7 +96,7 @@ module.exports = function(grunt) {
 		  target: {
 		    files: [{
 		      expand: true,
-		      src: ['<%= mdist %>/css/Manifest-main.css','<%= mdist %>/css/Manifest-edit.css','<%= mdist %>/css/Manifest-static.css'],
+		      src: ['<%= mdist %>/css/Manifest-main.css','<%= mdist %>/css/Manifest-print.css','<%= mdist %>/css/Manifest-edit.css','<%= mdist %>/css/Manifest-static.css'],
 		      ext: '.'+pkg.version+'.min.css'
 		    }]
 		  }
@@ -146,6 +146,10 @@ module.exports = function(grunt) {
 			css_main: {
 				src: ['<%= mdist %>/css/fonts.css','<%= mdist %>/css/fa.css','<%= mdist %>/css/leaflet.css','<%= mdist %>/css/visualize.css','<%= mdist %>/css/manifest.css'],
 				dest: '<%= mdist %>/css/<%= pkg.name %>-main.css'
+			},
+			css_print: {
+				src: ['<%= mdist %>/css/print.css'],
+				dest: '<%= mdist %>/css/<%= pkg.name %>-print.css'
 			},
 			css_edit: {
 				src: ['<%= mdist %>/css/fonts.css','<%= mdist %>/css/fa.css','<%= mdist %>/css/leaflet.css','<%= mdist %>/css/visualize.css','<%= mdist %>/css/simplemde.css','<%= mdist %>/css/editor.css'],

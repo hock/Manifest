@@ -77,6 +77,8 @@ class ManifestUI {
 		['dragleave', 'dragend', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.remove('is-dragover'); }));
 
 		window.onresize = this.ManifestResize;	
+		window.onbeforeprint = this.PrintBefore;
+		window.onafterprint = this.PrintAfter;
 		if (MI.Visualization.type !== 'map') { document.getElementById('vizwrap').classList.remove('closed'); MI.Visualization.Resize(); }
 		MI.Interface.ClearLoader();
 	}
@@ -86,6 +88,9 @@ class ManifestUI {
 		document.getElementById('sidepanel').scrollTo(0,0);
 		MI.initialized = true; 
 	}
+	
+	PrintBefore() { document.querySelectorAll('.ftimg').forEach(el => { el.setAttribute('loading','eager'); }); }
+	PrintAfter() {}
 	
 	Storyize() {
 		document.body.classList.add('storymap');

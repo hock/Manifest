@@ -374,8 +374,10 @@ class Manifest {
 		return true;
 	}
 	
-	_saveMapImage(gl, branding=false) {
-		MI.Atlas.glMap.prepareSaveImage = false;
+	_saveMapImage(gl, branding=false, getimage=false) {
+		console.log("branding"); console.log(branding);
+		console.log("get"); console.log(getimage);
+		MI.Atlas.glMap.prepareSaveImage = {status: false, logo: false, get: false};
 		
 		let canvas = document.createElement('canvas');
 		let markers = document.querySelectorAll('.leaflet-overlay-pane canvas')[0];
@@ -396,17 +398,22 @@ class Manifest {
 			composite.fillStyle = "white";
 			composite.fillText("M", 10, 8);
 		}
-		let link = document.createElement('a');
-		link.download = 'test.png';
-		link.href = 	composite.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-		link.click();
-		
+		if (getimage === false) {
+			let link = document.createElement('a');
+			link.download = 'test.png';
+			link.href = 	composite.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+			link.click();	
+		} else {
+			let mapimage = new Image();
+			mapimage.src = composite.canvas.toDataURL("image/png"); mapimage.id = 'map-printpreview';
+			document.body.appendChild(mapimage);
+		}
 	}
 	 ExportManifest(d, filename, format) {
 		let a = document.createElement('a');
 		
 		if (format === 'map') {
-			MI.Atlas.glMap.prepareSaveImage = true;
+			MI.Atlas.glMap.prepareSaveImage = {status: true, logo: false, get: false};
 			MI.Atlas.glMap.triggerRepaint(); 
 		} else if (format === 'json') {
 			let json = '';
