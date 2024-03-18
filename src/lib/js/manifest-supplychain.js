@@ -233,6 +233,8 @@ class ManifestSupplyChain {
 		
 		d.details.layers.push(maplayergroup.addLayer(pointLayer));
 		d.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
+		
+		for (let l in MI.Atlas.maplayer) { if (MI.Atlas.maplayer[l].points) { MI.Atlas.maplayer[l].points.bringToFront(); } }
 	
 		MI.Interface.RefreshMeasureList();
 		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .mdetail_title'); }

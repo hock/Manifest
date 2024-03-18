@@ -70,6 +70,9 @@ class ManifestUI {
 			}
 			document.querySelectorAll('.mlist .featuredimages > .ftimg').forEach(el => { el.setAttribute("loading","eager"); });
 		}
+		for (let l in MI.Atlas.maplayer) {
+			if (MI.Atlas.maplayer[l].id === 1029261216) { MI.Atlas.maplayer[l].points.bringToFront(); }	
+		}
 
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
 			e.preventDefault(); e.stopPropagation(); }));
