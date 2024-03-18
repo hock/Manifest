@@ -71,7 +71,7 @@ L.Map.SmoothWheelZoom = L.Handler.extend({
         this._wheelMousePosition = this._map.mouseEventToContainerPoint(e);
 
         clearTimeout(this._timeoutId);
-        this._timeoutId = setTimeout(this._onWheelEnd.bind(this), 1);
+        this._timeoutId = setTimeout(this._onWheelEnd.bind(this), 100);
 
         L.DomEvent.preventDefault(e);
         L.DomEvent.stopPropagation(e);

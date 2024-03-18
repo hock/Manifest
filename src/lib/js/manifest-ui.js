@@ -64,7 +64,11 @@ class ManifestUI {
 			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
 		}});
 		if (MI.options.storyMap) { 
-			//this.SetBasemap('light'); 
+			for (let s in MI.supplychains) { 
+				document.getElementById('storybanner').style.backgroundColor = MI.supplychains[s].details.style.fillColor; 
+				document.getElementById('storybanner').style.borderColor = MI.supplychains[s].details.style.color; 
+			}
+			document.querySelectorAll('.mlist .featuredimages > .ftimg').forEach(el => { el.setAttribute("loading","eager"); });
 		}
 
 		['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { 
@@ -85,9 +89,9 @@ class ManifestUI {
 	
 	Storyize() {
 		document.body.classList.add('storymap');
-		MI.Atlas.radius = 20;
-		MI.Atlas.styles.point.fontsize = 0.1;
 		
+		MI.Atlas.styles.point.fontsize = 0.1;
+	
 		let storybanner = document.createElement('div');
 		storybanner.id = 'storybanner';
 		storybanner.innerHTML = `M`;
@@ -118,7 +122,8 @@ class ManifestUI {
 				}); 
 		return io;
 	}
-	//storymap
+	
+	// storymap
 	SetupStoryTrigger(selector){
 		let els = document.querySelectorAll(selector);
 		els = Array.from(els);
@@ -175,7 +180,7 @@ class ManifestUI {
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
 				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + 'gsheet/' + id; id = ManifestUtilities.Hash(id);
 			} else {
-				type = 'manifest'; idref = loadurl; id = ManifestUtilities.Hash(loadurl);
+				type = 'manifest'; idref = loadurl; id = ManifestUtilities.Hash(loadurl);			
 			}
 		} else {
 			let val = value ? value : document.getElementById('load-samples').value;
@@ -185,7 +190,12 @@ class ManifestUI {
 			id = option[1];
 		
 			if (type === 'smap') { loadurl = MI.options.serviceurl + 'smap/' + id; } 
-			else if	(type === 'manifest') { loadurl = id; id = ManifestUtilities.Hash(id); } 
+			else if	(type === 'manifest') { 
+				if (id === 'json/manifest.json') {
+					fetch("CHANGELOG.md").then(c => c.text()).then(changelog => { MI.changelog = changelog;} );
+				}
+				loadurl = id; id = ManifestUtilities.Hash(id); 
+			} 
 			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + 'gsheet/' + id; idref = id; id = ManifestUtilities.Hash(id); }	
 		}
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === id) { unloaded = true; }}
@@ -322,13 +332,20 @@ class ManifestUI {
 		let choices = {none:'none'};
 		let previous = document.getElementById('measure-choices').value;
 
-		for (let s in MI.supplychains) { for (let m in MI.supplychains[s].details.measures) { choices[m] = m; }}
+		for (let s in MI.supplychains) { for (let m in MI.supplychains[s].details.measures) { if (m !== 'starttime' && m !== 'endtime') {choices[m] = m;} }}
 	    while (measurechoices.firstChild) { measurechoices.removeChild(measurechoices.lastChild); }
 	
 		for (let c in choices) { let option = document.createElement('option'); option.value = c; option.textContent = c; measurechoices.append(option); }
 		Array.from(document.getElementById('measure-choices').querySelectorAll('option')).forEach((el) => { if (el.value === previous) { measurechoices.value = previous; } });
 	}
-
+	
+	SetVizOptions() {
+		let directed = false;
+		for (let sc of MI.supplychains) { if (sc.graph.type === 'directed') { directed = true; } }
+		if (directed) { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.removeAttribute('hidden'); el.removeAttribute('disabled');});
+		} else { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.setAttribute('hidden',''); el.setAttribute('disabled','');}); }
+		
+	}
 	SetBasemap(tile) {
 	    MI.Atlas.SwitchBasemap(MI.Atlas.glMap, tile);
 	}

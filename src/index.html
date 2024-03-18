@@ -9,12 +9,14 @@
 
 	<!-- build:process -->
 	<base href="<%= baseurl %>">
-	<link rel="stylesheet" href="<%= css_path %>"> 
+	<link rel="stylesheet" href="<%= css_path %>" media="screen"> 
 	<meta property="og:url" content="<%= baseurl %>">	
 	<link rel="canonical" href="<%= baseurl %>">
 	<script> 
 		const mversion = "<%= version %>";		
-		//if (<%= livereload %>) {//	console.log("live reload");//	}
+		const mtarget = "<%= target %>";		
+		
+		if (mtarget === 'local') { var console = {}; console.log = function(){}; window.console = console;}
 	</script>
 	<!-- /build -->
 
@@ -32,18 +34,18 @@
 	
 	<section class="vizmenu">
 		<nav class="vizmenu-entry">
-			<div id="viz-choice-label" class="vizmenu-label">Visualize</div>
+			<label for="viz-choice" id="viz-choice-label" class="vizmenu-label">Visualize</label>
 			<select name="viz-choice" id="viz-choices">
 				<option id="map-viz-choice" value="map">Map</option>
-				<option id="forcegraph-viz-choice" value="forcegraph">Graph</option>
-				<option id="flow-viz-choice" value="flow">Flow</option>
-				<option id="chord-viz-choice" value="chord">Chord</option>
+				<option id="forcegraph-viz-choice" class="graph-dependent" hidden disabled value="forcegraph">Graph</option>
+				<option id="flow-viz-choice" class="graph-dependent" hidden disabled value="flow">Flow</option>
+				<option id="chord-viz-choice" class="graph-dependent" hidden disabled value="chord">Chord</option>
 				<option id="listview-viz-choice" value="listview">Sheet</option>
 				<option id="textview-viz-choice" value="textview">Data</option>
 			</select>
 		</nav>
 		<nav class="vizmenu-entry">
-			<div id="measure-choice-label" class="vizmenu-label">Scale</div>	
+			<label for="measure-choice" id="measure-choice-label" class="vizmenu-label">Scale</label>	
 			<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
 		</nav>
 		<div class="clear"></div>
@@ -125,8 +127,8 @@
 	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	
-	<script src="<%= js_libpath %>"></script>
-	<script src="<%= js_mainpath %>"></script>
+	<script src="<%= js_libpath %>" defer></script>
+	<script src="<%= js_mainpath %>" defer></script>
     <!-- /build -->
 	
     <!-- build:remove -->		

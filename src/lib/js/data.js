@@ -11,8 +11,6 @@ function Start() {
 function RenderSamples(data) {
 	let samplelist = document.getElementById('samplelist');
 	for (var s of data.collection) { 
-		console.log(s);
-		console.log(s.id.split('/')[(s.id.split('/')).length-1].split('.')[0]);
 		let thumb = s.id.split('/')[(s.id.split('/')).length-1].split('.')[0];
 		//thumb = 'western-electric';
 		let sample = document.createElement('li');

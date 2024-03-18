@@ -12,7 +12,7 @@ class Manifest {
 		// options = { hoverHighlight: false, retinaTiles: false };
 
 		this.initialized = false;
-		this.changelog = 'no notes';
+		this.changelog = '';
 		
 		this.supplychains = [];
 		this.Supplychain = new ManifestSupplyChain();
@@ -28,11 +28,13 @@ class Manifest {
 		
 		if (!(MI.initialized) || MI.Atlas.active_point === null) { MI.Atlas.SetView(MI.options.view); }
 		if (MI.supplychains.length > 0) {
-			if (!(MI.initialized || delay)) { MI.Interface.CleanupInterface(); }   
+			if (!(MI.initialized || delay)) { 
+				MI.Interface.CleanupInterface(); 
+			}   
 		}
-
-		// Do Testing
-		if (MI.options.demoMode) { MI.ManifestTests(); }
+		if (!(MI.initialized) && MI.options.demoMode) {
+			MI.ManifestTests(); 
+		}
 	}
 	
 	ManifestTests() {
@@ -49,7 +51,8 @@ class Manifest {
 	
 	/** SupplyChain processor main wrapper function. **/
 	Process(type, d, options) {
-		console.log(d);
+		let lname = d.summary ? d.summary.name : (d.g.values[1] ? d.g.values[1][0] : "");
+		console.log(`Loaded: ${lname} (${options.url})`);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 		options = Object.assign(options, MI.options);
 		
@@ -265,7 +268,8 @@ class Manifest {
 				let id = sc.graph.nodes[l].id.split('-');
 				sc.graph.nodes[l].id = id[0]+'-'+(Number(id[1]));				
 			}
-		}		
+		}	
+		MI.Interface.SetVizOptions();	
 	}
 	
 	SMAPGraph(d, options) {
@@ -330,7 +334,8 @@ class Manifest {
 		}		
 		let adjgraph = [];
 		for (let l = 0; l < sc.graph.nodes.length; l++) { if (typeof sc.graph.nodes[l] !== 'undefined') { adjgraph.push(sc.graph.nodes[l]); } }
-		sc.graph.nodes = adjgraph.reverse();		
+		sc.graph.nodes = adjgraph.reverse();
+		MI.Interface.SetVizOptions();		
 	}
 
 	/** Setup the graph relationships for Yeti files **/
@@ -398,7 +403,6 @@ class Manifest {
 		
 	}
 	 ExportManifest(d, filename, format) {
-		 console.log("export manifest");
 		let a = document.createElement('a');
 		
 		if (format === 'map') {

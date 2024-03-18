@@ -12469,7 +12469,7 @@
 		if (layer.feature.properties.style.img) { this._ctx.drawImage(layer.feature.properties.style.img.el, p.x - r / 2, p.y - r / 2, r, r); }
 		else { 
 			ctx.font = layer.feature.properties.style.fontsize+"px Roboto"; ctx.fillStyle = "rgb(255, 255, 255)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-			if (layer.feature.properties.clustered.length > 0) {
+			if (layer.feature.properties.clustered.length > 0 && !MI.options.storyMap) {
 				this._ctx.drawImage(MI.Atlas.clusterimg.el, p.x - r / 2, p.y - r / 2, r, r);
 			} else {
 				this._ctx.fillText(String(layer.feature.properties.mindex),p.x,p.y);

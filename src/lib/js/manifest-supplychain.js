@@ -209,7 +209,9 @@ class ManifestSupplyChain {
 				 }
 			}
 		}	
-	
+		
+		// Reverse so cluster order makes sense
+		points.features = points.features.reverse();
 		let pointLayer = new L.geoJSON(points, { onEachFeature: MI.Atlas.RenderPoint, pointToLayer: function (feature, latlng) { 
 			//let icons = ['factory','warehouse','inventory','building','boat'];
 			//let icon = icons[Math.floor(Math.random()*icons.length)];
@@ -246,6 +248,10 @@ class ManifestSupplyChain {
 		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
+		
+		if (MI.options.storyMap) { 
+			//let c =  styling.color[1];  styling.color[1] = styling.color[0]; styling.color[0] = c; styling.style.opacity = 0.4; 
+		} 
 			
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
@@ -258,6 +264,7 @@ class ManifestSupplyChain {
 			let ftcolors = ft.properties.color.split(',');
 			setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
 		}
+		// Customized point colors for storymap 
 		Object.assign(ft.properties, setup);
 		
 		let li = 
@@ -278,9 +285,9 @@ class ManifestSupplyChain {
 				
 				${ft.properties.images.length > 1 ? 
 				`<div class="images-controls">
-					<button id="imgbutton-left_${ft.properties.lid}" class="images-button images-display-left"><i class="fas fa-caret-left"></i></button>
+					<button id="imgbutton-left_${ft.properties.lid}" class="images-button images-display-left" title="Left Image Button"><i class="fas fa-caret-left"></i></button>
 					<div class="images-box">${(ft.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${ft.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
-					<button id="imgbutton-right_${ft.properties.lid}" class="images-button images-display-right"><i class="fas fa-caret-right"></i></button>
+					<button id="imgbutton-right_${ft.properties.lid}" class="images-button images-display-right" title="Left Image Button"><i class="fas fa-caret-right"></i></button>
 				</div>` : ''} 
 			</div>` : ''}
 								  	
@@ -483,7 +490,6 @@ class ManifestSupplyChain {
 					}
 				}
 				MI.Atlas.RenderPoint(MI.Atlas.map._layers[i].feature,MI.Atlas.map._layers[i]);
-			
 			}
 		}
 	
@@ -492,6 +498,7 @@ class ManifestSupplyChain {
 		MI.Interface.RefreshMeasureList(); 
 		if (document.getElementById('blob-'+id)) { document.getElementById('blob-'+id).remove(); }
 
+		MI.Interface.SetVizOptions();
 		MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);			
 		MI.Interface.SetDocumentTitle();	
 	}

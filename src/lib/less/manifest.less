@@ -17,8 +17,6 @@
 	.fulltext {display:initial;}
 	.blur { filter:blur(0.2rem) saturate(0) }
 	
-	/* User Classes */
-	.cite { font-size: 0.8rem; background: #eee; border: thin solid #ccc; padding: 0.4rem;}
 	/* Viewer Styles */
 	#view-wrapper { overflow:hidden;  position: absolute; top: 0; right: 0; bottom: 0; width: 100%; *height:100%; }
 	.map { position: absolute; top: 0; right: 0; bottom: 0; width: 100%; *height:100%; }
@@ -91,9 +89,16 @@
 		vertical-align:middle; overflow:hidden; text-overflow:ellipsis; color:inherit;}
 	#manifestlist .mtitle a:hover { text-decoration:underline; cursor:pointer;}
 	#manifestlist .mtitle i { vertical-align:middle; width:1rem;}
-	#manifestlist .mdescription { border-bottom:1px solid; padding:1rem; margin:0; }
-	#manifestlist .mdescription:empty { padding:0;}
-	#manifestlist .mdescription > p { padding:0; margin:0;}
+	#manifestlist .mdescription { 
+		font-size:1rem; padding:1rem; margin:0; 
+		color:#333; background:#fff; border-bottom:1px solid #eee; 
+		img, iframe { width:100%; }
+		img + img { margin-top:0.25rem;}
+		.cite { font-size: 0.8rem; background: #eee; border: thin solid #ccc; padding: 0.4rem;}
+		> p { padding:0; margin:0;}
+		&:empty { padding:0;}
+		
+	}
 	
 	#manifestlist p.measures { font-size:0.8rem; }
 	#manifestlist ul.mlist { list-style:none; margin:0; padding:0; }
@@ -104,6 +109,14 @@
 	#manifestlist ul.mlist .featuredimages { height: 15rem; margin:0.8rem 0;}
 	#manifestlist ul.mlist .featuredimages.multiple { padding-bottom:2rem; }
 	
+	// Internal List styles
+	#manifestlist ul.mlist .description {
+		blockquote {
+			margin-left:0; margin-right:0; padding-left: 0.4rem; padding-right: 0.4rem;
+			border-left:0.2rem solid #ccc;
+		}
+	}
+	 
 	#manifestlist ul.mlist .featuredimages .ftimg { 
 		object-fit:cover; object-position:center center; height:0; min-height:100%; width:100%; cursor:zoom-in; display:none;
 		&:first-child{ display:block;}
@@ -121,10 +134,10 @@
 	#manifestlist ul.mlist .featuredimages .images-box .images-spot { font-size:0.6rem; margin:auto 0.2rem; cursor:pointer; height:1.5rem; padding: 0.6rem 0;}
 	#manifestlist ul.mlist .featuredimages .images-box .images-spot:hover .fa-circle:before { content: "\f192"; }
 	#manifestlist ul.mlist .featuredimages .images-box .images-spot.selected .fa-circle:before { content: "\f192"; }
-	#manifestlist ul.mlist .featuredimages .images-button { overflow:auto; padding:0 0.5rem; font-size:1.5rem; border:none;  bottom:0; }
+	#manifestlist ul.mlist .featuredimages .images-button { overflow:auto; padding:0 0.5rem; font-size:1.5rem; border:none; }
 	#manifestlist ul.mlist .featuredimages .images-button:hover { cursor:pointer;}
-	#manifestlist ul.mlist .featuredimages .images-display-left { left:0;}
-	#manifestlist ul.mlist .featuredimages .images-display-right { right:0;}
+	#manifestlist ul.mlist .featuredimages .images-display-left { }
+	#manifestlist ul.mlist .featuredimages .images-display-right { }
 	
 	#manifestlist li .pdetails p { display:inline;}
 	#manifestlist li .pdetails .measures .mtype:after { content: ": ";}
@@ -136,27 +149,28 @@
 		ul { padding-left:1rem; font-size:0.8rem;}
 	}
 		
-	#manifestlist ul.mlist details.sources ol li p, #manifestlist ul.mlist details.sources ol li ol, #manifestlist ul.mlist details.sources ol li ul, #manifestlist ul.mlist details.sources ol li blockquote { display:inline; margin:0; padding:0;}
-	#manifestlist ul.mlist details.sources ol { list-style:square; margin:0 ; padding:0.2rem 0; font-size:0.9rem;}
-	#manifestlist ul.mlist details.sources ol li { margin:0; padding:0; border:none; }
-	#manifestlist ul.mlist details.sources ol { counter-reset: list; } 
-	#manifestlist ul.mlist details.sources ol > li { 
-		list-style: none; 
-		text-overflow: ellipsis;
-    	white-space: nowrap;
-    	overflow: hidden; 
-	} 
-	#manifestlist ul.mlist details.sources ol > li:before { content: "[" counter(list, decimal) "] "; counter-increment: list; }
-
-	#manifestlist ul.mlist details.sources ol:empty { display:none;}
+	#manifestlist ul.mlist details.sources {
+		ol li p, ol li ol, ol li ul, ol li blockquote { display:inline; margin:0; padding:0;}
+		ol { 
+			counter-reset: list;
+			list-style:square; margin:0 ; padding:0.2rem 0; font-size:0.9rem;
+			li { margin:0; padding:0; border:none; width:auto; }
+			> li + li { margin-top: 0.4rem;}
+			> li {  
+				list-style: none; margin:0; padding:0;
+				a { word-break: break-all; }
+				&:before { content: "[" counter(list, decimal) "] "; counter-increment: list; display:inline-block; vertical-align:top; margin-right:0.5rem;}
+			}
+		&:empty { display:none;}
+		}
+	}
 
 	#manifestlist ul.mlist summary { font-size:0.9rem; cursor:pointer; outline: none; padding:0.2rem 0;}
-	#manifestlist li p, #manifestlist li .mdescription { font-size:0.9em; padding:0.2rem 0; margin:0;}
+	#manifestlist li p { font-size:0.9em; padding:0.2rem 0; margin:0;}
 	#manifestlist h5.mdetail_title { display:inline; font-size:1rem; line-height:1.5rem;}
 	#manifestlist p.placename, #manifestlist p.category { display:inline-block; margin-right:0.2rem;}
-	#manifestlist li img, #manifestlist .mdescription img { width:100%; }
-	#manifestlist li iframe, #manifestlist .mdescription iframe { width:100%; }
-	#manifestlist .mdescription img + img { margin-top:0.25rem;}
+	#manifestlist li img { width:100%; }
+	#manifestlist li iframe { width:100%; }
 	#manifestlist li .pdetails .cat-link {text-decoration:underline;cursor:pointer;}
 	#manifestlist li .manifest-link {text-decoration:underline;cursor:pointer;}
 	
@@ -329,20 +343,32 @@
 	.marinelayer img { filter: brightness(0.5) sepia(1) saturate(300%) hue-rotate(200deg); }
 	.raillayer img { filter: brightness(0.1) sepia(1) saturate(5000%) hue-rotate(190deg) opacity(40%); }
 
-	.leaflet-popup-content { margin:1rem;}
-	.leaflet-popup-content h2 { margin:0 -1rem 1rem -1rem; padding:1rem; text-stroke: 1px rgba(0,0,0,0.6); background-blend-mode: multiply; }
-	.leaflet-popup-content h2.poptitle { margin:-1rem -1rem 1rem -1rem; padding:1rem; border-radius:0.5rem 0.5rem 0 0; }
-	.leaflet-popup-content h2.poptitle.cluster { margin-bottom:0; }
-	.leaflet-popup-content h2.popuphop { margin: -1rem; padding: 1rem; text-align:center;}
 	.leaflet-popup-content-wrapper {
 		padding:0;
 		overflow-y: auto;
 		max-height: 25rem;
 	}
-	.leaflet-popup-content .popuplink, .leaflet-popup-content .popupselect { padding:0 0 1rem 0;}
-	.leaflet-popup-content .popuplink h2 span, .leaflet-popup-content .popupselect h2 span {cursor:pointer;}
-	.leaflet-popup-content .popuplink h2 span:hover, .leaflet-popup-content .popupselect h2 span:hover {text-decoration:underline;}
-	.leaflet-popup-content img { max-width:100%;}
+	.leaflet-popup-content { 
+		margin:1rem;
+		blockquote {
+			margin-left:0; margin-right:0; padding-left: 0.4rem; padding-right: 0.4rem;
+			border-left:0.2rem solid #ccc; 
+		}
+		h2 { 
+			margin:0 -1rem 1rem -1rem; padding:1rem; text-stroke: 1px rgba(0,0,0,0.6); background-blend-mode: multiply; 
+			&.poptitle { margin:-1rem -1rem 1rem -1rem; padding:1rem; border-radius:0.5rem 0.5rem 0 0; }
+			&.poptitle.cluster { margin-bottom:0; }
+			&.popuphop { margin: -1rem; padding: 1rem; text-align:center;}
+		}
+		img { max-width:100%;}
+		.popuplink, .popupselect { 
+			padding:0 0 1rem 0;
+			h2 span {
+				cursor:pointer;
+				&:hover {text-decoration:underline;}
+			}
+		}
+	}
 	.leaflet-tooltip { border-radius: 0; border:none;}
 	.leaflet-tooltip div.mtooltip { border-radius: 0.25rem; border:2px solid #fff;line-height:0.8rem; margin: -7px; padding: 0.5rem; text-align:center;}
 	
@@ -435,9 +461,8 @@ margin: -2rem -2rem 0 -2rem; background:#4d34db; color:#fff}
 	body.light #loader h1 { color:#fff;}
 	body.light #loader h2 { color:#eee;}
 	body.light #manifestlist .mtitle { background:#fff; color:#000; }
-	body.light #manifestlist .mdescription { color:#333; background:#fff; border-color:#eee; }
 	body.light #sidepanel { background: rgba(255,255,255,0.9); }
-	body.light #manifestlist li p, body.light #manifestlist li .mdescription { color:#333; } 
+	body.light #manifestlist li p { color:#333; } 
 	body.light #manifestlist .mtitle { border-color: #eee; }
 	body.light #manifestlist li { border-color: #ddd; }
 	body.light #manifestlist #mmenu { color:#333; background:#999; border-color: #eee; }
@@ -482,7 +507,6 @@ margin: -2rem -2rem 0 -2rem; background:#4d34db; color:#fff}
 	body.light #manifestlist li div.dot { border-color: #3498DB; background:#3498DB; }
 	body.light #manifestlist li div.dot:hover { filter:saturate(70%); }
 	body.light #messages { color: #fff; }
-	body.light.map #messages { color: #21222C; }
 	
 	.leaflet-popup-content h2 { color:#999;background:#eee;  }
 	.leaflet-popup-content h2.poptitle { color:#999;background:#eee;}

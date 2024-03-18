@@ -13,28 +13,28 @@ module.exports = function(grunt) {
 	grunt.file.write('package.json', JSON.stringify(pkg, null, 2));
 	
 	const development = { 
+		id: 'development',
 		baseurl: 'https://manifest.supplystudies.com/dev/', 
 		serverurl: 'https://service.supplystudies.com/manifest/', 
 		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
 		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
-		src: 'src', dist: '/var/www/manifest.supplystudies.com/dev/',
-		livereload: false
+		src: 'src', dist: '/var/www/manifest.supplystudies.com/dev/'
 	}
 	const local_min = { 
+		id: 'local_min',
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
 		serverurl: 'http://hockbook.local:3000/', 
 		css_path: 'css/Manifest-main.'+pkg.version+'.min.css', css_editpath: 'css/Manifest-edit.'+pkg.version+'.min.css', css_staticpath: 'css/Manifest-static.'+pkg.version+'.min.css',
 		js_mainpath: 'js/Manifest-main.'+pkg.version+'.min.js', js_editpath: 'js/Manifest-edit.'+pkg.version+'.min.js', js_staticpath: 'js/Manifest-static.'+pkg.version+'.min.js', js_datapath: 'js/Manifest-data.'+pkg.version+'.min.js', js_libpath: 'js/Manifest-lib.'+pkg.version+'.min.js',
-		src: 'src', dist: 'dist',
-		livereload: false
+		src: 'src', dist: 'dist'
 	}
 	const local = { 
+		id: 'local',
 		baseurl: 'http://hockbook.local/Manifest/dist/', 
 		serverurl: 'http://hockbook.local:3000/', 
 		css_path: 'css/Manifest-main.css', css_editpath: 'css/Manifest-edit.css', css_staticpath: 'css/Manifest-static.css',
 		js_mainpath: 'js/Manifest-main.js', js_editpath: 'js/Manifest-edit.js', js_staticpath: 'js/Manifest-static.js', js_datapath: 'js/Manifest-data.js', js_libpath: 'js/Manifest-lib.js',
-		src: 'src', dist: 'dist',
-		livereload: true
+		src: 'src', dist: 'dist'	
 	}
 	const target = local;
 	target.version = pkg.version;
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
 	  mversion: target.version,
 	  mbaseurl: target.baseurl,
 	  mserverurl: target.serverurl,
-	  mlivereload: target.livereload,
+	  mtarget: target,
 	  		
 	  pkg: grunt.file.readJSON('package.json'),
 		copy: {
@@ -79,7 +79,7 @@ module.exports = function(grunt) {
 						version: target.version,
 						css_path: target.css_path, css_editpath: target.css_editpath, css_staticpath: target.css_staticpath,
 						js_mainpath: target.js_mainpath, js_editpath: target.js_editpath, js_staticpath: target.js_staticpath, js_datapath: target.js_datapath, js_libpath: target.js_libpath,
-						livereload: '<%= mlivereload %>'
+						target: target.id
 					}
 				}
 			}

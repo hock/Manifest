@@ -3,7 +3,7 @@ class ManifestAtlas {
 	constructor(options) {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
-			preferCanvas: true, minZoom: 3, maxZoom: 18, worldCopyJump: false, center: new L.LatLng(options.position.lat,options.position.lng), zoom: options.zoom, zoomControl: false, scrollWheelZoom: false, smoothSensitivity:1,  closePopupOnClick: pop 
+			preferCanvas: true, minZoom: 3, maxZoom: 18, worldCopyJump: false, center: new L.LatLng(options.position.lat,options.position.lng), zoom: options.zoom, zoomControl: false, scrollWheelZoom: false, smoothSensitivity:1, closePopupOnClick: pop 
 		});
 		this.maplayer = [];
 		this.active_point = null;
@@ -53,6 +53,7 @@ class ManifestAtlas {
 		/* Styles */
 		this.styles = {
 			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 9 },
+			'disabled': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 9 },			
 			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
 			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#dbedf9', fillColor: '#2196F3', weight: 2, opacity: 1, fillOpacity: 1 }	
@@ -168,7 +169,7 @@ class ManifestAtlas {
 	
 	RenderIntro(feature, layer) {		
 		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
-		let popupContent, tooltipTitle, fid = feature.properties.lid;		
+		let popupContent, fid = feature.properties.lid;		
 				
 		popupContent = `
 		<h2 id="popup-${fid}" class="poptitle">
@@ -185,10 +186,6 @@ class ManifestAtlas {
 		<div id="intro-readme"><div id="intro-content-log">${MI.Util.markdowner.makeHtml(MI.changelog)}</div></div>
 		</div>`;
 		layer.bindPopup(popupContent, { className: 'pop-intro'});
-		
-		tooltipTitle = feature.properties.title; 
-		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle}</div>`;
-		layer.bindTooltip(tooltipContent);	
 		
 		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
 		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
@@ -347,10 +344,49 @@ class ManifestAtlas {
 		}}
 		if (feature.properties.clustered.length > 0) {
 			let ccount = 0;
+			const measuretype = document.getElementById('measure-choices').value;
+			let measuretotal = 0;
+			let tooltipDynamic = '';
+			
+			if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
+				let findmeasure = feature.properties.measures.find(m => m.mtype === measuretype);				
+				if (findmeasure && findmeasure.mvalue !== '') { 
+					measuretotal += Number(findmeasure.mvalue);
+					let measureround = (Math.round((measuretotal + Number.EPSILON) * 100) / 100);
+					measureround = (measureround === 0) ? ' > 0.01' : measureround; 
+					tooltipDynamic = '('+measureround+findmeasure.munit+' total)'; 
+				}
+			}
+			
 			if (!feature.properties.hidden) { ccount++; }
-			for (let i in feature.properties.clustered) { if (!feature.properties.clustered[i].properties.hidden) { ccount++; } }
-				let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> Cluster of ${ccount} Nodes</div>`;
+			for (let i in feature.properties.clustered) { if (!feature.properties.clustered[i].properties.hidden) { 
+				ccount++; 
+				if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
+					let findmeasure = feature.properties.clustered[i].properties.measures.find(m => m.mtype === measuretype);
+					if (findmeasure && findmeasure.mvalue !== '') { 
+						measuretotal += Number(findmeasure.mvalue);
+						let measureround = (Math.round((measuretotal + Number.EPSILON) * 100) / 100);						
+						measureround = (measureround === 0) ? ' > 0.01' : measureround; 
+						tooltipDynamic = '('+measureround+findmeasure.munit+' total)'; 
+					}
+				}
+			} }
+				let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> Cluster of ${ccount} Nodes ${tooltipDynamic}</div>`;
 			layer.setTooltipContent(tooltipContent);	
+		} else {
+			const measuretype = document.getElementById('measure-choices').value;	
+			let tooltipTitle = feature.properties.title; 
+			let tooltipDynamic = '';
+			if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
+				let findmeasure = feature.properties.measures.find(m => m.mtype === measuretype);
+				if (findmeasure && findmeasure.mvalue !== '') { 
+					let measureround = (Math.round((Number(findmeasure.mvalue) + Number.EPSILON) * 100) / 100);
+					measureround = (measureround === 0) ? ' > 0.01' : measureround; 
+					tooltipDynamic = '('+measureround+findmeasure.munit+')'; 
+				}
+			}
+			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle} ${tooltipDynamic}</div>`;
+			layer.bindTooltip(tooltipContent);	
 		}		
 	}
 	
@@ -380,6 +416,9 @@ class ManifestAtlas {
 		const measureSort = document.getElementById('measure-choices').value;
 	
 		if (ft && layer) {
+			//let newStyle = this.GetScaledProperties(ft, measureSort);
+			//let newRadius = newStyle.radius; 
+			//let newFill = newStyle.disabled ? MI.Atlas.styles.disabled.fillColor : ''; let newColor = newStyle.disabled ? MI.Atlas.styles.disabled.color : '';
 			let newRadius = this.GetScaledRadius(ft, measureSort);
 			layer.setStyle({ radius: newRadius }); return;
 		}
@@ -483,11 +522,23 @@ class ManifestAtlas {
 		if (ft.properties.measures.some(m => m.mtype === measureSort)) {
 			const measureVal = ft.properties.measures.filter(m => { return m.mtype === measureSort; }).pop().mvalue;
 			const measureMax = MI.supplychains[ft.properties.index].details.measures[measureSort].max;				
-			newRadius = (this.GetRadius(ft, measureSort === 'none') / 2) + 40 * (measureVal / measureMax);				
+			newRadius = Math.max((MI.Atlas.styles.point.radius - 2), (this.GetRadius(ft, measureSort === 'none') / 2) + 40 * (measureVal / measureMax));				
 		}
 		return newRadius;
 	}
-
+	
+	GetScaledProperties(ft, measureSort) {
+		let newRadius = this.GetRadius(ft, measureSort === 'none');
+		let propMatch = false;
+		if (ft.properties.measures.some(m => m.mtype === measureSort)) {
+			const measureVal = ft.properties.measures.filter(m => { return m.mtype === measureSort; }).pop().mvalue;
+			const measureMax = MI.supplychains[ft.properties.index].details.measures[measureSort].max;				
+			newRadius = Math.max((MI.Atlas.styles.point.radius - 2), (this.GetRadius(ft, measureSort === 'none') / 2) + 40 * (measureVal / measureMax));	
+			propMatch = true;			
+		}
+		return {radius: newRadius, disabled: !propMatch};
+	}
+	
 	SwitchBasemap(map, tile) {
 		let style = MI.Atlas.tiletypes[tile.toUpperCase()];
 		let def = MI.Atlas.layerdefs[tile.toLowerCase()];
