@@ -310,13 +310,18 @@ class ManifestUI {
 	
 	Link(link, event) {
 		event.preventDefault(); event.stopPropagation();
-		if (link.includes('manifest://')) {
-			this.LoadFromLauncher(link.replace('manifest://', 'manifest-https://'), false);
-		} else {
-			this.LoadFromLauncher('manifest-'+link, false);
+		let type;
+		if (link.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
+			type = 'smap'; link = link.substring(60).split('.')[0];
+		} else if (link.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
+			type = 'gsheet'; link = link.substring(39).split('/')[0];
+		} else { type = 'manifest'; }
+		if (link.includes('manifest://')) { link = link.replace('manifest://', type+'-https://'); } else { link = type+'-'+link; }
+		if (MI.options.storyMap) {  window.location = window.location.origin+window.location.pathname+'?storyMap#'+link; window.location.reload();} 
+		else {
+			this.LoadFromLauncher(link, false);
 		}
 	}
-	
 	ImageScroll(lid, n, jump=false) {
 	    let slideIndex = Number(document.getElementById('local_'+lid).querySelectorAll('div.featuredimages')[0].getAttribute('data-index')) + n; 
 		let slides = document.getElementById('local_'+lid).querySelectorAll('div.featuredimages .ftimg');
