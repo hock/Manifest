@@ -509,7 +509,7 @@
 /* Compressed/Mobile Styles */
 @media only screen and (max-width: 920px) and (orientation: portrait) { 
 	body {  display: flex; flex-flow: column wrap; width:100vw; min-width:100vw; max-width:100vw; }
-	#mapmenu, #mapcapture, #fullscreen-menu, .leaflet-control-layers, #mapcapture, .leaflet-control-zoomhome, .leaflet-control-attribution, .fulltext, .fas.closemap, .leaflet-left .leaflet-control, .leaflet-popup-pane, .leaflet-tooltip-pane, .footer {display:none;}
+	#mapmenu, #mapcapture, #fullscreen-menu, .leaflet-control-layers, #mapcapture, .leaflet-control-zoomhome, .leaflet-control-attribution, .fulltext, .fas.closemap, .leaflet-left .leaflet-control, .leaflet-popup-pane, .leaflet-tooltip-pane, .footer, .share-button {display:none;}
 	
 	#manifestbar { position: static; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000;
 		#minfoheader { padding:0.75rem 1rem;}
@@ -522,6 +522,7 @@
 			.vizmenu-entry { 
 				margin-left:0.5rem;
 			}
+			.vizmenu-label { display:none; }
 			#viz-choices, #measure-choices {
 				background:@m-grey;border:1px solid @m-grey-border; color:#333;
 				text-align:center; text-align-last: center; padding:0.25rem; line-height:1rem;
