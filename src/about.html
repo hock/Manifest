@@ -12,6 +12,13 @@
 	<link rel="stylesheet" href="<%= css_staticpath %>"> 
 	<meta property="og:url" content="<%= baseurl %>about/">	
 	<link rel="canonical" href="<%= baseurl %>about/">
+	<script> 
+		const mversion = "<%= version %>";		
+		const mtarget = "<%= target %>";		
+		const serverurl = "<%= serverurl %>";		
+		
+		if (mtarget === 'development' || mtarget === 'production') { var console = {}; console.log = function(){}; window.console = console;}
+	</script>
 	<!-- /build -->
 
 	<!-- build:section layout.header --><!-- /build -->

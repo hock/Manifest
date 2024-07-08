@@ -31,7 +31,7 @@
 		const mversion = "<%= version %>";		
 		const mtarget = "<%= target %>";		
 		
-		if (mtarget === 'development') { var console = {}; console.log = function(){}; window.console = console;}
+		if (mtarget === 'development' || mtarget === 'production') { var console = {}; console.log = function(){}; window.console = console;}
 	</script>
 	<!-- /build -->
 

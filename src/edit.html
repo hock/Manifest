@@ -17,7 +17,7 @@
 		const mtarget = "<%= target %>";		
 		const serverurl = "<%= serverurl %>";		
 		
-		if (mtarget === 'development') { var console = {}; console.log = function(){}; window.console = console;}
+		if (mtarget === 'development' || mtarget === 'production') { var console = {}; console.log = function(){}; window.console = console;}
 	</script>
 	<!-- /build -->
 
