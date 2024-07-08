@@ -1,11 +1,8 @@
 let util = new ManifestUtilities();
 
 function Start() { 	
-	fetch('json/smapindex.json').then(r => r.json()).then(d => SetTable(JSON.parse(d))); 
-	fetch('json/samples.json').then(r => r.json()).then(d => RenderSamples(d)); 
-	
-	document.querySelectorAll('#minfo-hamburger, #minfo').forEach(el => { 
-		el.addEventListener('click', (e) => { document.getElementById('minfodetail').classList.toggle('closed'); }); });	
+	fetch('json/smapindex.json').then(r => r.json()).then(d => RenderSMAP(JSON.parse(d))); 
+	fetch('json/samples.json').then(r => r.json()).then(d => RenderManifest(d.collection)); 
 }
 
 function RenderSamples(data) {
@@ -24,7 +21,29 @@ function RenderSamples(data) {
 		samplelist.appendChild(sample);
 	} 
 }
-function SetTable(data) {	
+function RenderManifest(data) {	
+	var options = {
+	  valueNames: ['id','title','author', 'categories', 'description'],
+	    item: function(values) {
+			let thumb = values.id.split('/')[(values.id.split('/')).length-1].split('.')[0];
+			
+			return `<li class="entry">
+						<div class="samplewrap">
+							<h3 class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></h3>
+							<div class="sampleauthor">${values.author}</div>
+							<div class="sampletags">${values.categories}</div>
+							<img src="json/samples/thumbnails/${thumb}.png" loading="lazy"/>
+							<div class="sampledescription">${util.markdowner.makeHtml(values.description)}</div>
+						</div>
+					</li>`;
+		},
+		page:20,
+	    pagination: [ { paginationClass: "pagination", innerWindow: 2, left: 1, right: 1, item: '<li><a class="page"></a></li>'}]	
+	};
+
+	let list = new List('manifestsamples', options, data);
+}
+function RenderSMAP(data) {	
 	var options = {
 	  valueNames: ['id','nm','dc'],
 	    item: function(values) {
@@ -42,7 +61,7 @@ function SetTable(data) {
 						<div class="clear"></div>
 					</li>`;
 		},
-		page:10,
+		page:20,
 	    pagination: [ { paginationClass: "pagination", innerWindow: 2, left: 1, right: 1, item: '<li><a class="page"></a></li>'}]	
 	};
 

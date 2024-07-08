@@ -9,11 +9,24 @@
 
 	<!-- build:process -->
 	<base href="<%= baseurl %>">
+	<link rel="preload" href="images/logo.svg" as="image" type="image/svg+xml">
+	<link rel="preconnect" href="https://fonts.gstatic.com/">
+	<!-- /build -->
+	
+	<!-- build:section layout.loader --><!-- /build -->	
+
+	<!-- build:process -->
 	<link rel="stylesheet" href="<%= css_path %>" media="screen"> 
-	<link rel="stylesheet" href="<%= css_printpath %>" media="print"> 
+	<link rel="stylesheet" href="<%= css_printpath %>" media="print" defer> 
+
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
+    <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
+    <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+    <link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
 	
 	<meta property="og:url" content="<%= baseurl %>">	
 	<link rel="canonical" href="<%= baseurl %>">
+	
 	<script> 
 		const mversion = "<%= version %>";		
 		const mtarget = "<%= target %>";		
@@ -26,77 +39,86 @@
 </head>
 
 <body class="light">
+	<section id="loader">
+		<h1 id="loadertitle">Manifest</h1>
+		<h2 id="loadermessage">Supply Chain Platform</h2>
+	</section>
 	<section id="manifestbar">
 	    <!-- build:section layout.launcher --><!-- /build -->
 	</section>
-	
-	<section id="sidepanel">
-		<div id="manifestlist"></div>
+	<section id="sidewrap">
+		<section id="sidepanel">
+			<div id="manifestlist"></div>
+		</section>
 	</section>
-	
-	<section class="vizmenu">
-		<nav class="vizmenu-entry">
-			<label for="viz-choices" id="viz-choice-label" class="vizmenu-label">Visualize</label>
-			<select name="viz-choice" id="viz-choices">
-				<option id="map-viz-choice" value="map">Map</option>
-				<option id="forcegraph-viz-choice" class="graph-dependent" hidden disabled value="forcegraph">Graph</option>
-				<option id="flow-viz-choice" class="graph-dependent" hidden disabled value="flow">Flow</option>
-				<option id="chord-viz-choice" class="graph-dependent" hidden disabled value="chord">Chord</option>
-				<option id="listview-viz-choice" value="listview">Sheet</option>
-				<option id="textview-viz-choice" value="textview">Data</option>
-			</select>
-		</nav>
-		<nav class="vizmenu-entry">
-			<label for="measure-choices" id="measure-choice-label" class="vizmenu-label">Scale</label>	
-			<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
-		</nav>
-		<div class="clear"></div>
-	</section>
-	
 	<main id="view-wrapper" class="view-wrapper">
-		<div id="vizwrap" class="vizwrap closed">
-			<svg id="vizshell" class="vizsvg" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill="#21222c"></rect></svg>
-			<input id="viz-slider" class="slider" type="range" min="20" max="100" value="30" step="5" oninput="MI.Visualization.Update();">		
-		</div>
-		<div id="viztooltip"></div>
-		<div class="searchwidget">
-			<i class="fas fa-search"></i> 
-			<input type="text" placeholder="Filter by..." id="searchbar"> 
-			<i id="searchclear" class="fas fa-times-circle searchclear"></i>
-		</div>
+		<div id="missing-viz" class="closed"><i class="fas fa-question-circle"></i></div>
 		
-		<div id="mapmenu"><i class="fas fa-layer-group"></i></div>
-		<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
-		<div id="messages" class="closed"></div>
-		<div id="mapcapture"><i class="fas fa-camera"></i></div>
+		<div id="vizwrap" class="vizwrap closed">
+			<svg id="vizshell" class="vizsvg" fill="#21222c" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill=""></rect></svg>
+		</div>
+		<section class="ui">		
+			<section class="vizmenu">
+				<nav class="vizmenu-entry">
+					<label for="viz-choices" id="viz-choice-label" class="vizmenu-label">Visualize</label>
+					<select name="viz-choice" id="viz-choices">
+						<option id="map-viz-choice" value="map">Map</option>
+						<option id="forcegraph-viz-choice" class="graph-dependent" hidden disabled value="forcegraph">Graph</option>
+						<option id="flow-viz-choice" class="graph-dependent" hidden disabled value="flow">Flow</option>
+						<option id="chord-viz-choice" class="graph-dependent" hidden disabled value="chord">Chord</option>
+						<option id="chart-viz-choice" class="measure-dependent" hidden disabled value="chart">Chart</option>			
+						<option id="listview-viz-choice" class="fullapp" value="listview">Sheet</option>
+						<option id="textview-viz-choice" class="fullapp" value="textview">Data</option>
+					</select>
+				</nav>
+				<nav class="vizmenu-entry">
+					<label for="measure-choices" id="measure-choice-label" class="vizmenu-label">Scale</label>	
+					<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
+				</nav>
+				<div class="clear"></div>
+			</section>
+			<div id="viztooltip"></div>
+			<div class="searchwidget">
+				<i class="fas fa-search"></i> 
+				<input type="text" autocomplete="off" placeholder="Filter by..." id="searchbar"> 
+				<i id="searchclear" class="fas fa-times-circle searchclear"></i>
+			</div>
+			<div id="time-slider"></div>
+	
+			<div id="mapmenu"><i class="fas fa-layer-group"></i></div>
+			<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
+			<div id="messages" class="closed"><p id="messages-text"></p></div>
+			<div id="mapcapture"><i class="fas fa-camera"></i></div>
 
-		<nav id="mapmenu-window" class="closed">
-			<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
-			
-			<div id="basemapselect">
-				<h3><label for="basemap-chooser">Map Baselayer</label></h3>
-				<select name="basemap" id="basemap-chooser"></select>
-			</div>
-			<div id="datalayers">
-				<h3>Data Layers</h3> 
-				<p id="datalayers-description">Add Pmtiles, Geojson, or Shapefiles.</p>
-				<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
-				<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
-				<div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
-				<div id="userdatalayers"></div>
-				<div id="load-datalayers-row">
-					<input type="text" id="load-datalayers-input"><button id="load-datalayers-btn"><i class="fas fa-plus-circle"></i></button>
+			<nav id="mapmenu-window" class="closed">
+				<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
+		
+				<div id="basemapselect">
+					<h3><label for="basemap-chooser">Map Baselayer</label></h3>
+					<select name="basemap" id="basemap-chooser"></select>
 				</div>
-			</div>
-			<div id="liveobjects">
-				<h3>Live Objects</h3> 
-				<ul id="liveobjectlist"></ul>
-			</div>
-			<div id="supplycategories">
-				<h3>Manifest Documents</h3> 
-			</div>
-		</nav>
+				<div id="datalayers">
+					<h3>Data Layers</h3> 
+					<p id="datalayers-description"></p>
+					<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
+					<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
+					<div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
+					<div id="userdatalayers"></div>
+					<div id="load-datalayers-row">
+						<input type="text" id="load-datalayers-input"><button id="load-datalayers-btn"><i class="fas fa-plus-circle"></i></button>
+					</div>
+				</div>
+				<div id="liveobjects">
+					<h3>Live Objects</h3> 
+					<ul id="liveobjectlist"></ul>
+				</div>
+				<div id="supplycategories">
+					<h3>Manifest Documents</h3> 
+				</div>
+			</nav>
+		</section>
 		<div class="map" id="map"></div>
+		<div class="chartview closed" id="chartview"></div>
 		<div class="textview closed" id="textview"></div>
 		<div class="listview closed" id="listview">
 			<div id="datalist" class="dataviewer smapviewer">
@@ -111,22 +133,17 @@
 					<div class="notes col sort" data-sort='notes'>Additional Notes</div>
 					<div class="clear"></div>
 				</div>
-				<input type="search" id="datasearch" class="search" placeholder="Search...">
+				<input type="search" id="datasearch" class="search" autocomplete="off" placeholder="Search...">
 				<ul class=list id="manifestlistview"></ul>
 			    <ul class="pagination"></ul>	
 			</div>
 		</div>
 	</main>
-
-	<section id="loader">
-		<h1 id="loadertitle">Manifest</h1>
-		<h2 id="loadermessage">Supply Chain Platform</h2>
-		<div id="loaderspinner" class="lds-spinner">
-			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-		</div>
+	<section id="fullscreen-modal" class="closed" data-id="" data-index="">
+		<div id="full-modal-left" class="closed"><i class="fas fa-caret-left"></i></div>
+		<div id="full-modal"><div id="full-modal-image" class="closed"></div><iframe id="full-modal-video" class="closed" src="" width="100%" height="100%" frameborder="0"></iframe><div id="full-modal-caption"></div></div>
+		<div id="full-modal-right" class="closed"><i class="fas fa-caret-right"></i></div>
 	</section>
-	<section id="fullscreen-modal" class="closed"><div id="full-modal"></div></section>
-	<!-- build:section layout.footer --><!-- /build -->
 
     <!-- build:process -->	
 	<script src="<%= js_libpath %>" defer></script>

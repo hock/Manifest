@@ -14,28 +14,36 @@ class ManifestSupplyChain {
 						};	
 		d.properties = Object.assign(defs.properties, d.properties); d.graph = Object.assign(defs.graph, d.graph);
 		this.SetupStyle(d);
-		
-		let mheader = document.createElement('div');
-		mheader.id = 'mheader-'+id; mheader.classList.add('mheader', 'scref-'+d.details.id);
-		let fillcolor = d.details.style.fillColor, textcolor = d.details.style.textColor;		
-		let url = d.details.url.split('#')[0]+window.location.search+'#'+d.details.url.split('#')[1];
-		
-		mheader.innerHTML = `
-		<div class="mtitle" style="background: ${fillcolor}; color: ${textcolor};">
-			<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a href="${url}">${d.properties.title}</a>
-			<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${textcolor};"></i>
-		</div>`;
-						
-		let mdetails = document.createElement('div');
-		mdetails.id = 'mdetails-'+id; mdetails.classList.add('mdetails');
-		mdetails.innerHTML = `<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>`;
 	
-		let mlist = document.createElement('ul');
-		mlist.id = 'mlist-'+id; mlist.classList.add('mlist');
-	
-		document.getElementById('manifestlist').append(mheader,mdetails,mlist);	
+		let storymode = MI.options.urlparams.storyMap !== 'false' ? (MI.options.storyMap || MI.options.embed) || (d.setOptions && d.setOptions.storyMap && MI.supplychains.length === 1) : false;
+		let mobject = 	`<div id="mheader-${id}" style="${storymode ? `background-color: ${d.details.style.fillColor};` : ''}" class="mheader" data-scref="${d.details.id}">
+							<div class="mtitle" style="${!storymode ? `background-color: ${d.details.style.fillColor};` : ''} color: ${d.details.style.textColor};">
+								<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}" onclick="event.preventDefault(); MI.Interface.URLSet('${d.details.url}');"` : ''}>${d.properties.title}</a>
+								<div class="menu-options">
+									<i id="share-${id}" class="share-button fas fa-share-square"></i>          
+									<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
+								</div>
 		
+							</div>		
+						</div>
+						${storymode ? `<div id="storybanner" style="background-color: ${MI.options.embed ? `${tinycolor(d.details.style.fillColor).setAlpha(0.8)}` :  `${d.details.style.fillColor}`}"><span id="minfo"><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}?storyMap=false"` : ''}>${d.properties.title}</a> on <a href="./">Manifest</a></div>` : ''}
+
+						<div id="mdetails-${id}" class="mdetails">
+						    <div id="share-options-${id}" class="share-container closed">
+							    <ul class="share-menu" style="color:${d.details.style.fillColor}; background:${d.details.style.lightColor};">
+									<span>Share:</span>
+							        <li><a onclick="window.open('${ManifestUtilities.Slugify(d.details.url)}', '_blank');">New Window</a> <i class="fas fa-window-restore"></i></li>
+							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'markdown');">Download</a> <i class="fab fa-markdown"></i></li>
+							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'json');">Download</a> <i class="fas fa-file-download"></i></li>
+							    </ul>
+							</div>
+							<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>
+						</div>
+						<ul id="mlist-${id}" class="mlist"></ul>
+					`;
+		document.getElementById('manifestlist').insertAdjacentHTML('beforeend', mobject);
 		document.getElementById('mheader-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowHeader(nodeid); });
+		document.getElementById('share-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowShare(nodeid); });
 		document.getElementById('closemap-'+id).addEventListener('click', (e, nodeid=id) => { MI.Supplychain.Remove(nodeid); });
 		
 		let supplycatmap = {}, supplycats = {};
@@ -49,17 +57,12 @@ class ManifestSupplyChain {
 			}
 		}
 		
-		let supplycat = document.createElement('div');
-		supplycat.id = 'supplycat-'+id; supplycat.classList.add('supplycatgroup');
-		supplycat.innerHTML = `<span class="supplyrow"><label for="chain-${id}" class="supplycatheader"><input type="checkbox" id="chain-${id}" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span>`;
-		document.getElementById('supplycategories').append(supplycat);	
+		let supplycat = `<div id="supplycat-${id}" class="supplycatgroup"><span class="supplyrow"><label for="chain-${id}" class="supplycatheader"><input type="checkbox" id="chain-${id}" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span></div>`;
+		document.getElementById('supplycategories').insertAdjacentHTML('beforeend', supplycat);	
 		
 		document.getElementById('supplytoggle-'+id).addEventListener('click', (e) => { 
 			document.getElementById('supplycatsub-'+id).classList.toggle('closed');
 			document.getElementById('supplytoggle-'+id).classList.toggle('plus');
-			
-			//if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
-			//else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } 
 		});
 		
 		let supplycatsub = document.createElement('div');
@@ -101,6 +104,8 @@ class ManifestSupplyChain {
 		let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
 		let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { if (el.style.display !== 'none') { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;}});
 		
+		MI.Interface.SetupTime();
+		
 		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) { 
 			MI.Interface.ClearSearch(); MI.Interface.Search(); 
 		}
@@ -132,8 +137,10 @@ class ManifestSupplyChain {
 				if (ft.properties.index) { d.mapper[Number(ft.properties.index-1)] = ft; } // manifest
 				else { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
 			}
-			if (ft.geometry.type === 'Point') { 
-				let pointblob = this.SetupPoint(ft, d, index); nodelist.push(pointblob.li); points.features.push(pointblob.ft);
+			if (ft.geometry.type === 'Point') {
+				let pointblob = this.SetupPoint(ft, d, index); 
+				nodelist.push(pointblob.li); 
+				if (ft.geometry.coordinates[0] !== '' && ft.geometry.coordinates[1] !== '') { points.features.push(pointblob.ft); }
 			} else { 
 				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, d, index) : this.SetupLine(ft, d, index); 
 					
@@ -147,19 +154,17 @@ class ManifestSupplyChain {
 		document.getElementById('mlist-'+d.details.id).innerHTML = nodelist.join('');
 		
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('li').forEach(el => { el.addEventListener('click', (e) => {  MI.Atlas.PointFocus(el.id.substring(6)); }); });
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.measure-link').forEach(el => { el.addEventListener('click', (e) => { document.getElementById('measure-choices').value = el.dataset.measure; MI.Atlas.MeasureSort(); e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => {  if (!MI.options.storyMap && !MI.options.embed) { MI.Atlas.PointFocus(el.id.split('_').pop()); } }); });
 		document.getElementById('mdetails-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.node-sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-left').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), -1); }); });	
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-right').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), 1); }); });	
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-spot').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { 
-				e.stopPropagation();
-				document.getElementById('full-modal').style.backgroundImage = 'url('+el.src+')';
-				document.getElementById('fullscreen-modal').classList.toggle('closed');
-		});});
-
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('fullscreen-modal').classList.toggle('closed'); MI.Interface.ModalSet(el); 		
+ });});
+		
 		if (lines.features.length === 0) { document.querySelectorAll('.nodelineheader.lines').forEach(el => { 
 			let inputs = el.querySelectorAll('input');
 			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
@@ -237,7 +242,7 @@ class ManifestSupplyChain {
 		for (let l in MI.Atlas.maplayer) { if (MI.Atlas.maplayer[l].points) { MI.Atlas.maplayer[l].points.bringToFront(); } }
 	
 		MI.Interface.RefreshMeasureList();
-		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .mdetail_title'); }
+		if (MI.options.storyMap || MI.options.embed) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .node-title'); }
 		
 		return d;
 	}
@@ -247,15 +252,11 @@ class ManifestSupplyChain {
 		
 		MI.Atlas.styles.point.fontsize = d.options.fontsize ? d.options.fontsize : MI.Atlas.styles.point.fontsize;
 		
-		let colors =  d.options.color ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
+		let colors =  typeof d.setOptions.color !== 'undefined' ? d.setOptions.color.value.split(',').map(c => '#' + c) : typeof d.options.color !== 'undefined' ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
-		
-		if (MI.options.storyMap) { 
-			//let c =  styling.color[1];  styling.color[1] = styling.color[0]; styling.color[0] = c; styling.style.opacity = 0.4; 
-		} 
 			
-		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(styling.color[0]).setAlpha(0.1).toString()}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
+		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: styling.color[2]}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
 	SetupPoint(ft, d, index) {
@@ -268,33 +269,41 @@ class ManifestSupplyChain {
 		}
 		// Customized point colors for storymap 
 		Object.assign(ft.properties, setup);
-		
+		// Could add an image like: `<li id="node_${ft.properties.lid}" class="mnode" data-scref="${d.details.id}" style="position:relative;">
+		//	<img style="opacity:5%; z-index:-1; position:absolute; top:0; left:-1rem; width:calc(100% + 2rem); height:100%; object-fit:cover;" src="${MI.Atlas.GetTileImage(ft.properties.latlng.lat, ft.properties.latlng.lng, 13)}">
 		let li = 
-		`<li id="local_${ft.properties.lid}" class="scref-${d.details.id}">
-			<div class="dot" style="background: ${d.details.style.fillColor}; border-color: ${d.details.style.color};">${ft.properties.mindex}</div>
-			<h5 class="mdetail_title">${ft.properties.title}</h5>
-			<div class="pdetails">
-				${ ft.properties.placename !== '' ? `<p class="placename" style="color: ${d.details.style.darkerColor};">${ft.properties.placename}</p>` : ''}
-				${ ft.properties.categories.length !== 0 ? `<p class="category"> ${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join(" ")}</p>` : ''}
-				${ ft.properties.measures.length !== 0 ? `<p class="measures"> ${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? new Date(Number(m.mvalue)*1000).toDateString() : `<span class="mtype">${m.mtype}</span>${m.mvalue}${m.munit}`).join(", ")}</p>` : ''}
+		`<li id="node_${ft.properties.lid}" class="mnode" data-scref="${d.details.id}" tabindex="0">
+			<div class="node-dot" style="background: ${ft.properties.style.fillColor}; border-color: ${ft.properties.style.color};">${ft.properties.mindex}</div>
+			<h5 class="node-title">${ft.properties.title}</h5>
+			${ ft.properties.placename !== '' ? `<div class="node-place" style="color: ${d.details.style.darkerColor};">${ft.properties.placename}</div>` : ''}
+			${ ft.properties.time ? `<div class="node-time" ${ft.properties.time.start ? `data-start="${ft.properties.time.start}"` : ``} ${ft.properties.time.end ? `data-end="${ft.properties.time.end}"` : ``} style="color: ${d.details.style.darkerColor};">${ft.properties.time.start ? `<span class="time-start">${ManifestUtilities.PrintUTCDate(ft.properties.time.start)}</span>` : ''}<span class="time-separator"> — </span>${ft.properties.time.end ? `<span class="time-end">${ManifestUtilities.PrintUTCDate(ft.properties.time.end)}</span>` : ''}</div>` : ''}
+			
+			<div class="node-details">
+				${ ft.properties.categories.length !== 0 ? `<div class="category ${(ft.properties.categories.length === 1 && ft.properties.categories[0] === '') ? 'closed' : ''}">${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join('')}</div>` : ''}${ ft.properties.measures.length !== 0 ? `<div class="measures">${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? '' : `<a class="measure-link" data-measure="${m.mtype}"><span class="mtype">${m.mtype}</span>${m.mvalue}${m.munit}</a>`).join('')}</div>` : ''}
 			</div> 
-				
-			${ft.properties.images.length !== 0 ? `<div class="featuredimages ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
+			
+			<div class="node-images-wrap">
+			${ft.properties.images.length !== 0 ? `<div class="node-images ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
 				
 				${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
-				`<iframe class="ftimg" src="${img.URL}?modestbranding=1&enablejsapi=1&rel=0&fs=0&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
+				`<iframe class="ftimg" src="${img.URL}?enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
 				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 
 				
-				${ft.properties.images.length > 1 ? 
-				`<div class="images-controls">
-					<button id="imgbutton-left_${ft.properties.lid}" class="images-button images-display-left" title="Left Image Button"><i class="fas fa-caret-left"></i></button>
-					<div class="images-box">${(ft.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${ft.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
-					<button id="imgbutton-right_${ft.properties.lid}" class="images-button images-display-right" title="Left Image Button"><i class="fas fa-caret-right"></i></button>
-				</div>` : ''} 
+				
 			</div>` : ''}
-								  	
-			<div class="description">${ft.properties.description !== '' ? ManifestUtilities.Linkify(ft.properties.description) : ''}</div>
-			<details class="sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
+			
+			${ft.properties.images.length > 1 ? 
+			`<div class="images-controls">
+				<button id="imgbutton-left_${ft.properties.lid}" tabindex="-1" class="images-button images-display-left" title="Left Image Button"><i class="fas fa-caret-left"></i></button>
+				<div class="images-box">${(ft.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${ft.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
+				<button id="imgbutton-right_${ft.properties.lid}" tabindex="-1" class="images-button images-display-right" title="Left Image Button"><i class="fas fa-caret-right"></i></button>
+			</div>` : ''}
+			
+			${ft.properties.images.length !== 0 ? `<div class="images-caption">${ft.properties.images[0].caption ? ft.properties.images[0].caption : '' }</div>` : ''}
+			</div>
+					  	
+			<div class="node-description">${ft.properties.description !== '' ? ManifestUtilities.Linkify(ft.properties.description) : ''}</div>
+			<details class="node-sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
 				<summary>Notes</summary>
 				<ol>
 					${ft.properties.sources.map(src => src ? `<li>${ManifestUtilities.Linkify(src)}</li>` : '').join("")}
@@ -302,7 +311,6 @@ class ManifestSupplyChain {
 				</ol>
 			</details>
 		</li>`;
-		
 		return {'li':li, 'ft':ft};
 	}
 	
@@ -328,13 +336,24 @@ class ManifestSupplyChain {
 		
 		if ( breakstart !== 0 && !isNaN(sign)) { 
 			if (sign === 1) {
-				let part1 = multipass[0].slice(0, breakstart); part1.push([-180, part1[part1.length-1][1]]);
-				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([180, part1[part1.length-1][1]]);
+				let part1 = multipass[0].slice(0, breakstart); 
+				// needs y coord interpolation to look right
+				// TODO Angle and zoom to fit popup
+				//let angle = Math.atan2(p1.x - pt2.y, pt2.x - pt2.y) * 180 / Math.PI;
+				
+				part1.push([-180, part1[part1.length-1][1]+1]);
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); 
+				// needs y coord interpolation to look right
+				part2.unshift([180, part1[part1.length-1][1]+1]);
 				ft.geometry.coordinates = [part1, part2];
 				
 			} else if (sign === -1) {
-				let part1 = multipass[0].slice(0, breakstart); part1.push([180, part1[part1.length-1][1]]); 
-				let part2 = multipass[0].slice(breakend+1,multipass[0].length); part2.unshift([-180, part1[part1.length-1][1]]);
+				let part1 = multipass[0].slice(0, breakstart); 
+				// needs y coord interpolation to look right
+				part1.push([180, part1[part1.length-1][1]+1]); 
+				let part2 = multipass[0].slice(breakend+1,multipass[0].length); 
+				// needs y coord interpolation to look right
+				part2.unshift([-180, part1[part1.length-1][1]+1]);
 				ft.geometry.coordinates = [part1, part2];
 			}
 		} 
@@ -368,8 +387,8 @@ class ManifestSupplyChain {
 	}
 	SetupArrow(ft, d, index) {	
 		let midindex = Math.floor((ft.geometry.raw[0].length-1)*0.8);
-		let middle = ft.geometry.raw[0][midindex];		
-		let angle = Math.atan2(ft.geometry.raw[0][midindex+5][0] - ft.geometry.raw[0][midindex-5][0], ft.geometry.raw[0][midindex+5][1] - ft.geometry.raw[0][midindex-5][1]) * 180 / Math.PI;
+		let middle = ft.geometry.raw[0][midindex];	
+		let angle = Math.atan2(ft.geometry.raw[0][Math.min(midindex+5,ft.geometry.raw[0].length-1)][0] - ft.geometry.raw[0][Math.max(midindex-5,0)][0], ft.geometry.raw[0][Math.min(midindex+5,ft.geometry.raw[0].length-1)][1] - ft.geometry.raw[0][Math.max(midindex-5,0)][1]) * 180 / Math.PI;
 
 		let arrow = {
 			type: 'Feature',
@@ -475,9 +494,14 @@ class ManifestSupplyChain {
 			MI.Interface.ShowHeader(targetid, true);
 			if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { MI.Atlas.MapPointClick(MI.Atlas.active_point, 'auto'); } 
 		}
-		else if (document.getElementById('minfodetail').classList.contains('closed')) { 
-			MI.Interface.ShowLauncher(); 
-			MI.Visualization.Set('map', MI.Interface.active_element);			
+		else {
+			// Close special Manifest Popup
+			if (MI.Interface.active_element === '1029261216' ) { MI.Atlas.active_point.closePopup(); }
+			
+			if (document.getElementById('minfodetail').classList.contains('closed')) { 
+				MI.Interface.ShowLauncher(); 
+				MI.Visualization.Set('map', MI.Interface.active_element);	
+			}		
 		}
 	
 		for (let i in MI.Atlas.map._layers) { 
@@ -494,12 +518,22 @@ class ManifestSupplyChain {
 				MI.Atlas.RenderPoint(MI.Atlas.map._layers[i].feature,MI.Atlas.map._layers[i]);
 			}
 		}
-	
+		
+		for (let vl in MI.Atlas.vdatalayers) {			
+			if (MI.Atlas.vdatalayers[vl].scid && MI.Atlas.vdatalayers[vl].scid === id) {
+				if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[vl].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[vl].id); }  	
+				if ( MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) !== undefined) { 
+					MI.Atlas.glMap.removeSource('mlayer-'+MI.Atlas.vdatalayers[vl].id); }  
+				document.getElementById('lc-'+MI.Atlas.vdatalayers[vl].id).remove();
+			}
+		}
 		MI.Atlas.Refresh(); MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());
 	
 		MI.Interface.RefreshMeasureList(); 
 		if (document.getElementById('blob-'+id)) { document.getElementById('blob-'+id).remove(); }
 
+		MI.Interface.SetupTime();
+		
 		MI.Interface.SetVizOptions();
 		MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);			
 		MI.Interface.SetDocumentTitle();	
@@ -550,7 +584,7 @@ class ManifestSupplyChain {
 				MI.Atlas.map.addLayer(mlayer.lines); MI.Atlas.map.addLayer(mlayer.arrows); MI.Atlas.map.addLayer(mlayer.points); 
 				document.getElementById('supplycat-'+id).querySelectorAll('input').forEach(el =>  { el.checked = true; });
 							
-				if (!MI.options.storyMap) { 
+				if (!MI.options.storyMap && !MI.options.embed) { 
 					if (document.getElementsByClassName('leaflet-popup').length > 0 && MI.Atlas.active_point) { 
 						let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { 
 							el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
@@ -568,8 +602,8 @@ class ManifestSupplyChain {
 					MI.Atlas.map.removeLayer(mlayer.points); MI.Atlas.map.addLayer(mlayer.points);} }); 	
 			}
 		}
-	
-		if (!MI.options.storyMap) { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }			
+		if (!MI.options.storyMap && !MI.options.embed) {  let searchvalue = document.getElementById('searchbar').value; MI.Interface.ClearSearch(); MI.Interface.Search(searchvalue, true); }
+		if (!MI.options.storyMap && !MI.options.embed) { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }			
 		MI.Atlas.Refresh();
 	}
 }

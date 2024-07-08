@@ -41,6 +41,40 @@
 				"$ref": "node.json"
 			},
 			"options": { "disable_array_reorder": "true", "disable_array_delete_all_rows": "true", "disable_array_delete_last_row": "true" }
+		},
+		"options": {
+			"title": "Options",		
+			"type": "array",
+			"format": "table",
+			"items": {
+				"title": "Option",
+				"type": "object",
+				"properties": {
+					"type": {
+						"title": "Type",
+						"type": "string",
+						"description": "Option",					
+						"enum": [ "other","map","visualization","position","zoom","storymap","datalayer"],
+						"default": ""	
+					},	
+					"value": {
+						"title": "Value",
+						"description": "Value for the option.",
+						"type": "string"
+					},
+					"parameters": {
+						"title": "Additional Parameters",
+						"description": "Additional parameters.",
+						"type": "string"
+					}
+				}
+			},
+			"options": {
+				"disable_collapse": true,
+				"disable_array_reorder": "true",
+				"disable_array_delete_all_rows": "true",
+				"disable_array_delete_last_row": "true"
+			}
 		}	
 	}
 }

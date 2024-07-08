@@ -4,13 +4,17 @@ const { google } = require("googleapis");
 const mserver = require('./json/mserver.json');
 const aprsfi = require('./json/aprsfi.json');
 const maptiler = require('./json/maptiler.json');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
 const cors = require('cors')
 const corsOptions = {
-  origin: ['https://manifest.supplystudies.com','http://localhost','http://hockbook.local']
+  origin: ['https://manifest.supplystudies.com','http://localhost','https://hockbook.local']
 }
+
+const mime = { html: 'text/html', txt: 'text/plain', css: 'text/css', gif: 'image/gif', jpg: 'image/jpeg', png: 'image/png', svg: 'image/svg+xml', js: 'application/javascript' };
 
 app.use(cors(corsOptions));
 app.listen(mserver.port, () => { console.log(`Server running at ${mserver.name}:${mserver.port}/`); });
@@ -21,14 +25,56 @@ app.get('/', (req, res) => {
 	res.send(`Manifest Web Service v${mserver.version}`); 
 });
 
+
+app.get('/thumb/:name', async (req, res) => {
+    let file = path.join('../json/samples/thumbnails/',req.params.name);
+
+	console.log(file);
+    let type = mime[path.extname(file).slice(1)] || 'text/plain';
+    let s = fs.createReadStream(file);
+    s.on('open', function () {
+        res.set('Content-Type', type);
+        s.pipe(res);
+    });
+    s.on('error', function () {
+		file = path.join('../images/','card.jpg');
+		type = mime[path.extname(file).slice(1)] || 'text/plain';
+		console.log(file);
+		let g = fs.createReadStream(file);
+	
+	    g.on('open', function () { console.log('g open'); res.set('Content-Type', type); g.pipe(res); });
+	    g.on('error', function () { console.log('g error'); res.set('Content-Type', 'text/plain'); res.status(404).end('Not found 2'); });
+    });
+});
+	
 app.get('/marinetraffic/', async (req, res) => {});
 
 app.get('/maptiler/:type', async (req, res) => {
 	console.log("Requested Map Tile: "+req.params.type);	
 	
-	const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key, {
+	if (req.params.type === 'raster') {
+		const data = 'https://api.maptiler.com/maps/791a2394-6b08-4ef6-ab01-bc385f68ac37/{z}/{x}/{y}.webp?key='+maptiler.key;
+		res.send(data);		
+	} else {
+		const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key, {
+			headers: {'Referer': 'https://service.supplystudies.com/',}
+		});
+		//const response = await fetch('https://api.protomaps.com/tiles/v3.json?key=357cb60093a0b2c9');	
+		const data = await response.json();
+		res.send(data);		
+	}		
+});
+
+app.get('/geocode/:type/:query', async (req, res) => {
+	console.log("Geocoding: "+req.params.query);
+	
+	let options = '';	
+	if (req.params.type !== 'reverse') { otpions = '&proximity=ip&autocomplete=true&fuzzyMatch=true&limit=3'; }
+	const response = await fetch('https://api.maptiler.com/geocoding/'+req.params.query+'.json?key='+maptiler.key+options, {
 		headers: {'Referer': 'https://service.supplystudies.com/',}
 	});
+	//const response = await fetch('https://api.protomaps.com/tiles/v3.json?key=357cb60093a0b2c9');	
+
 	const data = await response.json();
 		
 	res.send(data);

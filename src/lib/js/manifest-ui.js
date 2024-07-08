@@ -3,13 +3,14 @@ class ManifestUI {
 		this.interval = null;
 		this.filter = {clear: true, term: null};
 		this.active_element = null; this.paneldisplay = {};
+		this.timeslider = false;
 		this.observer = this.SetupObserver();
 
 		document.getElementById('fullscreen-menu').addEventListener('click', (e) => { MI.Interface.ToggleFullscreen(); });
 		document.getElementById('mapcapture').addEventListener('click', (e) => { MI.ExportManifest(null, document.title, 'map'); });
 		document.getElementById('minfo').addEventListener('click', (e) => { MI.Interface.ShowLauncher(); });
 		document.getElementById('minfo-hamburger').addEventListener('click', (e) => { MI.Interface.ShowLauncher(); });
-	
+		
 		// CHECK used to also assign mouseup to first below
 		document.getElementById('searchbar').addEventListener('keyup', (e) => { MI.Interface.Search(); });
 		document.getElementById('searchclear').addEventListener('click', (e) => { MI.Interface.ClearSearch(); MI.Interface.Search(); });	
@@ -18,24 +19,23 @@ class ManifestUI {
 	/** Called after Manifest has been initialized and the first supply chain loaded **/ 
 	CleanupInterface() { 	
 		console.log(MI); 
-		document.getElementById('load-samples').addEventListener('change', function() {
-			const selected = document.getElementById('load-samples').value;
-		
-			if (selected === 'url') { document.getElementById('loadlistpanel').className = document.getElementById('launcher-details').className = 'url'; 
-				if (document.getElementById('manifestbar').classList.contains('open')) { 
-					document.getElementById('sidepanel').style.top = document.getElementById('manifestbar').offsetHeight + ManifestUtilities.RemToPixels(1) + 'px'; 
-				}} 
-			else if (selected === 'file') { document.getElementById('loadlistpanel').className = document.getElementById('launcher-details').className = 'file'; 
-				if (document.getElementById('manifestbar').classList.contains('open')) { 
-					document.getElementById('sidepanel').style.top = document.getElementById('manifestbar').offsetHeight + ManifestUtilities.RemToPixels(1) + 'px'; 
-				}} 
-			else { document.getElementById('loadlistpanel').className = document.getElementById('launcher-details').className = ''; 
-				if (document.getElementById('manifestbar').classList.contains('open')) { 
-					document.getElementById('sidepanel').style.top = document.getElementById('manifestbar').offsetHeight + ManifestUtilities.RemToPixels(1) + 'px'; 
-				}} 
+		document.getElementById('load-custom').addEventListener('change', function() {
+			const selected = document.getElementById('load-custom').value;
+			if (selected === 'url') { 
+				document.getElementById('loadlist-group-custom').className = 'url'; 
+				document.getElementById('load-custom-urltext').classList.remove('closed');
+				document.getElementById('load-custom-filetext').classList.add('closed');
+				
+			}
+			else if (selected === 'file') { document.getElementById('loadlist-group-custom').className = 'file'; 
+				document.getElementById('load-custom-urltext').classList.add('closed');
+				document.getElementById('load-custom-filetext').classList.remove('closed');
+			} 				
 		});
 				
 		document.getElementById('load-samples-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-samples').value); });	
+		document.getElementById('load-custom-btn').addEventListener('click', (e) => { MI.Interface.LoadFromLauncher(document.getElementById('load-custom').value); });	
+		
 		document.getElementById('basemap-chooser').addEventListener('change', (e) => { 
 			this.SetBasemap(document.getElementById('basemap-chooser').value); 
 		});
@@ -53,8 +53,12 @@ class ManifestUI {
 			MI.Atlas.ProcessDataLayerFromElement(el);}); 
 		});
 		document.getElementById('fullscreen-modal').addEventListener('click', (e) => { 
+			MI.Interface.StopVideoPlayback();
 			document.getElementById('fullscreen-modal').classList.toggle('closed');
 		});
+		document.getElementById('full-modal-left').addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ModalScroll(-1); });
+		document.getElementById('full-modal-right').addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ModalScroll(1); });
+		
 		let dropElement = document.getElementById('minfodetail');
 		let dropArea = new jsondrop('minfodetail', { 
 			onEachFile: function(file, start) { MI.Process('manifest', file.data, {id: ManifestUtilities.Hash(file.name), url: '', start:MI.supplychains.length === 0}); } 
@@ -62,13 +66,9 @@ class ManifestUI {
 		document.getElementById('file-input').addEventListener('change', (e) => { if (!MI.LoadManifestFile(e.target.files[0], e.target.value.split( '\\' ).pop())) { 
 			this.ShakeAlert(document.getElementById('manifestbar'));
 			// @TODO This should shake, but it mysteriously doesn't the function gets called but no animation (in Safari)
-		}});
-		if (MI.options.storyMap) { 
-			for (let s in MI.supplychains) { 
-				document.getElementById('storybanner').style.backgroundColor = MI.supplychains[s].details.style.fillColor; 
-				document.getElementById('storybanner').style.borderColor = MI.supplychains[s].details.style.color; 
-			}
-			document.querySelectorAll('.mlist .featuredimages > .ftimg').forEach(el => { el.setAttribute("loading","eager"); });
+		} else { MI.Interface.ShowLauncher(); }});
+		if (MI.options.storyMap || MI.options.embed) { 
+			document.querySelectorAll('.mlist .node-images > .ftimg').forEach(el => { el.setAttribute("loading","eager"); });
 		}
 		for (let l in MI.Atlas.maplayer) {
 			if (MI.Atlas.maplayer[l].id === 1029261216) { MI.Atlas.maplayer[l].points.bringToFront(); }	
@@ -79,15 +79,12 @@ class ManifestUI {
 		['dragover', 'dragenter'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.add('is-dragover'); }));
 		['dragleave', 'dragend', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.remove('is-dragover'); }));
 
+		document.addEventListener("keydown", MI.Interface.KeyHandler);
+		
 		window.onresize = this.ManifestResize;	
 		window.onbeforeprint = this.PrintBefore;
 		window.onafterprint = this.PrintAfter;
 		if (MI.Visualization.type !== 'map') { document.getElementById('vizwrap').classList.remove('closed'); MI.Visualization.Resize(); }
-		MI.Interface.ClearLoader();
-	}
-	
-	ClearLoader() {
-		document.getElementById('loader').style.display = 'none'; 
 		document.getElementById('sidepanel').scrollTo(0,0);
 		MI.initialized = true; 
 	}
@@ -97,22 +94,39 @@ class ManifestUI {
 	
 	Storyize() {
 		document.body.classList.add('storymap');
-		
+		window.dispatchEvent(new Event('resize'));
 		MI.Atlas.styles.point.fontsize = 0.1;
-	
-		let storybanner = document.createElement('div');
-		storybanner.id = 'storybanner';
-		storybanner.innerHTML = `M`;
-	
-		document.querySelectorAll('body.storymap').forEach(el => { el.append(storybanner); });
-		
-		document.getElementById('storybanner').addEventListener('click', (e) => { 
-			const newUrl = window.location.origin+window.location.pathname+window.location.hash;
-			window.location.replace(newUrl);
-		});
-		
+	} 
+	Embedize() {
+		document.body.classList.add('embedmap');
+		window.dispatchEvent(new Event('resize'));
+		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
 	
+	SetupTime() {
+		let timeset = false, starttime, endtime;
+		MI.Interface.timeslider = false;
+		document.getElementById('time-slider').innerHTML = '';
+		for (let s in MI.supplychains) { 
+			if (MI.supplychains[s].details.time) {
+				timeset = true;
+				if (MI.supplychains[s].details.time.start) { starttime = Number(MI.supplychains[s].details.time.start); }
+				if (MI.supplychains[s].details.time.end) { endtime = Number(MI.supplychains[s].details.time.end); }
+			}
+		}
+		if (timeset) {
+			document.getElementById('time-slider').innerHTML = `<div id="timer-lower-value"></div> <div id="time-control-wrap"><div id="time-control"></div></div> <div id="timer-upper-value"></div>`;
+			MI.Interface.timeslider = new DualHRange('time-control', { lowerBound: starttime, upperBound:endtime, lower: starttime, upper: endtime });
+			MI.Interface.timeslider.addEventListener('update', (event) => {
+				let searchvalue = document.getElementById('searchbar').value; MI.Interface.ClearSearch(); MI.Interface.Search(searchvalue, true);
+				
+				document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.lower);
+				document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.upper);	
+			}, {passive: true} );
+			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(starttime);
+			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(endtime);
+		}
+	}
 	SetupObserver() {
 		let io = new IntersectionObserver((entries) => { 	
 				    entries.forEach((entry) => {
@@ -138,7 +152,7 @@ class ManifestUI {
 		els.forEach(el => {
   	    	let observer = new IntersectionObserver((entries, observer) => { 
 				entries.forEach(entry => { if (entry.isIntersecting) { 
-					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], false, false);	
+					MI.Atlas.PointFocus(entry.target.parentElement.id.split('_')[1], {flyto: true});						
 				}});
   	  	  	});
 			observer.observe(el);
@@ -150,6 +164,7 @@ class ManifestUI {
 	/** Handles header actions **/
 	ShowHeader(id) {
 		let mheader = document.getElementById('mheader-'+id);
+		if (!mheader) { return; }
 		let offset = mheader.clientHeight;
 
 		while (mheader.previousSibling) {
@@ -164,7 +179,10 @@ class ManifestUI {
 			document.getElementById('textview').scrollTo(0, document.getElementById('blob-'+id).offsetTop - ManifestUtilities.RemToPixels(1));
 		}
 	}
-
+	
+	ShowShare(id) {
+		document.getElementById('share-options-'+id).classList.toggle('closed');
+	}
 	/** Handles the Manifest information and loading menu **/
 	ShowLauncher() {	
 		document.getElementById('minfodetail').classList.toggle('closed');
@@ -182,26 +200,21 @@ class ManifestUI {
 		let unloaded = false, loadurl, id, type, idref;
 		
 		if (value === 'url') {
-			loadurl = document.getElementById('load-samples-input').value;
+			loadurl = document.getElementById('load-custom-input').value;
 			if (loadurl.toLowerCase().indexOf('https://raw.githubusercontent.com/hock/smapdata/master/data/') >= 0) {
 				type = 'smap'; id = loadurl.substring(60).split('.')[0]; idref = id; loadurl = MI.options.serviceurl + 'smap/' + id;
 			} else if (loadurl.toLowerCase().indexOf('https://docs.google.com/spreadsheets/d/') >= 0) {
 				type = 'gsheet'; id = loadurl.substring(39).split('/')[0]; idref = id; loadurl = MI.options.serviceurl + 'gsheet/' + id; id = ManifestUtilities.Hash(id);
-			} else {
-				type = 'manifest'; idref = loadurl; id = ManifestUtilities.Hash(loadurl);			
-			}
+			} else { type = 'manifest'; idref = loadurl; id = ManifestUtilities.Hash(loadurl);	}
 		} else {
 			let val = value ? value : document.getElementById('load-samples').value;
 			let option = val.split('-');
 			type = option[0];	
 			option = [option.shift(), option.join('-')];
 			id = option[1];
-		
 			if (type === 'smap') { loadurl = MI.options.serviceurl + 'smap/' + id; } 
 			else if	(type === 'manifest') { 
-				if (id === 'json/manifest.json') {
-					fetch("CHANGELOG.md").then(c => c.text()).then(changelog => { MI.changelog = changelog;} );
-				}
+				if (id === 'json/manifest.json') { fetch("CHANGELOG.md").then(c => c.text()).then(changelog => { MI.changelog = changelog;} ); }
 				loadurl = id; id = ManifestUtilities.Hash(id); 
 			} 
 			else if (type === 'gsheet') { loadurl = MI.options.serviceurl + 'gsheet/' + id; idref = id; id = ManifestUtilities.Hash(id); }	
@@ -244,8 +257,17 @@ class ManifestUI {
 				let uncat = ('cat-'+el.parentElement.id.split('-')[1]+'-').toLowerCase();
 				let testcat = cats[0].dataset.cat.toLowerCase();
 				
-				if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
+				if (MI.Interface.timeslider && el.querySelectorAll('.node-time').length !== 0 && (el.querySelectorAll('.node-time')[0].dataset.start || el.querySelectorAll('.node-time')[0].dataset.end)) {
+					let starttime = el.querySelectorAll('.node-time')[0].dataset.start ? Number(el.querySelectorAll('.node-time')[0].dataset.start) : MI.Interface.timeslider.lowerBound;
+					let endtime = el.querySelectorAll('.node-time')[0].dataset.end ? Number(el.querySelectorAll('.node-time')[0].dataset.end) : starttime;
+					
+					if ( ( (endtime < Number(MI.Interface.timeslider.lower)) || (starttime > Number(MI.Interface.timeslider.upper))) || catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
 					else { el.style.display = 'list-item'; }
+				} else {
+					if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
+					else { el.style.display = 'list-item'; }
+				}
+				
 		    });
 			MI.Interface.filter.clear = true;
 		}
@@ -270,6 +292,12 @@ class ManifestUI {
 				
 				if (closedcats.includes(uncat+'uncategorized') && cats.length === 1 && 'cat-'+catid+'-'+cats[0] === uncat) {
 					found = false;
+				}
+				if (MI.Interface.timeslider && MI.Atlas.map._layers[i].feature.properties.time) {
+					let starttime = MI.Atlas.map._layers[i].feature.properties.time.start ? Number(MI.Atlas.map._layers[i].feature.properties.time.start) : MI.Interface.timeslider.lowerBound;
+					let endtime = MI.Atlas.map._layers[i].feature.properties.time.end ? Number(MI.Atlas.map._layers[i].feature.properties.time.end) : starttime;
+					
+					if ( (starttime < Number(MI.Interface.timeslider.lower)) || (endtime > Number(MI.Interface.timeslider.upper))) { found = false; }
 				}
 				// TODO Ideally we hide lines if one of the nodes isn't present... for categories this is more complicated and probably requires some changes to the line feature structure to store more information about its connected nodes.
 			
@@ -308,6 +336,17 @@ class ManifestUI {
 		MI.Interface.filter = {term: null, clear: true};
 	}
 	
+	KeyHandler(e) {
+		// Modal Keys
+		if (!document.getElementById('fullscreen-modal').classList.contains('closed') && 
+			!document.getElementById('full-modal-left').classList.contains('closed') && !document.getElementById('full-modal-right').classList.contains('closed')) {
+			if (e.key === 'ArrowLeft') { MI.Interface.ModalScroll(-1); e.stopPropagation(); }
+			if (e.key === 'ArrowRight') { MI.Interface.ModalScroll(1); }					
+		}
+		if (!document.getElementById('fullscreen-modal').classList.contains('closed')) {	
+			if (e.key === 'Escape') {  MI.Interface.StopVideoPlayback(); document.getElementById('fullscreen-modal').classList.toggle('closed'); }			
+		}
+	}
 	Link(link, event) {
 		event.preventDefault(); event.stopPropagation();
 		let type;
@@ -317,15 +356,16 @@ class ManifestUI {
 			type = 'gsheet'; link = link.substring(39).split('/')[0];
 		} else { type = 'manifest'; }
 		if (link.includes('manifest://')) { link = link.replace('manifest://', type+'-https://'); } else { link = type+'-'+link; }
-		if (MI.options.storyMap) {  window.location = window.location.origin+window.location.pathname+'?storyMap#'+link; window.location.reload();} 
+		if (MI.options.storyMap || MI.options.embed) {  window.location = window.location.origin+window.location.pathname+'?storyMap#'+link; window.location.reload();} 
 		else {
 			this.LoadFromLauncher(link, false);
 		}
 	}
-	ImageScroll(lid, n, jump=false) {
-	    let slideIndex = Number(document.getElementById('local_'+lid).querySelectorAll('div.featuredimages')[0].getAttribute('data-index')) + n; 
-		let slides = document.getElementById('local_'+lid).querySelectorAll('div.featuredimages .ftimg');
-		let spots = document.getElementById('local_'+lid).querySelectorAll('div.featuredimages .images-spot');
+	
+	ImageScroll(lid, n, jump=false, modal=false) {
+	    let slideIndex = Number(document.getElementById('node_'+lid).querySelectorAll('.node-images')[0].getAttribute('data-index')) + n; 
+		let slides = document.getElementById('node_'+lid).querySelectorAll('.node-images .ftimg');
+		let spots = document.getElementById('node_'+lid).querySelectorAll('.images-spot');
 		
 	    if (slideIndex > slides.length) {slideIndex = 1;} 
 	    if (slideIndex < 1) {slideIndex = slides.length; }
@@ -334,11 +374,43 @@ class ManifestUI {
 	      slides[i].style.display = "none"; 
 		  spots[i].classList.remove('selected');
 	    }
+		document.getElementById('node_'+lid).querySelectorAll('.images-caption')[0].textContent = slides[slideIndex-1].getAttribute('title');
+		if (modal) { MI.Interface.ModalSet(slides[slideIndex-1]); }
+		
 	    slides[slideIndex-1].style.display = "block"; 
 		spots[slideIndex-1].classList.add('selected');
-		document.getElementById('local_'+lid).querySelectorAll('div.featuredimages')[0].setAttribute('data-index', slideIndex);
+		document.getElementById('node_'+lid).querySelectorAll('.node-images')[0].setAttribute('data-index', slideIndex);
 		MI.Interface.StopVideoPlayback();
 	}
+	
+	ModalSet(el) {		
+		if (el.parentElement.classList.contains('multiple')) {
+			document.getElementById('full-modal-left').classList.remove('closed');
+			document.getElementById('full-modal-right').classList.remove('closed');	
+			document.getElementById('fullscreen-modal').dataset.id = el.parentElement.parentElement.parentElement.id.split('_').pop();
+			document.getElementById('fullscreen-modal').dataset.index = el.parentElement.dataset.index;
+		} else {
+			document.getElementById('full-modal-left').classList.add('closed');
+			document.getElementById('full-modal-right').classList.add('closed');
+			document.getElementById('fullscreen-modal').dataset.id = '';
+			document.getElementById('fullscreen-modal').dataset.index = '';
+		}
+		if (el.src.substring(0,24) === 'https://www.youtube.com/') {
+			document.getElementById('full-modal-image').classList.add('closed');
+			document.getElementById('full-modal-video').classList.remove('closed');
+			document.getElementById('full-modal-video').setAttribute('src',el.src+'enablejsapi=1&origin='+window.location.origin+'&color=white&controls=0');
+		} else {
+			document.getElementById('full-modal-video').setAttribute('src','');		
+			document.getElementById('full-modal-video').classList.add('closed');
+			document.getElementById('full-modal-image').classList.remove('closed');
+			document.getElementById('full-modal-image').style.backgroundImage = 'url('+el.src+')';
+		}
+		document.getElementById('full-modal-caption').textContent = el.getAttribute("title");			
+	}
+	ModalScroll(direction) {
+		MI.Interface.ImageScroll(document.getElementById('fullscreen-modal').dataset.id, direction, false, true); 
+	}
+	
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');
@@ -353,10 +425,23 @@ class ManifestUI {
 	}
 	
 	SetVizOptions() {
-		let directed = false;
-		for (let sc of MI.supplychains) { if (sc.graph.type === 'directed') { directed = true; } }
+		let directed = false, measured = false;
+		for (let sc of MI.supplychains) { 
+			if (sc.graph.type === 'directed') { directed = true;} 
+			if (Object.keys(sc.details.measures).length > 0) { 
+				measured = false;
+				for (let measure of Object.keys(sc.details.measures)) { if (measure !== 'starttime' && measure !== 'endtime') { measured = true; } }
+			}			
+		}
 		if (directed) { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.removeAttribute('hidden'); el.removeAttribute('disabled');});
 		} else { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.setAttribute('hidden',''); el.setAttribute('disabled','');}); }
+		
+		if (measured) { document.getElementById('viz-choices').querySelectorAll('.measure-dependent').forEach(el => { el.removeAttribute('hidden'); el.removeAttribute('disabled');});
+		} else { document.getElementById('viz-choices').querySelectorAll('.measure-dependent').forEach(el => { el.setAttribute('hidden',''); el.setAttribute('disabled','');}); }
+		
+		if (MI.Interface.IsMobile()) {
+			 document.getElementById('viz-choices').querySelectorAll('.fullapp').forEach(el => { el.setAttribute('hidden',''); el.setAttribute('disabled','');}); 
+		}
 		
 	}
 	SetBasemap(tile) {
@@ -365,7 +450,7 @@ class ManifestUI {
 	
 	AddDataLayer(ref) {	
 		let type = ref.split('.').pop();
-		if (type === 'geojson' || type === 'pmtiles') {
+		if (type === 'geojson' || type === 'pmtiles' || type === 'jpg' || type === 'png') {
 			/*let dlayer = document.createElement('div');
 			let lclass = type === 'geojson' ? 'geojson' : 'vector';
 			dlayer.classList.add('layerrow');
@@ -387,11 +472,13 @@ class ManifestUI {
 		if (document.body.classList.contains('fullscreen')) {
 			document.body.classList.remove('fullscreen');
 		} else { document.body.classList.add('fullscreen'); }
-		if (document.getElementsByClassName('leaflet-popup').length >= 1 && MI.Atlas.active_point !== null) { 
-			MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng( MI.Atlas.active_point._popup._source.feature.properties.latlng));				
+		
+		MI.Atlas.map.invalidateSize({pan: false, animate: false, debounceMoveend: false});
+		if (document.getElementsByClassName('leaflet-popup').length >= 1 && MI.Atlas.active_point !== null) { 			
+			MI.Atlas.map.setView(MI.Atlas.active_point._popup._source.feature.properties.latlng, MI.Atlas.map.getZoom(), {animate: false});							
 		}
 		MI.Atlas.homecontrol.setHomeCoordinates();
-		MI.Visualization.Resize();
+		MI.Interface.ManifestResize();
 	}
 	
 	SetDocumentTitle() {
@@ -404,22 +491,34 @@ class ManifestUI {
 		document.title = setTitle;
 		document.querySelector('meta[property="og:title"]').setAttribute("content", setTitle);
 		
+		if (scTitles.length === 1) {
+			let description = MI.supplychains[0].properties.description.replace(/(<([^>]+)>)/ig,'');
+			document.querySelector('meta[name="description"]').setAttribute("content", description);
+			document.querySelector('meta[property="og:description"]').setAttribute("content", description);
+		} else {
+			let description = document.querySelector('meta[name="manifest-description"]').getAttribute("content");
+			document.querySelector('meta[name="description"]').setAttribute("content", description);
+			document.querySelector('meta[property="og:description"]').setAttribute("content", description);
+		}
+		
 	}
 	
-	ManifestResize() { MI.Visualization.Resize(); }
-
-	ShowLoader() {
-		document.getElementById('loader').style.background = 'rgba(0,0,0,0.8)';
-		document.getElementById('loader').style.display = 'block'; 
+	URLSet(url) {
+		window.history.pushState({}, '', ManifestUtilities.Slugify(url));
 	}
+	ManifestResize() { MI.Visualization.Resize(); }
 	
 	ShowMessage(msg) {
 		clearTimeout(this.interval);
 		document.getElementById('messages').classList.remove("closed");
-		document.getElementById('messages').innerHTML = msg;
-		this.interval = setTimeout((e) => {document.getElementById('messages').innerHTML = ''; document.getElementById('messages').classList.add("closed");}, 5000);
+		document.getElementById('messages-text').innerHTML = msg;
+		this.interval = setTimeout((e) => {document.getElementById('messages-text').innerHTML = ''; document.getElementById('messages').classList.add("closed");}, 5000);
 	}
-	
+	ClearMessages() {
+		clearTimeout(this.interval);
+		document.getElementById('messages-text').innerHTML = ''; 
+		document.getElementById('messages').classList.add("closed");
+	}
 	ShakeAlert(element, time=20, coefficient=50){
 	    element.style.transition = '0.1s';
     
@@ -441,17 +540,17 @@ class ManifestUI {
 	
 	/* Mobile Functions /* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 	Mobilify(id, index) {
-		document.getElementById('sidepanel').classList.add('middle');
+		document.getElementById('sidewrap').classList.add('middle');
 		this.SetupSwipes('mheader-'+id, function(el,d) {
-			const sidepanel = document.getElementById('sidepanel');
+			const sidewrap = document.getElementById('sidewrap');
 			const viewwrap = document.getElementById('view-wrapper');
-			if (sidepanel.classList.contains('top')) {
-				if (d === 'd') { sidepanel.classList.remove('top'); sidepanel.classList.add('middle'); viewwrap.classList.remove('top'); viewwrap.classList.add('middle'); }
-			} else if (sidepanel.classList.contains('middle')) {
-				if (d === 'u') { sidepanel.classList.remove('middle'); sidepanel.classList.add('top'); viewwrap.classList.remove('middle'); viewwrap.classList.add('top'); } 			
-				else if (d === 'd') { sidepanel.classList.remove('middle'); sidepanel.classList.add('bottom'); viewwrap.classList.remove('middle'); viewwrap.classList.add('bottom'); }
-			} else if (sidepanel.classList.contains('bottom')) {
-				if (d === 'u') {  sidepanel.classList.remove('bottom'); sidepanel.classList.add('middle'); viewwrap.classList.remove('bottom'); viewwrap.classList.add('middle'); }
+			if (sidewrap.classList.contains('top')) {
+				if (d === 'd') { sidewrap.classList.remove('top'); sidewrap.classList.add('middle'); viewwrap.classList.remove('top'); viewwrap.classList.add('middle'); }
+			} else if (sidewrap.classList.contains('middle')) {
+				if (d === 'u') { sidewrap.classList.remove('middle'); sidewrap.classList.add('top'); viewwrap.classList.remove('middle'); viewwrap.classList.add('top'); } 			
+				else if (d === 'd') { sidewrap.classList.remove('middle'); sidewrap.classList.add('bottom'); viewwrap.classList.remove('middle'); viewwrap.classList.add('bottom'); }
+			} else if (sidewrap.classList.contains('bottom')) {
+				if (d === 'u') {  sidewrap.classList.remove('bottom'); sidewrap.classList.add('middle'); viewwrap.classList.remove('bottom'); viewwrap.classList.add('middle'); }
 			}
 			if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }					
 		});

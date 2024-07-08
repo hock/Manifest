@@ -1,0 +1,14 @@
+{
+	"name": "NEH Project Teams",
+	"description": "Manifest from NEH Digital Humanities Teams", 
+	"collection": [
+		{"id": "manifest-json/cases/NEH/bishop.json", "title": "Elizabeth Bishop - Notorious Uranium References"},
+		{"id": "manifest-json/cases/NEH/otanez.json", "title": "Marty Otanez - Tobacco Leaf Supply Chain"},
+		{"id": "manifest-json/cases/NEH/uribe.json", "title": "Verónica Uribe del Águila - CatSniffer"},
+		{"id": "manifest-json/cases/NEH/li.json", "title": "Zizi Li - Aditi Mayer: Sustainable Fashion Influencer Media Production/Distribution Map"},
+		{"id": "manifest-json/cases/NEH/guha.json", "title": "Suryansu Guha - Global Media Industries Visual Effects (VFX) Supply Chain"}
+		
+		
+	]
+}
+

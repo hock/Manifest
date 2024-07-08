@@ -3,7 +3,7 @@ class ManifestAtlas {
 	constructor(options) {
 		let pop = !(options.mobile) ? true : false;
 		this.map = new L.Map('map', { 
-			preferCanvas: true, minZoom: 3, maxZoom: 18, worldCopyJump: false, center: new L.LatLng(options.position.lat,options.position.lng), zoom: options.zoom, zoomControl: false, scrollWheelZoom: false, smoothSensitivity:1, closePopupOnClick: pop 
+			preferCanvas: true, minZoom: 3, maxZoom: 18, worldCopyJump: false, maxBoundsViscosity: 1, center: new L.LatLng(options.position.lat,options.position.lng), maxBounds: new L.LatLngBounds(new L.LatLng(-90, 180), new L.LatLng(90, -180)), zoom: options.zoom, zoomControl: false, scrollWheelZoom: false, smoothSensitivity:1, closePopupOnClick: pop 
 		});
 		this.maplayer = [];
 		this.active_point = null;
@@ -21,10 +21,11 @@ class ManifestAtlas {
 		map_tiler_key = '3l62IEM16L7oUgCXLpag';
 		
 		this.tiletypes = {
-			DEFAULT: options.serviceurl + 'maptiler/' + 'bright-v2',			
-			PROTO: 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.mvt?key=e66d42174e71874a',
+			DEFAULT: 'services/maps/maptiler.json',	
+			//DEFAULT: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
+			//PROTO: 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.mvt?key=e66d42174e71874a',
 			SATELLITE:  options.serviceurl + 'maptiler/' + 'satellite',
-			ESRI_WORLD: 'services/maps/esri-world-imagery.json',	
+			//ESRI_WORLD: 'services/maps/esri-world-imagery.json',	
 			TOPO: options.serviceurl + 'maptiler/' + 'topo-v2',				
 			GRAYSCALE: options.serviceurl + 'maptiler/' + 'backdrop',				
 			BW: options.serviceurl + 'maptiler/' + 'toner-v2',				
@@ -32,11 +33,11 @@ class ManifestAtlas {
 		};
 		
 		maplibregl.addProtocol("pmtiles",new pmtiles.Protocol().tile);
-        maplibregl.setRTLTextPlugin('https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.1/mapbox-gl-rtl-text.js');
+        maplibregl.setRTLTextPlugin('services/maps/mapbox-gl-rtl-text.js');
 		 		
 		/* Define Layers */
 		this.layerdefs = {
-			default:	{ description: 'Default', layer: new L.maplibreGL({ style: this.tiletypes.DEFAULT, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			default:	{ description: 'Default', noWrap: true, layer: new L.maplibreGL({ style: this.tiletypes.DEFAULT, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			topo:	{ description: 'Topographic', layer: new L.maplibreGL({ style: this.tiletypes.TOPO, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			satellite:	{ description: 'Satellite Image', layer: new L.maplibreGL({ style: this.tiletypes.SATELLITE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			grayscale:	{ description: 'Grayscale', layer: new L.maplibreGL({ style: this.tiletypes.GRAYSCALE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
@@ -62,7 +63,6 @@ class ManifestAtlas {
 		
 		// Map configuration
 		this.homecontrol = L.Control.zoomHome().addTo(this.map);
-		this.map.setMaxBounds(new L.LatLngBounds(new L.LatLng(-85, 180), new L.LatLng(85, - 240)));
 		this.map.on('popupopen', (e) => { this.PopupOpen(e); });
 		this.map.on('popupclose', (e) => { this.PopupClose(e); });
 		this.map.on('tooltipopen', (e) => { this.TooltipOpen(e); });
@@ -92,7 +92,6 @@ class ManifestAtlas {
 				  	});	
 				}
 			}
-			/* this.glMap.addSource("we-map-1927-source", { "type": "image", "url": "./json/samples/westernelectric/we-map-1927.png", "coordinates": [ [-180, 85], [180, 85], [180, -85], [-180, -85] ] }); this.glMap.addLayer({ "id": "overlay", "source": "we-map-1927-source", "type": "raster", "paint": { "raster-opacity": 1 } }); */
 			
 			document.getElementById('datalayers').querySelectorAll('input[type=checkbox]').forEach(el => { 
 				MI.Atlas.ProcessDataLayerFromElement(el);
@@ -125,14 +124,14 @@ class ManifestAtlas {
 		if (mode === 'tour') {
 			let ft = MI.Atlas.playlist.list[MI.Atlas.playlist.index].feature;
 	
-			MI.Atlas.map.flyTo(MI.Atlas.GetOffsetLatlng(ft.properties.latlng, 12), 12, {
+			MI.Atlas.map.flyTo(ft.properties.latlng, 12, {
 				animate: true, duration: 5}); 	
 			let offset = 0;
-			if (document.getElementById('local_'+ft.properties.lid).parentElement) {
-				let prev = document.getElementById('local_'+ft.properties.lid).parentElement.previousElementSibling;
+			if (document.getElementById('node_'+ft.properties.lid).parentElement) {
+				let prev = document.getElementById('node_'+ft.properties.lid).parentElement.previousElementSibling;
 				while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
 			}
-			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+ft.properties.lid).offsetTop + (-1*offset), behavior: 'smooth'});	
+			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('node_'+ft.properties.lid).offsetTop + (-1*offset), behavior: 'smooth'});	
 			
 			MI.Atlas.playlist.list[MI.Atlas.playlist.index].setStyle({fillColor: MI.Atlas.playlist.list[MI.Atlas.playlist.index].feature.properties.style.highlightColor});	
 		} else { // mode === highlight
@@ -144,7 +143,7 @@ class ManifestAtlas {
 	PopupOpen(e) {		
 		this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
 		this.SetActivePoint(e.sourceTarget);
-		this.map.setView(this.GetOffsetLatlng(e.popup._latlng));
+		this.map.setView(e.popup._latlng, this.map.getZoom());
 
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
 		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});				
@@ -164,7 +163,7 @@ class ManifestAtlas {
 	
 	TagClick(id, lat, lng) {
 		MI.Atlas.PointFocus(id); 
-		MI.Atlas.map.setView(MI.Atlas.GetOffsetLatlng(new L.LatLng(lat,lng), 16), 16);
+		MI.Atlas.map.setView(new L.LatLng(lat,lng), 16);
 	}
 	
 	RenderIntro(feature, layer) {		
@@ -203,7 +202,7 @@ class ManifestAtlas {
 		let popupContent, tooltipTitle, fid = feature.properties.lid;
 
 		popupContent = `
-		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor}; color:${feature.properties.style.textColor};">
+		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor} center center; color:${feature.properties.style.textColor};">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
@@ -234,7 +233,8 @@ class ManifestAtlas {
 
 		if (feature.properties.clustered.length > 0) { tooltipTitle = '<i class="fas fa-boxes"></i> Cluster of '+(feature.properties.clustered.length+1)+' Nodes'; }
 		else { tooltipTitle = feature.properties.title; }
-		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle}</div>`;
+
+		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.textColor}">${tooltipTitle}</div>`;
 		layer.bindTooltip(tooltipContent);	
 		
 		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
@@ -259,44 +259,44 @@ class ManifestAtlas {
 	}
 
 	/** Focus on a point on the map and open its popup. **/
-	PointFocus(pid, fit=false, flyto=false) {	
+	PointFocus(pid, options) {	
+		options = Object.assign({}, {fit: false, flyto: false, open: true, zoom:null}, options);
+		
 		for (let i in this.map._layers) {		
-			if (typeof this.map._layers[i].feature !== 'undefined') {			
-				if (flyto) { 
-					this.map._layers[i].setStyle({
-						fillColor: this.map._layers[i].feature.properties.style.fillColor, 
-						color: this.map._layers[i].feature.properties.style.color});		
-				}
-				if (this.map._layers[i].feature.properties.lid === Number(pid)) {		
+			let l = this.map._layers[i];
+			if (typeof l.feature !== 'undefined') {			
+				if (typeof l.feature !== 'undefined' && l.feature.properties.lid === Number(pid)) {
 					if (MI.Visualization.type === 'map') { 
-						this.SetActivePoint(this.map._layers[i]); 
+						this.SetActivePoint(l); 
 						
-						if (fit) { 
-							let sid = MI.supplychains[this.map._layers[i].feature.properties.mindex-1].details.id;
-							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});
-							let zoomlevel = MI.options.storyMap ? 10 : this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom+1;
-							this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), zoomlevel, {reset: true}); 
-							
+						if (options.fit && typeof MI.supplychains[l.feature.properties.mindex-1] !== 'undefined') { 
+							let sid = MI.supplychains[l.feature.properties.mindex-1].details.id;
+							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});	
+							let zoomlevel = options.zoom ? options.zoom : Math.max(4, this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom);
+							this.map.setView(l._latlng, zoomlevel, {reset: true, animate:false}); 									
 						}
-						if (flyto) {
-							this.map.flyTo(this.GetOffsetLatlng(this.map._layers[i]._latlng), 12); 		
-							this.SetActivePoint({_latlng: this.map._layers[i].feature.properties.latlng}); 
-							this.map._layers[i].setStyle({fillColor: this.map._layers[i].feature.properties.style.highlightColor});			
-								
+						if (!options.flyto) {
+							if (!MI.options.storyMap && !MI.options.embed) { if (options.open) { l.openPopup(); } }
+							else {  								
+								if (this.map.getBounds().contains(l._latlng)) { this.map.flyTo(l._latlng, this.map.getZoom(), {updateWhenZooming: false, duration: 1});
+								} else { this.map.setView(l._latlng, this.map.getZoom(), {animate: false}); }
+							}						
 						} else {
-							if (MI.options.storyMap && this.map.getZoom !== 10) { 
-								if (this.map.getBounds().contains(this.map._layers[i]._latlng)) {
-									this.map.flyTo(this.GetOffsetLatlng(this.map._layers[i]._latlng), 10, {duration: 1}); 		
-								} else {
-									this.map.setView(this.GetOffsetLatlng(this.map._layers[i]._latlng), 10, {reset: true}); 
-								}
-							} else {								
-								this.map._layers[i].openPopup(); 
+							if (!MI.options.storyMap && !MI.options.embed) {
+								this.map.flyTo(l._latlng, this.map.getZoom()); 		
+							} else {
+								let sid = MI.supplychains[0].details.id;
+								let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});	
+								let zoomlevel = options.zoom ? options.zoom : Math.max(10, this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom);
+								this.map.flyTo(l._latlng, zoomlevel); 				
 							}
+							this.SetActivePoint({_latlng: l.feature.properties.latlng}); 
+							l.setStyle({fillColor: l.feature.properties.style.highlightColor});	
 						}
-					}
+					} 
 				}
-			} 
+				else if (options.flyto) { l.setStyle({fillColor: l.feature.properties.style.fillColor, color: l.feature.properties.style.color});}
+			}
 		} 
 		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) {
 			 this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase()); 
@@ -309,19 +309,19 @@ class ManifestAtlas {
 		let id = null;		
 		
 		if (typeof node === 'object') { id = node._popup._source.feature.properties.lid; 
-		} else { id = node; if (document.getElementById('local_'+id)) { MI.Atlas.PointFocus(id); /* replacing: document.getElementById('local_'+id).click();*/ } else { return; } }
+		} else { id = node; if (document.getElementById('node_'+id)) { MI.Atlas.PointFocus(id); /* replacing: document.getElementById('node_'+id).click();*/ } else { return; } }
 	
 		let offset = 0;
 		
-		if (document.getElementById('local_'+id) && document.getElementById('local_'+id).parentElement) {
-			let prev = document.getElementById('local_'+id).parentElement.previousElementSibling;
+		if (document.getElementById('node_'+id) && document.getElementById('node_'+id).parentElement) {
+			let prev = document.getElementById('node_'+id).parentElement.previousElementSibling;
 			while (prev) { if (prev.classList.contains('mheader')) { offset += prev.offsetHeight; } prev = prev.previousElementSibling; }
 		} else { MI.Atlas.active_point.closePopup(); return;}
 		
 		if (!MI.initialized) {
 			document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
 		} else {
-			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('local_'+id).offsetTop + (-1*offset), behavior: speed});	
+			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('node_'+id).offsetTop + (-1*offset), behavior: speed});	
 		}
 	}
 	
@@ -385,7 +385,7 @@ class ManifestAtlas {
 					tooltipDynamic = '('+measureround+findmeasure.munit+')'; 
 				}
 			}
-			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}">${tooltipTitle} ${tooltipDynamic}</div>`;
+			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.textColor}">${tooltipTitle} ${tooltipDynamic}</div>`;
 			layer.bindTooltip(tooltipContent);	
 		}		
 	}
@@ -446,24 +446,11 @@ class ManifestAtlas {
 		if (!ft.properties.hidden) { ccount++; }
 		for (let i in ft.properties.clustered) { if (!ft.properties.clustered[i].properties.hidden) { ccount++; } maxcount++; }
 
-		if (ccount === 0) { MI.Atlas.active_point.closePopup(); return; }
+		if (ccount === 0) {  if (MI.Atlas.active_point) { MI.Atlas.active_point.closePopup(); }  return; }
 		else if (ccount === maxcount) { document.getElementById('map').querySelectorAll('.cluster-count').forEach(el => { el.textContent = maxcount; }); } 
 		else { document.getElementById('map').querySelectorAll('.cluster-count').forEach(el => { el.textContent = ccount+'/'+maxcount; }); }
 		if (this.active_point) { this.MapPointClick(this.active_point); }
 		
-	}
-	GetOffsetLatlng(ll, z=0) {
-		let targetPoint;
-		if (z === 0) { z = this.map.getZoom(); }
-		if (MI.Interface.IsMobile()) {
-			targetPoint = this.map.project(ll, z).add([0, document.getElementById('sidepanel').offsetHeight/2]);
-		    return this.map.unproject(targetPoint, z);
-		} else if (!document.body.classList.contains('fullscreen') && !MI.options.storyMap) {	
-			targetPoint = this.map.project(ll, z).subtract([document.getElementById('sidepanel').offsetWidth/2,0]);
-		   return this.map.unproject(targetPoint, z);			
-		} else {
-			return ll;
-		}	
 	}
 	
 	SetActivePoint(pt, clear=false) {
@@ -474,7 +461,7 @@ class ManifestAtlas {
 			if (pt) {
 				this.active_point = pt;
 				let latlng = pt._latlng ? pt._latlng : pt._popup._latlng;
-				this.homecontrol.setHomeCoordinates(this.GetOffsetLatlng(latlng, 3));
+				this.homecontrol.setHomeCoordinates(latlng, 3);
 			}
 			else {
 				this.active_point = null;
@@ -485,23 +472,29 @@ class ManifestAtlas {
 	}
 	
 	/** A centering function that focuses on the first point of a supply chain **/
-	SetView(type='interest', init=false) {
-		if (type === 'interest') {
+	SetView(type='interest', popup=true) {
+		if (type === 'interest' || (MI.options.position.lat === 0 && MI.options.position.lng === 0)) {
 			let index = MI.initialized ? document.getElementsByClassName('mlist').length-1 : 0;
 			const mlistId = document.getElementsByClassName('mlist')[index].id.split('-')[1];
 			const nodeId = document.getElementsByClassName('mlist')[index].childNodes[0].id.split('_')[1];
 
-			if (MI.Visualization.type === 'map') {
-				if (!MI.options.storyMap) {
-					MI.Atlas.PointFocus(nodeId, true);	
-				}
-			}	
-			else if (MI.Visualization.type === 'textview') {
-				MI.Interface.ShowHeader(mlistId);
-			}	
-		} else if (type === 'center') {
-			MI.Atlas.map.setView(this.GetOffsetLatlng(new L.LatLng(MI.options.position.lat,MI.options.position.lng)), MI.options.zoom); 
-		}
+			if (MI.Visualization.type === 'map') { 
+				if (MI.options.urlparams.zoom || MI.options.storyMap || MI.options.embed || (MI.supplychains.length === 1 && MI.supplychains[0].setOptions && MI.supplychains[0].setOptions.zoom)) {
+					if (MI.options.storyMap || MI.options.embed) { 
+						let sid = MI.supplychains[0].details.id, ll;
+						
+						for (let i in this.map._layers) {		
+							if (typeof this.map._layers[i].feature !== 'undefined' && this.map._layers[i].feature.properties.lid === Number(nodeId)) {
+								let offset = document.documentElement.clientHeight/2 - document.getElementById('mheader-'+sid).offsetHeight/2;
+								ll = this.map.unproject(this.map.project(new L.latLng(this.map._layers[i].feature.geometry.coordinates[1],this.map._layers[i].feature.geometry.coordinates[0]),MI.options.zoom)); 
+    							ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x, this.map.latLngToContainerPoint(ll).y-offset]);
+							}
+						}
+						MI.Atlas.map.setView(ll, MI.options.zoom, {animate: false}); 
+					} else { MI.Atlas.PointFocus(nodeId, {fit:true, zoom: MI.options.zoom, open: popup}); }	
+				} else { MI.Atlas.PointFocus(nodeId, {fit: true, open: popup}); } 					
+			}
+		} else if (type === 'center') { MI.Atlas.map.setView(MI.options.position, MI.options.zoom, {animate:false}); }
 	}
 	
 	DisplayLayers(show=true) {
@@ -562,70 +555,48 @@ class ManifestAtlas {
 	}
 	
 	ProcessDataLayerFromElement(el, clear=false) {
+		let dlid = MI.Atlas.vdatalayers[el.value].id;
+		
+		// Vector Layers
 		if (el.classList.contains('vector')) {
-			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) === undefined) { 		
+			if (el.checked && MI.Atlas.glMap.getLayer(dlid) === undefined) { 		
 				MI.Atlas.glMap.addLayer({
-					'id': MI.Atlas.vdatalayers[el.value].id,
-					'type': MI.Atlas.vdatalayers[el.value].layertype,
-					'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
-					'source-layer': MI.Atlas.vdatalayers[el.value].sourcelayer,
-					'paint': MI.Atlas.vdatalayers[el.value].paintrules
+					'id': dlid, 'type': MI.Atlas.vdatalayers[el.value].layertype, 'source': 'mlayer-'+dlid, 'source-layer': MI.Atlas.vdatalayers[el.value].sourcelayer, 'paint': MI.Atlas.vdatalayers[el.value].paintrules
 				});	
 			} 
-			else { 
-				if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id); } } 
+			else if ( MI.Atlas.glMap.getLayer(dlid) !== undefined) { MI.Atlas.glMap.removeLayer(dlid); }  
+		// Geojson Layers
 		} else if (el.classList.contains('geojson')) {
-			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-point') === undefined && 
-				MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-line') === undefined &&
-				MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-poly') === undefined) { 	
-					MI.Atlas.glMap.addLayer({
-						'id': MI.Atlas.vdatalayers[el.value].id+'-point',
-						'type': 'circle',
-						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
-						'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' },
-						'filter': ['==', '$type', 'Point']
-					});	
-				
-					MI.Atlas.glMap.addLayer({
-						'id': MI.Atlas.vdatalayers[el.value].id+'-line',
-						'type': 'line',
-						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
-						'paint': { 'line-color': '#ff69b4', 'line-width': 2 },
-						'filter': ['==', '$type', 'LineString']
-					});	
-				
-					MI.Atlas.glMap.addLayer({
-						'id': MI.Atlas.vdatalayers[el.value].id+'-poly',
-						'type': 'fill',
-						'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
-						'paint': { "fill-color": "#ff69b4" },
-						'filter': ['==', '$type', 'Polygon']
-					});	
+			let point = MI.Atlas.glMap.getLayer(dlid+'-point');
+			let line = MI.Atlas.glMap.getLayer(dlid+'-line');
+			let poly = MI.Atlas.glMap.getLayer(dlid+'-poly');
+		
+			if (el.checked && point === undefined && line === undefined && poly === undefined) { 	
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'circle', 'source': 'mlayer-'+dlid, 'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' }, 'filter': ['==', '$type', 'Point'] });
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-line', 'type': 'line', 'source': 'mlayer-'+dlid, 'paint': { 'line-color': '#ff69b4', 'line-width': 2 }, 'filter': ['==', '$type', 'LineString'] });				
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-poly', 'type': 'fill', 'source': 'mlayer-'+dlid, 'paint': { "fill-color": "#ff69b4" }, 'filter': ['==', '$type', 'Polygon'] });
+
 			} 
-			else { if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-point') !== undefined || 
-					 MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-line') !== undefined ||
-					 MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id+'-poly') !== undefined) { 
-						 
-					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-point'); 
-					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-line'); 
-					 MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id+'-poly'); 
-				} 
-			} 
-		} else {
-			if (el.checked && MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) === undefined) { 		
+			else if ( point !== undefined || line !== undefined || poly !== undefined) {			 
+				MI.Atlas.glMap.removeLayer(dlid+'-point'); MI.Atlas.glMap.removeLayer(dlid+'-line'); MI.Atlas.glMap.removeLayer(dlid+'-poly');
+			}  
+		// Image Layers
+		} else if (el.classList.contains('imagelayer')) {
+			if (el.checked && MI.Atlas.glMap.getLayer(dlid) === undefined) { 		
+				this.glMap.addLayer({ "id": dlid, "source": 'mlayer-'+dlid, "type": "raster", "paint": { "raster-opacity": 1 } }); 		
+			} else if ( MI.Atlas.glMap.getLayer(dlid) !== undefined) { MI.Atlas.glMap.removeLayer(dlid); } 
+		// Other Raster Layers
+		} else {	
+			if (el.checked && MI.Atlas.glMap.getLayer(dlid) === undefined) { 		
 				MI.Atlas.glMap.addLayer({
-					'id': MI.Atlas.vdatalayers[el.value].id,
-					'type': 'raster',
-					'source': 'mlayer-'+MI.Atlas.vdatalayers[el.value].id,
-					'paint': MI.Atlas.vdatalayers[el.value].paintrules,
-					'minzoom': MI.Atlas.vdatalayers[el.value].minZoom,
-					'maxzoom': MI.Atlas.vdatalayers[el.value].maxZoom
+					'id': dlid, 'type': 'raster', 'source': 'mlayer-'+dlid, 'paint': MI.Atlas.vdatalayers[el.value].paintrules, 'minzoom': MI.Atlas.vdatalayers[el.value].minZoom, 'maxzoom': MI.Atlas.vdatalayers[el.value].maxZoom
 				});	
 			} 
-			else { if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[el.value].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[el.value].id); } } 
+			else if ( MI.Atlas.glMap.getLayer(dlid) !== undefined) { MI.Atlas.glMap.removeLayer(dlid); }  
 		}
 	}
-	LoadExternalDataLayer(type, ref) {
+	
+	LoadExternalDataLayer(type, ref, options=null) {
 		switch(type) {
 			case 'geojson': fetch(ref).then(r => r.json()).then(geojson => MI.Atlas._addGeojson(geojson,ref)); break;
 			case 'pmtiles': 
@@ -638,6 +609,9 @@ class ManifestAtlas {
 						
 					}
 				}); break;
+			case 'png': MI.Atlas._addImagelayer(ref, options); break;
+			case 'jpg': MI.Atlas._addImagelayer(ref, options); break;
+			
 		}	
 	}
 	_addPMTile(l, id, ref, type, paint) {
@@ -646,7 +620,7 @@ class ManifestAtlas {
 			MI.Atlas.glMap.addSource('mlayer-'+'udl_'+id, { type: 'vector', url: "pmtiles://"+ref });
 		
 			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
-			dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${id}`;
+			dlayer.id = 'lc-udl_'+id; dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${id}`;
 			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+id; dcheck.value = 'udl_'+id; dcheck.classList.add('vector');
 
 			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
@@ -663,7 +637,7 @@ class ManifestAtlas {
 			MI.Atlas.glMap.addSource('mlayer-udl_'+ref, { type: 'geojson', data: geojson });
 		
 			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
-			dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${ref}`;
+			dlayer.id = 'lc-udl_'+ref; dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${ref}`;
 			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+ref; dcheck.value = 'udl_'+ref; dcheck.classList.add('geojson');
 
 			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
@@ -674,10 +648,27 @@ class ManifestAtlas {
 			MI.Interface.ShowMessage('Data source already added.');
 		}		
 	}
-	GetTileImage(lat, lon, zoom) {
+	_addImagelayer(ref, options) {
+		if (MI.Atlas.glMap.getSource('mlayer-udl_'+ref) === undefined) {
+			MI.Atlas.vdatalayers['udl_'+ref] = {id: 'udl_'+ref, scid: options.scid, data: ref, type: 'image', sourcelayer: ref};	
+			this.glMap.addSource('mlayer-udl_'+ref, { "type": "image", "url": ref, "coordinates": options.extents });
+							
+			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
+			dlayer.id = 'lc-udl_'+ref; dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${ref.split('/').pop()}`;
+			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+ref; dcheck.value = 'udl_'+ref; dcheck.classList.add('imagelayer');
+
+			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
+			document.getElementById('userdatalayers').appendChild(dlayer); dlayer.appendChild(dcontainer); dcontainer.prepend(dcheck); 
+		
+			if (MI.Atlas.glMapLoaded) {MI.Atlas.ProcessDataLayerFromElement(dcheck);}
+		} else {
+			MI.Interface.ShowMessage('Data source already added.');
+		}			
+	}
+	GetTileImage(lat, lon, zoom, type='toner-v2') {
 	    let xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 	    let ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * (1<<zoom) ));
-		return 'https://api.maptiler.com/maps/toner-v2/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr'; 
+		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr'; 
 	}
 	
 	/** Cycle through the colors for supply chains randomly **/

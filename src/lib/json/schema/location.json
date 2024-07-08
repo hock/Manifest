@@ -8,6 +8,7 @@
 			"description": "A human-readable address to use as a label for this location.",		
 		    "options": {
 				"inputAttributes": {
+					"class": "addressinput",
 					"placeholder":  "New York, NY"
 				}
 		    }

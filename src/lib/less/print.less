@@ -4,7 +4,7 @@
 	        height: 100%; width:100%; margin: 0;  padding:0; font-family: "Roboto", Arial, Helvetica, sans-serif; font-weight: normal; font-size: 12px; 
 	}
 	.closed { display:none;}
-	#mmenu, .vizmenu, .vizwrap, .searchwidget, #mapmenu, #fullscreen-menu, #mapcapture, .leaflet-control-container, #loader, .mtitle i, #manifestbar, .leaflet-popup { display:none;}
+	.vizmenu, .vizwrap, .searchwidget, #mapmenu, #fullscreen-menu, #mapcapture, .leaflet-control-container, #loader, .mtitle i, #manifestbar, .leaflet-popup { display:none;}
 
 	#manifestlist .mtitle {
 		font-size:40pt;
@@ -12,24 +12,33 @@
 	}
 
 	#manifestlist ul.mlist { 
-		padding:1rem; 
+		padding:0; 
 		border-top:1px solid #000; 
-		display: flex;
-		width: calc(100% - 2rem);
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 25% 25% 25% 25%;
 	}
 	#manifestlist .mdetails { font-size:16pt; }
 	#manifestlist li { 
 		page-break-inside: avoid; margin:0; padding:1rem; 
 		list-style:none;
-		width: calc(25% - 2rem);
 	}
+	#manifestlist li .node-images {
+		display: grid;
+		grid-template-columns: auto auto auto auto;
+		grid-template-rows: max-content;
+		 page-break-inside: avoid;
+		.images-controls { display:none;}
+		border:1px solid #ccc;
+		background:#ccc;
+		margin: 0.25rem 0;
+	}
+	
 	#manifestlist li img {
-		width:90%;
+		width:calc(100% - 2px - 0.5rem);
+		border:1px solid #ccc;
+		margin:0.25rem;
 	}
-	#manifestlist li .dot {
+	#manifestlist li .node-dot {
 		float:left; font-size: 16pt; margin-right:0.5rem;
 		padding:0 0.5rem;
 		background:#999; color:#fff;
@@ -38,27 +47,32 @@
 		display:block; width:100%; margin:0; padding:0; margin-bottom:0.5rem;
 	}
 	#manifestlist li ul li {
-		font-size:14pt; width:auto; list-style:none; margin:0; padding:0; float:none;
+		 width:auto; list-style:none; margin:0.25rem 0; padding:0; float:none;
 	}
-	#manifestlist li h5 { font-size:16pt; margin:0 0 0.5rem 0; overflow-wrap: break-word;}	
-	#manifestlist li p, #manifestlist li .mdescription { font-size:14pt; margin:0 0 0.5rem 0; overflow-wrap: break-word;}	
+	#manifestlist li .node-title { font-size:16pt; line-height:20pt; margin:0 0 0.5rem 0; overflow-wrap: break-word; page-break-inside: avoid;}	
+	#manifestlist li .node-description, #manifestlist li .node-place, #manifestlist li .node-time, #manifestlist li .node-details, #manifestlist li p { font-size:12pt; margin:0 0 0.5rem 0; overflow-wrap: break-word; page-break-inside: avoid;}	
+	#manifestlist li .node-details .cat-link:after, #manifestlist li .node-details .measure-link:after  { content: " "; }
+	#manifestlist li .node-details .measures .mtype:after { content: ": ";}
 	#sideplanel {
 		page-break-after: always;
 	}
+	#manifestlist .mdescription a::after, #manifestlist li .node-description a::after {
+	    content: " (" attr(href) ") ";
+	  }
 	#map-printpreview {
 		z-index:50000;
 	}
-	#view-wrapper { page-break-before: always; position:relative; height:100%; width:100%; background:red; overflow:hidden;} 
+	#view-wrapper { page-break-before: always; position:relative; height:100%; width:100%; overflow:hidden;} 
 	body .map {  
 		width:100%; height:100%; 
 		position:relative; 
 	}
 
 	.mheader, .mdetails, .footer {
-		padding:1rem 1rem;
+		padding:0.5rem 1rem;
 	}
 	.footer { font-size:14pt; }
-	details { display:none;}
+	.node-sources { display:none;}
 	
 	canvas.leaflet-zoom-animated { 
 		position:absolute; top:0; left:0

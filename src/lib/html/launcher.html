@@ -5,34 +5,38 @@
 <div id="minfodetail" class="closed">
 	<p id="mtagline">A toolkit for visualizing, analyzing, and documenting supply chains, production lines, and trade networks.</p>
 	<nav id="minfomenu">
-		<a href="" class="minfo-menu-item"><i class="minfo-icon fas fa-tablet"></i>Manifest: Supply Chain Platform</a>
-		<a href="edit/" class="minfo-menu-item"><i class="minfo-icon fas fa-edit"></i>Creating Manifests</a>
-		<div class="spacer"></div>
-		
-		<a href="about/" class="minfo-menu-item"><i class="minfo-icon fas fa-archive"></i>About the Project</a>
-		<a href="data/" class="minfo-menu-item"><i class="minfo-icon fas fa-table"></i>Manifests & Other Datasets</a>
-		<a href="https://supplystudies.com/syllabus/#reversesourcing" class="minfo-menu-item"><i class="minfo-icon fas fa-archive"></i>Supply Studies Curriculum</a>
-		<div class="spacer"></div>
-		<a href="https://supplystudies.com/" class="minfo-menu-item"><i class="minfo-icon fas fa-cog"></i>Supply Studies</a>
-		<a href="https://github.com/hock/Manifest" class="minfo-menu-item"><i class="minfo-icon fab fa-github-square"></i>Github</a>
+		<a href="" class="minfo-menu-item"><i class="minfo-icon fas fa-home"></i><span class="minfo-menu-label">Home</span><span class="minfo-menu-note">Manifest Web Application</span></a>		
+		<a href="about/" class="minfo-menu-item"><i class="minfo-icon fas fa-info-circle"></i><span class="minfo-menu-label">About</span><span class="minfo-menu-note">Overview of the Project</span></a>
+		<a href="https://github.com/hock/Manifest/wiki" class="minfo-menu-item"><i class="minfo-icon fas fa-file-alt"></i><span class="minfo-menu-label">Wiki</span><span class="minfo-menu-note">Supply Chain Research Guide</span></a>
 	</nav>
 	
-	<div id="launcher-details">
-		<p id="collection-description"></p>
-		<p id="load-samples-sampletext">You can start with a Manifest from our <a href="data/">collection</a>, or load a File or URL in one of the <a href="edit/">file formats</a> we support.</p>
-		<p id="load-samples-urltext">Enter a URL for a public Google Sheet based on our <a href="https://github.com/hock/Manifest/wiki/3.-Creating-Manifests-in-Google-Sheets">Template</a> or to a <a href="https://github.com/hock/Manifest/wiki/4.-Manifest-Document-Format">Manifest Document format</a> json file.</p>
-		<p id="load-samples-filetext">If you have a Manifest Document created with the <a href="edit/">Manifest Editor</a> (usually a json file), you can upload it.</p>
-	</div>
 	<div id="loadlistpanel">
-		<select name="load-samples" id="load-samples">
-		    <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
-		    <optgroup id="load-samples-custom" label="User Created Manifests"></optgroup>		
-		</select>
+		<div id="loadlist-samples-group" class="loadlist-group">	
+			<div id="load-samples-sampletext"><a href="data/" class="minfo-menu-item"><i class="minfo-icon fas fa-table"></i><span class="minfo-menu-label">Browse</span><span class="minfo-menu-note">Collected Manifests & Data Sets</span></a></div>
+			<div id="loadlist-group-samples" class="load-list-group">
+				<select name="load-samples" id="load-samples">
+				    <optgroup id="load-samples-group" label="Collected Manifests"></optgroup>
+				</select>
+				<button id="load-samples-btn"><i class="fas fa-arrow-circle-right"></i></button>
+			
+			</div>
+		</div>
+		<div id="loadlist-custom-group" class="loadlist-group">
+			<a href="edit/" class="minfo-menu-item"><i class="minfo-icon fas fa-edit"></i><span class="minfo-menu-label">Create</span><span class="minfo-menu-note">Manifest Editor & Templates</span></a>
+			<div id="loadlist-group-custom" class="url">
+				<select name="load-custom" id="load-custom">
+				    <optgroup id="load-custom-group" label="User Created Manifests"></optgroup>		
+				</select>
+			
+				<input type="text" id="load-custom-input" placeholder="https://site.url/manifest.json">
+				<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple>
+				<label for="file-input" id="file-input-label" ><i class="fas fa-upload"></i> <span id="file-input-label-text">Upload Manifest Document</span></label>
+				<button id="load-custom-btn"><i class="fas fa-arrow-circle-right"></i></button>
+			</div>
+			<div id="load-custom-urltext" class="custom-load-text">
+				Enter a URL for a public Google Sheet based on our <a href="https://github.com/hock/Manifest/wiki/3.-Creating-Manifests-in-Google-Sheets">Template</a> or for a <a href="https://github.com/hock/Manifest/wiki/4.-Manifest-Document-Format">Manifest Document format</a> json file.</div>
+			<div id="load-custom-filetext" class="custom-load-text closed">If you have a Manifest Document created with the <a href="edit/">Manifest Editor</a> (usually a json file), you can upload it.</div>
+		</div>
 		
-		<input type="text" id="load-samples-input">
-		<input type="file" name="file-input[]" id="file-input" class="inputfile file-input" data-multiple-caption="{count} files selected" multiple>
-		<label for="file-input" id="file-input-label" ><i class="fas fa-upload"></i> <span id="file-input-label-text">Upload Manifest Document</span></label>
-		
-		<button id="load-samples-btn">Load</button>
 	</div>
 </div>

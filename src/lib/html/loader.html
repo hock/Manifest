@@ -1,0 +1,9 @@
+<script>
+	const queryString = window.location.search;
+	const urlParams = new URLSearchParams(queryString);
+	if (urlParams.get('embed') !== null || urlParams.get('storyMap') !== null) { document.documentElement.classList.add('loading'); }
+</script>
+<style> 
+	.loading #loader { display:block; position:absolute;z-index:50000;height:100%;width:100%;text-align:center;background:#4d34db; left:0; top:0; } 
+	.loading #loader #loadermessage { color:#fff; } .loading #loader #loadermessage a { color:#fff; } .loading #loader h1 { color:#fff; } .loading #loader h2 { color:#eee; }
+</style>

@@ -85,7 +85,7 @@
         _zoomHome: function (e) {
             //jshint unused:false
 			 if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
-            	 this._map.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,this.options.homeZoom), this.options.homeZoom);					  
+            	 this._map.setView(MI.Atlas.active_point._popup._source.feature.properties.latlng, this.options.homeZoom);					  
 			 } else {
             	 this._map.setView(this.options.homeCoordinates, this.options.homeZoom);
 			 }

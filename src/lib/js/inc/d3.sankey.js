@@ -134,7 +134,7 @@
   // Some constants for circular link calculations
   const verticalMargin = 25;
   const baseRadius = 10;
-  const scale = 0.3; //Possibly let user control this, although anything over 0.5 starts to get too cramped
+  const scale = 0.5; //Possibly let user control this, although anything over 0.5 starts to get too cramped
 
   var sankey = function () {
     // Set the default values
@@ -1069,7 +1069,7 @@
             let y = d.y1
             return [x, y]
           })
-        link.path = normalPath(link)
+        link.path = sankeyLinkPath(link)
       }
 
 
@@ -1698,6 +1698,35 @@
 })
 
 
+function sankeyLinkPath(link) {
+  // this is a drop in replacement for d3.sankeyLinkHorizontal()
+  // well, without the accessors/options
+	let offset = 50;
+  let sx = link.source.x1
+  let tx = link.target.x0 + 1
+  let sy0 = link.y0 - link.width/2
+  let sy1 = link.y0 + link.width/2
+  let ty0 = link.y1 - link.width/2
+  let ty1 = link.y1 + link.width/2
+  
+  let halfx = (tx - sx)/2
 
+  let path = d3.path()  
+  path.moveTo(sx, sy0)
 
+  let cpx1 = sx + halfx
+  let cpy1 = sy0 + offset
+  let cpx2 = sx + halfx
+  let cpy2 = ty0 - offset
+  path.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, tx, ty0)
+  path.lineTo(tx, ty1)
+
+  cpx1 = sx + halfx
+  cpy1 = ty1 - offset
+  cpx2 = sx + halfx
+  cpy2 = sy1 + offset
+  path.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, sx, sy1)
+  path.lineTo(sx, sy0)
+  return path.toString()
+}
 

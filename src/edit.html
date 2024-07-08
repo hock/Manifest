@@ -12,6 +12,13 @@
 	<link rel="stylesheet" href="<%= css_editpath %>"> 
 	<meta property="og:url" content="<%= baseurl %>edit/">	
 	<link rel="canonical" href="<%= baseurl %>edit/">
+	<script> 
+		const mversion = "<%= version %>";		
+		const mtarget = "<%= target %>";		
+		const serverurl = "<%= serverurl %>";		
+		
+		if (mtarget === 'development') { var console = {}; console.log = function(){}; window.console = console;}
+	</script>
 	<!-- /build -->
 
 	<!-- build:section layout.header --><!-- /build -->
@@ -21,13 +28,12 @@
 <div id="infoborder"></div>
 <section id="infowrap">
 	<section id="textbar">			
-	    <!-- build:section layout.launcher --><!-- /build -->				
 	    <!-- build:section layout.navigation --><!-- /build -->
 	</section>
 	<section id="editor_intro">
 		<h1>Creating Manifests</h1>
 		
-		<p class="biggertext callout">This page contains information on creating Manifest Documents, including a simple proof-of-concept editor and a note on supported file formats. At this time the best way to create Manifest Documents is to use the Google Sheets template we provide. <br><br>For more information on how to create a Manifest Document, please <strong><a href="https://github.com/hock/Manifest/wiki/2.-Creating-Manifests">follow this guide</a></strong>.</p>
+		<p class="biggertext callout">This page contains information on creating Manifest Documents, including a basic editor and a note on supported file formats. The best way to create Manifest Documents is to use the Google Sheets template we provide. <br><br>For more information on how to create Manifest Documents, please <strong><a href="https://github.com/hock/Manifest/wiki/2.-Creating-Manifests">follow this guide</a></strong>.</p>
 		
 	</section>
     <section id="editor_wrap">

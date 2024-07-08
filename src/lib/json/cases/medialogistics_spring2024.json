@@ -1,0 +1,22 @@
+{
+	"name": "Media Logistics Spring 2024",
+	"description": "Media Supply Chain Manifests for Media Logistics Spring 2024.", 
+	"collection": [
+		{"id": "manifest-json/cases/ML-S2024/imad.json", "title": "Samsung 980 Pro SSD (by Hiba Imad)"},
+		{"id": "manifest-json/cases/ML-S2024/cortina.json", "title": "Nintendo Switch - HAC-001 (by Justin Cortina)"},
+		{"id": "manifest-json/cases/ML-S2024/kabongo.json", "title": "Oculus Quest 2 (by Nathan Kabongo)"},
+		{"id": "manifest-json/cases/ML-S2024/do.json", "title": "Rayban Meta (by Grace Do)"},
+		{"id": "manifest-json/cases/ML-S2024/fernandez.json", "title": "Victrola Journey+ Bluetooth Suitcase Record Player, Turquoise (by Margarita Fernandez Pereira)"},
+		{"id": "manifest-json/cases/ML-S2024/pak.json", "title": "Beats Flex (by Davis Pak)"},
+		{"id": "manifest-json/cases/ML-S2024/hicks.json", "title": "\"1989 (Taylor's Version)\" on Vinyl (by Saniyah Hicks)"},
+		{"id": "manifest-json/cases/ML-S2024/brooks.json", "title": "Airpod Max (by Carley Brooks)"},
+		{"id": "manifest-json/cases/ML-S2024/yagar.json", "title": "\"Fine Line\" on Vinyl (by Nicole Yagar)"},
+		{"id": "manifest-json/cases/ML-S2024/lin.json", "title": "Apple Wired Earbuds (by Vicky Lin)"},
+		{"id": "manifest-json/cases/ML-S2024/littman.json", "title": "\"Let It Be\" on Vinyl (by Abby Littman)"},
+		{"id": "manifest-json/cases/ML-S2024/salam.json", "title": "Sony Playstation 5 (by Nora Salam)"},
+		{"id": "manifest-json/cases/ML-S2024/chin.json", "title": "\"Demon Days\" on CD (by Stephen Chin)"},
+		{"id": "manifest-json/cases/ML-S2024/farnam.json", "title": "Sonos Move 2 (by Ethan Farnam)"},
+		{"id": "manifest-json/cases/ML-S2024/rui.json", "title": "Alienware AW2720 Monitor (by Rui Lin, Honglin Gao, & Yaonan Yang)"}
+	]
+}
+

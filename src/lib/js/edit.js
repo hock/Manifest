@@ -1,5 +1,8 @@
-document.addEventListener('DOMContentLoaded', function(event) { Start(); });
+let maptile = '';
 
+document.addEventListener('DOMContentLoaded', function(event) { 
+	fetch(serverurl+'maptiler/raster/').then(r => r.text()).then(data => {maptile = data; Start();});	
+});
 	
 /** Setup Manifest JSON editor **/
 function Start() {		
@@ -34,7 +37,7 @@ function Start() {
 	let mapCenter = [40.730610,-73.935242];
 	let map = L.map('map_chooser', {center : mapCenter, zoom : 3});
 	
-	L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}@2x.png', { maxZoom: 12, attribution: 'Terrain, Stamen', worldCopyJump: false }).addTo(map);
+	L.tileLayer(maptile, { maxZoom: 12, attribution: 'Terrain, Stamen', worldCopyJump: false }).addTo(map);
 	
 	let marker = L.marker( mapCenter, {
 		icon: L.divIcon({
@@ -47,6 +50,10 @@ function Start() {
 		let geoed = editor.getEditor(editor.geoinput.getAttribute('name').replace(/\[/g, '.').replace(/\]/g, ''));
 		geoed.setValue(e.latlng.lat+','+e.latlng.lng);
 	    UpdateChooserMarker(e.latlng.lat, e.latlng.lng, marker);
+		fetch(serverurl + 'geocode/reverse/'+e.latlng.lng+','+e.latlng.lat).then(c => c.json()).then(data => { 
+			geoed.container.parentElement.parentElement.querySelectorAll('.addressinput').forEach(el => { el.value = data.features[0].place_name; });
+		});
+		
 	});
 
 	// Editor setup
@@ -65,8 +72,41 @@ function Start() {
 		 }); });	
 		document.querySelectorAll('.geocoderinput').forEach(el => { el.addEventListener('keydown', (e) => { 
 			let inputvalue = el.value;
-			if (inputvalue !== '') { if (typeof inputvalue.split(',')[1] !== 'undefined') { UpdateChooserMarker(inputvalue.split(',')[0], inputvalue.split(',')[1], marker);}}
-		}); });				
+			if (inputvalue !== '') { if (typeof inputvalue.split(',')[1] !== 'undefined') { 
+				UpdateChooserMarker(inputvalue.split(',')[0], inputvalue.split(',')[1], marker);}}
+		}); });	
+		document.querySelectorAll('.addressinput').forEach(el => { el.addEventListener('blur', (e) => { 
+			//document.getElementById('loc_autocomplete').remove();
+		});});
+		document.querySelectorAll('.addressinput').forEach(el => { el.addEventListener('keyup', (e) => { 
+			let inputvalue = el.value;
+			if (inputvalue !== '') {
+				fetch(serverurl + 'geocode/standard/'+inputvalue).then(c => c.json()).then(data => { 
+					if (data.query.join(' ').toLowerCase() === el.value.replace(',','').toLowerCase()) {
+						el.parentElement.style.position = 'relative';
+						if (document.getElementById('loc_autocomplete')) { document.getElementById('loc_autocomplete').remove(); }
+						let auto = document.createElement('ul');
+						auto.id = 'loc_autocomplete';					
+						el.parentElement.append(auto);
+					
+						let matches = '';
+						for (let ft in data.features) {
+							matches += '<li><span class="auto-title">'+data.features[ft].text+'</span><span class="auto-subtitle">'+data.features[ft].place_name+'</span></li>';
+						}
+						document.getElementById('loc_autocomplete').innerHTML = matches;
+					
+						document.getElementById('loc_autocomplete').querySelectorAll('li').forEach(li => { li.addEventListener('click', (e) => { 
+							e.stopPropagation();
+							el.value = li.getElementsByTagName('span')[1].textContent; 
+							el.parentElement.parentElement.parentElement.nextSibling.querySelectorAll('.geocoderinput').forEach(geo => { 
+								geo.value = data.features[0].center[1]+','+data.features[0].center[0];
+							}); 
+							document.getElementById('loc_autocomplete').remove();
+						}); });	
+					}
+				});	
+			}
+		}); });	
 	});
 }
 

@@ -1,3 +1,15 @@
+##Release Notes Version 0.4.0
+
+###New Features
+* Visualizations: Visualizations have been rewritten, and a new visualization (chart) has been added.
+* Time series data: Manifest now supports time data and displays a time slider control when needed.
+* Image support: Better image support for nodes.
+* New Manifests: New sample manifests have been added (mines, ports, apple suppliers, etc.).
+
+###Bug Fixes
+* Numerous bug fixes.
+* Viewer panel has been adjusted to more reliably position map interface.
+
 ##Release Notes Version 0.3.1
 
 ###New Features

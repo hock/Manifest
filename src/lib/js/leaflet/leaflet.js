@@ -3179,7 +3179,7 @@
   			return this;
   		}
 		if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
-		    return this.setView(MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,zoom),zoom, {zoom: options});
+		    return this.setView(MI.Atlas.active_point._popup._source.feature.properties.latlng, zoom, {zoom: options});
 		} else {
 			return this.setView(this.getCenter(), zoom, {zoom: options});
 		}
@@ -3587,17 +3587,15 @@
   				clearTimeout(this._sizeTimer);
   				this._sizeTimer = setTimeout(bind(this.fire, this, 'moveend'), 200);
   			} else {
-  				this.fire('moveend');
+				// CHECK
+  				//this.fire('moveend');
   			}
   		}
 
   		// @section Map state change events
   		// @event resize: ResizeEvent
   		// Fired when the map is resized.
-  		return this.fire('resize', {
-  			oldSize: oldSize,
-  			newSize: newSize
-  		});
+  		
   	},
 
   	// @section Methods for modifying map state

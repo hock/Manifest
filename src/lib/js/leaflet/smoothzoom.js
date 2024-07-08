@@ -100,7 +100,7 @@ L.Map.SmoothWheelZoom = L.Handler.extend({
 		// @TODO This would allow better scrolling but lines are too complicated
 
         if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
-            this._center = MI.Atlas.GetOffsetLatlng(MI.Atlas.active_point._popup._source.feature.properties.latlng,this._zoom);
+            this._center = MI.Atlas.active_point._popup._source.feature.properties.latlng;
         } else if (map.options.smoothWheelZoom === 'center') {
             this._center = this._startLatLng;
         } else {
