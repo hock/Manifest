@@ -644,6 +644,7 @@ class ManifestUI {
 		if ( !(document.getElementById('sidewrap').classList.contains('top') || document.getElementById('sidewrap').classList.contains('middle') || document.getElementById('sidewrap').classList.contains('bottom'))) {
 			document.getElementById('sidewrap').classList.add('middle');
 		}
+		
 		this.SetupSwipes('mheader-'+id, function(el,d) {
 			const sidewrap = document.getElementById('sidewrap');
 			const viewwrap = document.getElementById('view-wrapper');

@@ -6,7 +6,7 @@
 /* General Styles */
 @media only screen {
 	body { 
-		font-family: "Roboto", Arial, Helvetica, sans-serif; font-weight: normal; font-size: 1em; margin: 0; width:100%; min-width: 760px; height: 100vh;
+		font-family: "Roboto", Arial, Helvetica, sans-serif; font-weight: normal; font-size: 1em; margin: 0; width:100%; min-width: 760px; height: 100%; max-height:100%; 
 		color: #000; background-color: #fff; overflow:hidden;
 	}
 	#loader { display:none; position:absolute;z-index:50000;height:100%;width:100%;text-align:center;background-color: @m-purple-bright; left:0; top:0;
@@ -47,8 +47,7 @@
 		} 
 	}
 	#manifestbar { 
-		border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); transition: height .25s ease-in-out;
-		background:@m-purple-bright; color:#fff; max-height: calc(100% - 4rem);
+		border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); overflow-x:scroll; background:@m-purple-bright; color:#fff; max-height: 100%;
 		#minfoheader {
 			#minfo { 
 				cursor:pointer; margin-left:0.25rem; width:calc(100% - 4rem); display:inline-block; vertical-align:bottom; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -592,9 +591,9 @@
 			display: flex; flex-flow: column wrap; width:100vw; min-width:100vw; max-width:100vw; 
 			#mapmenu, #mapcapture, #fullscreen-menu, .leaflet-control-layers, #mapcapture, .leaflet-control-zoomhome, .leaflet-control-attribution, .fulltext, .fas.closemap, .leaflet-left .leaflet-control, .leaflet-popup-pane, .leaflet-tooltip-pane, .footer, .share-button, #time-slider {display:none;}
 	
-			#manifestbar { position: static; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000;
+			#manifestbar { position: absolute; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000; overflow-x:scroll; max-height: calc(100% - 4rem);
 				#minfoheader { padding:0.75rem 1rem;}
-				#minfodetail { padding:0.1rem 1rem 1rem 1rem; margin:0; min-height: calc(100vh - 4.5rem); box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);}
+				#minfodetail { padding:0.1rem 1rem 1rem 1rem; margin:0; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);}
 			} 
 			#view-wrapper { 
 				position: absolute; top:0; height: 100%; width: 100%; display: block; outline:none;
