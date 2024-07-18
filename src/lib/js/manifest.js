@@ -16,7 +16,7 @@ class Manifest {
 		
 		this.supplychains = [];
 		this.Supplychain = new ManifestSupplyChain();
-		this.Interface = new ManifestUI(); this.options.mobile = this.Interface.IsMobile();
+		this.Interface = new ManifestUI(); this.options.mobile = this.Interface.IsMobile(options);
 		this.Atlas = new ManifestAtlas(options);
 		this.Visualization = new ManifestVisualization();		
 		this.Messenger = new ManifestMessenger(this.Atlas);
@@ -32,6 +32,13 @@ class Manifest {
 			
 				if (MI.options.demoMode) { MI.ManifestTests(); }
 			}   
+		}
+
+		if (MI.Interface.IsMobile()) {		
+			if (document.getElementById('viz-choices').querySelector('option[value='+document.getElementById('viz-choices').value+']').disabled) {
+				MI.Visualization.type = 'map';
+			}
+			MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);		
 		}
 	}
 	
@@ -57,6 +64,10 @@ class Manifest {
 		console.log(`Loaded: ${lname} (${options.url})`);
 		for (let s in MI.supplychains) { if (MI.supplychains[s].details.id === options.id) { return; }}
 		
+		if (document.getElementById('samples-previews') !== null) {
+			document.getElementById('samples-previews').querySelectorAll('.sample-preview').forEach(el => { 
+				if (Number(el.dataset.hash) === options.id) { el.classList.add('loaded'); } 
+		}); }
 		options = Object.assign(options, MI.options);
 	
 		switch(type) {
@@ -68,6 +79,7 @@ class Manifest {
 			case 'gsheet': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET(d, options))); 
 				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
 		}
+		
 		d.setOptions = type !== 'smap' ? this.ProcessOptions(d.setOptions, d) : {};
 		MI.Start(options.delay);	
 	}
@@ -105,7 +117,7 @@ class Manifest {
 		let setOptions = {};
 		for (let o in manifest.options) { setOptions[manifest.options[o].type] = {'value':manifest.options[o].value, 'parameters':manifest.options[o].parameters}; }
 		
-		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, setOptions: setOptions, options: options, details: {id: options.id, url: (options.url === '' || options.url === '#manifest-') ? '' : ('#manifest-'+options.url).split('#')[0]+window.location.search+'#'+('#manifest-'+options.url).split('#')[1], layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
+		let d = {type: 'FeatureCollection', mtype: 'manifest', raw: manifest, mapper: {}, setOptions: setOptions, options: options, details: {id: options.id, url: (options.url === '' || options.url === '#manifest-') ? '' : ('#manifest-'+options.url).split('#')[0]+'#'+('#manifest-'+options.url).split('#')[1], layers: [], measures: []}, properties: {title: manifest.summary.name, description: MI.Util.markdowner.makeHtml(manifest.summary.description)}, features: [], stops: [], hops: []};
 		
 		if (d.details.url === '#manifest-') { d.details.url = '#'; }
 		for (let n of manifest.nodes) {

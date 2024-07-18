@@ -47,8 +47,8 @@ class ManifestAtlas {
 
 		this.vdatalayers = {
 			shippinglanes: {id: 'shippinglanes', url: 'pmtiles://services/data/shippinglanes.pmtiles', type: 'vector', sourcelayer: 'Shipping_Lanes_v1', paintrules: { 'line-color': '#1a3d68', 'line-width': 3, 'line-opacity': 0.1 }, layertype: 'line'},
-			railroads: {id: 'railroads', url: 'pmtiles://services/data/railroads.pmtiles', type: 'vector', sourcelayer: 'globalrailways1', paintrules: { 'line-color': '#684519', 'line-width': 1, 'line-opacity': 0.6 }, layertype: 'line'},
-			marinetraffic: {id: 'marinetraffic', tiles: this.tiletypes.MARINE, type: 'raster', tileSize: 256, minZoom: 3, maxZoom: 18, paintrules: { 'raster-saturation': -1, 'raster-opacity': 0.75 }, layertype: 'line'}
+			railroads: {id: 'railroads', url: 'pmtiles://services/data/railroads.pmtiles', type: 'vector', sourcelayer: 'globalrailways1', paintrules: { 'line-color': '#684519', 'line-width': 1, 'line-opacity': 0.6 }, layertype: 'line'}
+			//marinetraffic: {id: 'marinetraffic', tiles: this.tiletypes.MARINE, type: 'raster', tileSize: 256, minZoom: 3, maxZoom: 18, paintrules: { 'raster-saturation': -1, 'raster-opacity': 0.75 }, layertype: 'line'}
 		};
 						  
 		/* Styles */
@@ -142,11 +142,31 @@ class ManifestAtlas {
 	
 	PopupOpen(e) {		
 		this.UpdateCluster(document.getElementById('searchbar').value.toLowerCase(), e.popup._source.feature);
+		
+		this.PopupHandlers(e);	
+		
 		this.SetActivePoint(e.sourceTarget);
 		this.map.setView(e.popup._latlng, this.map.getZoom());
 
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
 		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});				
+	}
+	
+	PopupHandlers(e) {
+		e.popup._contentNode.querySelectorAll('.mpopup').forEach(el => {
+			let popup = el;
+			let popid = el.id.split('-').pop();
+
+			if (document.getElementById('node_'+popid).querySelectorAll('.node-images.multiple').length !== 0) {
+				popup.querySelectorAll('.node-images.multiple')[0].dataset.index = document.getElementById('node_'+popid).querySelectorAll('.node-images.multiple')[0].dataset.index;
+				MI.Interface.ImageScroll(popid, 0, document.getElementById('node_'+popid).querySelectorAll('.node-images.multiple')[0].dataset.index, false, popup);
+			}
+			popup.querySelectorAll('.images-display-left').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), -1, false, false, popup); }); });	
+			popup.querySelectorAll('.images-display-right').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), 1, false, false, popup); }); });	
+			popup.querySelectorAll('.images-spot').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index, false, popup); }); });	
+			popup.querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('fullscreen-modal').classList.toggle('closed'); MI.Interface.ModalSet(el); }); });	
+		});
+			
 	}
 	
 	PopupClose(e) {
@@ -170,20 +190,20 @@ class ManifestAtlas {
 		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, fid = feature.properties.lid;		
 				
-		popupContent = `
+		popupContent = `<div id="popup-${fid}" class="mpopup">
 		<h2 id="popup-${fid}" class="poptitle">
 			<div id="intro-logo" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></div> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">Manifest</span>
 		</h2>
 		<div id="intro-version">v${mversion}</div>
-		<div id="intro-content">
-		
-		<div id="intro-main">
-		
-		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>		
+		<div id="intro-content">	
+			<div id="intro-main">
+			<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>		
+			</div>
+			<div id="intro-readme"><div id="intro-content-log">${MI.Util.markdowner.makeHtml(MI.changelog)}</div></div>
 		</div>
-		<div id="intro-readme"><div id="intro-content-log">${MI.Util.markdowner.makeHtml(MI.changelog)}</div></div>
 		</div>`;
+		
 		layer.bindPopup(popupContent, { className: 'pop-intro'});
 		
 		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
@@ -199,14 +219,35 @@ class ManifestAtlas {
 		if (feature.properties.lid === 10292612160000) { MI.Atlas.RenderIntro(feature, layer); return; }
 		
 		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
-		let popupContent, tooltipTitle, fid = feature.properties.lid;
-
-		popupContent = `
+		let popupContent, fid = feature.properties.lid;
+ 
+		popupContent = `<div id="popup-${feature.properties.lid}" class="mpopup">
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor} center center; color:${feature.properties.style.textColor};">
 			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
-		<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</p>`;
+		<div class="node-images-wrap">
+		${feature.properties.images.length !== 0 ? `<div class="node-images ${feature.properties.images.length > 1 ? `multiple` : ''}" ${feature.properties.images.length > 1 ? `data-index="1"` : ''}>
+	
+			${feature.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
+			`<iframe class="ftimg" src="${img.URL}?enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || feature.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
+			`<img class="ftimg" ${i !== 0 || feature.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : feature.properties.title}" alt="${img.caption ? img.caption : feature.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 
+	
+	
+		</div>` : ''}
+
+		${feature.properties.images.length > 1 ? 
+		`<div class="images-controls">
+			<button id="imgbutton-left_${feature.properties.lid}" tabindex="-1" class="images-button images-display-left" title="Left Image Button"><i class="fas fa-caret-left"></i></button>
+			<div class="images-box">${(feature.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${feature.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
+			<button id="imgbutton-right_${feature.properties.lid}" tabindex="-1" class="images-button images-display-right" title="Left Image Button"><i class="fas fa-caret-right"></i></button>
+		</div>` : ''}
+
+		${feature.properties.images.length !== 0 ? `<div class="images-caption">${feature.properties.images[0].caption ? feature.properties.images[0].caption : '' }</div>` : ''}
+		</div>
+
+		<div class="node-description">${MI.Atlas.PopMLink(ManifestUtilities.Linkify(feature.properties.description))}</>
+		</div>`;
 	
 		if (feature.properties.clustered.length > 0) {
 			let fts = [feature].concat(feature.properties.clustered);
@@ -217,25 +258,43 @@ class ManifestAtlas {
 				<i class="fas fa-th"></i> Cluster of <span id="cluster-count" class="cluster-count">${feature.properties.clustered.length+1}</span> Nodes
 			</h2>`;
 			
-			for (let ft of fts) {
+			for (const ft of fts) {
 				popupContent += `
-				<div id="popup-${ft.properties.lid}" class="popuplink clusterbox">
+				<div id="popup-${ft.properties.lid}" class="mpopup popuplink clusterbox">
 					<h2 style="background: ${ft.properties.style.textColor}; color: ${ft.properties.style.fillColor}">
 						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
 					<p class="closed">${ft.properties.category} | ${ft.properties.placename}</p>
-					<p>${MI.Atlas.PopMLink(ManifestUtilities.Linkify(ft.properties.description))}</p>
+				
+					<div class="node-images-wrap">
+					${ft.properties.images.length !== 0 ? `<div class="node-images cluster ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
+		
+						${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
+						`<iframe class="ftimg" src="${img.URL}?enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
+						`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 
+		
+		
+					</div>` : ''}
+	
+					${ft.properties.images.length > 1 ? 
+					`<div class="images-controls cluster">
+						<button id="imgbutton-left_${ft.properties.lid}" tabindex="-1" class="images-button images-display-left" title="Left Image Button"><i class="fas fa-caret-left"></i></button>
+						<div class="images-box">${(ft.properties.images.map((img,i) => { return `<div class="images-spot ${i === 0 ? `selected`: ''}" data-lid="${ft.properties.lid}" data-index="${Number(i+1)}"><i class="far fa-circle"></i></div>`; })).join('')}</div>
+						<button id="imgbutton-right_${ft.properties.lid}" tabindex="-1" class="images-button images-display-right" title="Left Image Button"><i class="fas fa-caret-right"></i></button>
+					</div>` : ''}
+	
+					${ft.properties.images.length !== 0 ? `<div class="images-caption">${ft.properties.images[0].caption ? ft.properties.images[0].caption : '' }</div>` : ''}
+					</div>
+	
+					<div class="node-description">${MI.Atlas.PopMLink(ManifestUtilities.Linkify(ft.properties.description))}</div>
+	
 				</div>`;
 			}
 		} 	
 		layer.bindPopup(popupContent);
 
-		if (feature.properties.clustered.length > 0) { tooltipTitle = '<i class="fas fa-boxes"></i> Cluster of '+(feature.properties.clustered.length+1)+' Nodes'; }
-		else { tooltipTitle = feature.properties.title; }
-
-		let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.textColor}">${tooltipTitle}</div>`;
-		layer.bindTooltip(tooltipContent);	
+		layer.bindTooltip('');	
 		
 		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
 		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
@@ -371,7 +430,14 @@ class ManifestAtlas {
 					}
 				}
 			} }
-				let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> Cluster of ${ccount} Nodes ${tooltipDynamic}</div>`;
+			
+			let tooltipList = '{'+feature.properties.title;
+			for (let i in feature.properties.clustered) { if (!feature.properties.clustered[i].properties.hidden) { 
+				tooltipList += ', '+feature.properties.clustered[i].properties.title;	
+			} }
+			tooltipList += '}';
+			
+			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> Cluster of ${ccount} Nodes ${tooltipDynamic}<br>${tooltipList}</div>`;
 			layer.setTooltipContent(tooltipContent);	
 		} else {
 			const measuretype = document.getElementById('measure-choices').value;	
@@ -507,7 +573,7 @@ class ManifestAtlas {
 		this.Refresh();
 	}
 	GetRadius(ft, cluster=true) {
-		if (cluster) { return Math.min(ft.properties.clustered.length*5+this.radius,30); } else { return this.radius; }
+		if (cluster && ft.properties.clustered) { return Math.min(ft.properties.clustered.length*5+this.radius,30); } else { return this.radius; }
 	}
 	
 	GetScaledRadius(ft, measureSort) {
@@ -572,7 +638,17 @@ class ManifestAtlas {
 			let poly = MI.Atlas.glMap.getLayer(dlid+'-poly');
 		
 			if (el.checked && point === undefined && line === undefined && poly === undefined) { 	
-					MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'circle', 'source': 'mlayer-'+dlid, 'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' }, 'filter': ['==', '$type', 'Point'] });
+					//MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'circle', 'source': 'mlayer-'+dlid, 'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' }, 'filter': ['==', '$type', 'Point'] });
+					if (!MI.Atlas.glMap.hasImage('boat')) {
+						MI.Atlas.glMap.loadImage('https://hockbook.local/Manifest/dist/images/markers/boat-angle.png', function(error, image) {
+							if (error) { throw error; }
+							MI.Atlas.glMap.addImage('boat', image); 
+							MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'symbol', 'source': 'mlayer-'+dlid, 'layout': { 'icon-image': 'boat', 'icon-size': 0.15, 'icon-rotate': ['get', 'heading'] }, 'filter': ['==', '$type', 'Point']});
+						});
+					} else {
+						MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'symbol', 'source': 'mlayer-'+dlid, 'layout': { 'icon-image': 'boat', 'icon-size': 0.15, 'icon-rotate': ['get', 'heading'] }, 'filter': ['==', '$type', 'Point']});
+					}
+					
 					MI.Atlas.glMap.addLayer({ 'id': dlid+'-line', 'type': 'line', 'source': 'mlayer-'+dlid, 'paint': { 'line-color': '#ff69b4', 'line-width': 2 }, 'filter': ['==', '$type', 'LineString'] });				
 					MI.Atlas.glMap.addLayer({ 'id': dlid+'-poly', 'type': 'fill', 'source': 'mlayer-'+dlid, 'paint': { "fill-color": "#ff69b4" }, 'filter': ['==', '$type', 'Polygon'] });
 

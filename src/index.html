@@ -57,6 +57,8 @@
 		<div id="vizwrap" class="vizwrap closed">
 			<svg id="vizshell" class="vizsvg" fill="#21222c" preserveAspectRatio="xMinYMin meet"> <rect x="0" y="0" width="100%" height="100%" fill=""></rect></svg>
 		</div>
+		<div class="chartview closed" id="chartview"></div>
+		
 		<section class="ui">		
 			<section class="vizmenu">
 				<nav class="vizmenu-entry">
@@ -102,7 +104,7 @@
 					<p id="datalayers-description"></p>
 					<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
 					<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
-					<div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div>
+					<!--div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div-->
 					<div id="userdatalayers"></div>
 					<div id="load-datalayers-row">
 						<input type="text" id="load-datalayers-input"><button id="load-datalayers-btn"><i class="fas fa-plus-circle"></i></button>
@@ -118,7 +120,6 @@
 			</nav>
 		</section>
 		<div class="map" id="map"></div>
-		<div class="chartview closed" id="chartview"></div>
 		<div class="textview closed" id="textview"></div>
 		<div class="listview closed" id="listview">
 			<div id="datalist" class="dataviewer smapviewer">

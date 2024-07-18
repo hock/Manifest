@@ -20,9 +20,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	options = Object.assign(options, LoadParams(options));
 	MI = new Manifest(options);
-	
 	console.log(options);
-
+	
 	if (MI.options.storyMap) { MI.Interface.Storyize(); }
 	if (MI.options.embed) { MI.Interface.Embedize(); }
 	document.documentElement.classList.remove('loading');
@@ -110,12 +109,31 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	function LoadSample(d) {
 		document.getElementById('load-samples-group').innerHTML = document.getElementById('load-custom-group').innerHTML = '';
-		
-		for (var s in d.collection) { 
+		for (let s in d.collection) { 
 			let option = document.createElement('option');
 			option.value = d.collection[s].id; option.innerHTML = d.collection[s].title;
 			document.getElementById('load-samples-group').appendChild(option);
-		} 
+		}
+		
+		if (d.collected === false && !MI.Interface.IsMobile()) {
+			document.getElementById('load-samples').classList.add('closed');
+		    
+			let samples = `<div id="samples-spacer" class="closed"></div><div id="samples-previews">`;	
+			for (let s in d.collection) { 
+				let option = document.createElement('option');
+				option.value = d.collection[s].id; option.innerHTML = d.collection[s].title;
+				document.getElementById('load-samples-group').appendChild(option);
+				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${d.collection[s].id}" data-hash="${ManifestUtilities.Hash(d.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(d.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${d.collection[s].id.split('/')[(d.collection[s].id.split('/')).length-1].split('.')[0]}.png);">
+					<div class="sample-title">${d.collection[s].title}</div>
+					<div class="sample-description">${d.collection[s].description.replaceAll('**','')}</div>
+				</div>`;
+			} 
+			samples += `<div>`;
+		
+			document.getElementById('loadlist-group-samples').insertAdjacentHTML('afterbegin', samples);
+		
+			MI.Interface.SetupSamplelistHandlers();
+		}
 		
 		let urloption =  document.createElement('option'), fileoption = document.createElement('option');
 		urloption.value = 'url'; urloption.innerHTML = 'URL'; fileoption.value = 'file'; fileoption.innerHTML = 'FILE';
@@ -145,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (key === 'color') { o[key] = value.split(','); o[key] = o[key].map(c => '#' + c); }
 			if (key === 'position') { o[key].lat = value.split(',')[0]; o[key].lng = value.split(',')[1]; o.view = 'center'; }
 			if (key === 'zoom') {  o.view = 'center'; }
-			if (key === 'storyMap') { if (!value) { o[key] = true; } else { o[key] = value === 'false' ? false : value === 'true' ? true : null; } if (o[key] && !urlObject.zoom) { o.zoom = 10; } }
+			if (key === 'storyMap' || key === 'storymap') { if (!value) { o.storyMap = true; } else { o.storyMap = value === 'false' ? false : value === 'true' ? true : null; } if (o.storyMap && !urlObject.zoom) { o.zoom = 10; } }
 			if (key === 'embed') { if (!value) { o[key] = true; } else { o[key] = value === 'false' ? false : value === 'true' ? true : null; } }
 			
 			if (['visualization','map','view','zoom'].includes(key)) { o[key] = value; }

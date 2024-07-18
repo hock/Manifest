@@ -2,7 +2,7 @@
 	"name": "Media Logistics Spring 2023",
 	"description": "Media Supply Chain Maps for Media Logistics Spring 2023.", 
 	"collection": [
-		{"id": "manifest-json/cases/ML-S2023/comery-setrakian.json", "title": "Airpods (by Teryn Colmery and Sira Setrakian)"},
+		{"id": "manifest-json/cases/ML-S2023/colmery-setrakian.json", "title": "Airpods (by Teryn Colmery and Sira Setrakian)"},
 		{"id": "manifest-json/cases/ML-S2023/garcia.json", "title": "Tesla Model Y (by Karina Garcia)"},
 		{"id": "manifest-json/cases/ML-S2023/stefani.json", "title": "Kodak Disposable Camera (by Nathan Stefani)"},
 		{"id": "manifest-json/cases/ML-S2023/weathersby-gorelik.json", "title": "Ring Doorbell Camera 4 (by Madison Weathersby and Julia Gorelik)"},

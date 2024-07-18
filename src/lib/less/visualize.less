@@ -162,7 +162,7 @@ body.fullscreen {
 /* Storymap */
 body.storymap 
 {
-	#storybanner { z-index:12250; position:sticky; top:0; width:100%; background:#fff; color:#fff; padding:1rem 2rem; margin-top:-4rem; a { color:#fff; font-weight:bold;}}
+	#storybanner { z-index:12250; position:sticky; top:0; width:calc(100% - 4rem); background:#fff; color:#fff; padding:1rem 2rem; margin-top:-4rem; a { color:#fff; font-weight:bold;}}
 	#sidewrap {
 		width:100%; background:none;
 		#sidepanel { top:0;left:auto;right:0;width:100%;margin:0;border-radius:0;background:none;}
@@ -284,7 +284,7 @@ body.embedmap
 	
 	.vizsvg {position:relative;height:100%;width:100%;display:block;}
 	.vizmenu, body.light .vizmenu { background:none; border:none; }
-	.vizmenu { position: absolute; display:block; box-shadow:none; padding:0;  top: 0.75rem; right:1rem;  z-index:13000;} 
+	.vizmenu { position: absolute; display:block; box-shadow:none; padding:0;  top: 0.75rem; right:1rem;  z-index:11000;} 
 
 	.vizmenu-entry { padding:0; display:inline-block; float:none; background:none; border-color:#fff;}
 	.vizmenu-entry select {width:100%; }
@@ -315,5 +315,10 @@ body.embedmap
 	#datasort {display:none;}
 	.dataviewer ul.pagination{display:block;position:static;}
 	#datasearch{position:static; width:100%;}
-
+	
+	#chartview {
+		#charttable { margin:8rem 1rem 1rem 0.5rem;width:calc(100% - 1rem);height:calc(100% - 12.8rem); }
+		th.chartlabel { top:6.5rem;left:calc(0.5rem);width:calc(20% - 1.3rem); }
+		th.chartmeasure { top:6.5rem;right:calc(0.5rem);width:calc(80% - 2.4rem + 1px); }
+	}
 }

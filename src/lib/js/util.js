@@ -17,7 +17,7 @@ class ManifestUtilities {
 	static Hash(str) { let hash = 0, i, chr; if (str.length === 0) { return hash; } for (let i = 0; i < str.length; i++) { 
 		chr = str.charCodeAt(i); hash = ((hash << 5) - hash) + chr; hash |= 0; } return Math.abs(hash); }
 	static Linkify(str) { return str.replaceAll(ManifestUtilities.URLMatch(), '<a href=\"$1\">$1</a>').replaceAll(ManifestUtilities.ManifestMatch(), '<a class="manifest-link" href="$1">$1</a>'); }
-	static Slugify(str) { 
+	static Slugify(str) {
 		let slug = str; 
 		if (slug.substring(0,1) === '#') { slug = slug.substring(1,slug.length); }
 		if (slug.substring(0,14) === 'manifest-json/') { return 'manifest/'+slug.substring(14,slug.length).split('.')[0]+'/'; } 

@@ -26,12 +26,11 @@ function RenderManifest(data) {
 	  valueNames: ['id','title','author', 'categories', 'description'],
 	    item: function(values) {
 			let thumb = values.id.split('/')[(values.id.split('/')).length-1].split('.')[0];
-			
 			return `<li class="entry">
 						<div class="samplewrap">
 							<h3 class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></h3>
 							<div class="sampleauthor">${values.author}</div>
-							<div class="sampletags">${values.categories}</div>
+							<div class="sampletags"><ul>${values.categories.split(',').map(s => `<li>${s}</li>`).join('')}</ul></div>
 							<img src="json/samples/thumbnails/${thumb}.png" loading="lazy"/>
 							<div class="sampledescription">${util.markdowner.makeHtml(values.description)}</div>
 						</div>

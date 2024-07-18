@@ -6,7 +6,10 @@ class ManifestVisualization {
 	}
 	
 	Set(type, scid, refresh=false) {
+		if (MI.Interface.IsMobile() && MI.supplychains[0]) { scid = String(MI.supplychains[0].details.id); }
 		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {
+			console.log("viz set");
+			
 			MI.Visualization.active_scid = scid; 
 			MI.Interface.ClearMessages();
 			
@@ -239,10 +242,9 @@ class ManifestVisualization {
 	Resize() {
 		this.width = document.getElementById("view-wrapper").offsetWidth;
 		this.height = document.getElementById("view-wrapper").offsetHeight;
-		if (MI.Interface.IsMobile()) { this.height = document.getElementById('vizshell').clientHeight; }	
+		//if (MI.Interface.IsMobile()) { this.height = document.getElementById('vizshell').clientHeight; }	
 		
 		let svg = document.getElementById('vizshell');
-		
 		svg.setAttribute('width',this.width); svg.setAttribute('height',this.height); 
 		this.Update();
 	}
@@ -356,7 +358,7 @@ class ForceGraph {
 		return (MI.Interface.IsMobile() && middle) ? this.height * 0.4 : this.height / 2; 
 	}
 	
-	Run() {			
+	Run() {		
 		this.simulation.alphaDecay(0.3);
 	}
 	
@@ -598,7 +600,7 @@ class SankeyDiagram {
 		return (MI.Interface.IsMobile() && middle) ? this.height * 0.4 : this.height / 2; 
 	}
 	get margin() {
-		return {top: ManifestUtilities.RemToPixels(2.5), right: ManifestUtilities.RemToPixels(2.5), 
+		return {top: MI.Interface.IsMobile() ? ManifestUtilities.RemToPixels(7) : ManifestUtilities.RemToPixels(2.5), right: ManifestUtilities.RemToPixels(2.5), 
 			bottom: ManifestUtilities.RemToPixels(6.5), left: ManifestUtilities.RemToPixels(2.5)};
 	}
 	_zoomed() { d3.select('svg g') .attr('transform', d3.event.transform); }

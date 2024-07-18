@@ -344,7 +344,11 @@
 	#samplelist { display:flex; flex-wrap: wrap; justify-content:stretch; list-style:none; padding:0; width:calc(100% + 4rem); margin:0 -2rem;}
 	#samplelist .samplewrap { padding:0; margin:0;}
 	#samplelist .sampletitle { padding: 1rem 0 0.25rem 0; font-size:1.2rem;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-	#samplelist .sampletags { font-size:1rem; color:#666; padding:0 0 0.5rem 0;}
+	#samplelist .sampletags { 
+		font-size:0.8rem; color:#666; padding:0 0 0.5rem 0; height:2.5rem; overflow:hidden;
+		ul { list-style:none; display:inline-block; padding:0; margin:0;}
+		li { display:inline-block; width: auto; box-shadow: none; padding:0.1rem 0.25rem; margin:0.1rem 0.1rem 0.1rem 0; background:rgba(223, 219, 249, 0.8); border-radius:1rem; }
+	}
 	#samplelist .sampleauthor { font-size:1rem;padding:0;margin:0 0 0.5rem 0;}
 	#samplelist p:empty { display:inline;}
 	

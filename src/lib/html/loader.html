@@ -1,7 +1,7 @@
 <script>
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
-	if (urlParams.get('embed') !== null || urlParams.get('storyMap') !== null) { document.documentElement.classList.add('loading'); }
+	if (urlParams.get('embed') !== null || urlParams.get('storyMap') !== null || urlParams.get('storymap') !== null) { document.documentElement.classList.add('loading'); }
 </script>
 <style> 
 	.loading #loader { display:block; position:absolute;z-index:50000;height:100%;width:100%;text-align:center;background:#4d34db; left:0; top:0; } 
