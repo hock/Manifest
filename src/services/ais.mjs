@@ -1,13 +1,13 @@
 import WebSocket from "ws";
 import * as fs from 'fs';
 const socket = new WebSocket("wss://stream.aisstream.io/v0/stream");
-const API_KEY = '2b1e5dc9ad13c3b21a3b4f1a12665ce13f320311';
+const AIS = require('./json/ais.json');
 
 let features = [];
 
 socket.addEventListener("open", (_) => {
   const subscriptionMessage = {
-    APIkey: API_KEY,
+    APIkey: AIS.key,
     BoundingBoxes: [ [ [-90, -180], [90, 180], ], ],
   };
   console.log(JSON.stringify(subscriptionMessage));
