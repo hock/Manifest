@@ -397,6 +397,14 @@ class ManifestUI {
 				}	
 			}); 
 		}
+		if (MI.options.timerange) {
+			MI.Interface.timeslider.lower = MI.options.timerange.lower;
+			MI.Interface.timeslider.upper = MI.options.timerange.upper;
+			MI.Interface.OnTimeUpdate();
+	
+			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
+			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);
+		}
 		
 	}
 

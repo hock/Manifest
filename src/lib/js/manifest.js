@@ -96,6 +96,14 @@ class Manifest {
 		if (d.setOptions.position && MI.supplychains.length === 1 && !(MI.options.urlparams.position)) { 
 			MI.options.position = {lat:Number(d.setOptions.position.value.split(',')[0]),lng:Number(d.setOptions.position.value.split(',')[1])}; MI.options.view = 'center';}
 		if (d.setOptions.zoom && MI.supplychains.length === 1 && !(MI.options.urlparams.zoom)) { MI.options.zoom = Number(d.setOptions.zoom.value); MI.options.view = 'center'; }
+		if (d.setOptions.timerange && MI.Interface.timeslider) { 	
+			MI.Interface.timeslider.lower = MI.options.timerange.lower;
+			MI.Interface.timeslider.upper = MI.options.timerange.upper;
+			MI.Interface.OnTimeUpdate();
+	
+			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
+			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);
+		}
 		
 		if (d.setOptions.storyMap && MI.supplychains.length === 1 && !(MI.options.urlparams.storyMap)) { 	
 			MI.options.zoom = typeof d.setOptions.zoom !== 'undefined' ? Number(d.setOptions.zoom.value) : 10;

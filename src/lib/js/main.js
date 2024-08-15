@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (key === 'color') { o[key] = value.split(','); o[key] = o[key].map(c => '#' + c); }
 			if (key === 'position') { o[key].lat = value.split(',')[0]; o[key].lng = value.split(',')[1]; o.view = 'center'; }
 			if (key === 'zoom') {  o.view = 'center'; }
+			if (key === 'timerange') {  o[key] = {lower: Number(value.split(':')[0]), upper: Number(value.split(':')[1])}; }
 			if (key === 'storyMap' || key === 'storymap') { if (!value) { o.storyMap = true; } else { o.storyMap = value === 'false' ? false : value === 'true' ? true : null; } if (o.storyMap && !urlObject.zoom) { o.zoom = 10; } }
 			if (key === 'embed') { if (!value) { o[key] = true; } else { o[key] = value === 'false' ? false : value === 'true' ? true : null; } }
 			

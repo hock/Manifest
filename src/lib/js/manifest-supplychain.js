@@ -282,10 +282,8 @@ class ManifestSupplyChain {
 			${ft.properties.images.length !== 0 ? `<div class="node-images ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
 				
 				${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
-				`<iframe class="ftimg" src="${img.URL}?enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0"></iframe>` : 
-				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 
-				
-				
+				`<iframe class="ftimg" src="${img.URL}?si=N9SHiMo-QTcPyqdP&enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` : 
+				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 	
 			</div>` : ''}
 			
 			${ft.properties.images.length > 1 ? 
@@ -653,8 +651,8 @@ class Time {
 		const starttime = this.GetStart() ? this.GetStart() : MI.Interface.timeslider.lowerBound;
 		const endtime = this.GetEnd() ? this.GetEnd() : MI.Interface.timeslider.upperBound;
 		
-		if ( (starttime < Number(MI.Interface.timeslider.lower) && endtime < Number(MI.Interface.timeslider.lower)) || 
-			 (starttime > Number(MI.Interface.timeslider.upper) && endtime > Number(MI.Interface.timeslider.upper))) { return false; }
+		if ( (starttime <= Number(MI.Interface.timeslider.lower) && endtime <= Number(MI.Interface.timeslider.lower)) || 
+			 (starttime >= Number(MI.Interface.timeslider.upper) && endtime >= Number(MI.Interface.timeslider.upper))) { return false; }
 		else { return true; }
 	}
 }
@@ -674,7 +672,7 @@ class Measure {
 			if (MI.Interface.timeslider) {
 				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
 				for (let v of this.mvalue) {
-					if ( (Object.keys(v)[0] > Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] < Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] > seriesval.time) { 
+					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] >= seriesval.time) { 
 						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
 					}
 
@@ -704,7 +702,7 @@ class Measure {
 			if (MI.Interface.timeslider) {
 				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
 				for (let v of this.mvalue) {
-					if ( (Object.keys(v)[0] > Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] < Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] > seriesval.time) { 
+					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] >= seriesval.time) { 
 						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
 					}
 
