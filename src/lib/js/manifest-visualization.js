@@ -7,9 +7,7 @@ class ManifestVisualization {
 	
 	Set(type, scid, refresh=false) {
 		if (MI.Interface.IsMobile() && MI.supplychains[0]) { scid = String(MI.supplychains[0].details.id); }
-		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {
-			console.log("viz set");
-			
+		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {			
 			MI.Visualization.active_scid = scid; 
 			MI.Interface.ClearMessages();
 			
@@ -23,7 +21,7 @@ class ManifestVisualization {
 				case 'chart': MI.Visualization.ChartViz(); break;							
 				case 'listview': MI.Visualization.ListViz(); break;			
 				case 'textview': MI.Visualization.TextViz(); break;
-			  	default: console.log('Visualization type not supported...');
+			  	default: console.log('Visualization type not supported.');
 			}
 		}
 	}
@@ -98,11 +96,11 @@ class ManifestVisualization {
 		document.querySelectorAll('.viz, #vizshell defs, #charttable').forEach(el => { el.remove(); }); 
 		
 		if (MI.supplychains.length > 0) {		
-			let sc = null;
+			let sc = 0;
 			for (let i in MI.supplychains) {
+				
 				if (document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { sc = i; }
 			}
-			
 			let canvascolor = MI.supplychains[sc].details.colorchoice[0];
 			document.getElementById('chartview').style.backgroundColor = tinycolor.mix('#21222c', canvascolor, 10);
 			
@@ -126,10 +124,10 @@ class ManifestVisualization {
 				for (let node of MI.supplychains[sc].graph.nodes) { if (!(node.ref.properties.hidden)) {
 					color_index++; if (color_index >= color_range.length) {color_index = 0;}
 					
-					if (node.ref.properties.measures.some(m => m.mtype === measureSort)) {
-						const measure = node.ref.properties.measures.filter(m => { return m.mtype === measureSort; }).pop();
+					if (node.ref.properties.measures.some(m => m.GetType() === measureSort)) {
+						const measure = node.ref.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop();
 						const measureMax = MI.supplychains[sc].details.measures[measureSort].max;		
-						this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix('#21222c', canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure"><span class="measurebar" data-content="${measure.munit}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.mvalue/measureMax * 100}%;">${measure.mvalue}</span></td></tr>`;
+						this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix('#21222c', canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
 								
 					}
 					alternate = !alternate;
@@ -140,7 +138,7 @@ class ManifestVisualization {
 					MI.Atlas.MapPointClick(el.id.split('-').pop()); MI.Atlas.active_point = el.id.split('-').pop(); 
 				}); }); 
 				
-				const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+				const getCellValue = (tr, idx) => tr.children[idx].dataset.value || tr.children[idx].innerText || tr.children[idx].textContent;
 
 				const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
 				    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
@@ -275,7 +273,7 @@ class ManifestVisualization {
 class ForceGraph {
 	constructor(graph) {
 		this.graph = graph;
-		this.graph.nodes.forEach(x => { x.value = MI.Atlas.GetScaledRadius(x.ref, document.getElementById('measure-choices').value); });
+		this.graph.nodes.forEach(x => { x.value = MI.Atlas.GetScaledRadius(x.ref, document.getElementById('measure-choices').value, false); });
 		
 		this.svg = d3.select('svg').attr('width', this.width).attr('height', this.height);
 		this.viz = this.svg.append('g').attr('class', 'viz forcegraph');
@@ -289,12 +287,12 @@ class ForceGraph {
 		.force('radial', d3.forceRadial((this.width)/8, this.xpos, this.ypos).strength(0.8))
 		.force('y', d3.forceY(this.ypos).strength(0.4))
 		.force('collision', d3.forceCollide().radius(d => { 
-			let collision = Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value))*2 + 
+			let collision = Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false))*2 + 
 				d.linkcount * 2; 
 					return collision; }).strength(0.4))
 		.force('link', d3.forceLink(this.graph.links).id(n => { return n.id;}).strength(1).distance(d => { return Math.max(d.source.linkcount,d.target.linkcount) * 2; }))
 	    .force('charge', d3.forceManyBody().strength(d => { 
-			let charge = -50 * (Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value))+d.linkcount);
+			let charge = -50 * (Number(MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false))+d.linkcount);
 			return charge; }))
 		.on('tick', e => this._tick());
 		
@@ -318,13 +316,13 @@ class ForceGraph {
 		this.node = this.viz.append('g').attr('class', 'nodes').selectAll('circle').data(this.graph.nodes).enter().append('circle') 
 			.attr('cx', d => this.xpos) 
 			.attr('cy', d => this.ypos) 		
-			.attr('r', d => MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)) 
+			.attr('r', d => MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)) 
 			.style('fill', d => d.fillColor).style('stroke', d => d.color)
 			.on("mouseover", (d,i) => { 
 				d3.select('#viztooltip')
 				.style('display','block').style("left", (d3.event.pageX - this.xoffset) + 10 + "px").style("top", (d3.event.pageY - 15) + "px")
 				.style('background-color',d.color).style('border-color',d.fillColor).style('color',tinycolor.mostReadable(d.fillColor, [tinycolor(d.fillColor).darken(50), tinycolor(d.fillColor).brighten(50)]).toHexString())
-				.html('<h3>'+d.ref.properties.title+'</h3><h5>Index: '+d.ref.properties.mindex+'<br/>Value: '+d.value+'</h5>'+d.ref.properties.description);})
+				.html('<h3>'+d.ref.properties.title+'</h3><h5>Index: '+d.ref.properties.mindex+'<br/>Value: '+Math.round(d.value)+'</h5>'+d.ref.properties.description);})
 			.on("mousemove", (d,i) => { 				
 				d3.select('#viztooltip').style("left", (d3.event.pageX - this.xoffset) + 10 + "px")
 					.style("top", (d3.event.pageY - 15) + "px");})
@@ -368,7 +366,8 @@ class ForceGraph {
 		let zoom = d3.zoom().scaleExtent([0.5, 1]).translateExtent([[0, 0], [this.width, this.height]]).on("zoom", this._zoomed);
 		d3.select('svg').call(zoom.transform, d3.zoomIdentity);
 		d3.select('svg').call(zoom);	
-		
+				
+		this.viz.selectAll('circle').attr('r', d => MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)); 
 		this.simulation.force('center', d3.forceCenter(this.xpos, this.ypos))
 		.force('radial', d3.forceRadial((this.width)/8, this.xpos, this.ypos).strength(0.8))
 		.force('y', d3.forceY(this.ypos).strength(0.4))
@@ -393,8 +392,8 @@ class ForceGraph {
 			let dx = d.target.x - d.source.x, dy = d.target.y - d.source.y, dr = Math.sqrt(dx * dx + dy * dy);
 				return [ 'M',d.source.x,d.source.y, 'A',Math.max(0,dr),Math.max(0,dr),0,0,1,d.target.x,d.target.y].join(' ');});
 
-		this.label.attr('x', d => Math.min(Math.max(d.x,d.x+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.width-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))))
-			.attr('y', d => Math.min(Math.max(d.y,d.y+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.height-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))));	
+		this.label.attr('x', d => Math.min(Math.max(d.x,d.x+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.width-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))))
+			.attr('y', d => Math.min(Math.max(d.y,d.y+MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)+(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))),this.height-MI.Atlas.GetScaledRadius(d.ref, document.getElementById('measure-choices').value, false)-(0.2 * parseFloat(getComputedStyle(document.documentElement).fontSize))));	
 				
 		this._updategroups();		
 	}
@@ -434,7 +433,7 @@ class SankeyDiagram {
 		this.graph.links = this.graph.links.map(x => {
 			return {
 				source: nodeMap[x.source], target: nodeMap[x.target],
-				value: Number(MI.Atlas.GetScaledRadius(nodeMap[x.source].ref, document.getElementById('measure-choices').value))
+				value: Number(MI.Atlas.GetScaledRadius(nodeMap[x.source].ref, document.getElementById('measure-choices').value, false))
 				//value: (Number(MI.Atlas.GetScaledRadius(nodeMap[x.source].ref, document.getElementById('measure-choices').value)) + Number(MI.Atlas.GetScaledRadius(nodeMap[x.target].ref, document.getElementById('measure-choices').value))) / 10
 			}; 
 		});
@@ -682,8 +681,8 @@ class ChordDiagram {
 		let total_items = nodes.length;
 		    nodes.forEach(function(node) { node.count = 0; matrix[node.index] = d3.range(total_items).map(item_index => { return 0; }); });
 		    edges.forEach(function(edge) {
-				let sourceval = Number(MI.Atlas.GetScaledRadius(nodes[edge.sourceid].ref, document.getElementById('measure-choices').value));
-				let targetval = Number(MI.Atlas.GetScaledRadius(nodes[edge.targetid].ref, document.getElementById('measure-choices').value));
+				let sourceval = Number(MI.Atlas.GetScaledRadius(nodes[edge.sourceid].ref, document.getElementById('measure-choices').value, false));
+				let targetval = Number(MI.Atlas.GetScaledRadius(nodes[edge.targetid].ref, document.getElementById('measure-choices').value, false));
 		        matrix[edge.sourceid][edge.targetid] += sourceval; matrix[edge.targetid][edge.sourceid] += targetval;
 		        nodes[edge.sourceid].count += sourceval; nodes[edge.targetid].count += targetval;
 		    });

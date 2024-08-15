@@ -30,8 +30,15 @@
 	<script> 
 		const mversion = "<%= version %>";		
 		const mtarget = "<%= target %>";		
+		const mbaseurl = "<%= baseurl %>";
 		
-		if (mtarget === 'development' || mtarget === 'production') { var console = {}; console.log = function(){}; window.console = console;}
+		function tag(msg) {
+			gtag("event", "manifest_log", { "message": msg });
+		}
+		console.log = tag;
+		if (mtarget === 'development' || mtarget === 'production') { 
+			var console = {}; console.log = function(){}; window.console = console;
+		}
 	</script>
 	<!-- /build -->
 

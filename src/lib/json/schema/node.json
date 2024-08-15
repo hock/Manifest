@@ -152,6 +152,9 @@
 							"munit": {
 								"type": "string",
 								"options": { "inputAttributes": { "placeholder": "kg" } }						
+							},
+							"series": {
+								"type": "boolean"
 							}
 						}
 					},

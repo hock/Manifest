@@ -1,3 +1,11 @@
+##Release Notes Version 0.5.0
+
+###New Features
+* Measures: Significant improvements to measures, with new kinds of measures and better formatting of existing measures.
+
+###Bug Fixes
+* Numerous bug fixes.
+
 ##Release Notes Version 0.4.0
 
 ###New Features

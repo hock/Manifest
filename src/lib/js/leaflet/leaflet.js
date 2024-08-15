@@ -9621,16 +9621,16 @@
   			}
   		}
 
-  		if (!latlng) {
+//  		if (!latlng) {
   			if (layer.getCenter) {
   				latlng = layer.getCenter();
   			} else if (layer.getLatLng) {
   				latlng = layer.getLatLng();
 				
   			} else {
-  				throw new Error('Unable to get source layer LatLng.');
+  				//throw new Error('Unable to get source layer LatLng.');
   			}
-  		}
+  	//	}
 
   		// set overlay source to this layer
   		this._source = layer;
@@ -12498,11 +12498,7 @@
 		
   		var options = layer.options;
 
-  		if (options.fill) {
-  			ctx.globalAlpha = options.fillOpacity;
-  			ctx.fillStyle = options.fillColor || options.color;
-  			ctx.fill(options.fillRule || 'evenodd');
-  		}
+
 
   		if (options.stroke && options.weight !== 0) {
   			if (ctx.setLineDash) {
@@ -12514,6 +12510,11 @@
   			ctx.lineCap = options.lineCap;
   			ctx.lineJoin = options.lineJoin;
   			ctx.stroke();
+  		}
+  		if (options.fill) {
+  			ctx.globalAlpha = options.fillOpacity;
+  			ctx.fillStyle = options.fillColor || options.color;
+  			ctx.fill(options.fillRule || 'evenodd');
   		}
   	},
 

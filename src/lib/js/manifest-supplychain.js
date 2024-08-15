@@ -32,9 +32,10 @@ class ManifestSupplyChain {
 						    <div id="share-options-${id}" class="share-container closed">
 							    <ul class="share-menu" style="color:${d.details.style.fillColor}; background:${d.details.style.lightColor};">
 									<span>Share:</span>
-							        <li><a onclick="window.open('${ManifestUtilities.Slugify(d.details.url)}', '_blank');">New Window</a> <i class="fas fa-window-restore"></i></li>
-							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'markdown');">Download</a> <i class="fab fa-markdown"></i></li>
-							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'json');">Download</a> <i class="fas fa-file-download"></i></li>
+							        <li><a onclick="window.open('${ManifestUtilities.Slugify(d.details.url)}', '_blank');">Open</a> <i class="fas fa-window-restore"></i></li>
+							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'embed');">Embed</a> <i class="fas fa-window-restore"></i></li>		
+							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'markdown');">Markdown</a> <i class="fas fa-file-download"></i></li>
+							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'json');">JSON</a> <i class="fas fa-file-download"></i></li>
 							    </ul>
 							</div>
 							<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>
@@ -123,7 +124,7 @@ class ManifestSupplyChain {
 		let nodelist = [];
 		
 		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false, disabled: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -155,7 +156,7 @@ class ManifestSupplyChain {
 		
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.measure-link').forEach(el => { el.addEventListener('click', (e) => { document.getElementById('measure-choices').value = el.dataset.measure; MI.Atlas.MeasureSort(); e.stopPropagation(); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => {  if (!MI.options.storyMap && !MI.options.embed) { MI.Atlas.PointFocus(el.id.split('_').pop()); } }); });
+		document.getElementById('mlist-'+d.details.id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => {  if (!MI.options.storyMap) { MI.Atlas.PointFocus(el.id.split('_').pop()); } }); });
 		document.getElementById('mdetails-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
 		document.getElementById('mlist-'+d.details.id).querySelectorAll('.node-sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
@@ -218,11 +219,7 @@ class ManifestSupplyChain {
 		// Reverse so cluster order makes sense
 		points.features = points.features.reverse();
 		let pointLayer = new L.geoJSON(points, { onEachFeature: MI.Atlas.RenderPoint, pointToLayer: function (feature, latlng) { 
-			//let icons = ['factory','warehouse','inventory','building','boat'];
-			//let icon = icons[Math.floor(Math.random()*icons.length)];
 			if (feature.properties.icon !== '') { feature.properties.style.img = { url: 'images/markers/'+feature.properties.icon+'.png' }; }
-			//feature.properties.style.img = { url: 'images/markers/'+icon+'.png' };
-			
 			return L.circleMarker(latlng, MI.Atlas.styles.point); 
 		} });	
 		
@@ -241,8 +238,7 @@ class ManifestSupplyChain {
 		
 		for (let l in MI.Atlas.maplayer) { if (MI.Atlas.maplayer[l].points) { MI.Atlas.maplayer[l].points.bringToFront(); } }
 	
-		MI.Interface.RefreshMeasureList();
-		if (MI.options.storyMap || MI.options.embed) { MI.Interface.SetupStoryTrigger('#mlist-'+d.details.id+' li .node-title'); }
+		MI.Interface.OnMapComplete(d.details.id);
 		
 		return d;
 	}
@@ -276,10 +272,10 @@ class ManifestSupplyChain {
 			<div class="node-dot" style="background: ${ft.properties.style.fillColor}; border-color: ${ft.properties.style.color};">${ft.properties.mindex}</div>
 			<h5 class="node-title">${ft.properties.title}</h5>
 			${ ft.properties.placename !== '' ? `<div class="node-place" style="color: ${d.details.style.darkerColor};">${ft.properties.placename}</div>` : ''}
-			${ ft.properties.time ? `<div class="node-time" ${ft.properties.time.start ? `data-start="${ft.properties.time.start}"` : ``} ${ft.properties.time.end ? `data-end="${ft.properties.time.end}"` : ``} style="color: ${d.details.style.darkerColor};">${ft.properties.time.start ? `<span class="time-start">${ManifestUtilities.PrintUTCDate(ft.properties.time.start)}</span>` : ''}<span class="time-separator"> — </span>${ft.properties.time.end ? `<span class="time-end">${ManifestUtilities.PrintUTCDate(ft.properties.time.end)}</span>` : ''}</div>` : ''}
+			${ ft.properties.time ? `<div class="node-time" ${ft.properties.time.GetStart() ? `data-start="${ft.properties.time.GetStart()}"` : ``} ${ft.properties.time.GetEnd() ? `data-end="${ft.properties.time.GetEnd()}"` : ``} style="color: ${d.details.style.darkerColor};">${ft.properties.time.GetStart() ? `<span class="time-start">${ft.properties.time.PrintStart()}</span>` : ''}<span class="time-separator"> — </span>${ft.properties.time.GetEnd() ? `<span class="time-end">${ft.properties.time.PrintEnd()}</span>` : ''}</div>` : ''}
 			
 			<div class="node-details">
-				${ ft.properties.categories.length !== 0 ? `<div class="category ${(ft.properties.categories.length === 1 && ft.properties.categories[0] === '') ? 'closed' : ''}">${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join('')}</div>` : ''}${ ft.properties.measures.length !== 0 ? `<div class="measures">${ft.properties.measures.filter(m => m && m.mvalue).map(m => (m.mtype === 'starttime' || m.mtype === 'endtime') ? '' : `<a class="measure-link" data-measure="${m.mtype}"><span class="mtype">${m.mtype}</span>${m.mvalue}${m.munit}</a>`).join('')}</div>` : ''}
+				${ ft.properties.categories.length !== 0 ? `<div class="category ${(ft.properties.categories.length === 1 && ft.properties.categories[0] === '') ? 'closed' : ''}">${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join('')}</div>` : ''}${ ft.properties.measures.length !== 0 ? `<div class="measures">${ft.properties.measures.filter(m => m && m.GetValue()).map(m => ['starttime','start','endtime','end'].includes(m.GetType()) ? '' : m.GetType() !== 'date' ? `<a class="measure-link" data-measure="${m.GetType()}"><span class="mtype">${m.PrintType()}</span><span class="mvalue">${m.PrintValue()}</span><span class="munit">${m.PrintUnit()}</span></a>` : `<span class="mtype">${m.PrintType()}</span>${m.PrintValue()}${m.PrintUnit()}`).join('')}</div>` : ''}
 			</div> 
 			
 			<div class="node-images-wrap">
@@ -424,25 +420,34 @@ class ManifestSupplyChain {
 	SetupMeasures(ft, sc) {
 		let measure = ft.properties.measures, measure_list = Object.assign([], this.measures), measurecheck = false, smapmeasures = [];
 		for (let e in ft.properties.measures) {
-			if (ft.properties.measures[e].mtype !== '') {
+			if (ft.properties.measures[e].GetType() !== '') {
 				let ftmeasure = ft.properties.measures[e], measurecheck = false;
 			
-				for (let l in measure_list) { if (l.measure === ftmeasure.mtype) { measurecheck = true; } }
-				if (measurecheck === false) { measure_list.push({measure: ftmeasure.mtype, unit: ftmeasure.munit}); }
-				if (ftmeasure.mtype === 'length') {ftmeasure.mtype = "Length"; }
-				if (typeof sc.measures[ftmeasure.mtype] === 'undefined') { sc.measures[ftmeasure.mtype] = {max: 1, min: 0}; }
-				let mmax = Number(sc.measures[ftmeasure.mtype].max) > Number(ftmeasure.mvalue) ? Number(sc.measures[ftmeasure.mtype].max) : Number(ftmeasure.mvalue);
-				sc.measures[ftmeasure.mtype] = { max: mmax, min: 0 };
+				for (let l in measure_list) { if (l.measure === ftmeasure.GetType()) { measurecheck = true; } }
+				if (measurecheck === false) { measure_list.push({measure: ftmeasure.GetType(), unit: ftmeasure.munit}); }
+				if (ftmeasure.GetType() === 'length') {ftmeasure.SetType("Length"); }
+				if (typeof sc.measures[ftmeasure.GetType()] === 'undefined') { sc.measures[ftmeasure.GetType()] = {cum: 0, max: ftmeasure.GetValue(), min: ftmeasure.GetValue()}; }
+
+				sc.measures[ftmeasure.GetType()] = { 
+					cum: sc.measures[ftmeasure.GetType()].cum + ftmeasure.GetValue(), 
+					max: ftmeasure.GetValue() > sc.measures[ftmeasure.GetType()].max ? ftmeasure.GetValue() : sc.measures[ftmeasure.GetType()].max,
+					min: ftmeasure.GetValue() < sc.measures[ftmeasure.GetType()].min ? ftmeasure.GetValue() : sc.measures[ftmeasure.GetType()].min,
+					series: ftmeasure.series 
+				};
 			} 
 		}
 	
 		for (let l in measure_list) {		
 			if (typeof ft.properties[measure_list[l].measure] !== 'undefined') { 
-				if (typeof sc.measures[measure_list[l].measure] === 'undefined') { sc.measures[measure_list[l].measure] = {max: 1, min: 0}; }
-				sc.measures[measure_list[l].measure] = { max: Number(sc.measures[measure_list[l].measure].max) + Number(ft.properties[measure_list[l].measure]), min: 0 };
+				if (typeof sc.measures[measure_list[l].measure] === 'undefined') { sc.measures[measure_list[l].measure] = {cum: 0, max: Number(ft.properties[measure_list[l].measure]), min: Number(ft.properties[measure_list[l].measure])}; }
+				sc.measures[measure_list[l].measure] = { 
+					cum: Number(sc.measures[measure_list[l].measure].cum) + Number(ft.properties[measure_list[l].measure]),
+					max: Number(ft.properties[measure_list[l].measure]) > Number(sc.measures[measure_list[l].measure].max) ? Number(ft.properties[measure_list[l].measure]) : Number(sc.measures[measure_list[l].measure].max),
+					min: Number(ft.properties[measure_list[l].measure]) < Number(sc.measures[measure_list[l].measure].min) ? Number(ft.properties[measure_list[l].measure]) : Number(sc.measures[measure_list[l].measure].min)
+				};
 	
 				measure[measure_list[l].measure] = ft.properties[measure_list[l].measure]; 
-				smapmeasures.push({mtype: measure_list[l].measure, munit: measure_list[l].unit, mvalue: ft.properties[measure_list[l].measure]});
+				smapmeasures.push(new Measure(measure_list[l].measure, Number(ft.properties[measure_list[l].measure]), measure_list[l].unit));
 			}
 		}		
 		return smapmeasures.length > 0 ? smapmeasures : (Object.entries(ft.properties.measures).length === 0 ? [] : ft.properties.measures);
@@ -612,5 +617,129 @@ class ManifestSupplyChain {
 		if (!MI.options.storyMap && !MI.options.embed) {  let searchvalue = document.getElementById('searchbar').value; MI.Interface.ClearSearch(); MI.Interface.Search(searchvalue, true); }
 		if (!MI.options.storyMap && !MI.options.embed) { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element); }			
 		MI.Atlas.Refresh();
+	}
+}
+
+class Time {
+	constructor(start=null, end=null) {
+		this.start = start;
+		this.end = end;
+	}
+	SetStart(start) {
+		this.start = start;
+	}
+	SetEnd(end) {
+		this.end = end;
+	}
+	GetStart() {
+		return this.start === null ? false : this.start;
+	}
+	GetEnd() {
+		return this.end === null ? false : this.end;
+	}
+	PrintStart() { 
+		let utcstring = new Date(Number(this.start)*1000).toUTCString(); 
+		let date = {weekday:utcstring.slice(0,3), month:utcstring.slice(8,11), day:utcstring.slice(5,7).replace(/^0/, ''), year:utcstring.slice(12,16)};
+		utcstring = utcstring.slice(4,16);
+		return date.month + ' ' + date.day + ' ' + date.year;
+	}
+	PrintEnd() { 
+		let utcstring = new Date(Number(this.end)*1000).toUTCString(); 
+		let date = {weekday:utcstring.slice(0,3), month:utcstring.slice(8,11), day:utcstring.slice(5,7).replace(/^0/, ''), year:utcstring.slice(12,16)};
+		utcstring = utcstring.slice(4,16);
+		return date.month + ' ' + date.day + ' ' + date.year;
+	}
+	InRange() {
+		const starttime = this.GetStart() ? this.GetStart() : MI.Interface.timeslider.lowerBound;
+		const endtime = this.GetEnd() ? this.GetEnd() : MI.Interface.timeslider.upperBound;
+		
+		if ( (starttime < Number(MI.Interface.timeslider.lower) && endtime < Number(MI.Interface.timeslider.lower)) || 
+			 (starttime > Number(MI.Interface.timeslider.upper) && endtime > Number(MI.Interface.timeslider.upper))) { return false; }
+		else { return true; }
+	}
+}
+class Measure {
+	constructor(type, value, unit, options={}) {
+		this.mtype = type;
+		this.mvalue = value;
+		this.munit = unit;		
+		this.series = options.series ? options.series : false;
+	}
+
+	GetType() {
+		return this.mtype;
+	}
+	GetValue() {
+		if (typeof this.mvalue === 'object') {
+			if (MI.Interface.timeslider) {
+				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
+				for (let v of this.mvalue) {
+					if ( (Object.keys(v)[0] > Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] < Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] > seriesval.time) { 
+						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
+					}
+
+				}
+				
+				return Number(seriesval.value);
+				
+			} else { return Number(Object.values(this.mvalue[0])[0]); }
+		} else if (typeof this.mvalue === 'string' && this.mvalue.substring(1).includes('-')) { // look for range but ignore negative numbers
+			return (Number(this.mvalue.split('-')[0]) + Number(this.mvalue.split('-').pop())) / 2; 
+		} else { 
+			return Number(this.mvalue); 
+		}
+	}
+	GetUnit() {
+		return this.munit;
+	}
+	
+	PrintType() {
+		return this.mtype;
+	}
+	PrintValue() {
+		const currencies = ['usd','eur','gbp'];
+		const currency = this.munit.includes('-') ? currencies.filter(v => this.munit.split('-').includes(v)).pop() : currencies.find(v => v.includes(this.munit));
+		
+		if (typeof this.mvalue === 'object') {
+			if (MI.Interface.timeslider) {
+				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
+				for (let v of this.mvalue) {
+					if ( (Object.keys(v)[0] > Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] < Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] > seriesval.time) { 
+						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
+					}
+
+				}
+				return Number(seriesval.value);
+				
+			} else { return Number(Object.values(this.mvalue[0])[0]); }
+		} else { 
+			if (this.mtype === 'date') { return ManifestUtilities.PrintUTCDate(Number(this.mvalue)); } 
+			else {
+				if (currency !== undefined && this.munit !== '') {
+					if (currency === 'usd') { return '$'+this.mvalue; }
+					if (currency === 'eur') { return '€'+this.mvalue; }
+					if (currency === 'gbp') { return '£'+this.mvalue; }				
+				} 
+				else { return this.mvalue; }
+			}
+		}
+	}
+	PrintUnit() {
+		const currencies = ['usd','eur','gbp'];
+		const currency = this.munit.includes('-') ? currencies.filter(v => this.munit.split('-').includes(v)).pop() : currencies.find(v => v.includes(this.munit));
+		
+		if (this.mtype === 'date') { return ''; }
+		else if (currency !== undefined) { return this.munit.split('-').length > 1 ? ' '+this.munit.split('-')[0] : ''; } 
+		else { return this.munit; }
+	}
+	
+	SetType(type) {
+		this.mtype = type;
+	}
+	SetValue(value) {
+		this.mvalue = value;
+	}
+	SetUnit(unit) {
+		this.munit = unit;
 	}
 }

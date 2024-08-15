@@ -123,17 +123,25 @@ class Manifest {
 		for (let n of manifest.nodes) {
 			let ft = {type: 'Feature', properties: {index: n.overview.index, scid: options.id, title: n.overview.name, description: MI.Util.markdowner.makeHtml(n.overview.description), placename: n.location.address, category: n.attributes.category ? n.attributes.category : '', images: n.attributes.image.map(function(s) { return s;}), icon: n.attributes.icon ? n.attributes.icon : '', color: n.attributes.color ? n.attributes.color : '', measures: n.measures.measures, sources: n.attributes.sources.map(function(s) { return s.source;}), notes: MI.Util.markdowner.makeHtml(n.notes.markdown)}, geometry: {type:'Point', coordinates:[n.location.geocode.split(',')[1] ? n.location.geocode.split(',')[1] : '', n.location.geocode.split(',')[0] ? n.location.geocode.split(',')[0] : '']}};
 			
-			ft.properties.measures = ft.properties.measures.sort(function(a,b) { return a.mtype.localeCompare(b.mtype); });
+			// Measure Setup
+			for	(let m in ft.properties.measures) { 
+				let moptions = {};
+				if (ft.properties.measures[m].series || typeof ft.properties.measures[m].mvalue === 'object') { moptions.series = true; }
+				ft.properties.measures[m] = new Measure(ft.properties.measures[m].mtype, ft.properties.measures[m].mvalue, ft.properties.measures[m].munit, moptions);
+			}
+			ft.properties.measures = ft.properties.measures.sort(function(a,b) { return a.GetType().localeCompare(b.GetType()); });
+						
+			let measureobject = [];
 			for	(let m of ft.properties.measures) { 
-				if (!ft.properties.time && (m.mtype === 'starttime' || m.mtype === 'endtime')) { ft.properties.time = {}; if (!d.details.time) { d.details.time = {}; }}
-				if (m.mtype === 'starttime') { 
-					ft.properties.time.start = m.mvalue; 
-					d.details.time.start = d.details.time.start ? Math.min(Number(d.details.time.start), Number(m.mvalue)) : m.mvalue;
-					d.details.time.end = d.details.time.end ? Math.max(Number(d.details.time.end), Number(m.mvalue)) : m.mvalue;
-				} if (m.mtype === 'endtime') { 
-					ft.properties.time.end = m.mvalue;
-					d.details.time.start = d.details.time.start ? Math.min(Number(d.details.time.start), Number(m.mvalue)) : m.mvalue;
-					d.details.time.end = d.details.time.end ? Math.max(Number(d.details.time.end), Number(m.mvalue)) : m.mvalue;
+				if (!ft.properties.time && ['starttime','start','endtime','end'].includes(m.GetType())) { ft.properties.time = new Time(); if (!d.details.time) { d.details.time = new Time(); }}
+				if (['starttime','start'].includes(m.GetType())) { 
+					ft.properties.time.SetStart(m.GetValue()); 
+					d.details.time.SetStart(d.details.time.GetStart() ? Math.min(Number(d.details.time.GetStart()), m.GetValue()) : m.GetValue());
+					d.details.time.SetEnd(d.details.time.GetEnd() ? Math.max(Number(d.details.time.GetEnd()), m.GetValue()) : m.GetValue());
+				} if (['endtime','end'].includes(m.GetType())) { 
+					ft.properties.time.SetEnd(m.GetValue());
+					d.details.time.SetStart(d.details.time.GetStart() ? Math.min(Number(d.details.time.GetStart()), m.GetValue()) : m.GetValue());
+					d.details.time.SetEnd(d.details.time.GetEnd() ? Math.max(Number(d.details.time.GetEnd()), m.GetValue()) : m.GetValue());
 				}
 			}
 			//for (let attr in manifest.nodes[i].attributes) { d.features[i][attr] = manifest.nodes[i].attributes[attr]; }
@@ -144,7 +152,7 @@ class Manifest {
 			}		
 			d.features.push(ft);
 		}
-		if (d.details.time && (d.details.time.start === d.details.time.end)) { d.details.time = null;}
+		if (d.details.time && (d.details.time.GetStart() === d.details.time.GetEnd())) { d.details.time = null;}
 
 		for (let h of d.hops) {
 			h.from = d.features[h.from_stop_id-1]; h.to = d.features[h.to_stop_id-1];
@@ -192,22 +200,45 @@ class Manifest {
 			for (let i = 0; i < sheetpoints.length; i++) { indexmap[sheetpoints[i].index] = i+1; sheetpoints[i].index = i+1; }
 			
 			for (let n of sheetpoints) {
-				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images.split('),('), icon: n.icon ? n.icon : '', color: n.color ? n.color : '', measures: typeof n.measure !== 'undefined' && n.measure !== '' ? n.measure.split('),(').map(function(s) { if (typeof s !== 'undefined' && (s.split(',').length === 3)) { return {mtype:s.split(',')[0].replace('(','').replace(')',''), mvalue:s.split(',')[1], munit:s.split(',')[2].replace('(','').replace(')','')};}}) : [], sources: n.sources.split('),('), notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
+				let ft = {type: 'Feature', properties: {index: n.index, scid: options.id, title: n.name, description: MI.Util.markdowner.makeHtml(n.description), placename: n.location, category: n.category, images: n.images.split('),('), icon: n.icon ? n.icon : '', color: n.color ? n.color : '', sources: n.sources.split('),('), notes: MI.Util.markdowner.makeHtml(typeof n.additionalnotes !== 'undefined' ? n.additionalnotes : '')}, geometry: {type:'Point', coordinates:[n.geocode.split(',')[1] ? n.geocode.split(',')[1] : '', n.geocode.split(',')[0] ? n.geocode.split(',')[0] : '']}};
 				if (ft.properties.sources.length !== 1 || (ft.properties.sources[0].charAt(0) === '(' && ft.properties.sources[ft.properties.sources.length-1].slice(-1) === ')')) { 
 					ft.properties.sources[0] = ft.properties.sources[0].slice(1); 
 					ft.properties.sources[ft.properties.sources.length-1] = ft.properties.sources[ft.properties.sources.length-1].slice(0,-1);
 				}
-				ft.properties.measures = ft.properties.measures.sort(function(a,b) { return a.mtype.localeCompare(b.mtype); });
+				ft.properties.measures = [];
+				
+				if (typeof n.measure !== 'undefined' && n.measure !== '') {
+					ft.properties.measures = n.measure.split('),(').map(function(s) { 
+						if (typeof s !== 'undefined' && (s.split(',').length >= 3)) { 
+							let series = s.includes(':');
+							let rawmeasure = s.split(',');
+							let type = rawmeasure.shift().replace(/[^a-z0-9]/gi,'');
+							let unit = rawmeasure.pop().replace(/[^a-z0-9\-]/gi,'');
+							
+							let value = series ? rawmeasure.map(function(t) { return {[t.split(':')[0].replace(/[^a-z0-9]/gi,'')]: t.split(':')[1].replace(/[^a-z0-9\-]/gi,'')}; }) : rawmeasure.pop().replace(/[^a-z0-9\-]/gi,'');
+							return {mtype:type, mvalue:value, munit:unit, options:{series:series}};
+						}
+					});
+				} 
+				
+				if (ft.properties.measures.length !== 0 && ft.properties.measures[0].mtype.charAt(0) === '(' && ft.properties.measures[ft.properties.measures.length-1].munit.slice(-1) === ')') { 
+					ft.properties.measures[0].mtype = ft.properties.measures[0].mtype.slice(1); 
+					ft.properties.measures[ft.properties.measures.length-1].munit = ft.properties.measures[ft.properties.measures.length-1].munit.slice(0,-1);
+				}
+				for	(let m in ft.properties.measures) { 
+					ft.properties.measures[m] = new Measure(ft.properties.measures[m].mtype, ft.properties.measures[m].mvalue, ft.properties.measures[m].munit, ft.properties.measures[m].options);
+				}
+				ft.properties.measures = ft.properties.measures.sort(function(a,b) { return a.GetType().localeCompare(b.GetType()); });
 				for	(let m of ft.properties.measures) { 
-					if (!ft.properties.time && (m.mtype === 'starttime' || m.mtype === 'endtime')) { ft.properties.time = {}; if (!sheetsc.details.time) { sheetsc.details.time = {}; }}
-					if (m.mtype === 'starttime') { 
-						ft.properties.time.start = m.mvalue; 
-						sheetsc.details.time.start = sheetsc.details.time.start ? Math.min(Number(sheetsc.details.time.start), Number(m.mvalue)) : m.mvalue;
-						sheetsc.details.time.end = sheetsc.details.time.end ? Math.max(Number(sheetsc.details.time.end), Number(m.mvalue)) : m.mvalue;
-					} if (m.mtype === 'endtime') { 
-						ft.properties.time.end = m.mvalue;
-						sheetsc.details.time.start = sheetsc.details.time.start ? Math.min(Number(sheetsc.details.time.start), Number(m.mvalue)) : m.mvalue;
-						sheetsc.details.time.end = sheetsc.details.time.end ? Math.max(Number(sheetsc.details.time.end), Number(m.mvalue)) : m.mvalue;
+					if (!ft.properties.time && ['starttime','start','endtime','end'].includes(m.GetType())) { ft.properties.time = new Time(); if (!sheetsc.details.time) { sheetsc.details.time = new Time(); }}
+					if (['starttime','start'].includes(m.GetType())) { 
+						ft.properties.time.SetStart(m.GetValue()); 
+						sheetsc.details.time.SetStart(sheetsc.details.time.GetStart() ? Math.min(Number(sheetsc.details.time.GetStart()), m.GetValue()) : m.GetValue());
+						sheetsc.details.time.SetEnd(sheetsc.details.time.GetEnd() ? Math.max(Number(sheetsc.details.time.GetEnd()), m.GetValue()) : m.GetValue());
+					} if (['endtime','end'].includes(m.GetType())) { 
+						ft.properties.time.SetEnd(m.GetValue());
+						sheetsc.details.time.SetStart(sheetsc.details.time.GetStart() ? Math.min(Number(sheetsc.details.time.GetStart()), m.GetValue()) : m.GetValue());
+						sheetsc.details.time.SetEnd(sheetsc.details.time.GetEnd() ? Math.max(Number(sheetsc.details.time.GetEnd()), m.GetValue()) : m.GetValue());
 					}
 				}
 
@@ -218,10 +249,7 @@ class Manifest {
 				}
 				ft.properties.images = ft.properties.images.map(function(i) { 
 					let icap = i.split('|'); if (icap.length <= 1) { return { URL: icap[0] }; } else { return {URL: icap[0], caption: icap[1] }; }});
-				if (ft.properties.measures.length !== 0 && ft.properties.measures[0].mtype.charAt(0) === '(' && ft.properties.measures[ft.properties.measures.length-1].munit.slice(-1) === ')') { 
-					ft.properties.measures[0].mtype = ft.properties.measures[0].mtype.slice(1); 
-					ft.properties.measures[ft.properties.measures.length-1].munit = ft.properties.measures[ft.properties.measures.length-1].munit.slice(0,-1);
-				}				
+								
 				
 				sheetsc.stops.push({ local_stop_id:Number(n.index), id:Number(n.index), attributes:ft.properties, geometry:ft.geometry });
 				if (n.destinationindex !== '') {
@@ -232,7 +260,7 @@ class Manifest {
 				}		
 				sheetsc.features.push(ft);
 			}
-			if (sheetsc.details.time && (sheetsc.details.time.start === sheetsc.details.time.end)) { sheetsc.details.time = null;}
+			if (sheetsc.details.time && (sheetsc.details.time.GetStart() === sheetsc.details.time.GetEnd())) { sheetsc.details.time = null;}
 			
 			for (let h of sheetsc.hops) {
 				h.from = sheetsc.features[h.from_stop_id-1]; h.to = sheetsc.features[h.to_stop_id-1];
@@ -517,6 +545,10 @@ class Manifest {
 			a.setAttribute('href', 'data:text/md;charset=utf-8,'+encodeURIComponent(this._manifestToMarkdown(d)));
 			a.setAttribute('download', filename+'.md');
 			a.click();
+		} else if(format === 'embed') {
+			let ecode = `<iframe src="${mbaseurl}${ManifestUtilities.Slugify(d.details.url)}?embed" width="560" height="340" frameborder="0"></iframe>`;
+			navigator.clipboard.writeText(ecode);
+			MI.Interface.ShowMessage('Embed code copied to clipboard.');
 		}
 	}
 
@@ -527,7 +559,7 @@ class Manifest {
 			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
 			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
 				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates[1]+','+node.ref.geometry.coordinates[0]},
-				attributes:{destinationindex:[],image:node.ref.properties.images,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+				attributes:{destinationindex:[],category:node.ref.properties.category,image:node.ref.properties.images,icon:node.ref.properties.icon,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
 			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
 			s.nodes[Number(node.id.split('-')[1])] = n;
 		}
@@ -649,13 +681,13 @@ class ManifestMessenger {
 	}
 
 	Add(url, callback) {
-		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects[obj.oid] = obj; console.log(this.objects);}); 
+		fetch(url).then(c => c.json()).then(d => callback(d)).then(obj => {this.objects[obj.oid] = obj; console.dir(this.objects);}); 
 	}
 	
 	AddObject(oid) {
 		let call = MI.options.serviceurl+'aprsfi/vessel/'+oid;
 		this.Add(call, function(d) {
-			console.log(d);
+			console.dir(d);
 			let vessel = {oid: oid, name: d.entries[0].name, heading: d.entries[0].heading, latlng: new L.latLng(d.entries[0].lat,d.entries[0].lng)};
 			vessel.style = MI.Atlas.styles.live; vessel.style.rotation = vessel.angle = vessel.heading;
 			let tooltipContent = `<div id="tooltip-oid-${oid}" class="mtooltip" style="background: #ffffff; color: #2196F3;">The vessel ${vessel.name} (${d.entries[0].lat},${d.entries[0].lng})</div>`;

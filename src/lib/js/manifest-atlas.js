@@ -53,8 +53,7 @@ class ManifestAtlas {
 						  
 		/* Styles */
 		this.styles = {
-			'point': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 9 },
-			'disabled': { fillColor: '#eeeeee', color: '#999999', radius: 10, weight: 3, opacity: 1, fillOpacity: 1, fontsize: 9 },			
+			'point': { fillColor: '#eeeeee', color: '#999999', radius: 8, weight: 5, opacity: 1, fillOpacity: 1, fontsize: 9 },			
 			'line': { color: '#dddddd', fillColor: '#dddddd', stroke: true, weight: 2, opacity: 0.2, smoothFactor: 1 },
 			'arrow': { rotation: 0, width: 8, height: 5, color: '#dddddd', fillColor: '#dddddd', weight: 2, opacity: 0.4, fillOpacity: 1 },
 			'live': { rotation: 0, width: 16, height: 10, color: '#dbedf9', fillColor: '#2196F3', weight: 2, opacity: 1, fillOpacity: 1 }	
@@ -66,7 +65,7 @@ class ManifestAtlas {
 		this.map.on('popupopen', (e) => { this.PopupOpen(e); });
 		this.map.on('popupclose', (e) => { this.PopupClose(e); });
 		this.map.on('tooltipopen', (e) => { this.TooltipOpen(e); });
-		this.map.on('tooltipclose', (e) => { this.TooltipOpen(e); });
+		this.map.on('tooltipclose', (e) => { this.TooltipClose(e); });
 		
 		//if (document.body.classList.contains('dark')) { this.baselayer = 'dark'; }	
 		this.map.addLayer(this.layerdefs[this.baselayer].layer); 
@@ -103,22 +102,22 @@ class ManifestAtlas {
 	
 	Refresh() { this.map._renderer._redraw(); }
 	
+	
 	Play(mode) {
-		console.log("play");
-		for (let i in MI.Atlas.map._layers) { 
-			//console.log(MI.Atlas.map._layers[i]);
-			
-			if (MI.Atlas.map._layers[i].feature && MI.Atlas.map._layers[i].feature.geometry && MI.Atlas.map._layers[i].feature.geometry.type === 'Point') {
-				//MI.Atlas.map._layers[i].setStyle({fillColor: MI.Atlas.map._layers[i].feature.properties.style.highlightColor});		
-			
-				//console.log(MI.Atlas.map._layers[i].feature);
+		console.log("Playing Manifest");
+		MI.Atlas.BuildPlaylist();
+		MI.Atlas.playlist.runtime = setInterval(MI.Atlas.PlayStep, 10000, mode);
+	}
+	BuildPlaylist() {
+		MI.Atlas.playlist.list = [];
+		for (let i in MI.Atlas.map._layers) { 			
+			if (MI.Atlas.map._layers[i].feature && MI.Atlas.map._layers[i].feature.geometry && MI.Atlas.map._layers[i].feature.properties.type === 'node') {
+				//MI.Atlas.map._layers[i].setStyle({fillColor: MI.Atlas.map._layers[i].feature.properties.style.highlightColor});					
 				MI.Atlas.playlist.list.push(MI.Atlas.map._layers[i]);
 			}
 		}
 		MI.Atlas.playlist.list = MI.Atlas.playlist.list.sort(
-		    (p1, p2) => (p1.feature.properties.lid > p2.feature.properties.lid) ? 1 : (p1.feature.properties.lid < p2.feature.properties.lid) ? -1 : 0);
-		
-		MI.Atlas.playlist.runtime = setInterval(MI.Atlas.PlayStep, 10000, mode);
+		    (p1, p2) => (p1.feature.properties.lid > p2.feature.properties.lid) ? 1 : (p1.feature.properties.lid < p2.feature.properties.lid) ? -1 : 0);		
 	}
 	PlayStep(mode) {
 		if (mode === 'tour') {
@@ -149,7 +148,10 @@ class ManifestAtlas {
 		this.map.setView(e.popup._latlng, this.map.getZoom());
 
 		if (!e.popup._source.feature.properties.angle) { this.MapPointClick(this.active_point); }
-		e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});				
+		
+		if (!e.popup._source.feature.properties.disabled) {
+			e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.highlightColor});	
+		}			
 	}
 	
 	PopupHandlers(e) {
@@ -173,7 +175,9 @@ class ManifestAtlas {
 		this.SetActivePoint(null); 		
 		if (typeof e.popup._source !== 'undefined') {
 			if (e.popup._source.feature.properties.type === 'node') {
-				e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.fillColor});		
+				if (!e.popup._source.feature.properties.disabled) {
+					e.popup._source.setStyle({fillColor: e.popup._source.feature.properties.style.fillColor});		
+				}
 			}
 		}
 	}
@@ -299,8 +303,12 @@ class ManifestAtlas {
 		layer.on('click', (e) => { let toolTip = layer.getTooltip(); if (toolTip) { layer.closeTooltip(toolTip);} });		
 		layer.on('mouseover', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOver(e, l, f); });
 		layer.on('mouseout', (e, l=layer, f=feature) => { MI.Atlas.PointMouseOut(e, l, f); });	
-		
+				
 		layer.setStyle(feature.properties.style); 	
+		if (feature.properties.clustered.length > 0) { 
+			layer.setStyle({weight: feature.properties.style.radius * 2, opacity:0.4}); 
+		}
+		 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
 	PopMLink(str) { return str.replaceAll('class="manifest-link"','class="manifest-link" onclick="MI.Interface.Link(event.target.href, event);"'); }
@@ -335,13 +343,13 @@ class ManifestAtlas {
 							this.map.setView(l._latlng, zoomlevel, {reset: true, animate:false}); 									
 						}
 						if (!options.flyto) {
-							if (!MI.options.storyMap && !MI.options.embed) { if (options.open) { l.openPopup(); } }
+							if (!MI.options.storyMap) { if (options.open) { l.openPopup(); } }
 							else {  								
 								if (this.map.getBounds().contains(l._latlng)) { this.map.flyTo(l._latlng, this.map.getZoom(), {updateWhenZooming: false, duration: 1});
 								} else { this.map.setView(l._latlng, this.map.getZoom(), {animate: false}); }
 							}						
 						} else {
-							if (!MI.options.storyMap && !MI.options.embed) {
+							if (!MI.options.storyMap) {
 								this.map.flyTo(l._latlng, this.map.getZoom()); 		
 							} else {
 								let sid = MI.supplychains[0].details.id;
@@ -350,11 +358,17 @@ class ManifestAtlas {
 								this.map.flyTo(l._latlng, zoomlevel); 				
 							}
 							this.SetActivePoint({_latlng: l.feature.properties.latlng}); 
-							l.setStyle({fillColor: l.feature.properties.style.highlightColor});	
+							if (!l.feature.properties.disabled) {							
+								l.setStyle({fillColor: l.feature.properties.style.highlightColor});	
+							}
 						}
 					} 
 				}
-				else if (options.flyto) { l.setStyle({fillColor: l.feature.properties.style.fillColor, color: l.feature.properties.style.color});}
+				else if (options.flyto) { 
+					if (!l.feature.properties.disabled) {							
+						l.setStyle({fillColor: l.feature.properties.style.fillColor, color: l.feature.properties.style.color});
+					}
+				}
 			}
 		} 
 		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) {
@@ -367,8 +381,9 @@ class ManifestAtlas {
 		if (node === null) { return; }
 		let id = null;		
 		
-		if (typeof node === 'object') { id = node._popup._source.feature.properties.lid; 
-		} else { id = node; if (document.getElementById('node_'+id)) { MI.Atlas.PointFocus(id); /* replacing: document.getElementById('node_'+id).click();*/ } else { return; } }
+		if (typeof node === 'object' && node._popup) { 
+			id = node._popup._source.feature.properties.lid; 
+		} else { id = node; if (document.getElementById('node_'+id)) { MI.Atlas.PointFocus(id); } else { return; } }
 	
 		let offset = 0;
 		
@@ -379,26 +394,29 @@ class ManifestAtlas {
 		
 		if (!MI.initialized) {
 			document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
-		} else {
+		} else if (!MI.options.embed) {
 			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('node_'+id).offsetTop + (-1*offset), behavior: speed});	
-		}
+		} else if (MI.options.embed){ 			
+			document.getElementsByClassName('mlist')[0].scrollTo({left: document.getElementById('node_'+id).offsetLeft - ManifestUtilities.RemToPixels(1), top: 0, behavior:'instant'});		
+		} 
 	}
 	
 	PointMouseOver(e, layer, feature) { 
-		layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); 
-		
+		if (!layer.feature.properties.disabled) {	
+			layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); 
+		}
 		if (MI.options.hoverHighlight) {
 		for (let l in MI.Atlas.map._layers) {
 			if (MI.Atlas.map._layers[l].feature && typeof MI.Atlas.map._layers[l].feature.properties.connections === 'undefined' &&
 				MI.Atlas.map._layers[l].feature.properties.lid !== feature.properties.lid) {
 					if (!(this.active_point) || (this.active_point && 
 						MI.Atlas.map._layers[l].feature.properties.lid !== this.active_point._popup._source.feature.properties.lid)) { 
-							MI.Atlas.map._layers[l].setStyle({fillOpacity:0.5, opacity:0.5});
+						MI.Atlas.map._layers[l].setStyle({fillOpacity:0.5, opacity:0.5});
 					}
 			} else if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.connections && 
 						MI.Atlas.map._layers[l].feature.properties.connections.from.properties.lid !== feature.properties.lid && 
 						MI.Atlas.map._layers[l].feature.properties.connections.to.properties.lid !== feature.properties.lid) {
-					MI.Atlas.map._layers[l].setStyle({fillOpacity:0.1, opacity:0.1});
+						MI.Atlas.map._layers[l].setStyle({fillOpacity:0.1, opacity:0.1});
 				}
 		}}
 		if (feature.properties.clustered.length > 0) {
@@ -407,26 +425,26 @@ class ManifestAtlas {
 			let measuretotal = 0;
 			let tooltipDynamic = '';
 			
-			if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
-				let findmeasure = feature.properties.measures.find(m => m.mtype === measuretype);				
-				if (findmeasure && findmeasure.mvalue !== '') { 
-					measuretotal += Number(findmeasure.mvalue);
+			if (!['starttime','endtime','start','end','none'].includes(measuretype)) {
+				let findmeasure = feature.properties.measures.find(m => m.GetType() === measuretype);		
+				if (findmeasure && findmeasure.GetValue() !== '') { 
+					measuretotal += Number(findmeasure.GetValue());
 					let measureround = (Math.round((measuretotal + Number.EPSILON) * 100) / 100);
 					measureround = (measureround === 0) ? ' > 0.01' : measureround; 
-					tooltipDynamic = '('+measureround+findmeasure.munit+' total)'; 
+					tooltipDynamic = '('+new Measure(findmeasure.GetType(),measureround,findmeasure.GetUnit()).PrintValue()+findmeasure.PrintUnit()+' total)'; 
 				}
 			}
 			
 			if (!feature.properties.hidden) { ccount++; }
 			for (let i in feature.properties.clustered) { if (!feature.properties.clustered[i].properties.hidden) { 
 				ccount++; 
-				if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
-					let findmeasure = feature.properties.clustered[i].properties.measures.find(m => m.mtype === measuretype);
-					if (findmeasure && findmeasure.mvalue !== '') { 
-						measuretotal += Number(findmeasure.mvalue);
+				if (!['starttime','endtime','start','end','none'].includes(measuretype)) {
+					let findmeasure = feature.properties.clustered[i].properties.measures.find(m => m.GetType() === measuretype);
+					if (findmeasure && findmeasure.GetValue() !== '') { 
+						measuretotal += Number(findmeasure.GetValue());
 						let measureround = (Math.round((measuretotal + Number.EPSILON) * 100) / 100);						
 						measureround = (measureround === 0) ? ' > 0.01' : measureround; 
-						tooltipDynamic = '('+measureround+findmeasure.munit+' total)'; 
+						tooltipDynamic = '('+new Measure(findmeasure.GetType(),measureround,findmeasure.GetUnit()).PrintValue()+findmeasure.PrintUnit()+' total)'; 
 					}
 				}
 			} }
@@ -437,18 +455,18 @@ class ManifestAtlas {
 			} }
 			tooltipList += '}';
 			
-			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> Cluster of ${ccount} Nodes ${tooltipDynamic}<br>${tooltipList}</div>`;
+			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> <strong>Cluster of ${ccount} Nodes</strong> ${tooltipDynamic}<br>${tooltipList}</div>`;
 			layer.setTooltipContent(tooltipContent);	
 		} else {
 			const measuretype = document.getElementById('measure-choices').value;	
 			let tooltipTitle = feature.properties.title; 
 			let tooltipDynamic = '';
-			if (measuretype !== 'none' && measuretype !== 'starttime' && measuretype !== 'endtime') {
-				let findmeasure = feature.properties.measures.find(m => m.mtype === measuretype);
-				if (findmeasure && findmeasure.mvalue !== '') { 
-					let measureround = (Math.round((Number(findmeasure.mvalue) + Number.EPSILON) * 100) / 100);
+			if (!['starttime','endtime','start','end','none'].includes(measuretype)) {
+				let findmeasure = feature.properties.measures.find(m => m.GetType() === measuretype);
+				if (findmeasure && findmeasure.GetValue() !== '') { 
+					let measureround = (Math.round((Number(findmeasure.GetValue()) + Number.EPSILON) * 100) / 100);
 					measureround = (measureround === 0) ? ' > 0.01' : measureround; 
-					tooltipDynamic = '('+measureround+findmeasure.munit+')'; 
+					tooltipDynamic = '('+new Measure(findmeasure.GetType(),measureround,findmeasure.GetUnit()).PrintValue()+findmeasure.PrintUnit()+')'; 
 				}
 			}
 			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.textColor}">${tooltipTitle} ${tooltipDynamic}</div>`;
@@ -457,10 +475,12 @@ class ManifestAtlas {
 	}
 	
 	PointMouseOut(e, layer, feature) { 
-		layer.setStyle({fillColor: layer.feature.properties.style.fillColor, color: layer.feature.properties.style.color});
+		if (!layer.feature.properties.disabled) {
+			layer.setStyle({fillColor: layer.feature.properties.style.fillColor, color: layer.feature.properties.style.color});
+		}
 		if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
 			if (this.active_point._popup._source._leaflet_id === e.sourceTarget._leaflet_id) {
-				if (!feature.properties.hidden) { layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); }
+				if (!feature.properties.hidden && !feature.properties.disabled) { layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); }
 			}
 		}
 		if (MI.options.hoverHighlight) {
@@ -482,16 +502,50 @@ class ManifestAtlas {
 		const measureSort = document.getElementById('measure-choices').value;
 	
 		if (ft && layer) {
-			//let newStyle = this.GetScaledProperties(ft, measureSort);
-			//let newRadius = newStyle.radius; 
-			//let newFill = newStyle.disabled ? MI.Atlas.styles.disabled.fillColor : ''; let newColor = newStyle.disabled ? MI.Atlas.styles.disabled.color : '';
 			let newRadius = this.GetScaledRadius(ft, measureSort);
-			layer.setStyle({ radius: newRadius }); return;
+			
+			if (measureSort !== 'none' && !(ft.properties.measures.some(m => (m.GetType() === measureSort && m.GetValue() !== 0)))) {
+				ft.properties.disabled = true;
+				layer.setStyle({fillColor: tinycolor(ft.properties.style.fillColor).lighten(20).toString()}); 
+				layer.setStyle({ radius: newRadius }); return;
+			} else {
+				ft.properties.disabled = false;		
+				layer.setStyle(ft.properties.basestyle);
+				if (ft.properties.clustered.length > 0) { layer.setStyle({weight: ft.properties.style.radius * 2, opacity:0.4}); }
+
+				if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
+					if (this.active_point._popup._source.feature.properties.lid === ft.properties.lid) {
+						layer.setStyle({fillColor: layer.feature.properties.style.highlightColor}); 
+					}
+				}
+				layer.setStyle({ radius: newRadius });
+				layer.bringToFront(); return;
+			}
 		}
-		for (let l in this.map._layers) {
+
+		for (let l in this.map._layers) {			
 			if (this.map._layers[l].feature && this.map._layers[l].feature.properties.type === 'node') {
 				let newRadius = this.GetScaledRadius(this.map._layers[l].feature, measureSort);
-				this.map._layers[l].setStyle({ radius: newRadius });
+				
+				if (measureSort !== 'none' && !(this.map._layers[l].feature.properties.measures.some(m => (m.GetType() === measureSort && m.GetValue() !== 0)))) {
+					this.map._layers[l].feature.properties.disabled = true;
+					this.map._layers[l].setStyle({fillColor: tinycolor(this.map._layers[l].feature.properties.style.fillColor).lighten(30).toString()});
+					this.map._layers[l].setStyle({ radius: newRadius });
+					
+				} else {
+					this.map._layers[l].feature.properties.disabled = false;				
+					this.map._layers[l].setStyle(this.map._layers[l].feature.properties.basestyle);
+					if (this.map._layers[l].feature.properties.clustered.length > 0) { this.map._layers[l].setStyle({weight: this.map._layers[l].feature.properties.style.radius * 2, opacity:0.4}); }
+					
+					if (this.active_point !== null && typeof this.active_point._popup !== 'undefined') {
+						if (this.active_point._popup._source.feature.properties.lid === this.map._layers[l].feature.properties.lid) {
+							this.map._layers[l].setStyle({fillColor: this.map._layers[l].feature.properties.style.highlightColor}); 
+						}
+					}
+					this.map._layers[l].setStyle({ radius: newRadius });
+					this.map._layers[l].bringToFront();
+				}
+				
 			}
 		}
 		MI.Visualization.Update();
@@ -502,15 +556,26 @@ class ManifestAtlas {
 		if (!ft && !MI.Atlas.active_point || MI.Visualization.type !== 'map') { return; } else { if (!ft && MI.Atlas.active_point._popup._source) { ft = MI.Atlas.active_point._popup._source.feature; }}	
 		let ccount = 0, maxcount = 1;
 		
-		let closedcats = [];
-		document.getElementById('supplycategories').querySelectorAll('.supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
-		document.getElementById('map').querySelectorAll('.clusterbox').forEach(el => { 
-			let text = el.textContent.toLowerCase();
-	        if (text.indexOf(s) !== -1 && !(closedcats.some(text.includes.bind(text)))) { el.style.display = 'block'; } else { el.style.display = 'none'; }		
-	    });	
+		//let closedcats = [];
+		//document.getElementById('supplycategories').querySelectorAll('.supplycat input').forEach(el => { if (!el.checked) { closedcats.push(el.value.split('-')[1]); }});
+		//document.getElementById('map').querySelectorAll('.clusterbox').forEach(el => { 
+		//	let text = el.textContent.toLowerCase();
+	      //  if (text.indexOf(s) !== -1 && !(closedcats.some(text.includes.bind(text)))) { el.style.display = 'block'; } else { el.style.display = 'none'; }		
+	    //});	
 				
 		if (!ft.properties.hidden) { ccount++; }
-		for (let i in ft.properties.clustered) { if (!ft.properties.clustered[i].properties.hidden) { ccount++; } maxcount++; }
+		for (let i in ft.properties.clustered) { 
+			if (!ft.properties.clustered[i].properties.hidden) { 
+				ccount++; 
+				if (document.getElementById('popup-'+ft.properties.clustered[i].properties.lid)) {
+					document.getElementById('popup-'+ft.properties.clustered[i].properties.lid).style.display = 'block'; }
+			} 
+			else { 
+				if (document.getElementById('popup-'+ft.properties.clustered[i].properties.lid)) { 
+					document.getElementById('popup-'+ft.properties.clustered[i].properties.lid).style.display = 'none'; } 
+			}
+			maxcount++; 
+		}	
 
 		if (ccount === 0) {  if (MI.Atlas.active_point) { MI.Atlas.active_point.closePopup(); }  return; }
 		else if (ccount === maxcount) { document.getElementById('map').querySelectorAll('.cluster-count').forEach(el => { el.textContent = maxcount; }); } 
@@ -545,15 +610,15 @@ class ManifestAtlas {
 			const nodeId = document.getElementsByClassName('mlist')[index].childNodes[0].id.split('_')[1];
 
 			if (MI.Visualization.type === 'map') { 
-				if (MI.options.urlparams.zoom || MI.options.storyMap || MI.options.embed || (MI.supplychains.length === 1 && MI.supplychains[0].setOptions && MI.supplychains[0].setOptions.zoom)) {
-					if (MI.options.storyMap || MI.options.embed) { 
+				if (MI.options.urlparams.zoom || MI.options.storyMap || (MI.supplychains.length === 1 && MI.supplychains[0].setOptions && MI.supplychains[0].setOptions.zoom)) {
+					if (MI.options.storyMap) { 
 						let sid = MI.supplychains[0].details.id, ll;
 						
 						for (let i in this.map._layers) {		
 							if (typeof this.map._layers[i].feature !== 'undefined' && this.map._layers[i].feature.properties.lid === Number(nodeId)) {
 								let offset = document.documentElement.clientHeight/2 - document.getElementById('mheader-'+sid).offsetHeight/2;
-								ll = this.map.unproject(this.map.project(new L.latLng(this.map._layers[i].feature.geometry.coordinates[1],this.map._layers[i].feature.geometry.coordinates[0]),MI.options.zoom)); 
-    							ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x, this.map.latLngToContainerPoint(ll).y-offset]);
+								ll = this.map.unproject(this.map.project(new L.latLng(this.map._layers[i].feature.geometry.coordinates[1],this.map._layers[i].feature.geometry.coordinates[0]),MI.options.zoom),MI.options.zoom); 
+    							ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x, this.map.latLngToContainerPoint(ll).y-offset]);								
 							}
 						}
 						MI.Atlas.map.setView(ll, MI.options.zoom, {animate: false}); 
@@ -572,30 +637,31 @@ class ManifestAtlas {
 			document.getElementById('mapcapture').classList.add('closed'); }	
 		this.Refresh();
 	}
-	GetRadius(ft, cluster=true) {
-		if (cluster && ft.properties.clustered) { return Math.min(ft.properties.clustered.length*5+this.radius,30); } else { return this.radius; }
-	}
-	
-	GetScaledRadius(ft, measureSort) {
-		let newRadius = this.GetRadius(ft, measureSort === 'none');
-		if (ft.properties.measures.some(m => m.mtype === measureSort)) {
-			const measureVal = ft.properties.measures.filter(m => { return m.mtype === measureSort; }).pop().mvalue;
-			const measureMax = MI.supplychains[ft.properties.index].details.measures[measureSort].max;				
-			newRadius = Math.max((MI.Atlas.styles.point.radius - 2), (this.GetRadius(ft, measureSort === 'none') / 2) + 40 * (measureVal / measureMax));				
+
+	GetScaledRadius(ft, sort, cluster=true) {
+		let measureVal = 0, measureMin = 1, measureMax = 1;
+		const measureSort = sort;
+
+		if (ft.properties.measures.some(m => m.GetType() === measureSort)) {
+			measureVal += ft.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop().GetValue();
+			measureMin = MI.supplychains[ft.properties.index].details.measures[measureSort].min;		
+			measureMax = MI.supplychains[ft.properties.index].details.measures[measureSort].max;
 		}
-		return newRadius;
-	}
-	
-	GetScaledProperties(ft, measureSort) {
-		let newRadius = this.GetRadius(ft, measureSort === 'none');
-		let propMatch = false;
-		if (ft.properties.measures.some(m => m.mtype === measureSort)) {
-			const measureVal = ft.properties.measures.filter(m => { return m.mtype === measureSort; }).pop().mvalue;
-			const measureMax = MI.supplychains[ft.properties.index].details.measures[measureSort].max;				
-			newRadius = Math.max((MI.Atlas.styles.point.radius - 2), (this.GetRadius(ft, measureSort === 'none') / 2) + 40 * (measureVal / measureMax));	
-			propMatch = true;			
+		if (cluster && ft.properties.clustered.length > 0) {
+			for (let cl of ft.properties.clustered) {
+				if (cl.properties.measures.some(m => m.GetType() === measureSort)) {
+					measureVal += cl.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop().GetValue();
+					measureMin = MI.supplychains[cl.properties.index].details.measures[measureSort].min;		
+					measureMax = MI.supplychains[cl.properties.index].details.measures[measureSort].max;
+				}
+			}
 		}
-		return {radius: newRadius, disabled: !propMatch};
+		
+		if (measureSort === 'none') { return this.radius; } 
+		else { return MI.Atlas._linearScale(measureVal,this.radius,20,measureMin,measureMax); }
+	}
+	_linearScale(unscaledNum, minAllowed, maxAllowed, min, max) {
+	  return Math.max(minAllowed,(maxAllowed - minAllowed) * (unscaledNum - min) / (max - min) + minAllowed || 0);
 	}
 	
 	SwitchBasemap(map, tile) {

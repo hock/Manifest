@@ -47,8 +47,9 @@
 		} 
 	}
 	#manifestbar { 
-		border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); overflow-x:scroll; background:@m-purple-bright; color:#fff; max-height: 100%;
+		border-radius:0.25rem; position: absolute; top: 0; left: 0; margin:1rem; width: 25rem; height:auto; padding:1rem 1rem 1rem 1rem; font-size:1.2rem; z-index:12500; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); overflow-x:scroll; background:@m-purple-bright; color:#fff; max-height: calc(100% - 4rem);
 		#minfoheader {
+			background:#4d34db;position:sticky;top:-1rem;padding:1rem;margin:-1rem;
 			#minfo { 
 				cursor:pointer; margin-left:0.25rem; width:calc(100% - 4rem); display:inline-block; vertical-align:bottom; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
 				#logotype { letter-spacing:-0.05rem;}
@@ -86,9 +87,9 @@
 	}
 	
 	#fullscreen-modal { 
-		background-color:#000000dd; position: absolute; top: 0; left: 0; margin:0; width: 100%; height: 100vh; z-index:50001; cursor:zoom-out;
+		background-color:#000000dd; position: absolute; top: 0; left: 0; margin:0; width: 100%; height: 100%; max-height:100%; z-index:50001; cursor:zoom-out; overflow:hidden;
 		#full-modal { 
-			position: absolute; top: 1rem; left: 1rem; bottom: 1rem; right:1rem; margin:0; width: calc(100vw - 2rem); height: calc(100vh - 2rem);  z-index:50001;  
+			position: absolute; top: 1rem; left: 1rem; bottom: 1rem; right:1rem; margin:0; width: calc(100vw - 2rem); height: calc(100% - 2rem);  max-height:100%; z-index:50001;  
 			display:flex; flex-direction: column;
 
 			#full-modal-image {
@@ -244,20 +245,23 @@
 			margin-bottom:1rem;
 			&.collected-samples { margin:1rem 0 0.5rem 0; }
 			#samples-spacer {
-				width:calc(100% - 3rem); height:calc(3rem + 2px); overflow:hidden;
+				width:calc(100% - 3rem); height:calc(3.5rem + 2px); overflow:hidden;
 			}
 			#samples-previews { width:calc(100% - 3rem); height:auto;
 			
 				&.open {
-					position:absolute;
 					height:auto;
+					max-height:calc(100% - 26rem);
 					background:#edebfb;
 					border-radius:0.25rem;
 					overflow-x:scroll; margin:calc(-0.5rem - 1px); padding:0.5rem;
 					border:1px solid #000;
 					box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2); 
+					
 					.sample-preview { display:block; background-color:#f6f5fd; }
 				}
+				&.open:not(.scroll) { position:fixed;width:24rem; }
+				&.open.scroll { position:absolute;width:24rem; }
 			    
 				.sample-preview {
 					width:calc(100% - 4rem); padding:0.25rem 0.25rem 0.25rem 3.5rem; border:1px solid #ccc; margin:0.25rem 0;
@@ -291,6 +295,10 @@
 	#load-samples-input, #load-custom-input { width:75%; padding: .375rem .25rem .375rem .25rem; font-size: 1rem; font-weight: 400; line-height: 1.5; vertical-align: middle; border: 1px solid; border-radius: .25rem; -webkit-appearance: none; -moz-appearance: none; outline: none; display:none; color: #222; background-color: #fff; border-color: #ccc; } 
 	#load-samples-btn, #load-custom-btn { width:3rem; display: inline-block; float:left; font-weight: 400; line-height: 1; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; line-height:1.5; padding: 0; margin-left:0.25rem; font-size: 1.25rem; border-radius: 0.25rem; border:none; color: @m-purple-bright; background:none; 
 		&:hover { color:#fff; background-color:@m-purple-bright;}
+	}
+	#open-collection-btn { width:calc(100% - 0.5rem); padding: .375rem .25rem .375rem .25rem; font-size: 1rem; font-weight: 400; line-height: 1.5; vertical-align: middle; border: 1px solid; border-radius: .25rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; outline: none; background-color:@m-purple-bright;border-color:@m-purple-bright;color:#fff; text-align:center; cursor:pointer; margin-top:1rem; 
+		a { text-decoration:none; }
+		&:hover { background-color:#5e45ec;border-color:#5e45ec; }
 	}
 	#load-custom-input { margin-left:0.25rem;}
 	#loadlist-group-custom {
@@ -527,8 +535,12 @@
 			}
 		}
 	}
-	.leaflet-tooltip { border-radius: 0; border:none;}
-	.leaflet-tooltip div.mtooltip { border-radius: 0.25rem; border:2px solid #fff;line-height:0.8rem; margin: -7px; padding: 0.5rem; text-align:center;}
+	.leaflet-tooltip { border-radius: 0; border:none;
+		div.mtooltip { 
+			border-radius: 0.25rem; border:2px solid #fff;line-height:0.8rem; margin: -7px; padding: 0.5rem; 
+			text-align:center; white-space: normal; width: max-content; max-width: 20rem; 
+		}
+	}
 	.leaflet-popup-content { min-width:22rem; }
 	
 	/* Manifest Splash */
@@ -592,9 +604,12 @@
 			#mapmenu, #mapcapture, #fullscreen-menu, .leaflet-control-layers, #mapcapture, .leaflet-control-zoomhome, .leaflet-control-attribution, .fulltext, .fas.closemap, .leaflet-left .leaflet-control, .leaflet-popup-pane, .leaflet-tooltip-pane, .footer, .share-button, #time-slider {display:none;}
 	
 			#manifestbar { position: absolute; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000; overflow-x:scroll; max-height: calc(100% - 4rem);
-				#minfoheader { padding:0.75rem 1rem;}
+				#minfoheader { background:#4d34db;position:sticky;top:0;padding:0.75rem 1rem;margin:0;}
 				#minfodetail { padding:0.1rem 1rem 1rem 1rem; margin:0; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);}
 			} 
+			#loadlistpanel #loadlist-group-samples #samples-previews.open:not(.scroll), #loadlistpanel #loadlist-group-samples #samples-previews.open.scroll { 
+			    width: calc(100% - 4rem);
+			}
 			#view-wrapper { 
 				position: absolute; top:0; height: 100%; width: 100%; display: block; outline:none;
 				#map { position: relative; top:0; height: 100%; width: 100%; display: block; outline:none;}
@@ -606,7 +621,7 @@
 					#viz-choices, #measure-choices {
 						background:@m-grey;border:1px solid @m-grey-border; color:#333;
 						text-align:center; text-align-last: center; padding:0.25rem; line-height:1rem;
-						box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); border-radius: 1rem;
+						box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2); border-radius: 1rem; 
 						option { text-align:center; text-align-last: center; }
 				
 					}

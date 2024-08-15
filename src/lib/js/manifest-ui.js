@@ -18,7 +18,7 @@ class ManifestUI {
 	
 	/** Called after Manifest has been initialized and the first supply chain loaded **/ 
 	CleanupInterface() { 	
-		console.log(MI); 
+		console.dir(MI); 
 		document.getElementById('load-custom').addEventListener('change', function() {
 			const selected = document.getElementById('load-custom').value;
 			if (selected === 'url') { 
@@ -100,6 +100,10 @@ class ManifestUI {
 	Embedize() {
 		document.body.classList.add('embedmap');
 		window.dispatchEvent(new Event('resize'));
+		
+		let embedcontrols = `<div id="embed-left"><i class="fas fa-caret-left"></i></div><div id="embed-right"><i class="fas fa-caret-right"></i></div>`;
+		document.getElementById('manifestlist').insertAdjacentHTML('beforeend', embedcontrols);
+		
 		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
 	
@@ -110,21 +114,43 @@ class ManifestUI {
 		for (let s in MI.supplychains) { 
 			if (MI.supplychains[s].details.time) {
 				timeset = true;
-				if (MI.supplychains[s].details.time.start) { starttime = Number(MI.supplychains[s].details.time.start); }
-				if (MI.supplychains[s].details.time.end) { endtime = Number(MI.supplychains[s].details.time.end); }
+				if (MI.supplychains[s].details.time.GetStart()) { starttime = MI.supplychains[s].details.time.GetStart(); }
+				if (MI.supplychains[s].details.time.GetEnd()) { endtime = MI.supplychains[s].details.time.GetEnd(); }
 			}
 		}
 		if (timeset) {
 			document.getElementById('time-slider').innerHTML = `<div id="timer-lower-value"></div> <div id="time-control-wrap"><div id="time-control"></div></div> <div id="timer-upper-value"></div>`;
 			MI.Interface.timeslider = new DualHRange('time-control', { lowerBound: starttime, upperBound:endtime, lower: starttime, upper: endtime });
 			MI.Interface.timeslider.addEventListener('update', (event) => {
-				let searchvalue = document.getElementById('searchbar').value; MI.Interface.ClearSearch(); MI.Interface.Search(searchvalue, true);
-				
+				MI.Interface.OnTimeUpdate();
+		
 				document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.lower);
 				document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.upper);	
 			}, {passive: true} );
 			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(starttime);
 			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(endtime);
+		}
+	}
+	
+	OnTimeUpdate() {
+		let searchvalue = document.getElementById('searchbar').value; MI.Interface.ClearSearch(); MI.Interface.Search(searchvalue, true);
+		if (document.getElementById('measure-choices').querySelectorAll('option[data-series]').length > 0) {
+			MI.Atlas.MeasureSort();
+			MI.Visualization.Update();
+
+			document.getElementById('manifestlist').querySelectorAll('.mnode .mvalue').forEach(el => { 
+				document.getElementById('measure-choices').querySelectorAll('option').forEach(op => { 						
+				if (op.dataset.series && el.parentElement.dataset.measure === op.value) {
+					const lid = Number(el.parentElement.parentElement.parentElement.parentElement.id.split('_')[1]);
+					const checkop = op;
+					for (let l in MI.Atlas.map._layers) {
+						if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.type === 'node' && MI.Atlas.map._layers[l].feature.properties.lid === lid) {
+							let findmeasure = MI.Atlas.map._layers[l].feature.properties.measures.find(m => m.GetType() === checkop.value);		
+							el.textContent = findmeasure.PrintValue();
+						}
+					}
+				}
+			}); });
 		}
 	}
 	SetupObserver() {
@@ -190,12 +216,15 @@ class ManifestUI {
 			if (document.getElementById('manifestbar').classList.contains('open')) { 
 				document.body.classList.add('launcher');
 				document.getElementById('sidepanel').style.top = document.getElementById('manifestbar').offsetHeight + ManifestUtilities.RemToPixels(1) + 'px'; 
+				if (document.getElementById('manifestbar').scrollHeight > document.getElementById('manifestbar').clientHeight) {
+					document.getElementById('manifestbar').classList.add('scroll'); document.getElementById('samples-previews').classList.add('scroll');			
+				} else { if (document.getElementById('manifestbar').classList.contains('scroll')) { document.getElementById('manifestbar').classList.remove('scroll'); document.getElementById('samples-previews').classList.remove('scroll'); } }
 			} else { document.body.classList.remove('launcher'); document.getElementById('sidepanel').style.top = '4rem'; }
 		}
 		else { if (document.getElementById('sidepanel').style.top !== 0) { document.getElementById('sidepanel').style.top = ''; } }
 	}
 
-	LoadFromLauncher(value, close=true) {
+	LoadFromLauncher(value, close=true, silent=false) {
 		let unloaded = false, loadurl, id, type, idref;
 		
 		if (value === 'url') {
@@ -223,19 +252,25 @@ class ManifestUI {
 		if (!unloaded && id) {
 			if (MI.Interface.IsMobile()) { for (let s in MI.supplychains) { MI.Supplychain.Remove(MI.supplychains[s].details.id); } }
 			fetch(loadurl).then(r => {
-				if (r.status === 404) { this.ShakeAlert(document.getElementById('manifestbar'));  this.ShowMessage("We couldn't find a valid Manifest format at that address."); }
-				else if (!r.ok) { this.ShakeAlert(document.getElementById('manifestbar')); r.text().then(e => { this.ShowMessage(e); }); } 
+				if ([400,401,403,404,405,408,409].includes(r.status)) { this.ShakeAlert(document.getElementById('manifestbar'));  this.ShowMessage("We couldn't find a valid Manifest format at that address."); }
+				else if ([500,501,502,503,504,505].includes(r.status)) { this.ShakeAlert(document.getElementById('manifestbar'));  this.ShowMessage("There is a problem at the Manifest Server."); }
+				else if (!r.ok) { if (!silent) { this.ShakeAlert(document.getElementById('manifestbar')); } r.text().then(e => { this.ShowMessage(e); }); } 
 				else { r.json().then(d => { 
 					let m = (type === 'gsheet') ? {
 						g: d[0], r: d[1] } : d; MI.Process(type, m, {id: id, idref: idref, url:loadurl, start:(MI.supplychains.length === 0)});})
 				.catch( err => {
-					this.ShakeAlert(document.getElementById('manifestbar'));  this.ShowMessage("We couldn't find a valid Manifest format at that address.");
+					if (!silent) { this.ShakeAlert(document.getElementById('manifestbar')); } this.ShowMessage("We couldn't find a valid Manifest format at that address.");
 				}).then(function() { 
 					if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element, true);}});}});
 			if (close) { MI.Interface.ShowLauncher(); }
-		} else { this.ShakeAlert(document.getElementById('manifestbar')); }
+		} else { if (!silent) { this.ShakeAlert(document.getElementById('manifestbar')); } }
 	}
 	
+	LoadLauncherCollection() {
+		document.getElementById('load-samples').querySelectorAll('option').forEach(el => { 
+			MI.Interface.LoadFromLauncher(el.value, true, true);
+		});	
+	}
 	/** A simple text match search **/
 	Search(term) {
 		if (term) { document.getElementById('searchbar').value = term; }
@@ -257,10 +292,10 @@ class ManifestUI {
 				let testcat = cats[0].dataset.cat.toLowerCase();
 				
 				if (MI.Interface.timeslider && el.querySelectorAll('.node-time').length !== 0 && (el.querySelectorAll('.node-time')[0].dataset.start || el.querySelectorAll('.node-time')[0].dataset.end)) {
-					let starttime = el.querySelectorAll('.node-time')[0].dataset.start ? Number(el.querySelectorAll('.node-time')[0].dataset.start) : MI.Interface.timeslider.lowerBound;
-					let endtime = el.querySelectorAll('.node-time')[0].dataset.end ? Number(el.querySelectorAll('.node-time')[0].dataset.end) : starttime;
+					//const nodetime = new Time(el.querySelectorAll('.node-time')[0].dataset.start ? Number(el.querySelectorAll('.node-time')[0].dataset.start) : MI.Interface.timeslider.lowerBound, el.querySelectorAll('.node-time')[0].dataset.end ? Number(el.querySelectorAll('.node-time')[0].dataset.end) : MI.Interface.timeslider.upperBound);
+					const nodetime = new Time(el.querySelectorAll('.node-time')[0].dataset.start, el.querySelectorAll('.node-time')[0].dataset.end);
 					
-					if ( ( (endtime < Number(MI.Interface.timeslider.lower)) || (starttime > Number(MI.Interface.timeslider.upper))) || catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
+					if ( !nodetime.InRange() || catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
 					else { el.style.display = 'list-item'; }
 				} else {
 					if ( catcount >= cats.length || el.textContent.toLowerCase().indexOf(MI.Interface.filter.term) === -1 || closedcats.includes(uncat+'uncategorized') && cats.length === 1 && testcat === uncat) { el.style.display = 'none'; } 
@@ -293,10 +328,7 @@ class ManifestUI {
 					found = false;
 				}
 				if (MI.Interface.timeslider && MI.Atlas.map._layers[i].feature.properties.time) {
-					let starttime = MI.Atlas.map._layers[i].feature.properties.time.start ? Number(MI.Atlas.map._layers[i].feature.properties.time.start) : MI.Interface.timeslider.lowerBound;
-					let endtime = MI.Atlas.map._layers[i].feature.properties.time.end ? Number(MI.Atlas.map._layers[i].feature.properties.time.end) : starttime;
-					
-					if ( (starttime < Number(MI.Interface.timeslider.lower)) || (endtime > Number(MI.Interface.timeslider.upper))) { found = false; }
+					if (!MI.Atlas.map._layers[i].feature.properties.time.InRange()) { found = false; }
 				}
 				// TODO Ideally we hide lines if one of the nodes isn't present... for categories this is more complicated and probably requires some changes to the line feature structure to store more information about its connected nodes.
 			
@@ -335,13 +367,45 @@ class ManifestUI {
 		MI.Interface.filter = {term: null, clear: true};
 	}
 	
+	// Post complete hook after Manifest has been mapped (usually called in Manifest->Process() )
+	OnMapComplete(id) {
+		MI.Interface.RefreshMeasureList();
+		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+id+' li .node-title'); }
+		if (MI.options.embed) { 
+			//MI.Interface.SetupStoryTrigger('#mlist-'+id+' li .node-title'); 
+			document.getElementById('mlist-'+id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => { 
+				document.getElementById('mlist-'+id).scrollTo(el.offsetLeft - ManifestUtilities.RemToPixels(1), 0); 
+			}); });
+			
+			// use playlist function
+			MI.Atlas.BuildPlaylist();
+			
+			document.getElementById('embed-left').addEventListener('click', (e) => { 
+				for (let i = MI.Atlas.playlist.list.length-1; i >= 0; i--) {
+					if (MI.Atlas.active_point && MI.Atlas.playlist.list[i].feature.properties.lid === MI.Atlas.active_point._popup._source.feature.properties.lid) {
+						i = i === 0 ? MI.Atlas.playlist.list.length-1 : i-1;
+						MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break;
+					}
+				}	
+			}); 
+			document.getElementById('embed-right').addEventListener('click', (e) => { 
+				for (let i = 0; i < MI.Atlas.playlist.list.length; i++) {
+					if (MI.Atlas.active_point && MI.Atlas.playlist.list[i].feature.properties.lid === MI.Atlas.active_point._popup._source.feature.properties.lid) {
+						i = i === MI.Atlas.playlist.list.length - 1 ? 0 : i+1;
+						MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break;
+					}
+				}	
+			}); 
+		}
+		
+	}
+
 	SetupSamplelistHandlers() {
 		const previews = document.getElementById('samples-previews'), spacer = document.getElementById('samples-spacer');
 	
 		previews.addEventListener('click', (e) => { 
 			if (!previews.classList.contains('open')) {
 				previews.classList.add('open'); spacer.classList.remove('closed');
-				previews.style.height = (window.innerHeight - previews.offsetTop - ManifestUtilities.RemToPixels(5)) + "px";
 				previews.querySelectorAll('.sample-preview').forEach(el => { 
 					if (el.classList.contains('selected')) {
 						previews.scrollTo(0, el.offsetTop - ManifestUtilities.RemToPixels(0.75)); 	
@@ -352,7 +416,8 @@ class ManifestUI {
 		    e.stopPropagation();
 		});
 		window.addEventListener('click', (e) => { 
-			if (previews.classList.contains('open')) { previews.classList.remove('open'); spacer.classList.add('closed'); previews.style.height = 'auto'; }			
+			if (previews.classList.contains('open')) { previews.classList.remove('open'); spacer.classList.add('closed');
+		 }			
 		});
 		previews.querySelectorAll('.sample-preview').forEach(el => { el.addEventListener('click', (e) => { 
 			if (!el.classList.contains('selected')) {
@@ -364,7 +429,7 @@ class ManifestUI {
 	}
 	KeyHandler(e) {
 		// Modal Keys
-		if (document.getElementById('samples-previews').classList.contains('open')) {			
+		if (document.getElementById('samples-previews') && document.getElementById('samples-previews').classList.contains('open')) {			
 			if (e.key === 'ArrowDown') {  
 				if (document.activeElement && document.activeElement.classList.contains('sample-preview')) {
 					document.activeElement.nextSibling.focus();
@@ -506,14 +571,20 @@ class ManifestUI {
 	/** Handles the measure sorting interface **/
 	RefreshMeasureList() {
 		const measurechoices = document.getElementById('measure-choices');
-		let choices = {none:'none'};
+		let choices = {none:{name:'none',ref:{series:false}}};
+		let reset = true;
 		let previous = document.getElementById('measure-choices').value;
-
-		for (let s in MI.supplychains) { for (let m in MI.supplychains[s].details.measures) { if (m !== 'starttime' && m !== 'endtime') {choices[m] = m;} }}
+		
+		for (let s in MI.supplychains) { for (let m in MI.supplychains[s].details.measures) { if (!['starttime','endtime','start','end','date'].includes(m)) {choices[m] = {name:m, ref:MI.supplychains[s].details.measures[m]};} }}
 	    while (measurechoices.firstChild) { measurechoices.removeChild(measurechoices.lastChild); }
 	
-		for (let c in choices) { let option = document.createElement('option'); option.value = c; option.textContent = c; measurechoices.append(option); }
-		Array.from(document.getElementById('measure-choices').querySelectorAll('option')).forEach((el) => { if (el.value === previous) { measurechoices.value = previous; } });
+		for (let c in choices) { 
+			let option = document.createElement('option'); option.value = choices[c].name; option.textContent = choices[c].name; 
+			if (choices[c].ref.series) { option.setAttribute('data-series', true); } 
+			measurechoices.append(option); 
+		}
+		Array.from(document.getElementById('measure-choices').querySelectorAll('option')).forEach((el) => { if (el.value === previous) { measurechoices.value = previous; reset = false; } });
+		if (reset) { MI.Atlas.MeasureSort(); }
 	}
 	
 	SetVizOptions() {
@@ -522,7 +593,7 @@ class ManifestUI {
 			if (sc.graph.type === 'directed') { directed = true;} 
 			if (Object.keys(sc.details.measures).length > 0) { 
 				measured = false;
-				for (let measure of Object.keys(sc.details.measures)) { if (measure !== 'starttime' && measure !== 'endtime') { measured = true; } }
+				for (let measure of Object.keys(sc.details.measures)) { if (!['starttime','endtime','start','end','date'].includes(measure)) { measured = true; } }
 			}			
 		}
 		if (directed) { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.removeAttribute('hidden'); el.removeAttribute('disabled');});
@@ -543,18 +614,7 @@ class ManifestUI {
 	AddDataLayer(ref) {	
 		let type = ref.split('.').pop();
 		if (type === 'geojson' || type === 'pmtiles' || type === 'jpg' || type === 'png') {
-			/*let dlayer = document.createElement('div');
-			let lclass = type === 'geojson' ? 'geojson' : 'vector';
-			dlayer.classList.add('layerrow');
-
-			dlayer.innerHTML = `<label class="layercontainer"><input type="checkbox" checked class="${lclass}" value="${ref}"><span class="layercheckmark"><i class="fas"></i></span> ${ ref.replace(/(^\w+:|^)\/\//, '')}</label>`;
-			document.getElementById('userdatalayers').append(dlayer);
-			dlayer.querySelectorAll('#datalayers input[type=checkbox]').forEach(el => { el.addEventListener('click', (e) => { 
-				MI.Atlas.ProcessDataLayerFromElement(el);
-			}); 
-			});*/
 			MI.Atlas.LoadExternalDataLayer(type, ref);
-
 		} else {
 			this.ShowMessage("This kind of data layer is not supported. Manifest currently supports geojson and pmtiles data.");
 		}
@@ -605,6 +665,13 @@ class ManifestUI {
 				MI.Visualization.type = 'map';
 			}
 			MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);
+		} else if (!(MI.options.storyMap || MI.options.embed)) {
+			if (document.getElementById('manifestbar').classList.contains('open')) { 
+				document.getElementById('sidepanel').style.top = document.getElementById('manifestbar').offsetHeight + ManifestUtilities.RemToPixels(1) + 'px'; 
+				if (document.getElementById('manifestbar').scrollHeight > document.getElementById('manifestbar').clientHeight) {
+					document.getElementById('manifestbar').classList.add('scroll'); document.getElementById('samples-previews').classList.add('scroll');
+				} else { if (document.getElementById('manifestbar').classList.contains('scroll')) { document.getElementById('manifestbar').classList.remove('scroll'); document.getElementById('samples-previews').classList.remove('scroll'); } }
+			} else { document.getElementById('sidepanel').style.top = '4rem'; }
 		}
 		MI.Visualization.Resize(); 
 	}

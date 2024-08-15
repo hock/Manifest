@@ -6,5 +6,5 @@
   "freeze": true,
   "eqeqeq": true,
   "undef": true,
-  "globals": {"console": true, "MI" : true, "Manifest" : true, "ManifestSupplyChain" : true, "ManifestAtlas" : true, "ManifestUI" : true, "ManifestVisualization" : true, "ManifestUtilities" : true, "mversion" : true, "serverurl" : true, "List" : true, "JSONEditor" : true, "L" : true, "Grate" : true, "maplibregl" : true, "pmtiles" : true, "tinycolor" : true, "showdown": true, "jsondrop" : true, "d3" : true, "SankeyPlus" : true, "DualHRange":true}
+  "globals": {"console": true, "MI" : true, "Manifest" : true, "ManifestSupplyChain" : true, "Measure" : true, "Time" : true, "ManifestAtlas" : true, "ManifestUI" : true, "ManifestVisualization" : true, "ManifestUtilities" : true, "mversion" : true, "mbaseurl" : true, "serverurl" : true, "List" : true, "JSONEditor" : true, "L" : true, "Grate" : true, "maplibregl" : true, "pmtiles" : true, "tinycolor" : true, "showdown": true, "jsondrop" : true, "d3" : true, "SankeyPlus" : true, "DualHRange":true}
 }
