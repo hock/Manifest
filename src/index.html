@@ -16,7 +16,8 @@
 	<!-- build:section layout.loader --><!-- /build -->	
 
 	<!-- build:process -->
-	<link rel="stylesheet" href="<%= css_path %>" media="screen"> 
+	<link rel="stylesheet" href="<%= css_core_path %>" media="screen">
+	<link rel="stylesheet" href="<%= css_path %>" media="screen" defer>
 	<link rel="stylesheet" href="<%= css_printpath %>" media="print" defer> 
 
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
@@ -99,7 +100,7 @@
 			<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
 			<div id="messages" class="closed"><p id="messages-text"></p></div>
 			<div id="mapcapture"><i class="fas fa-camera"></i></div>
-			<label id="colorscheme-switch" class="switch"> <input id="colorscheme-checkbox" type="checkbox"> <span class="slider round"></span> </label>
+			<label id="colorscheme-switch" for="colorscheme-checkbox" class="switch"> <input id="colorscheme-checkbox" name="colorscheme-checkbox" type="checkbox"> <span class="slider round"></span> </label>
 			<nav id="mapmenu-window" class="closed">
 				<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
 		
