@@ -17,8 +17,6 @@
 
 	<!-- build:process -->
 	<link rel="stylesheet" href="<%= css_core_path %>" media="screen">
-	<link rel="stylesheet" href="<%= css_path %>" media="screen" defer>
-	<link rel="stylesheet" href="<%= css_printpath %>" media="print" defer> 
 
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
     <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
@@ -155,6 +153,9 @@
 	</section>
 
     <!-- build:process -->	
+	<link rel="stylesheet" href="<%= css_path %>" media="screen" defer>
+	<link rel="stylesheet" href="<%= css_printpath %>" media="print" defer> 
+	
 	<script src="<%= js_libpath %>" defer></script>
 	<script src="<%= js_mainpath %>" defer></script>
     <!-- /build -->
