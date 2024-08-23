@@ -674,6 +674,7 @@
 									passive: true
 								});
 								var n = function(n) {
+									n.stopPropagation();
 									switch (null !== t.underDragging && n.preventDefault(), t.underDragging) {
 										case null:
 											return;

@@ -52,7 +52,7 @@ class ManifestVisualization {
 				if (MI.supplychains[i].graph !== undefined && document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { 
 					
 					let canvascolor = MI.supplychains[i].details.colorchoice[0];
-					document.getElementById('vizshell').style.fill = tinycolor.mix('#21222c', canvascolor, 10);
+					document.getElementById('vizshell').style.fill = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
 					
 					if (MI.supplychains[i].graph.links.length !== 0) {
 						let sgraph = this.GraphCopy(MI.supplychains[i].graph); 
@@ -102,7 +102,7 @@ class ManifestVisualization {
 				if (document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { sc = i; }
 			}
 			let canvascolor = MI.supplychains[sc].details.colorchoice[0];
-			document.getElementById('chartview').style.backgroundColor = tinycolor.mix('#21222c', canvascolor, 10);
+			document.getElementById('chartview').style.backgroundColor = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
 			
 			if (MI.Visualization.active_scid && Object.keys(MI.supplychains[sc].details.measures).length > 0) {
 				document.getElementById('missing-viz').classList.add('closed');
@@ -114,7 +114,7 @@ class ManifestVisualization {
 				}
 				const measureSort = document.getElementById('measure-choices').value;
 
-				this.chartview = `<table id="charttable" style="background:#21222c; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;				
+				this.chartview = `<table id="charttable" style="background:${window.getComputedStyle(document.body).getPropertyValue('--viz-bg')}; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;				
 				
 				let color_range = [
 					tinycolor(canvascolor).darken(5).toString(),tinycolor(canvascolor).toString(),tinycolor(canvascolor).brighten(5).toString(),tinycolor(canvascolor).brighten(10).toString(),tinycolor(canvascolor).brighten(15).toString(),tinycolor(canvascolor).brighten(20).toString(),tinycolor(canvascolor).brighten(25).toString()];
@@ -127,13 +127,13 @@ class ManifestVisualization {
 					if (node.ref.properties.measures.some(m => m.GetType() === measureSort)) {
 						const measure = node.ref.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop();
 						const measureMax = MI.supplychains[sc].details.measures[measureSort].max;		
-						this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix('#21222c', canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
+						this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
 								
 					}
 					alternate = !alternate;
 				} }
 				document.getElementById('chartview').innerHTML = this.chartview += '</table>';
-				document.getElementById('chartview').style.background = tinycolor.mix('#21222c', canvascolor, 10);
+				document.getElementById('chartview').style.background = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
 				document.getElementById('chartview').querySelectorAll('.chart-row').forEach(el => { el.addEventListener('click', (e) => { 
 					MI.Atlas.MapPointClick(el.id.split('-').pop()); MI.Atlas.active_point = el.id.split('-').pop(); 
 				}); }); 
@@ -181,17 +181,18 @@ class ManifestVisualization {
 		let values = [];
 		
 		for (let sc of MI.supplychains) {
-		
 			let rawvalues = sc.features.filter(e => e.geometry.type === 'Point');
+			let color = MI.options.darkmode ? sc.options.style.color : tinycolor(sc.options.style.color).darken(50).toHexString(), odd = true;
 			for (let val of rawvalues) {
-				values.push({manifest: sc.properties.title, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: (val.geometry.coordinates[0] !== '' && val.geometry.coordinates[1] !== '') ? String(val.geometry.coordinates).replace(',',', ') : '', categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
+				values.push({manifest: sc.properties.title, color: color, zebra: odd, index: val.properties.index, name: val.properties.title, description: val.properties.description, placename: val.properties.placename, geocode: (val.geometry.coordinates[0] !== '' && val.geometry.coordinates[1] !== '') ? String(val.geometry.coordinates).replace(',',', ') : '', categories: val.properties.category ? val.properties.category.split(',').join(', ') : '', notes: val.properties.notes});
+				odd = !(odd);
 			}
 		}
 		document.querySelectorAll('#vizwrap, #listview, #textview, #chartview, #missing-viz').forEach(el => { el.classList.add('closed'); }); document.getElementById('listview').classList.remove('closed');
 
 		let options = {
 		    item: function(values) {			
-				return `<li class="entry">
+				return `<li class="entry ${values.zebra ? 'zebra' : ''}" style=background:${values.zebra ? tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), values.color, 20).toHexString() : tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), values.color, 10).toHexString()};>
 							<div class="manifest col">${values.manifest}</div>
 				
 							<div class="index col">${values.index}</div>
@@ -306,7 +307,7 @@ class ForceGraph {
 			.attr('stroke-width', 0).attr('opacity', 0.5).style('fill', 'none').attr('marker-end', d => this._marker(d.color));
 	
 		this.label = this.viz.append('g').attr('class', 'labels').selectAll('text').data(this.graph.nodes).enter().append('text').attr('pointer-events', 'none')
-			.attr('fill', d => { if (d.ref !== undefined) {return d.ref.properties.basestyle.color; } })	
+			.attr('fill', d => { if (d.ref !== undefined) {return MI.options.darkmode ? tinycolor(d.ref.properties.basestyle.color).lighten(50).toString() : d.ref.properties.basestyle.color; } })	
 			.attr('x', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).x) 
 			.attr('y', d => MI.Atlas.map.latLngToContainerPoint(d.ref.properties.latlng, MI.Atlas.map.getZoom()).y) 	
 			.attr('stroke','#000000').attr('stroke-width','0.2')
@@ -335,9 +336,9 @@ class ForceGraph {
 
 		this.paths = this.groups.selectAll('path').data(this.groupIds, d => { return +d; }).enter().append('g').attr('class', 'paths').append('path')
 			.attr('stroke', d => { for (let i in MI.supplychains) { if (Number(MI.supplychains[i].details.id) === Number(d)) { 
-				return MI.supplychains[i].details.style.color; } } })
+				return MI.options.darkmode ? tinycolor(MI.supplychains[i].details.style.color).lighten(50).toString() : MI.supplychains[i].details.style.color; } } })
 			.style('stroke-dasharray','3,3').style('stroke-opacity','0.5')
-			.attr('fill', '#21222c')
+			.attr('fill', window.getComputedStyle(document.body).getPropertyValue('--viz-bg'))
 			.attr('fill-opacity', 1);
  
 		this.polygonGenerator = function(groupId) {
@@ -506,7 +507,7 @@ class SankeyDiagram {
 			.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 			
 		this.nodes.append('text').attr('x', d => (d.x1+4)) .attr('y', d => (d.y0 + d.y1) / 2).attr('dy', '0.35em')
-			.attr('text-anchor', 'left').text( d => d.label ) .attr('fill', d => d.ref.properties.style.color)
+			.attr('text-anchor', 'left').text( d => d.label ) .attr('fill', d => MI.options.darkmode ? tinycolor(d.ref.properties.style.color).lighten(50).toString() : d.ref.properties.style.color)
 			.attr('font-family', '"Roboto", Arial, Helvetica, sans-serif') .attr('font-size', '10px').style('cursor','pointer')
 			.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');			
 	
@@ -515,7 +516,7 @@ class SankeyDiagram {
 		
 		this.frame = this.framewrap.append('rect').attr('x', -10 ).attr('y', -10).attr('rx', 15).attr('ry', 15).attr('height', this.height+20)
 			.attr('width', this.width+20 ) .attr('stroke', '#eeeeee') .style('stroke-dasharray','3,3').style('stroke-opacity','0.5')
-			.attr('fill', '#21222c') .attr('fill-opacity', 1);
+			.attr('fill', window.getComputedStyle(document.body).getPropertyValue('--viz-bg')) .attr('fill-opacity', 1);
 			
 		this.nodes.attr('opacity', d => { if (d.ref.properties.hidden) {return 0.2; } else { return 1;} });	
 	}
@@ -558,7 +559,7 @@ class SankeyDiagram {
 			.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');			
 
 		this.nodes.append('text').attr('x', d => (d.x1+4)) .attr('y', d => (d.y0 + d.y1) / 2).attr('dy', '0.35em')
-			.attr('text-anchor', 'left').text( d => d.label ) .attr('fill', d => d.ref.properties.style.color)
+			.attr('text-anchor', 'left').text( d => d.label ) .attr('fill', d => MI.options.darkmode ? tinycolor(d.ref.properties.basestyle.color).lighten(50).toString() : d.ref.properties.style.color)
 			.attr('font-family', '"Roboto", Arial, Helvetica, sans-serif') .attr('font-size', '10px').style('cursor','pointer')
 			.attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');					
 		
@@ -599,7 +600,7 @@ class SankeyDiagram {
 		return (MI.Interface.IsMobile() && middle) ? this.height * 0.4 : this.height / 2; 
 	}
 	get margin() {
-		return {top: MI.Interface.IsMobile() ? ManifestUtilities.RemToPixels(7) : ManifestUtilities.RemToPixels(2.5), right: ManifestUtilities.RemToPixels(2.5), 
+		return {top: MI.Interface.IsMobile() ? ManifestUtilities.RemToPixels(7) : (document.body.classList.contains('fullscreen') ? ManifestUtilities.RemToPixels(6.5) : ManifestUtilities.RemToPixels(2.5)), right: ManifestUtilities.RemToPixels(2.5), 
 			bottom: ManifestUtilities.RemToPixels(6.5), left: ManifestUtilities.RemToPixels(2.5)};
 	}
 	_zoomed() { d3.select('svg g') .attr('transform', d3.event.transform); }

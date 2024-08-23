@@ -34,7 +34,7 @@
 		
 		if (mtarget === 'development' || mtarget === 'production') { 
 			var console = {}; console.log = function(){}; console.dir = function(){}; console.trace = function(){}; window.console = console;
-			console.log = function tag(msg) { gtag("event", "manifest_log", { "message": msg }); };
+			console.log = function tag(msg) { gtag("event", "manifest_log", { "message": msg, "value": msg }); };
 		}
 	</script>
 	<!-- /build -->
@@ -42,7 +42,7 @@
 	<!-- build:section layout.header --><!-- /build -->	
 </head>
 
-<body class="light">
+<body>
 	<section id="loader">
 		<h1 id="loadertitle">Manifest</h1>
 		<h2 id="loadermessage">Supply Chain Platform</h2>
@@ -66,20 +66,24 @@
 		<section class="ui">		
 			<section class="vizmenu">
 				<nav class="vizmenu-entry">
-					<label for="viz-choices" id="viz-choice-label" class="vizmenu-label">Visualize</label>
-					<select name="viz-choice" id="viz-choices">
-						<option id="map-viz-choice" value="map">Map</option>
-						<option id="forcegraph-viz-choice" class="graph-dependent" hidden disabled value="forcegraph">Graph</option>
-						<option id="flow-viz-choice" class="graph-dependent" hidden disabled value="flow">Flow</option>
-						<option id="chord-viz-choice" class="graph-dependent" hidden disabled value="chord">Chord</option>
-						<option id="chart-viz-choice" class="measure-dependent" hidden disabled value="chart">Chart</option>			
-						<option id="listview-viz-choice" class="fullapp" value="listview">Sheet</option>
-						<option id="textview-viz-choice" class="fullapp" value="textview">Data</option>
-					</select>
+					<label for="viz-choices" id="viz-choice-label" class="vizmenu-label">
+						<span class="label-title">Visualize</span>
+						<select name="viz-choice" id="viz-choices">
+							<option id="map-viz-choice" value="map">Map</option>
+							<option id="forcegraph-viz-choice" class="graph-dependent" hidden disabled value="forcegraph">Graph</option>
+							<option id="flow-viz-choice" class="graph-dependent" hidden disabled value="flow">Flow</option>
+							<option id="chord-viz-choice" class="graph-dependent" hidden disabled value="chord">Chord</option>
+							<option id="chart-viz-choice" class="measure-dependent" hidden disabled value="chart">Chart</option>			
+							<option id="listview-viz-choice" class="fullapp" value="listview">Sheet</option>
+							<option id="textview-viz-choice" class="fullapp" value="textview">Data</option>
+						</select>
+					</label>	
 				</nav>
 				<nav class="vizmenu-entry">
-					<label for="measure-choices" id="measure-choice-label" class="vizmenu-label">Scale</label>	
-					<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
+					<label for="measure-choices" id="measure-choice-label" class="vizmenu-label">
+						<span class="label-title">Scale</span>
+						<select name="measure-choice" id="measure-choices"> <option value="none">None</option> </select>
+					</label>	
 				</nav>
 				<div class="clear"></div>
 			</section>
@@ -95,7 +99,7 @@
 			<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
 			<div id="messages" class="closed"><p id="messages-text"></p></div>
 			<div id="mapcapture"><i class="fas fa-camera"></i></div>
-
+			<label id="colorscheme-switch" class="switch"> <input id="colorscheme-checkbox" type="checkbox"> <span class="slider round"></span> </label>
 			<nav id="mapmenu-window" class="closed">
 				<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
 		
@@ -135,8 +139,7 @@
 					<div class="placename col sort" data-sort='placename'>Address</div>
 					<div class="geocode col sort" data-sort='geocode'>Geocode</div>
 					<div class="categories col sort" data-sort='categories'>Category</div>
-					<div class="notes col sort" data-sort='notes'>Additional Notes</div>
-					<div class="clear"></div>
+					<div class="notes col sort" data-sort='notes'>Notes</div>
 				</div>
 				<input type="search" id="datasearch" class="search" autocomplete="off" placeholder="Search...">
 				<ul class=list id="manifestlistview"></ul>

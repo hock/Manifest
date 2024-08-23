@@ -39,6 +39,7 @@ class ManifestUI {
 		document.getElementById('basemap-chooser').addEventListener('change', (e) => { 
 			this.SetBasemap(document.getElementById('basemap-chooser').value); 
 		});
+		if (MI.options.darkmode) { document.getElementById('basemap-chooser').value = 'dark'; }
 		
 		document.getElementById('viz-choices').addEventListener('change', (e) => { MI.Visualization.Set(document.getElementById('viz-choices').value, MI.Interface.active_element); });
 	
@@ -49,6 +50,7 @@ class ManifestUI {
 		document.getElementById('load-datalayers-btn').addEventListener('click', (e) => { 
 			this.AddDataLayer(document.getElementById('load-datalayers-input').value); 
 		});
+		document.getElementById('colorscheme-switch').addEventListener('change', (e) => { MI.Interface.ColorScheme(document.getElementById('colorscheme-checkbox').checked); });
 		document.getElementById('datalayers').querySelectorAll('input[type=checkbox]').forEach(el => { el.addEventListener('click', (e) => { 
 			MI.Atlas.ProcessDataLayerFromElement(el);}); 
 		});
@@ -106,7 +108,22 @@ class ManifestUI {
 		
 		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
-	
+	ColorScheme(dark) {
+		MI.options.darkmode = dark;
+		MI.Supplychain.ReloadAll();
+		if (MI.options.darkmode) {
+			ManifestUtilities.SetCookie('darkmode',true,60);	
+			document.getElementById('basemap-chooser').value = 'dark';	
+			MI.Interface.SetBasemap('dark');
+			document.body.classList.add('dark');
+		} else {
+			ManifestUtilities.EraseCookie('darkmode');
+			
+			document.getElementById('basemap-chooser').value = 'default';
+			MI.Interface.SetBasemap('default');
+			document.body.classList.remove('dark');
+		}
+	}
 	SetupTime() {
 		let timeset = false, starttime, endtime;
 		MI.Interface.timeslider = false;
@@ -642,25 +659,20 @@ class ManifestUI {
 	}
 	
 	SetDocumentTitle() {
-		let scTitles = [], setTitle = '';
-		for (let sc of MI.supplychains) { scTitles.push(sc.properties.title); }
-		
-		if (scTitles.length === 1 && scTitles[0] === 'Manifest') { setTitle = 'Manifest'; } 
-		else { setTitle = scTitles.length > 0 ? scTitles.join(' + ') + ' - Manifest' : 'Manifest'; }
-		
-		document.title = setTitle;
-		document.querySelector('meta[property="og:title"]').setAttribute("content", setTitle);
-		
-		if (scTitles.length === 1) {
-			let description = MI.supplychains[0].properties.description.replace(/(<([^>]+)>)/ig,'');
-			document.querySelector('meta[name="description"]').setAttribute("content", description);
-			document.querySelector('meta[property="og:description"]').setAttribute("content", description);
-		} else {
-			let description = document.querySelector('meta[name="manifest-description"]').getAttribute("content");
-			document.querySelector('meta[name="description"]').setAttribute("content", description);
-			document.querySelector('meta[property="og:description"]').setAttribute("content", description);
+		for (let sc of MI.supplychains) { 
+			let scurl = sc.mtype === 'smap' ? sc.details.url.split('-')[1].replace('#smap','') : sc.mtype === 'gsheet' ? sc.options.url.replaceAll('/','').slice(sc.options.url.replaceAll('/','').lastIndexOf('gsheet') + ('gsheet').length).replace('#gsheet','') : sc.options.url.replace('#manifest','');
+			let sctitle = sc.properties.title + ' - Manifest';
+			let scdescription = sc.properties.description.replace(/(<([^>]+)>)/ig,'');
+			
+			if (ManifestUtilities.Slugify(scurl) === MI.options.initialurl) { 
+				document.title = sctitle;
+				document.querySelector('meta[property="og:title"]').setAttribute("content", sctitle);
+	
+				scdescription = (scdescription.length > 160) ? scdescription.substr(0, 157) + '...' : scdescription;
+				document.querySelector('meta[name="description"]').setAttribute("content", scdescription);
+				document.querySelector('meta[property="og:description"]').setAttribute("content", scdescription);
+			}
 		}
-		
 	}
 	
 	URLSet(url) {

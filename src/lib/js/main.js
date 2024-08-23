@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	
 	let options = {
 		options: true,
+		darkmode: false,
 		serviceurl: '<%= mserverurl %>',
 		 //serviceurl: 'http://hockbook.local:3000/',
 		
@@ -19,13 +20,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	};
 
 	// Load any url params into options
-	options = Object.assign(options, LoadParams(options));
+	options = Object.assign(options, LoadCookies(LoadParams(options)));
+	
 	MI = new Manifest(options);
 	console.dir(options);
 	
 	// Begin setup for special modes (storymap and embed) if url param is set
 	if (MI.options.storyMap) { MI.Interface.Storyize(); }
-	if (MI.options.embed) { MI.Interface.Embedize(); }
+	if (MI.options.embed) { MI.Interface.Embedize(); }	
+	if (MI.options.darkmode) { document.body.classList.add('dark'); document.getElementById('colorscheme-checkbox').setAttribute('checked',true); } 
+	
 	document.documentElement.classList.remove('loading');
 	
 	if (MI.options.visualization) { MI.Visualization.type = MI.options.visualization; }
@@ -37,11 +41,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		hash = ['manifest','json/'+window.location.pathname.split('/manifest/').pop().split('/').filter((a) => a !== '').join('/')+'.json'];
 	} else if (window.location.pathname.includes('/gsheet/')) {
 		hash = ['gsheet',window.location.pathname.split('/gsheet/').pop().split('/').filter((a) => a !== '').join('/')];
+	} else if (window.location.pathname.includes('/sourcemap/')) {
+		hash = ['smap',window.location.pathname.split('/sourcemap/').pop().split('/').filter((a) => a !== '').join('/')];
 	} else if (window.location.pathname.includes('/collection/')) {
 		hash = ['collection',window.location.pathname.split('/collection/').pop().split('/').filter((a) => a !== '').join('/')+'.json'];
 	} else if (typeof(location.hash) !== 'undefined' && location.hash !== '') { 
 		hash = location.hash.substr(1).split("-");
 	}
+	MI.options.initialurl = hash ? hash.slice(1).join('-') : '';
 	
 	// If a specific manifest has been requested, we see what kind it is and begin to load it
 	if (hash) { 
@@ -136,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		    
 			let samples = `<div id="samples-spacer" class="closed"></div><div id="samples-previews">`;	
 			for (let s in manifests.collection) { 
-				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.png);">
+				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.png),url(json/samples/thumbnails/48/default.png);">
 					<div class="sample-title">${manifests.collection[s].title}</div>
 					<div class="sample-description">${manifests.collection[s].description.replaceAll('**','')}</div>
 				</div>`;
@@ -173,6 +180,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				 id:((startertype !== 'smap') ? ManifestUtilities.Hash(starterid) : starterid)};
 	}	
 	
+	function LoadCookies(o) {
+		o.darkmode = o.darkmode ? o.darkmode : ManifestUtilities.GetCookie('darkmode') === 'true' ? true : false;
+		return o;
+		
+	}
 	function LoadParams(o) {
 		const urlParams = new URLSearchParams(window.location.search);
 		const urlObject = Object.fromEntries(urlParams);
@@ -184,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			if (key === 'timerange') {  o[key] = {lower: Number(value.split(':')[0]), upper: Number(value.split(':')[1])}; }
 			if (key === 'storyMap' || key === 'storymap') { if (!value) { o.storyMap = true; } else { o.storyMap = value === 'false' ? false : value === 'true' ? true : null; } if (o.storyMap && !urlObject.zoom) { o.zoom = 10; } }
 			if (key === 'embed') { if (!value) { o[key] = true; } else { o[key] = value === 'false' ? false : value === 'true' ? true : null; } }
+			if (key === 'darkmode') { if (!value) { o[key] = true; } else { o[key] = value === 'false' ? false : value === 'true' ? true : null; } }
 			
 			if (['visualization','map','view','zoom'].includes(key)) { o[key] = value; }
 			if (!value) { o[key] = true; }

@@ -31,7 +31,7 @@ function RenderManifest(data) {
 							<h3 class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></h3>
 							<div class="sampleauthor">${values.author}</div>
 							<div class="sampletags"><ul>${values.categories.split(',').map(s => `<li>${s}</li>`).join('')}</ul></div>
-							<img src="json/samples/thumbnails/${thumb}.png" loading="lazy"/>
+							<img src="json/samples/thumbnails/256/${thumb}.png" onerror="this.onerror=null; this.src='json/samples/thumbnails/256/default.png'" loading="lazy"/>
 							<div class="sampledescription">${util.markdowner.makeHtml(values.description)}</div>
 						</div>
 					</li>`;
@@ -55,7 +55,7 @@ function RenderSMAP(data) {
 							<a href="https://raw.githubusercontent.com/hock/smapdata/master/data/${values.id}.geojson">geojson</a>
 						</div>
 						<div class="name">
-							<a href="#smap-${values.id}">${values.nm}</a></div>
+							<a href="sourcemap/${values.id}/">${values.nm}</a></div>
 						<div class="description">${values.dc}</div>
 						<div class="clear"></div>
 					</li>`;

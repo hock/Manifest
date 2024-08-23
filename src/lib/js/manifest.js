@@ -174,7 +174,7 @@ class Manifest {
 	FormatSMAP(d, options) {
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
 		d.details = options; d.setOptions = {}; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
-		d.details.url = '#smap-'+options.idref;
+		d.details.url = options.idref ? '#smap-'+options.idref : '#smap-'+options.id;
 		for (let ft of d.features) {
 			ft.properties.category = '';
 			ft.properties.images = [];

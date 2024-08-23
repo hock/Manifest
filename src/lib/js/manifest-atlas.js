@@ -13,8 +13,8 @@ class ManifestAtlas {
 		
 		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
 		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
-		this.baselayer = options.map ? options.map : 'default';
-		
+		this.baselayer = options.map ? options.map : options.darkmode ? 'dark' : 'default';
+
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
 		
 		let map_tiler_key = 'v6o4lBqX0HjNRonNxTdr';
@@ -28,7 +28,8 @@ class ManifestAtlas {
 			//ESRI_WORLD: 'services/maps/esri-world-imagery.json',	
 			TOPO: options.serviceurl + 'maptiler/' + 'topo-v2',				
 			GRAYSCALE: options.serviceurl + 'maptiler/' + 'backdrop',				
-			BW: options.serviceurl + 'maptiler/' + 'toner-v2',				
+			BW: options.serviceurl + 'maptiler/' + 'toner-v2',		
+			DARK: options.serviceurl + 'maptiler/' + 'dataviz-dark',		
 			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=256&legends=1&X={x}&Y={y}&zoom={z}',
 		};
 		
@@ -41,6 +42,7 @@ class ManifestAtlas {
 			topo:	{ description: 'Topographic', layer: new L.maplibreGL({ style: this.tiletypes.TOPO, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			satellite:	{ description: 'Satellite Image', layer: new L.maplibreGL({ style: this.tiletypes.SATELLITE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			grayscale:	{ description: 'Grayscale', layer: new L.maplibreGL({ style: this.tiletypes.GRAYSCALE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			dark:	{ description: 'Dark', layer: new L.maplibreGL({ style: this.tiletypes.DARK, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			bw:	{ description: 'Black and White', layer: new L.maplibreGL({ style: this.tiletypes.BW, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			//proto: 		{ description:'Proto', layer: protomaps.leafletLayer({url:'services/protomaps.pmtiles'})},
 		};		
@@ -224,10 +226,10 @@ class ManifestAtlas {
 		
 		let bgimg = MI.Atlas.GetTileImage(feature.properties.latlng.lat, feature.properties.latlng.lng, 13);
 		let popupContent, fid = feature.properties.lid;
- 
+
 		popupContent = `<div id="popup-${feature.properties.lid}" class="mpopup">
 		<h2 id="popup-${fid}" class="poptitle" style="background: url('${bgimg}') ${feature.properties.style.fillColor} center center; color:${feature.properties.style.textColor};">
-			<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
+			<i class="fa-solid fa-circle-dot" onclick="MI.Atlas.TagClick(${fid},${feature.properties.latlng.lat},${feature.properties.latlng.lng});"></i> 
 			<span onclick="MI.Atlas.MapPointClick(${fid});">${feature.properties.title}</span>
 		</h2>
 		<div class="node-images-wrap">
@@ -266,7 +268,7 @@ class ManifestAtlas {
 				popupContent += `
 				<div id="popup-${ft.properties.lid}" class="mpopup popuplink clusterbox">
 					<h2 style="background: ${ft.properties.style.textColor}; color: ${ft.properties.style.fillColor}">
-						<i class="fas fa-tag" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
+						<i class="fa-solid fa-circle-dot" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
 					<p class="closed">${ft.properties.category} | ${ft.properties.placename}</p>
@@ -319,7 +321,7 @@ class ManifestAtlas {
 		if (title !== '') {
 			let popupContent = `
 			<h2 id="popup-${fid}" class="popuphop" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</h2>`;
-			let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</div>`;
+			let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${MI.options.darkmode ? tinycolor(feature.properties.style.color).lighten(30).toString() : feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</div>`;
 			layer.bindTooltip(tooltipContent);
 			//layer.bindPopup(popupContent);
 		}	
@@ -455,7 +457,7 @@ class ManifestAtlas {
 			} }
 			tooltipList += '}';
 			
-			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.color}; color: ${feature.properties.style.darkColor}"><i class="fas fa-boxes"></i> <strong>Cluster of ${ccount} Nodes</strong> ${tooltipDynamic}<br>${tooltipList}</div>`;
+			let tooltipContent = `<div id="tooltip-${feature.properties.lid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.textColor}"><i class="fas fa-boxes"></i> <strong>Cluster of ${ccount} Nodes</strong> ${tooltipDynamic}<br>${tooltipList}</div>`;
 			layer.setTooltipContent(tooltipContent);	
 		} else {
 			const measuretype = document.getElementById('measure-choices').value;	
@@ -658,7 +660,7 @@ class ManifestAtlas {
 		}
 		
 		if (measureSort === 'none') { return this.radius; } 
-		else { return MI.Atlas._linearScale(measureVal,this.radius,20,measureMin,measureMax); }
+		else { return MI.Atlas._linearScale(measureVal,this.radius,(cluster && ft.properties.clustered.length > 0) ? 30 : 20,measureMin,measureMax); }
 	}
 	_linearScale(unscaledNum, minAllowed, maxAllowed, min, max) {
 	  return Math.max(minAllowed,(maxAllowed - minAllowed) * (unscaledNum - min) / (max - min) + minAllowed || 0);

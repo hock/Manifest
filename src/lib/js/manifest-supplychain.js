@@ -138,8 +138,9 @@ class ManifestSupplyChain {
 				if (ft.properties.index) { d.mapper[Number(ft.properties.index-1)] = ft; } // manifest
 				else { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
 			}
-			if (ft.geometry.type === 'Point') {
-				let pointblob = this.SetupPoint(ft, d, index); 
+			
+			if (ft.geometry.type === 'Point') {				
+				let pointblob = this.SetupPoint(ft, d, index); 				
 				nodelist.push(pointblob.li); 
 				if (ft.geometry.coordinates[0] !== '' && ft.geometry.coordinates[1] !== '') { points.features.push(pointblob.ft); }
 			} else { 
@@ -150,7 +151,7 @@ class ManifestSupplyChain {
 						this.SetupSimpleArrow(JSON.parse(JSON.stringify(line)), d, index) : this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
 					lines.features.push(line); arrows.features.push(arrow);
 				}
-			}	
+			}				
 		}
 		document.getElementById('mlist-'+d.details.id).innerHTML = nodelist.join('');
 		
@@ -252,12 +253,11 @@ class ManifestSupplyChain {
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
 			
-		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: styling.color[2]}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
+		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: MI.options.darkmode ? tinycolor(styling.color[1]).darken(50).toString() : styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: styling.color[2]}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
 	SetupPoint(ft, d, index) {
 		let setup = { index: index, type: 'node', style: JSON.parse(JSON.stringify(d.details.style)), basestyle: JSON.parse(JSON.stringify(d.details.style)), latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
-		
 		// Individual point color
 		if ( ft.properties.color ) { 
 			let ftcolors = ft.properties.color.split(',');
@@ -271,11 +271,11 @@ class ManifestSupplyChain {
 		`<li id="node_${ft.properties.lid}" class="mnode" data-scref="${d.details.id}" tabindex="0">
 			<div class="node-dot" style="background: ${ft.properties.style.fillColor}; border-color: ${ft.properties.style.color};">${ft.properties.mindex}</div>
 			<h5 class="node-title">${ft.properties.title}</h5>
-			${ ft.properties.placename !== '' ? `<div class="node-place" style="color: ${d.details.style.darkerColor};">${ft.properties.placename}</div>` : ''}
-			${ ft.properties.time ? `<div class="node-time" ${ft.properties.time.GetStart() ? `data-start="${ft.properties.time.GetStart()}"` : ``} ${ft.properties.time.GetEnd() ? `data-end="${ft.properties.time.GetEnd()}"` : ``} style="color: ${d.details.style.darkerColor};">${ft.properties.time.GetStart() ? `<span class="time-start">${ft.properties.time.PrintStart()}</span>` : ''}<span class="time-separator"> — </span>${ft.properties.time.GetEnd() ? `<span class="time-end">${ft.properties.time.PrintEnd()}</span>` : ''}</div>` : ''}
+			${ ft.properties.placename !== '' ? `<div class="node-place" style="color: ${MI.options.darkmode ? d.details.style.lightColor : d.details.style.darkerColor};">${ft.properties.placename}</div>` : ''}
+			${ ft.properties.time ? `<div class="node-time" ${ft.properties.time.GetStart() ? `data-start="${ft.properties.time.GetStart()}"` : ``} ${ft.properties.time.GetEnd() ? `data-end="${ft.properties.time.GetEnd()}"` : ``} style="color: ${MI.options.darkmode ? d.details.style.lightColor : d.details.style.darkerColor};">${ft.properties.time.GetStart() ? `<span class="time-start">${ft.properties.time.PrintStart()}</span>` : ''}<span class="time-separator"> — </span>${ft.properties.time.GetEnd() ? `<span class="time-end">${ft.properties.time.PrintEnd()}</span>` : ''}</div>` : ''}
 			
 			<div class="node-details">
-				${ ft.properties.categories.length !== 0 ? `<div class="category ${(ft.properties.categories.length === 1 && ft.properties.categories[0] === '') ? 'closed' : ''}">${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join('')}</div>` : ''}${ ft.properties.measures.length !== 0 ? `<div class="measures">${ft.properties.measures.filter(m => m && m.GetValue()).map(m => ['starttime','start','endtime','end'].includes(m.GetType()) ? '' : m.GetType() !== 'date' ? `<a class="measure-link" data-measure="${m.GetType()}"><span class="mtype">${m.PrintType()}</span><span class="mvalue">${m.PrintValue()}</span><span class="munit">${m.PrintUnit()}</span></a>` : `<span class="mtype">${m.PrintType()}</span>${m.PrintValue()}${m.PrintUnit()}`).join('')}</div>` : ''}
+				${ ft.properties.categories.length !== 0 ? `<div class="category ${(ft.properties.categories.length === 1 && ft.properties.categories[0] === '') ? 'closed' : ''}"><i class="fa-solid fa-tags"></i> ${ft.properties.categories.map(cat => `<a class="cat-link" data-cat="cat-${d.details.id}-${cat}">${cat}</a>`).join('')}</div>` : ''}${ ft.properties.measures.filter(m => m && !['starttime','start','endtime','end'].includes(m.GetType())).length !== 0 ? `<div class="measures"><i class="fa-solid fa-calculator"></i> ${ft.properties.measures.filter(m => m && m.GetValue()).map(m => ['starttime','start','endtime','end'].includes(m.GetType()) ? '' : m.GetType() !== 'date' ? `<a class="measure-link" data-measure="${m.GetType()}"><span class="mtype">${m.PrintType()}</span><span class="mvalue">${m.PrintValue()}</span><span class="munit">${m.PrintUnit()}</span></a>` : `<span class="mtype">${m.PrintType()}</span>${m.PrintValue()}${m.PrintUnit()}`).join('')}</div>` : ''}
 			</div> 
 			
 			<div class="node-images-wrap">
@@ -297,7 +297,7 @@ class ManifestSupplyChain {
 			</div>
 					  	
 			<div class="node-description">${ft.properties.description !== '' ? ManifestUtilities.Linkify(ft.properties.description) : ''}</div>
-			<details class="node-sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${d.details.style.lightColor};">
+			<details class="node-sources ${(ft.properties.sources.length === 1 && !(ft.properties.sources[0]) && !(ft.properties.notes)) ? "closed" : ""}" style="background: ${ MI.options.darkmode ? 'var(--alt-bg-2)' : d.details.style.lightColor};">
 				<summary>Notes</summary>
 				<ol>
 					${ft.properties.sources.map(src => src ? `<li>${ManifestUtilities.Linkify(src)}</li>` : '').join("")}
@@ -445,15 +445,35 @@ class ManifestSupplyChain {
 				};
 	
 				measure[measure_list[l].measure] = ft.properties[measure_list[l].measure]; 
-				smapmeasures.push(new Measure(measure_list[l].measure, Number(ft.properties[measure_list[l].measure]), measure_list[l].unit));
+				
+				// Map SMAP Measures
+				if (Number(ft.properties[measure_list[l].measure]) !== 0) { 
+					smapmeasures.push(new Measure(measure_list[l].measure, Number(ft.properties[measure_list[l].measure]), measure_list[l].unit));
+				}
 			}
 		}		
 		return smapmeasures.length > 0 ? smapmeasures : (Object.entries(ft.properties.measures).length === 0 ? [] : ft.properties.measures);
 	}
 	
 	/** Removes a supply chain from the interface (along with its data) **/
+	ReloadAll() {
+		let chains = [];
+		for (let s in MI.supplychains) {
+			if (MI.supplychains[s].mtype === 'manifest') { chains.push({url:MI.supplychains[s].mtype+'-'+MI.supplychains[s].options.url,id:MI.supplychains[s].options.id}); }
+			else if (MI.supplychains[s].mtype === 'gsheet') {
+				chains.push({url:MI.supplychains[s].mtype+'-'+MI.supplychains[s].options.url.replaceAll('/','').slice(MI.supplychains[s].options.url.replaceAll('/','').lastIndexOf('gsheet') + ('gsheet').length),id:MI.supplychains[s].options.id}); 
+			} else if (MI.supplychains[s].mtype === 'smap') { 
+				let smapurl = MI.supplychains[s].details.url ? MI.supplychains[s].details.url.replace('#','').replace('smap-','') : MI.supplychains[s].options.id;
+				chains.push({url:MI.supplychains[s].mtype+'-'+smapurl,id:MI.supplychains[s].details.id});
+			} else { chains.push({url:MI.supplychains[s].mtype+'-'+MI.supplychains[s].options.url,id:MI.supplychains[s].options.id}); }
+		}
+		for (let c in chains) {
+			MI.Supplychain.Remove(chains[c].id);
+			MI.Interface.LoadFromLauncher(chains[c].url, true, true);
+		}
+	}
 	Remove(id) {
-		event.stopPropagation();
+		if (event) { event.stopPropagation(); }
 
 		let offset = document.getElementById('mheader-'+id).offsetHeight;
 		let targetid = 0;
@@ -546,7 +566,6 @@ class ManifestSupplyChain {
 		
 		MI.Interface.SetVizOptions();
 		MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);			
-		MI.Interface.SetDocumentTitle();	
 	}
 	
 	Hide(id, hide, type='chain') {
@@ -670,15 +689,15 @@ class Measure {
 	GetValue() {
 		if (typeof this.mvalue === 'object') {
 			if (MI.Interface.timeslider) {
-				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
+				this.seriesval = this.seriesval ? this.seriesval : {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
 				for (let v of this.mvalue) {
-					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] >= seriesval.time) { 
-						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
+					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper))) { 
+						this.seriesval.time = Number(Object.keys(v)[0]); this.seriesval.value = Number(Object.values(v)[0]);
 					}
 
 				}
 				
-				return Number(seriesval.value);
+				return Number(this.seriesval.value);
 				
 			} else { return Number(Object.values(this.mvalue[0])[0]); }
 		} else if (typeof this.mvalue === 'string' && this.mvalue.substring(1).includes('-')) { // look for range but ignore negative numbers
@@ -700,14 +719,14 @@ class Measure {
 		
 		if (typeof this.mvalue === 'object') {
 			if (MI.Interface.timeslider) {
-				let seriesval = {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
+				this.seriesval = this.seriesval ? this.seriesval : {time:Number(Object.keys(this.mvalue[0])[0]),value:Number(Object.values(this.mvalue[0])[0])};
 				for (let v of this.mvalue) {
-					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper)) && Object.keys(v)[0] >= seriesval.time) { 
-						seriesval.time = Number(Object.keys(v)[0]); seriesval.value = Number(Object.values(v)[0]);
+					if ( (Object.keys(v)[0] >= Number(MI.Interface.timeslider.lower) && Object.keys(v)[0] <= Number(MI.Interface.timeslider.upper))) { 
+						this.seriesval.time = Number(Object.keys(v)[0]); this.seriesval.value = Number(Object.values(v)[0]);
 					}
 
 				}
-				return Number(seriesval.value);
+				return Number(this.seriesval.value);
 				
 			} else { return Number(Object.values(this.mvalue[0])[0]); }
 		} else { 

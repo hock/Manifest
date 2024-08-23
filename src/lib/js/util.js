@@ -32,6 +32,28 @@ class ManifestUtilities {
 		utcstring = utcstring.slice(4,16);
 		return date.month + ' ' + date.day + ' ' + date.year;
 	}
+	static SetCookie(name,value,days) {
+	    let expires = '';
+	    if (days) {
+	        let date = new Date();
+	        date.setTime(date.getTime() + (days*24*60*60*1000));
+	        expires = '; expires=' + date.toUTCString();
+	    }
+	    document.cookie = 'manifest-'+name +'='+(value || '')+expires+'; path=/';
+	}
+	static GetCookie(name) {
+	    let nameEQ = 'manifest-'+name+'=';
+	    let ca = document.cookie.split(';');
+	    for (let i=0;i < ca.length;i++) {
+	        let c = ca[i];
+	        while (c.charAt(0) === ' ') { c = c.substring(1,c.length); }
+	        if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length,c.length); }
+	    }
+	    return null;
+	}
+	static EraseCookie(name) {   
+	    document.cookie = 'manifest-'+name+'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+	}
 }
 
 function until(conditionFunction) {
