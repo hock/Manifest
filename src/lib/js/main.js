@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			document.getElementById('minfomenu').classList.add('collected-description');
 			document.getElementById('loadlist-group-samples').classList.add('collected-samples');
 			document.getElementById('minfomenu').innerHTML = `<div id="special-collection-message">This is a special collection on <a href="">Manifest</a>.</div>
-			<div id="open-collection-btn"><a onclick="MI.Interface.LoadLauncherCollection();">Open all Manifests</a></div>`;
+			<div id="open-collection-btn" onclick="MI.Interface.LoadLauncherCollection();"><a>Open all Manifests</a></div>`;
 			document.getElementById('loadlist-custom-group').classList.add('closed'); 
 			document.getElementById('load-samples-sampletext').classList.add('closed');
 		}
