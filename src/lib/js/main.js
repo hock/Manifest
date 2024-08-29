@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (MI.options.embed) { MI.Interface.Embedize(); }	
 	if (MI.options.darkmode) { document.body.classList.add('dark'); document.getElementById('colorscheme-checkbox').setAttribute('checked',true); } 
 	
-	document.documentElement.classList.remove('loading');
+	MI.Interface.Initialize();
 	
 	if (MI.options.visualization) { MI.Visualization.type = MI.options.visualization; }
 	

@@ -339,3 +339,12 @@ body.embedmap
 		th.chartmeasure { top:6.5rem;right:calc(0.5rem);width:calc(80% - 2.4rem + 1px); }
 	}
 }
+@media only screen and (max-height: 920px) and (orientation: landscape) { 
+	#chartview th.chartlabel, #chartview th.chartmeasure {
+	    top: 4rem;
+	}
+	#chartview #charttable {
+		margin-top:5rem;
+		height: calc(100% - 9.8rem);
+	}
+}

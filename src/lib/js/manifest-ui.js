@@ -16,6 +16,11 @@ class ManifestUI {
 		document.getElementById('searchclear').addEventListener('click', (e) => { MI.Interface.ClearSearch(); MI.Interface.Search(); });	
 	}
 	
+	/** Called right after page starts if everything is looking ok. **/
+	Initialize() {
+		document.getElementById('manifestlist').innerHTML = '';
+		document.documentElement.classList.remove('loading');
+	}
 	/** Called after Manifest has been initialized and the first supply chain loaded **/ 
 	CleanupInterface() { 	
 		console.dir(MI); 

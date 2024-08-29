@@ -242,4 +242,26 @@
 			.mobiletext {display:initial;}
 		}
 	}
- }
+}
+ 
+@media only screen and (max-height: 920px) and (orientation: landscape) { 
+	body:not(.storymap, .embedmap) 
+ 	{
+ 		#sidewrap {
+ 			width:40%;top:calc(4.5rem);height:calc(100% - 5.5rem);
+ 			#sidepanel{height:100%;}
+ 			&.top { top:calc(4.5rem);height:3.5rem; } 
+ 			&.middle { top:calc(4.5rem);height:calc(100% - 5.5rem); } 
+ 			&.bottom { top: calc(100% - 4.5rem); height: 3.5rem; }
+		}
+ 		#manifestlist .mnode .node-place{display:block;}
+ 	    #view-wrapper {
+ 			.vizmenu{top:0.75rem;right:3.5rem;z-index:13000;}
+ 			.searchwidget {
+ 				top:auto;right:0.5rem;z-index:12000;bottom:1rem;left:auto;padding:0.175rem 0.25rem;
+ 				#searchbar{font-size:1rem;}
+ 			}
+ 		}
+ 		#manifestbar{max-height:calc(100% - 1rem);}	
+ 	}
+}

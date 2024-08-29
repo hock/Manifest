@@ -411,7 +411,7 @@
 	body.textpage .text-menu { display:none;}
 }
 
-@media only screen and (max-width: 920px) and (orientation: portrait) { 
+@media only screen and (max-width: 920px) and (orientation: portrait), only screen and (max-height: 920px) and (orientation: landscape) {  
 	body {  display: flex; flex-flow: column wrap; width:100vw; min-width:100vw; max-width:100vw; }
 	
 	.mobiletext {display:initial;}
@@ -421,21 +421,14 @@
 	#minfoheader { padding:1rem;}
 	#minfodetail { padding:0.1rem 1rem 1rem 1rem; margin:0; min-height: calc(100vh - 4.5rem);}
 	#manifestlist { }
-	#manifestlist li {
-	    padding: 0.5rem 0.5rem;
-	    border-bottom: 0.5px solid;
-	    width: 100%;
-	    margin: 0 auto;
-		overflow:hidden;
-	}
+	#manifestlist li { padding:0.5rem 0.5rem;border-bottom:0.5px solid;width:100%;margin:0 auto;overflow:hidden;border-radius:0;}
 	
 	#manifestsamples { margin:0; padding:0; box-shadow:none;}
 	#samplelist { width:100%; margin:0;}
-	#samplelist .sampletags { padding: 0.5rem 1rem; }
-	#samplelist img { width: 100%; border:1px solid #000; border-radius: 0.5rem; max-height:100vw;}
+	#samplelist img { width:calc(100% + 0.5rem);border:1px solid #000;border-radius:0.5rem;max-height:100vw;margin:0 -0.25rem;border-radius:0;border-left:none;border-right:none;}
 	#samplelist p { height:auto; }
 	
-	#samplelist li { width:calc(100% - 2rem); box-shadow:none;}
+	#samplelist li { width:calc(100% - 0.5rem); padding:0.25rem; margin:0.5rem 0; box-shadow:none; overflow: hidden; border-radius:0;}
 	
 	body.textpage { background:#fff; display: flex; flex-flow: column wrap;}
  	body.textpage #infowrap { display: flex; flex-flow: column wrap; margin:0; padding:0; background:#fff;  width:100%; }
@@ -445,15 +438,24 @@
 	body.textpage .text-menu, body.textpage .splash-image, body.textpage .splash-link, body.textpage #infoborder { display:none; }
 	body.textpage #infowrap .callout.bigtext, body.textpage .bigtext { font-size:1rem; line-height:initial;}
 	body.textpage #infowrap .callout.biggertext { font-size:1rem; line-height:initial;}
-	 
+	body.textpage li.textlistitem { 
+		border-left:4px solid #dfdbf9;padding-left:1rem;margin-bottom:1rem;width:calc(100% - 3rem - 4px);padding-right:1rem; font-size: 1rem; line-height: 1.2rem;
+	}
+	body.textpage div.textcolumn {
+        width: calc(100% - 1rem);
+        padding: 0.5rem;
+		border-bottom: 2px solid #fff;
+	}
+	
+	body.textpage #teambox { margin:0.5rem 0; border-radius:0;}
 	body.textpage #infowrap h1 {margin: 0.5rem 0 0.5rem 0;  padding: 0.5rem 1rem;}
 
 	body.textpage h1, body.textpage h2, body.textpage h3, body.textpage p, body.textpage ul { padding: 0.5rem 1rem; } 
 	body.textpage #infowrap .callout { padding:1rem; margin:0;} 
 	body.textpage ul li { margin-left: 1rem; }
 	body.textpage .splash-link { display:none;; }
-	body.textpage #infowrap .callin { margin:0; padding:1rem;}
-	
+	body.textpage #infowrap .callin { margin:0; padding:1rem;font-size:1rem;line-height:1.2rem;}
+
 	body.textpage .ft-slider-wrapper {
 	  width:100vw;
 	}
@@ -472,17 +474,21 @@
 		display:block
 	}
 	body.textpage .ft-slide {
-	    width: calc(100% - 1rem);
+	    width: calc(100% - 2rem);
+		margin:0; padding:1rem;
 	}
 	body.textpage .ft-slide-arrow { 
 		display:none;
 	}
 	
 	body.textpage .ft-slide img {
-		margin:0;
-	    width: calc(100% - 1rem);
+        margin: 0 -1rem;
+        width: calc(100% + 2rem);
 	}
-	.footer { margin:0; padding-top:1rem;}
+	body.textpage .ft-slide .featured-caption {
+		font-size:1rem;
+	}
+	.footer { margin:0; padding:1rem; width:calc(100% - 2rem); line-height:1.2rem;}
 	.footer .license { float:none;}
 	.footer .license-icons { display:none;}
 	.footer .footer-wrap-right { width:auto; float:none;}
@@ -513,16 +519,29 @@
 	margin: 1.5rem 0 0 0;
 	padding: 0.5rem 1rem;
 	}
-		 
+	
 	body.datapage #datawrap { width:100%;}
 	body.datapage #datawrap p {font-size:1rem; padding:0 1rem;}
 	body.datapage #datawrap h3 { margin:0.5rem 0 0 0; padding:0 1rem;}
+	
+	body.datapage #datawrap .sampletitle { margin:0.5rem 0 0.5rem 0; padding:0 0.75rem;}
+	body.datapage #datawrap .sampledescription p { padding:0 0.75rem;}
+	#samplelist .sampletags { padding: 0.25rem 0.75rem; }
+	body.datapage #datawrap .sampleauthor { margin:0.5rem 0 0.5rem 0; padding:0 0.75rem; }
+	
 	body.datapage #datawrap .name { padding:0.45rem 0;}
 	
 	body.datapage .dataviewer, body.datapage .dataviewer .list { width:100%; overflow:hidden;}
 	body.datapage .dataviewer .list { padding:0;}
 	body.datapage .dataviewer .list li { margin:0; font-size:1rem;}
-	body.datapage #manifestlist li { border:0; padding-left:5rem; padding-right:1rem; width:auto;}
+	body.datapage .dataviewer ul li.entry {
+	    width: calc(100% - 5rem); border-radius:0;
+	}
+	body.datapage .dataviewer ul li.entry:nth-child(odd) { background:#efecfa; } 
+	body.datapage .dataviewer ul li.entry:nth-child(even) { background:#ffffff; } 
+	
+	body.datapage ul.pagination { display:block;float:right;padding:0 1rem;margin:0 0 1rem 0;}
+	body.datapage #manifestlist li { border:0; padding-left:5rem; padding-right:1rem; width:calc(100% - 6rem);}
 	body.datapage #datasort { display:none;}
 	body.datapage #datasearch { display:inline; width:calc(100% - 2rem); margin-left: 1rem; margin-right:1rem;}
  }

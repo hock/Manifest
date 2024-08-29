@@ -26,7 +26,7 @@ class ManifestSupplyChain {
 		
 							</div>		
 						</div>
-						${storymode ? `<div id="storybanner" style="background-color: ${MI.options.embed ? `${tinycolor(d.details.style.fillColor).setAlpha(0.8)}` :  `${d.details.style.fillColor}`}"><span id="minfo"><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}?storymap=false&embed=false"` : ''}>${d.properties.title}</a> on <a href="./">Manifest</a></div>` : ''}
+						${storymode ? `<div id="storybanner" style="background-color: ${MI.options.embed ? `${tinycolor(d.details.style.fillColor).setAlpha(0.8)}` :  `${d.details.style.fillColor}`}"><span id="minfo"><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}?storymap=false&embed=false"` : ''}>${d.properties.title}</a> on <a href="./">Manifest</a></span></div>` : ''}
 
 						<div id="mdetails-${id}" class="mdetails">
 						    <div id="share-options-${id}" class="share-container closed">
