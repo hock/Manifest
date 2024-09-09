@@ -27,17 +27,13 @@ class Manifest {
 
 		if (MI.supplychains.length > 0) {
 			if (!(MI.initialized || delay)) { 
-				MI.Interface.CleanupInterface(); 				
-				document.dispatchEvent( new Event("Manifested"));
-			
+				MI.Interface.CleanupInterface(); document.dispatchEvent( new Event("Manifested"));
 				if (MI.options.demoMode) { MI.ManifestTests(); }
 			}   
 		}
 
 		if (MI.Interface.IsMobile()) {		
-			if (document.getElementById('viz-choices').querySelector('option[value='+document.getElementById('viz-choices').value+']').disabled) {
-				MI.Visualization.type = 'map';
-			}
+			if (document.getElementById('viz-choices').querySelector('option[value='+document.getElementById('viz-choices').value+']').disabled) { MI.Visualization.type = 'map'; }
 			MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);		
 		}
 	}
@@ -48,9 +44,7 @@ class Manifest {
 			MI.Interface.AddDataLayer('services/data/sample/roads.geojson');
 			MI.Interface.AddDataLayer('services/data/sample/countries.pmtiles');
 			//MI.Atlas.LoadExternalDataLayer('png', './json/cases/bishop/australia.png', {extents: [ [100, -1], [165, -4], [163, -45], [100, -45] ]});
-			//MI.Atlas.LoadExternalDataLayer('png', './json/samples/westernelectric/we-map-1927-wm.png', {extents: [ [-180, 85], [180, 85], [180, -85], [-180, -85] ]});
-			
-			
+			//MI.Atlas.LoadExternalDataLayer('png', './json/samples/westernelectric/we-map-1927-wm.png', {extents: [ [-180, 85], [180, 85], [180, -85], [-180, -85] ]});			
 		//	MI.Atlas.Play("tour"); // tour or highlight
 		});		
 		
@@ -68,20 +62,25 @@ class Manifest {
 			document.getElementById('samples-previews').querySelectorAll('.sample-preview').forEach(el => { 
 				if (Number(el.dataset.hash) === options.id) { el.classList.add('loaded'); } 
 		}); }
-		options = Object.assign(options, MI.options);
-	
-		switch(type) {
-			case 'manifest': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST(d, options))); 
-				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
-			case 'smap': this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP(d.geo, options))); 
-				this.SMAPGraph(d.graph, Object.assign(options, {style: d.geo.details.style})); break;
-			case 'yeti': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatYETI(d, options))); break;
-			case 'gsheet': d = this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET(d, options))); 
-				this.ManifestGraph({supplychain: {stops:d.stops, hops:d.hops}}, Object.assign(options, {style: d.details.style})); break;
-		}
+		options = Object.assign(options, MI.options);		
+		options.storymode = options.urlparams.storyMap !== 'false' ? (options.storyMap || options.embed) || (d.setOptions && d.setOptions.storyMap && MI.supplychains.length === 1) : false;
 		
-		d.setOptions = type !== 'smap' ? this.ProcessOptions(d.setOptions, d) : {};
-		MI.Start(options.delay);	
+		let index = MI.supplychains.length;
+
+		switch(type) {
+			case 'manifest': d = this.ManifestGraph(this.Supplychain.Map(this.Supplychain.Setup(this.FormatMANIFEST({index:index, manifest:d, options:options, data:{}})))); 
+				MI.supplychains.push(d.manifest);			
+				d.manifest.setOptions = this.ProcessOptions(d.manifest.setOptions, d.manifest); break;
+			case 'smap':  d = this.SMAPGraph(this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP({index:index, manifest:d.geo, options:options, data:{graph:d.graph}})))); 
+				MI.supplychains.push(d.manifest); break;
+				
+				
+			case 'gsheet': d = this.ManifestGraph(this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET({index:index, manifest:d, options:options, data:{}})))); 
+				MI.supplychains.push(d.manifest);			
+				d.manifest.setOptions = this.ProcessOptions(d.manifest.setOptions, d.manifest); break;
+		}
+		MI.Interface.OnProcessComplete(index, d.manifest.details.id, d.data); 
+		MI.Start(d.options.delay);		
 	}
 	
 	ProcessOptions(options, d) {
@@ -121,7 +120,8 @@ class Manifest {
 		return d.setOptions;
 	}
 	/** Format a Manifest file so Manifest can understand it */
-	FormatMANIFEST(manifest, options) {	
+	FormatMANIFEST(m) {	
+		let index = m.index, manifest = m.manifest, options = m.options, data = m.data;
 		let setOptions = {};
 		for (let o in manifest.options) { setOptions[manifest.options[o].type] = {'value':manifest.options[o].value, 'parameters':manifest.options[o].parameters}; }
 		
@@ -167,24 +167,28 @@ class Manifest {
 			let ft = {type: 'Feature', properties: {title: h.from.properties.title+'|'+h.to.properties.title, category: [...new Set([... h.from.properties.category.split(','),...h.to.properties.category.split(',')])].join(','), connections: {from: {scid: h.from.properties.scid, index: h.from.properties.index}, to: {scid:h.to.properties.scid, index:h.to.properties.index}}}, geometry: {type:"Line", coordinates:[h.from.geometry.coordinates,h.to.geometry.coordinates]}};
 			d.features.push(ft);
 		}	
-		return d;
+		
+		return {index:index, manifest:d, options:options, data:data};		
 	}
 
 	/** Format a legacy Sourcemap file so Manifest can understand it */
-	FormatSMAP(d, options) {
+	FormatSMAP(m) {
+		let index = m.index, d = m.manifest, options = m.options, data = m.data;
+		
 		d.raw = JSON.parse(JSON.stringify(d)); d.mtype = 'smap';
 		d.details = options; d.setOptions = {}; d.details.layers = []; d.details.measures = {}; d.mapper = {}; 
 		d.details.url = options.idref ? '#smap-'+options.idref : '#smap-'+options.id;
-		for (let ft of d.features) {
-			ft.properties.category = '';
-			ft.properties.images = [];
-			ft.properties.sources = [''];
-		}
-		return d;
+		for (let ft of d.features) { ft.properties.category = ''; ft.properties.images = []; ft.properties.sources = ['']; }
+		
+		Object.assign(options, {style: d.details.style});
+		d.options = options;
+		return {index:index, manifest:d, options:options, data:data};				
 	}
 
 	/** Format a google sheet file so Manifest can understand it */
-	FormatGSHEET(d, options) {
+	FormatGSHEET(m) {
+		let index = m.index, d = m.manifest, options = m.options, data = m.data;
+		
 		d.raw = JSON.parse(JSON.stringify(d));
 		let sheetoverview = this.GSheetToJson(d.g)[0], sheetpoints = this.GSheetToJson(d.r);
 		let setOptions = {};		
@@ -295,8 +299,7 @@ class Manifest {
 				sheetsc.stops.push({ 'local_stop_id':Math.max(1,j), 'id':Math.max(1,j), 'attributes':sheetsc.features[j].properties });
 			}					
 		}
-		return sheetsc;
-	
+		return {index:index, manifest:sheetsc, options:options, data:data};		
 	}
 	GSheetToJson(sheet) {
 		let rows = [];
@@ -311,177 +314,114 @@ class Manifest {
 		return rows;
 	}
 	
-	/** Format a Yeti file so Manifest can understand it */
-	FormatYETI(yeti, options) {	
-		let d = {type:'FeatureCollection', mtype: 'yeti'};
-		d.raw = yeti;
-		d.details = options; d.details.layers = []; d.details.measures = {};
-		d.properties = {title: yeti.company_name, description: yeti.company_address};
-		for (let item in yeti){	d.properties[item] = yeti[item]; }	
-		d.tempFeatures = d.properties.vendor_table; delete d.properties.vendor_table;	
-				
-		// Format Layer
-		d.features = [];
-	
-		for (let i in d.tempFeatures) {
-			if (typeof d.tempFeatures[i] !== 'undefined') {
-				d.features[i] = {type: 'Feature'};			
-				d.features[i].properties = {};	
-				for (let ft in d.tempFeatures[i]) { d.features[i][ft] = d.tempFeatures[i][ft]; }
-				d.features[i].properties.title = d.tempFeatures[i].vendor_name; delete d.tempFeatures[i].vendor_name;
-				d.features[i].properties.description = d.tempFeatures[i].product_descriptions.join(' / '); delete d.tempFeatures[i].product_descriptions;
-				d.features[i].properties.placename = d.tempFeatures[i].vendor_address; delete d.tempFeatures[i].vendor_address;
-						
-				d.features[i].properties.measures = {};
-				d.features[i].properties.percent = d.tempFeatures[i].shipments_percents_company;
-				d.features[i].properties.measures.percent = d.tempFeatures[i].shipments_percents_company;
-				d.details.measures.percent = {max:100, min:0};
-				d.features[i].geometry = {type:'Point', coordinates:[d.tempFeatures[i].lng, d.tempFeatures[i].lat]};
-			}
-		}
-	
-		delete d.tempFeatures;
-		return d;
-	}
-
 	/** Setup the graph relationships for Manifest files **/
-	ManifestGraph(d, options) {
-		let sc = null;
-		for (let s in MI.supplychains) {
-			if (MI.supplychains[s].details.id === options.id) { 
-				MI.supplychains[s].graph = {nodes:[], links:[]}; 
-				sc = MI.supplychains[s]; 
-			} 
-		}
+	ManifestGraph(m) {
+		let index = m.index, manifest = m.manifest, options = m.options, data = m.data;
+		
+		manifest.graph = {nodes:[], links:[]}; 
 
-		if (typeof d.supplychain.stops !== 'undefined') {
-			for (let i = 0; i < d.supplychain.stops.length; ++i) {
+		if (typeof manifest.stops !== 'undefined') {
+			for (let i = 0; i < manifest.stops.length; ++i) {
 			
-				let title = (d.supplychain.stops[i].attributes.title) ? d.supplychain.stops[i].attributes.title : 'Node';
-				let place = (d.supplychain.stops[i].attributes.placename) ? d.supplychain.stops[i].attributes.placename : 
-							((d.supplychain.stops[i].attributes.address) ? d.supplychain.stops[i].attributes.address : '');
+				let title = (manifest.stops[i].attributes.title) ? manifest.stops[i].attributes.title : 'Node';
+				let place = (manifest.stops[i].attributes.placename) ? manifest.stops[i].attributes.placename : 
+							((manifest.stops[i].attributes.address) ? manifest.stops[i].attributes.address : '');
 				let loc = place.split(', ').pop();
-				let localstopid = Number(d.supplychain.stops[i].local_stop_id-1);
-				let newNode = { id: options.id+'-'+localstopid, name: title, loc: loc, place: place, group: options.id, links: [], ref: sc.mapper[localstopid],
+				let localstopid = Number(manifest.stops[i].local_stop_id-1);
+				let newNode = { id: options.id+'-'+localstopid, name: title, loc: loc, place: place, group: options.id, links: [], ref: manifest.mapper[localstopid],
 					color: options.style.color, fillColor: options.style.fillColor };
-				sc.graph.nodes[d.supplychain.stops[i].local_stop_id - 1] = newNode;
+				manifest.graph.nodes[manifest.stops[i].local_stop_id - 1] = newNode;
 			}
 		}
 		
-		if (typeof d.supplychain.hops !== 'undefined' && d.supplychain.hops.length > 0) {
-			sc.graph.type = 'directed';
-			for (let j = 0; j < d.supplychain.hops.length; ++j) {	
-				sc.graph.nodes[d.supplychain.hops[j].to_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[j].from_stop_id - 1].loc);
-				let newLink = { source: Number(d.supplychain.hops[j].from_stop_id - 1), target: Number(d.supplychain.hops[j].to_stop_id - 1),
+		if (typeof manifest.hops !== 'undefined' && manifest.hops.length > 0) {
+			manifest.graph.type = 'directed';
+			for (let j = 0; j < manifest.hops.length; ++j) {	
+				manifest.graph.nodes[manifest.hops[j].to_stop_id - 1].links.push(manifest.graph.nodes[manifest.hops[j].from_stop_id - 1].loc);
+				let newLink = { source: Number(manifest.hops[j].from_stop_id - 1), target: Number(manifest.hops[j].to_stop_id - 1),
 					 color: options.style.color, fillColor: options.style.fillColor};
-				sc.graph.links.push(newLink);
+				manifest.graph.links.push(newLink);
 
 			} 	
-			for (let k = 0; k < d.supplychain.hops.length; ++k) {
-				sc.graph.nodes[d.supplychain.hops[k].from_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[k].to_stop_id - 1].loc);
+			for (let k = 0; k < manifest.hops.length; ++k) {
+				manifest.graph.nodes[manifest.hops[k].from_stop_id - 1].links.push(manifest.graph.nodes[manifest.hops[k].to_stop_id - 1].loc);
 			}
-		} else { sc.graph.type = 'undirected'; }
+		} else { manifest.graph.type = 'undirected'; }
 
-		for (let l = 0; l < sc.graph.links.length; l++) {
-			sc.graph.links[l].source = String(options.id)+'-'+(sc.graph.links[l].source);
-			sc.graph.links[l].target = String(options.id)+'-'+(sc.graph.links[l].target);		
+		for (let l = 0; l < manifest.graph.links.length; l++) {
+			manifest.graph.links[l].source = String(options.id)+'-'+(manifest.graph.links[l].source);
+			manifest.graph.links[l].target = String(options.id)+'-'+(manifest.graph.links[l].target);		
 		}
-		for (let l = 0; l < sc.graph.nodes.length; l++) {
-			if (typeof sc.graph.nodes[l] !== 'undefined') {
-				let id = sc.graph.nodes[l].id.split('-');
-				sc.graph.nodes[l].id = id[0]+'-'+(Number(id[1]));				
+		for (let l = 0; l < manifest.graph.nodes.length; l++) {
+			if (typeof manifest.graph.nodes[l] !== 'undefined') {
+				let id = manifest.graph.nodes[l].id.split('-');
+				manifest.graph.nodes[l].id = id[0]+'-'+(Number(id[1]));				
 			}
 		}	
-		MI.Interface.SetVizOptions();	
+		return {index:index, manifest:manifest, options:options, data:data};		
 	}
 	
-	SMAPGraph(d, options) {
-		let sc = null;
-		for (let s in MI.supplychains) {
-			if (MI.supplychains[s].details.id === options.id) { 
-				MI.supplychains[s].graph = {nodes:[], links:[]}; 
-				sc = MI.supplychains[s]; 
-			} 
-		}
+	SMAPGraph(m) {
+		let index = m.index, d = m.manifest, options = m.options, data = m.data;
+		
+		let sc = {nodes:[], links:[]};
 
 		let digits = null;
-		if (typeof d.supplychain.stops !== 'undefined') {
-			//d.supplychain.stops = d.supplychain.stops.reverse();
-			for (let i = 0; i < d.supplychain.stops.length; ++i) {
+		if (typeof data.graph.supplychain.stops !== 'undefined') {
+			//data.graph.supplychain.stops = data.graph.supplychain.stops.reverse();
+			for (let i = 0; i < data.graph.supplychain.stops.length; ++i) {
 			
-				let title = (d.supplychain.stops[i].attributes.title) ? d.supplychain.stops[i].attributes.title : 'Node';
-				let place = (d.supplychain.stops[i].attributes.placename) ? d.supplychain.stops[i].attributes.placename : 
-							((d.supplychain.stops[i].attributes.address) ? d.supplychain.stops[i].attributes.address : '');
+				let title = (data.graph.supplychain.stops[i].attributes.title) ? data.graph.supplychain.stops[i].attributes.title : 'Node';
+				let place = (data.graph.supplychain.stops[i].attributes.placename) ? data.graph.supplychain.stops[i].attributes.placename : 
+							((data.graph.supplychain.stops[i].attributes.address) ? data.graph.supplychain.stops[i].attributes.address : '');
 				let loc = place.split(', ').pop();
 
 				// Correct local stop id
-				digits = (Math.round(100*Math.log(d.supplychain.stops.length)/Math.log(10))/100)+1;
-				d.supplychain.stops[i].local_stop_id = Number((''+d.supplychain.stops[i].local_stop_id).slice(-1*digits));
+				digits = (Math.round(100*Math.log(data.graph.supplychain.stops.length)/Math.log(10))/100)+1;
+				data.graph.supplychain.stops[i].local_stop_id = Number((''+data.graph.supplychain.stops[i].local_stop_id).slice(-1*digits));
 
-				let ref = sc.mapper['map'+place.replace(/[^a-zA-Z0-9]/g, '')+title.replace(/[^a-zA-Z0-9]/g, '')];
-				let newNode = { id: options.id+'-'+Number(d.supplychain.stops[i].local_stop_id-1), name: title, loc: loc, place: place, group: options.id, links: [], ref: ref,
+				let ref = d.mapper['map'+place.replace(/[^a-zA-Z0-9]/g, '')+title.replace(/[^a-zA-Z0-9]/g, '')];
+				let newNode = { id: options.id+'-'+Number(data.graph.supplychain.stops[i].local_stop_id-1), name: title, loc: loc, place: place, group: options.id, links: [], ref: ref,
 					color: options.style.color, fillColor: options.style.fillColor };
-				sc.graph.nodes[d.supplychain.stops[i].local_stop_id - 1] = newNode;
+				sc.nodes[data.graph.supplychain.stops[i].local_stop_id - 1] = newNode;
 			}
-		} delete sc.mapper; // Remove Mapper
+		} delete d.mapper; // Remove Mapper
 	
-		if (typeof d.supplychain.hops !== 'undefined' && d.supplychain.hops.length > 0) {
-			sc.graph.type = 'directed';
-			for (let j = 0; j < d.supplychain.hops.length; ++j) {
+		if (typeof data.graph.supplychain.hops !== 'undefined' && data.graph.supplychain.hops.length > 0) {
+			sc.type = 'directed';
+			for (let j = 0; j < data.graph.supplychain.hops.length; ++j) {
 				// Correct stop ids
-				d.supplychain.hops[j].to_stop_id = Number((''+d.supplychain.hops[j].to_stop_id).slice(-1*digits));
-				d.supplychain.hops[j].from_stop_id = Number((''+d.supplychain.hops[j].from_stop_id).slice(-1*digits));
+				data.graph.supplychain.hops[j].to_stop_id = Number((''+data.graph.supplychain.hops[j].to_stop_id).slice(-1*digits));
+				data.graph.supplychain.hops[j].from_stop_id = Number((''+data.graph.supplychain.hops[j].from_stop_id).slice(-1*digits));
 			
-				sc.graph.nodes[d.supplychain.hops[j].to_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[j].from_stop_id - 1].loc);
-				let newLink = { source: Number(d.supplychain.hops[j].from_stop_id - 1), target: Number(d.supplychain.hops[j].to_stop_id - 1),
+				sc.nodes[data.graph.supplychain.hops[j].to_stop_id - 1].links.push(sc.nodes[data.graph.supplychain.hops[j].from_stop_id - 1].loc);
+				let newLink = { source: Number(data.graph.supplychain.hops[j].from_stop_id - 1), target: Number(data.graph.supplychain.hops[j].to_stop_id - 1),
 					 color: options.style.color, fillColor: options.style.fillColor};
-				sc.graph.links.push(newLink);
+				sc.links.push(newLink);
 
 			} 	
-			for (let k = 0; k < d.supplychain.hops.length; ++k) {
-				sc.graph.nodes[d.supplychain.hops[k].from_stop_id - 1].links.push(sc.graph.nodes[d.supplychain.hops[k].to_stop_id - 1].loc);
+			for (let k = 0; k < data.graph.supplychain.hops.length; ++k) {
+				sc.nodes[data.graph.supplychain.hops[k].from_stop_id - 1].links.push(sc.nodes[data.graph.supplychain.hops[k].to_stop_id - 1].loc);
 			}
-		} else { sc.graph.type = 'undirected'; }
+		} else { sc.type = 'undirected'; }
 
 		let offset = 0;
-		for (let l = 0; l < sc.graph.nodes.length; l++) { if (typeof sc.graph.nodes[l] === 'undefined') { offset++; } }
-		for (let l = 0; l < sc.graph.links.length; l++) {
-			sc.graph.links[l].source = String(options.id)+'-'+(sc.graph.links[l].source - offset);
-			sc.graph.links[l].target = String(options.id)+'-'+(sc.graph.links[l].target - offset);		
+		for (let l = 0; l < sc.nodes.length; l++) { if (typeof sc.nodes[l] === 'undefined') { offset++; } }
+		for (let l = 0; l < sc.links.length; l++) {
+			sc.links[l].source = String(options.id)+'-'+(sc.links[l].source - offset);
+			sc.links[l].target = String(options.id)+'-'+(sc.links[l].target - offset);		
 		}
-		for (let l = 0; l < sc.graph.nodes.length; l++) {
-			if (typeof sc.graph.nodes[l] !== 'undefined') {
-				let id = sc.graph.nodes[l].id.split('-');
-				sc.graph.nodes[l].id = id[0]+'-'+(Number(id[1])-offset);				
+		for (let l = 0; l < sc.nodes.length; l++) {
+			if (typeof sc.nodes[l] !== 'undefined') {
+				let id = sc.nodes[l].id.split('-');
+				sc.nodes[l].id = id[0]+'-'+(Number(id[1])-offset);				
 			}
 		}		
 		let adjgraph = [];
-		for (let l = 0; l < sc.graph.nodes.length; l++) { if (typeof sc.graph.nodes[l] !== 'undefined') { adjgraph.push(sc.graph.nodes[l]); } }
-		sc.graph.nodes = adjgraph.reverse();
-		MI.Interface.SetVizOptions();		
-	}
-
-	/** Setup the graph relationships for Yeti files **/
-	YETIGraph(d, options) {
-		let sc = null;
-		for (let i in MI.supplychains) {
-			if (MI.supplychains[i].details.id === options.id) { 
-				MI.supplychains[i].graph = {nodes:[], links:[]}; 
-				sc = MI.supplychains[i]; 
-			} 
-		}
-		let root = { id: sc.details.id, group: 1, name: sc.properties.company_name, ref: sc.features[0] };
-		sc.graph.nodes.push(root);
-	
-		for (let f in sc.features) {
-			let node = { id: sc.features[f].properties.lid, group: sc.features[f].properties.lid, name: sc.features[f].properties.title, ref: sc.features[f] };
-			sc.graph.nodes.push(node);
-		}
-		for (let j = 1; j <  sc.graph.nodes.length; ++j) {
-			let link = { size: 4, source: 0, target: j, value: 10 };
-			sc.graph.links.push(link);
-		}	
-		sc.graph.type = 'directed';
+		for (let l = 0; l < sc.nodes.length; l++) { if (typeof sc.nodes[l] !== 'undefined') { adjgraph.push(sc.nodes[l]); } }
+		sc.nodes = adjgraph.reverse();
+		d.graph = sc;	
+		return {index:index, manifest:d, options:options, data:data};			
 	}
 
 	LoadManifestFile(filedata, filename) {

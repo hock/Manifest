@@ -18,7 +18,7 @@
             padding: 0.1,
             // whether or not to register the mouse and keyboard
             // events on the maplibre overlay
-            interactive: false,
+            interactive: true,
             // set the tilepane as the default pane to draw gl tiles
             pane: 'tilePane'
         },

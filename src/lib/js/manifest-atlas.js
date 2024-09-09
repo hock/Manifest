@@ -38,7 +38,7 @@ class ManifestAtlas {
 		 		
 		/* Define Layers */
 		this.layerdefs = {
-			default:	{ description: 'Default', noWrap: true, layer: new L.maplibreGL({ style: this.tiletypes.DEFAULT, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
+			default:	{ description: 'Default', noWrap: true, layer: new L.maplibreGL({  interactive: true, style: this.tiletypes.DEFAULT, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			topo:	{ description: 'Topographic', layer: new L.maplibreGL({ style: this.tiletypes.TOPO, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			satellite:	{ description: 'Satellite Image', layer: new L.maplibreGL({ style: this.tiletypes.SATELLITE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
 			grayscale:	{ description: 'Grayscale', layer: new L.maplibreGL({ style: this.tiletypes.GRAYSCALE, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' })},
@@ -49,7 +49,9 @@ class ManifestAtlas {
 
 		this.vdatalayers = {
 			shippinglanes: {id: 'shippinglanes', url: 'pmtiles://services/data/shippinglanes.pmtiles', type: 'vector', sourcelayer: 'Shipping_Lanes_v1', paintrules: { 'line-color': '#1a3d68', 'line-width': 3, 'line-opacity': 0.1 }, layertype: 'line'},
-			railroads: {id: 'railroads', url: 'pmtiles://services/data/railroads.pmtiles', type: 'vector', sourcelayer: 'globalrailways1', paintrules: { 'line-color': '#684519', 'line-width': 1, 'line-opacity': 0.6 }, layertype: 'line'}
+			railroads: {id: 'railroads', url: 'pmtiles://services/data/railroads.pmtiles', type: 'vector', sourcelayer: 'globalrailways1', paintrules: { 'line-color': '#684519', 'line-width': 1, 'line-opacity': 0.6 }, layertype: 'line'},
+			cables: {id: 'cables', data: 'services/data/cables.geojson', type: 'geojson', sourcelayer: 'cables', paintrules: { "fill-color": "#ff69b4", 'line-color': '#ff69b4', "circle-stroke-color": "#ffffff", 'line-width': 2, 'circle-radius': 4, 'circle-stroke-width': 2 }, layertype: 'line'},
+			ais: {id: 'ais', data: 'services/data/ais.geojson', type: 'geojson', sourcelayer: 'cables', paintrules: { "fill-color": "#0096FF", 'line-color': '#0096FF', "circle-stroke-color": "#0047AB", 'line-width': 2, 'circle-radius': 4, 'circle-stroke-width': 2 }, layertype: 'line'}
 			//marinetraffic: {id: 'marinetraffic', tiles: this.tiletypes.MARINE, type: 'raster', tileSize: 256, minZoom: 3, maxZoom: 18, paintrules: { 'raster-saturation': -1, 'raster-opacity': 0.75 }, layertype: 'line'}
 		};
 						  
@@ -77,13 +79,18 @@ class ManifestAtlas {
 			document.getElementById('basemap-chooser').append(option);
 		}
 		// glMap Setup
-		this.glMap = this.layerdefs[this.baselayer].layer._glMap;
+		this.glMap = this.layerdefs[this.baselayer].layer.getMaplibreMap();
 		this.glMap.on('load', (e) => { 
 			for (let vl in MI.Atlas.vdatalayers) {
 				if (MI.Atlas.vdatalayers[vl].type === 'vector' && MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) === undefined) {
 					MI.Atlas.glMap.addSource('mlayer-'+MI.Atlas.vdatalayers[vl].id, {
 				      type: 'vector',
 				      url: 'pmtiles://services/data/'+MI.Atlas.vdatalayers[vl].id+'.pmtiles'
+				  	});	
+				} else if (MI.Atlas.vdatalayers[vl].type === 'geojson' && MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) === undefined) {
+					MI.Atlas.glMap.addSource('mlayer-'+MI.Atlas.vdatalayers[vl].id, {
+				      type: 'geojson',
+					  data: MI.Atlas.vdatalayers[vl].data,
 				  	});	
 				} else if (MI.Atlas.vdatalayers[vl].type === 'raster' && MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) === undefined) {
 					MI.Atlas.glMap.addSource('mlayer-'+MI.Atlas.vdatalayers[vl].id, {
@@ -313,6 +320,7 @@ class ManifestAtlas {
 		 	
 		MI.Atlas.MeasureSort(feature, layer);
 	}
+
 	PopMLink(str) { return str.replaceAll('class="manifest-link"','class="manifest-link" onclick="MI.Interface.Link(event.target.href, event);"'); }
 
 	/** Render lines by setting up a GeoJSON feature for display **/
@@ -337,7 +345,6 @@ class ManifestAtlas {
 				if (typeof l.feature !== 'undefined' && l.feature.properties.lid === Number(pid)) {
 					if (MI.Visualization.type === 'map') { 
 						this.SetActivePoint(l); 
-						
 						if (options.fit && typeof MI.supplychains[l.feature.properties.mindex-1] !== 'undefined') { 
 							let sid = MI.supplychains[l.feature.properties.mindex-1].details.id;
 							let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});	
@@ -346,7 +353,7 @@ class ManifestAtlas {
 						}
 						if (!options.flyto) {
 							if (!MI.options.storyMap) { if (options.open) { l.openPopup(); } }
-							else {  								
+							else {  			
 								if (this.map.getBounds().contains(l._latlng)) { this.map.flyTo(l._latlng, this.map.getZoom(), {updateWhenZooming: false, duration: 1});
 								} else { this.map.setView(l._latlng, this.map.getZoom(), {animate: false}); }
 							}						
@@ -356,14 +363,27 @@ class ManifestAtlas {
 							} else {
 								let sid = MI.supplychains[0].details.id;
 								let mlayer = MI.Atlas.maplayer.find(function(e) { return e.id === this.id; }, {id: sid});	
-								let zoomlevel = options.zoom ? options.zoom : Math.max(10, this.map._getBoundsCenterZoom(mlayer.points.getBounds()).zoom);
-								this.map.flyTo(l._latlng, zoomlevel); 				
+								let offset = l.feature.properties.lid % 2 === 0 ? document.documentElement.clientWidth/4 : document.documentElement.clientWidth/4 * -1;
+								let zoomlevel = Math.max(4,MI.options.zoom);
+								if (this.map.getZoom() === zoomlevel) { 
+									let ll = this.map.unproject(this.map.project(new L.latLng(l._latlng.lat,l._latlng.lng),this.map.getZoom()),this.map.getZoom()); 
+									ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x+offset, this.map.latLngToContainerPoint(ll).y]);	
+									this.map.flyTo(ll, zoomlevel); 
+								} else { 
+									this.map._stop(); 
+									this.map.setView(l._latlng, zoomlevel, {animate: false}); 
+									
+									let ll = this.map.unproject(this.map.project(new L.latLng(l._latlng.lat,l._latlng.lng),this.map.getZoom()),this.map.getZoom()); 
+									ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x+offset, this.map.latLngToContainerPoint(ll).y]);	
+									this.map.flyTo(ll, zoomlevel); 
+								}								
 							}
 							this.SetActivePoint({_latlng: l.feature.properties.latlng}); 
 							if (!l.feature.properties.disabled) {							
 								l.setStyle({fillColor: l.feature.properties.style.highlightColor});	
 							}
 						}
+						if (MI.options.storyMap || MI.options.embed) { l.bringToFront(); }
 					} 
 				}
 				else if (options.flyto) { 
@@ -618,9 +638,14 @@ class ManifestAtlas {
 						
 						for (let i in this.map._layers) {		
 							if (typeof this.map._layers[i].feature !== 'undefined' && this.map._layers[i].feature.properties.lid === Number(nodeId)) {
-								let offset = document.documentElement.clientHeight/2 - document.getElementById('mheader-'+sid).offsetHeight/2;
+		
+								let eloff = window.innerHeight - document.querySelector('.mdetails').getBoundingClientRect().bottom;
+								let offset = (-1 * window.innerHeight/2) + (eloff/2);
+								//let offset = document.documentElement.clientHeight/4;
+
 								ll = this.map.unproject(this.map.project(new L.latLng(this.map._layers[i].feature.geometry.coordinates[1],this.map._layers[i].feature.geometry.coordinates[0]),MI.options.zoom),MI.options.zoom); 
-    							ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x, this.map.latLngToContainerPoint(ll).y-offset]);								
+			
+    							ll = this.map.containerPointToLatLng([this.map.latLngToContainerPoint(ll).x, this.map.latLngToContainerPoint(ll).y+offset]);								
 							}
 						}
 						MI.Atlas.map.setView(ll, MI.options.zoom, {animate: false}); 
@@ -671,15 +696,15 @@ class ManifestAtlas {
 		let def = MI.Atlas.layerdefs[tile.toLowerCase()];
 		
 		if (MI.Atlas.glMapLoaded) {
-		    const layers = map.getStyle().layers;
-		    const sources = map.getStyle().sources;
-		    const filteredLayers = layers.filter(obj => { return obj.source !== undefined ? obj.source.includes('mlayer-') : false; });
-
-			const filteredSources = {};
-			for (let src of (Object.keys(sources))) { if (src.substr(0, 6) === 'mlayer') { filteredSources[src] = sources[src]; }}
-	
 		    fetch(style).then(r => r.json()).then(s => {
 		        const newStyle = s;
+			    const layers = map.getStyle().layers;
+			    const sources = map.getStyle().sources;
+			    const filteredLayers = layers.filter(obj => { return obj.source !== undefined ? obj.source.includes('mlayer-') : false; });
+
+				const filteredSources = {};
+				for (let src of (Object.keys(sources))) { if (src.substr(0, 6) === 'mlayer') { filteredSources[src] = sources[src]; }}
+	
 		        newStyle.layers = [...newStyle.layers, ...filteredLayers];
 		        newStyle.sources = Object.assign(newStyle.sources, filteredSources); 
 		        map.setStyle(newStyle);
@@ -706,7 +731,29 @@ class ManifestAtlas {
 			let poly = MI.Atlas.glMap.getLayer(dlid+'-poly');
 		
 			if (el.checked && point === undefined && line === undefined && poly === undefined) { 	
-					//MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'circle', 'source': 'mlayer-'+dlid, 'paint': {'circle-radius': 4, 'circle-stroke-width': 2, 'circle-color': '#ff69b4', 'circle-stroke-color': 'white' }, 'filter': ['==', '$type', 'Point'] });
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'circle', 'source': 'mlayer-'+dlid, 'paint': {'circle-radius': MI.Atlas.vdatalayers[el.value].paintrules['circle-radius'], 'circle-stroke-width': MI.Atlas.vdatalayers[el.value].paintrules['circle-stroke-width'], 'circle-color': MI.Atlas.vdatalayers[el.value].paintrules['fill-color'], 'circle-stroke-color': MI.Atlas.vdatalayers[el.value].paintrules['circle-stroke-color'] }, 'filter': ['==', '$type', 'Point'] });				
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-line', 'type': 'line', 'source': 'mlayer-'+dlid, 'paint': { 'line-color': MI.Atlas.vdatalayers[el.value].paintrules['line-color'], 'line-width': MI.Atlas.vdatalayers[el.value].paintrules['line-width'] }, 'filter': ['==', '$type', 'LineString'] });				
+					MI.Atlas.glMap.addLayer({ 'id': dlid+'-poly', 'type': 'fill', 'source': 'mlayer-'+dlid, 'paint': { "fill-color": MI.Atlas.vdatalayers[el.value].paintrules['fill-color'] }, 'filter': ['==', '$type', 'Polygon'] });
+					// @TODO adding interactivity to geojson (see _onMouseMove in leaflet.js)
+
+			        MI.Atlas.glMap.on('mouseenter', dlid+'-point', (e) => {
+			            const coordinates = e.features[0].geometry.coordinates.slice();
+			            const description = e.features[0].properties.name;
+						const pos = MI.Atlas.map.latLngToContainerPoint(new L.LatLng(coordinates[1],coordinates[0]));
+						if (description !== '') {
+							const tooltip = document.createElement("div");
+							tooltip.id = 'tooltip-geojson'; tooltip.classList.add('mtooltip'); tooltip.style.top = pos.y+'px'; tooltip.style.left = pos.x+10+'px'; 
+							tooltip.textContent = e.features[0].properties.name;
+							document.getElementById('map').appendChild(tooltip);
+						}
+			        });
+
+			        MI.Atlas.glMap.on('mouseleave', dlid+'-point', () => {
+						if (document.getElementById('tooltip-geojson')) {
+			           		document.getElementById('tooltip-geojson').remove();
+						}
+			        });
+					/*
 					if (!MI.Atlas.glMap.hasImage('boat')) {
 						MI.Atlas.glMap.loadImage('https://hockbook.local/Manifest/dist/images/markers/boat-angle.png', function(error, image) {
 							if (error) { throw error; }
@@ -715,18 +762,14 @@ class ManifestAtlas {
 						});
 					} else {
 						MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'symbol', 'source': 'mlayer-'+dlid, 'layout': { 'icon-image': 'boat', 'icon-size': 0.15, 'icon-rotate': ['get', 'heading'] }, 'filter': ['==', '$type', 'Point']});
-					}
-					
-					MI.Atlas.glMap.addLayer({ 'id': dlid+'-line', 'type': 'line', 'source': 'mlayer-'+dlid, 'paint': { 'line-color': '#ff69b4', 'line-width': 2 }, 'filter': ['==', '$type', 'LineString'] });				
-					MI.Atlas.glMap.addLayer({ 'id': dlid+'-poly', 'type': 'fill', 'source': 'mlayer-'+dlid, 'paint': { "fill-color": "#ff69b4" }, 'filter': ['==', '$type', 'Polygon'] });
-
+					}*/
 			} 
 			else if ( point !== undefined || line !== undefined || poly !== undefined) {			 
 				MI.Atlas.glMap.removeLayer(dlid+'-point'); MI.Atlas.glMap.removeLayer(dlid+'-line'); MI.Atlas.glMap.removeLayer(dlid+'-poly');
 			}  
 		// Image Layers
-		} else if (el.classList.contains('imagelayer')) {
-			if (el.checked && MI.Atlas.glMap.getLayer(dlid) === undefined) { 		
+		} else if (el.classList.contains('imagelayer')) {			
+			if (el.checked && MI.Atlas.glMap.getLayer(dlid) === undefined) { 
 				this.glMap.addLayer({ "id": dlid, "source": 'mlayer-'+dlid, "type": "raster", "paint": { "raster-opacity": 1 } }); 		
 			} else if ( MI.Atlas.glMap.getLayer(dlid) !== undefined) { MI.Atlas.glMap.removeLayer(dlid); } 
 		// Other Raster Layers
@@ -743,6 +786,7 @@ class ManifestAtlas {
 	LoadExternalDataLayer(type, ref, options=null) {
 		switch(type) {
 			case 'geojson': fetch(ref).then(r => r.json()).then(geojson => MI.Atlas._addGeojson(geojson,ref)); break;
+			case 'json': fetch(ref).then(r => r.json()).then(geojson => MI.Atlas._addGeojson(geojson,ref)); break;
 			case 'pmtiles': 
 				const p = new pmtiles.PMTiles(ref);
 				p.getMetadata().then(h => {					
@@ -796,7 +840,7 @@ class ManifestAtlas {
 		if (MI.Atlas.glMap.getSource('mlayer-udl_'+ref) === undefined) {
 			MI.Atlas.vdatalayers['udl_'+ref] = {id: 'udl_'+ref, scid: options.scid, data: ref, type: 'image', sourcelayer: ref};	
 			this.glMap.addSource('mlayer-udl_'+ref, { "type": "image", "url": ref, "coordinates": options.extents });
-							
+				
 			let dlayer = document.createElement('div'), dcontainer = document.createElement('label'), dcheck = document.createElement('input');
 			dlayer.id = 'lc-udl_'+ref; dlayer.classList.add('layerrow'); dcontainer.classList.add('layercontainer'); dcontainer.innerHTML = `<span class="layercheckmark"><i class="fas"></i></span> ${ref.split('/').pop()}`;
 			dcheck.type = 'checkbox'; dcheck.checked = true; dcheck.id = 'udl_'+ref; dcheck.value = 'udl_'+ref; dcheck.classList.add('imagelayer');
@@ -804,7 +848,7 @@ class ManifestAtlas {
 			dcheck.addEventListener('click', (e) => { MI.Atlas.ProcessDataLayerFromElement(dcheck);});		
 			document.getElementById('userdatalayers').appendChild(dlayer); dlayer.appendChild(dcontainer); dcontainer.prepend(dcheck); 
 		
-			if (MI.Atlas.glMapLoaded) {MI.Atlas.ProcessDataLayerFromElement(dcheck);}
+			if (MI.Atlas.glMapLoaded) {	MI.Atlas.ProcessDataLayerFromElement(dcheck);}
 		} else {
 			MI.Interface.ShowMessage('Data source already added.');
 		}			

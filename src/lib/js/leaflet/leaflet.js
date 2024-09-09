@@ -12540,8 +12540,9 @@
 
   	_onMouseMove: function (e) {
   		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return; }
-
-  		var point = this._map.mouseEventToLayerPoint(e);
+  		var point = this._map.mouseEventToLayerPoint(e);	
+		//var ll = this._map.layerPointToLatLng(point);
+		//MI.Atlas.glMap.fire('mousemove', { target: MI.Atlas.glMap, originalEvent: e, point: point, lngLat: new maplibregl.LngLat(ll.lng, ll.lat)});
   		this._handleMouseHover(e, point);
   	},
 

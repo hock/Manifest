@@ -19,8 +19,7 @@
 	<link rel="stylesheet" href="<%= css_core_path %>" media="screen">
 	<link href="<%= css_path %>" rel="preload" as="style" media="screen" onload="this.onload=null;this.rel='stylesheet'">
 	<noscript><link rel="stylesheet" href="<%= css_path %>" media="screen"></noscript>
-	<link href="<%= css_printpath %>" rel="preload" as="style" media="print" onload="this.onload=null;this.rel='stylesheet'">
-	<noscript><link rel="stylesheet" href="<%= css_printpath %>" media="print"></noscript>
+	<link rel="stylesheet" href="<%= css_printpath %>" media="print">
 	
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
     <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
@@ -42,7 +41,7 @@
 	</script>
 	<!-- /build -->
 
-	<!-- build:section layout.header --><!-- /build -->	
+	<!-- build:section recursive layout.header --><!-- /build -->	
 </head>
 
 <body>
@@ -55,7 +54,8 @@
 	</section>
 	<section id="sidewrap">
 		<section id="sidepanel">
-			<div id="manifestlist"></div>
+			<div id="manifestlist">
+			</div>
 		</section>
 	</section>
 	<main id="view-wrapper" class="view-wrapper">
@@ -113,8 +113,11 @@
 				<div id="datalayers">
 					<h3>Data Layers</h3> 
 					<p id="datalayers-description"></p>
-					<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes</label></div>
-					<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections</label></div>
+					<div class="layerrow"><label for="shippinglanes" class="layercontainer"><input id="shippinglanes" type="checkbox" value="shippinglanes" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Shipping Lanes <span class="dl-type pmtile">pmtile</span></label></div>
+					<div class="layerrow"><label for="railroads" class="layercontainer"><input id="railroads" type="checkbox" value="railroads" class="vector"><span class="layercheckmark"><i class="fas"></i></span> Rail Connections <span class="dl-type pmtile">pmtile</span></label></div>
+					<div class="layerrow"><label for="cables" class="layercontainer"><input id="cables" type="checkbox" value="cables" class="geojson"><span class="layercheckmark"><i class="fas"></i></span> Undersea Cables <span class="dl-type geojson">geojson</span></label></div>
+					<div class="layerrow"><label for="ais" class="layercontainer"><input id="ais" type="checkbox" value="ais" class="geojson"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic <span class="dl-type geojson">geojson</span></label></div>
+					
 					<!--div class="layerrow"><label for="marinetraffic" class="layercontainer"><input id="marinetraffic" type="checkbox" value="marinetraffic" class="raster"><span class="layercheckmark"><i class="fas"></i></span> Marine Traffic</label></div-->
 					<div id="userdatalayers"></div>
 					<div id="load-datalayers-row">

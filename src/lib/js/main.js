@@ -131,11 +131,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	function LoadSample(manifests) {		
 		// Setup basic sample options list
 		document.getElementById('load-samples-group').innerHTML = document.getElementById('load-custom-group').innerHTML = '';
-		for (let s in manifests.collection) { 
-			let option = document.createElement('option');
-			option.value = manifests.collection[s].id; option.innerHTML = manifests.collection[s].title;
-			document.getElementById('load-samples-group').appendChild(option);
-		}
+		let optionblob = '';
+		for (let s in manifests.collection) { optionblob += `<option value="${manifests.collection[s].id}">${manifests.collection[s].title}</option>`; }
+		document.getElementById('load-samples-group').insertAdjacentHTML('beforeend', optionblob);
 		
 		// Setup fancy list if this isn't a special collection and we aren't in a mobile view
 		if (manifests.collected === false && !MI.Interface.IsMobile()) {			

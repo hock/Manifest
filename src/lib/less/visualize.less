@@ -175,7 +175,10 @@ body.fullscreen {
 /* Storymap */
 body.storymap 
 {
-	#storybanner { z-index:12250; position:sticky; top:0; width:calc(100% - 4rem); background:#fff; color:#fff; padding:1rem 2rem; margin-top:-4rem; a { color:#fff; font-weight:bold;}}
+	#storybanner { 
+		z-index:12250; position:sticky; top:0; width:calc(100% - 6rem); background:#fff; color:#fff; margin-top:-4rem; padding: 1rem 2rem 1rem 4rem;
+	    background:url(../images/logo-bw.svg) no-repeat;background-position:2rem center;background-size:1.5rem;
+		a { color:#fff; font-weight:bold;}}
 	#sidewrap {
 		width:100%; background:none;
 		#sidepanel { top:0;left:auto;right:0;width:100%;margin:0;border-radius:0;background:none;}
@@ -184,11 +187,14 @@ body.storymap
 	#manifestlist {
 		.mheader { position:relative; z-index: 12500; .menu-options{ display:none; }}
 		.mtitle {
-			padding:1rem 2rem;font-size:4rem;background:url(../images/logo-bw.svg) no-repeat; background-position: center bottom 6rem; background-size: 10%; width:calc(100% - 4rem);margin:0; padding-top:35vh;
-			box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2); text-align:center;
-			
+			padding:1rem 2rem;font-size:4rem;width:calc(100% - 4rem);margin:0; padding-top:15vh;
+			box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2); text-align:center; background:none;
 			a {width:auto;display:initial;white-space:initial; }
 			&:hover {filter:none;}
+			.menumap {
+				background:url(../images/logo-bw.svg) no-repeat;background-position:center center;display:block;margin:0 auto;width:10rem;height:10rem;
+				&:before { content:""; }		
+			}
 		}
 		.mdescription {
 			font-size:1rem;line-height:1.5rem;width:85vw; padding: 3rem 1rem 2rem 1rem; margin:-1rem auto 15vh auto;border-radius:0.5rem; text-align:center;
@@ -221,13 +227,16 @@ body.storymap
 	#view-wrapper { width:100%;left:0;right:auto;}
 	.leaflet-control {display:none;}
 	#mlist-1029261216 #node_10292612160000 .node-details .measures { display:none;} 
-	#manifestbar,.footer,.searchwidget,#mapmenu,#fullscreen-menu,#mapcapture,.leaflet-popup-pane,.closemap,.menumap,.vizmenu,#time-slider {display:none;}
+	#manifestbar,.footer,.searchwidget,#mapmenu,#fullscreen-menu,#mapcapture,.leaflet-popup-pane,.closemap,.vizmenu,#time-slider {display:none;}
 }
 
 /* Storymap */
 body.embedmap 
 {
-	#storybanner { z-index:12250; position:sticky; top:0; background:#fff; color:#fff; padding:0.5rem 1rem; margin:1rem;border-radius:0.5rem;  a { color:#fff; font-weight:bold;}}
+	#storybanner { 
+		z-index:12250; position:sticky; top:0; background:#fff; color:#fff; padding:0.5rem 1rem 0.5rem 2.5rem; margin:1rem;border-radius:0.5rem;  
+	    background:url(../images/logo-bw.svg) no-repeat;background-position:1rem center;background-size:1.25rem;
+		a { color:#fff; font-weight:bold;}}
 	#sidewrap {
 		width:100%; background:none; pointer-events: none;
 		#sidepanel { top:0;left:auto;right:0;width:100%;margin:0;border-radius:0;background:none;}
@@ -282,16 +291,15 @@ body.embedmap
 	#manifestbar,.footer,.searchwidget,#mapmenu,#fullscreen-menu,#mapcapture,.leaflet-popup-pane,.closemap,.menumap,.vizmenu,#time-slider {display:none;}
 	
 	#embed-left {
-		width:3rem;height:calc(50vh);top:calc(50vh);font-size:3rem;position:absolute;left:1rem;color:var(--controls-bg);z-index:1;overflow:hidden;opacity:1;
-		text-shadow: -0.15rem 0rem 0.1rem rgba(0,0,0,0.2); cursor:pointer; -webkit-text-stroke: 1px #4d34db;
-		&:hover { color: #4d34db; text-shadow: -0.15rem 0rem 0.1rem #333 }
+		width:3rem;padding:0 1rem;height:calc(50vh);top:calc(50vh);font-size:3rem;position:absolute;left:1rem;color:var(--controls-bg);z-index:1;overflow:hidden;opacity:1;
+		text-shadow: -0.15rem 0rem 0.1rem rgba(0,0,0,0.2); cursor:pointer; -webkit-text-stroke: 1px var(--controls-bg);
+		&:hover { opacity:0.8;}
 	}
 	#embed-right {
-		width:3rem;height:calc(50vh);top:calc(50vh);font-size:3rem;position:absolute;right:1rem;text-align:right;color:var(--controls-bg);z-index:1;overflow:hidden;opacity:1;
-		text-shadow: 0.15rem 0rem 0.1rem rgba(0,0,0,0.2); cursor:pointer; -webkit-text-stroke: 1px #4d34db;
-		&:hover { color: #4d34db; text-shadow: 0.15rem 0rem 0.1rem #333; }
+		width:3rem;padding:0 1rem;height:calc(50vh);top:calc(50vh);font-size:3rem;position:absolute;right:1rem;text-align:right;color:var(--controls-bg);z-index:1;overflow:hidden;opacity:1;
+		text-shadow: 0.15rem 0rem 0.1rem rgba(0,0,0,0.2); cursor:pointer; -webkit-text-stroke: 1px var(--controls-bg);
+		&:hover { opacity:0.8;}
 	}
-
 }
 
 @media only screen and (max-width: 920px) and (orientation: portrait) { 

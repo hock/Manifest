@@ -17,10 +17,8 @@ class ManifestUI {
 	}
 	
 	/** Called right after page starts if everything is looking ok. **/
-	Initialize() {
-		document.getElementById('manifestlist').innerHTML = '';
-		document.documentElement.classList.remove('loading');
-	}
+	Initialize() { document.documentElement.classList.remove('loading'); }
+	
 	/** Called after Manifest has been initialized and the first supply chain loaded **/ 
 	CleanupInterface() { 	
 		console.dir(MI); 
@@ -56,6 +54,7 @@ class ManifestUI {
 			this.AddDataLayer(document.getElementById('load-datalayers-input').value); 
 		});
 		document.getElementById('colorscheme-switch').addEventListener('change', (e) => { MI.Interface.ColorScheme(document.getElementById('colorscheme-checkbox').checked); });
+		document.getElementById('colorscheme-switch').classList.add('animated');
 		document.getElementById('datalayers').querySelectorAll('input[type=checkbox]').forEach(el => { el.addEventListener('click', (e) => { 
 			MI.Atlas.ProcessDataLayerFromElement(el);}); 
 		});
@@ -86,7 +85,8 @@ class ManifestUI {
 		['dragover', 'dragenter'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.add('is-dragover'); }));
 		['dragleave', 'dragend', 'drop'].forEach(evt => dropElement.addEventListener(evt, (e) => { dropElement.classList.remove('is-dragover'); }));
 
-		document.addEventListener("keydown", MI.Interface.KeyHandler);
+		document.addEventListener("keydown", MI.Interface.KeyHandlerDown);
+		document.addEventListener("keyup", MI.Interface.KeyHandlerUp);
 		
 		window.onresize = this.ManifestResize;	
 		window.onbeforeprint = this.PrintBefore;
@@ -101,21 +101,18 @@ class ManifestUI {
 	
 	Storyize() {
 		document.body.classList.add('storymap');
+		document.getElementById('sidepanel').addEventListener("scroll", (e) => { if (e.srcElement.scrollTop === 0) { MI.Atlas.SetView(MI.options.view, false); } });
+
 		window.dispatchEvent(new Event('resize'));
 		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
 	Embedize() {
 		document.body.classList.add('embedmap');
 		window.dispatchEvent(new Event('resize'));
-		
-		let embedcontrols = `<div id="embed-left"><i class="fas fa-caret-left"></i></div><div id="embed-right"><i class="fas fa-caret-right"></i></div>`;
-		document.getElementById('manifestlist').insertAdjacentHTML('beforeend', embedcontrols);
-		
 		MI.Atlas.styles.point.fontsize = 0.1;
 	} 
 	ColorScheme(dark) {
 		MI.options.darkmode = dark;
-		MI.Supplychain.ReloadAll();
 		if (MI.options.darkmode) {
 			ManifestUtilities.SetCookie('darkmode',true,60);	
 			document.getElementById('basemap-chooser').value = 'dark';	
@@ -123,21 +120,23 @@ class ManifestUI {
 			document.body.classList.add('dark');
 		} else {
 			ManifestUtilities.EraseCookie('darkmode');
-			
 			document.getElementById('basemap-chooser').value = 'default';
 			MI.Interface.SetBasemap('default');
 			document.body.classList.remove('dark');
 		}
+		MI.Supplychain.ReloadAll();
 	}
 	SetupTime() {
-		let timeset = false, starttime, endtime;
+		let timeset = false, starttime = false, endtime = false;
 		MI.Interface.timeslider = false;
 		document.getElementById('time-slider').innerHTML = '';
 		for (let s in MI.supplychains) { 
-			if (MI.supplychains[s].details.time) {
+			if (MI.supplychains[s].details.time) {				
 				timeset = true;
-				if (MI.supplychains[s].details.time.GetStart()) { starttime = MI.supplychains[s].details.time.GetStart(); }
-				if (MI.supplychains[s].details.time.GetEnd()) { endtime = MI.supplychains[s].details.time.GetEnd(); }
+				if (MI.supplychains[s].details.time.GetStart()) { 
+					starttime = starttime ? MI.supplychains[s].details.time.GetStart() < starttime ? MI.supplychains[s].details.time.GetStart() : starttime : MI.supplychains[s].details.time.GetStart();}
+				if (MI.supplychains[s].details.time.GetEnd()) { 
+					endtime = endtime ? MI.supplychains[s].details.time.GetEnd() > endtime ? MI.supplychains[s].details.time.GetEnd() : endtime : MI.supplychains[s].details.time.GetEnd();}
 			}
 		}
 		if (timeset) {
@@ -389,46 +388,97 @@ class ManifestUI {
 		MI.Interface.filter = {term: null, clear: true};
 	}
 	
-	// Post complete hook after Manifest has been mapped (usually called in Manifest->Process() )
-	OnMapComplete(id) {
+	// Post complete hook after Manifest has been processed (usually called in Manifest->Process() )
+	OnProcessComplete(index, id, data) {
+		MI.Interface.SetVizOptions();	
+		
+		document.getElementById('manifestlist').insertAdjacentHTML('beforeend', data.mobject);
+		document.getElementById('mheader-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowHeader(nodeid); });
+		document.getElementById('share-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowShare(nodeid); });
+		document.getElementById('closemap-'+id).addEventListener('click', (e, nodeid=id) => { MI.Supplychain.Remove(nodeid); });
+		
+		document.getElementById('supplycategories').insertAdjacentHTML('beforeend', data.supplycat);	
+		
+		document.getElementById('supplytoggle-'+id).addEventListener('click', (e) => { 
+			document.getElementById('supplycatsub-'+id).classList.toggle('closed'); document.getElementById('supplytoggle-'+id).classList.toggle('plus'); });
+		
+		document.getElementById('supplycat-'+id).querySelectorAll('.supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
+			if (el.checked) { MI.Supplychain.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);} 
+			else { MI.Supplychain.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } }); });
+		document.getElementById('supplycat-'+id).querySelectorAll('.nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
+			if (el.checked) { MI.Supplychain.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);} 
+			else { MI.Supplychain.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } }); });
+		document.getElementById('supplycat-'+id).querySelectorAll('.supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
+			MI.Interface.filter.clear = false; MI.Interface.Search(document.getElementById('searchbar').value, true); });});
+		
+		document.getElementById('manifestlist').querySelectorAll('#mdetails-'+id+',#mlist-'+id).forEach(el => { MI.Interface.observer.observe(el); });
+		
+		let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { 
+			if (el.style.display !== 'none') { 
+				el.style.top = moffset+'px'; 
+				moffset += ManifestUtilities.RemToPixels(3); 
+			}});		
+		let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { 
+			if (el.style.display !== 'none') { 
+				el.style.bottom = roffset+'px'; 
+				roffset += ManifestUtilities.RemToPixels(3);
+			}});
+		
+		MI.Interface.SetupTime();
+		
+		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) { 
+			MI.Interface.ClearSearch(); MI.Interface.Search(); }
+			
+		if (MI.Interface.IsMobile()) { MI.Interface.Mobilify(id, index); }
+		MI.Interface.SetDocumentTitle();	
+				
+		document.getElementById('mlist-'+id).insertAdjacentHTML('beforeend', data.nodelist.join(''));
+		document.getElementById('mlist-'+id).querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  
+			MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.measure-link').forEach(el => { el.addEventListener('click', (e) => { 
+			document.getElementById('measure-choices').value = el.dataset.measure; MI.Atlas.MeasureSort(); e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => {  
+			if (!MI.options.storyMap) { MI.Atlas.PointFocus(el.id.split('_').pop()); } }); });
+		document.getElementById('mdetails-'+id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });
+		document.getElementById('mlist-'+id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.node-sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.images-display-left').forEach(el => { el.addEventListener('click', (e) => { 
+			e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), -1); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.images-display-right').forEach(el => { el.addEventListener('click', (e) => { 
+			e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), 1); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.images-spot').forEach(el => { el.addEventListener('click', (e) => { 
+			e.stopPropagation(); MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index); }); });	
+		document.getElementById('mlist-'+id).querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { 
+			e.stopPropagation(); document.getElementById('fullscreen-modal').classList.toggle('closed'); MI.Interface.ModalSet(el); });});
+ 
 		MI.Interface.RefreshMeasureList();
 		if (MI.options.storyMap) { MI.Interface.SetupStoryTrigger('#mlist-'+id+' li .node-title'); }
 		if (MI.options.embed) { 
-			//MI.Interface.SetupStoryTrigger('#mlist-'+id+' li .node-title'); 
+			let embedcontrols = `<div id="embed-left" style="color:${MI.supplychains[index].details.style.fillColor};"><i class="fas fa-caret-left"></i></div><div id="embed-right" style="color:${MI.supplychains[index].details.style.fillColor};"><i class="fas fa-caret-right"></i></div>`;
+			document.getElementById('manifestlist').insertAdjacentHTML('afterbegin', embedcontrols);
 			document.getElementById('mlist-'+id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => { 
 				document.getElementById('mlist-'+id).scrollTo(el.offsetLeft - ManifestUtilities.RemToPixels(1), 0); 
-			}); });
-			
-			// use playlist function
-			MI.Atlas.BuildPlaylist();
-			
+			}); });	
+
+			MI.Atlas.BuildPlaylist(); // use playlist function
 			document.getElementById('embed-left').addEventListener('click', (e) => { 
 				for (let i = MI.Atlas.playlist.list.length-1; i >= 0; i--) {
 					if (MI.Atlas.active_point && MI.Atlas.playlist.list[i].feature.properties.lid === MI.Atlas.active_point._popup._source.feature.properties.lid) {
-						i = i === 0 ? MI.Atlas.playlist.list.length-1 : i-1;
-						MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break;
-					}
-				}	
-			}); 
+						i = i === 0 ? MI.Atlas.playlist.list.length-1 : i-1; MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break; }}});
+
 			document.getElementById('embed-right').addEventListener('click', (e) => { 
 				for (let i = 0; i < MI.Atlas.playlist.list.length; i++) {
 					if (MI.Atlas.active_point && MI.Atlas.playlist.list[i].feature.properties.lid === MI.Atlas.active_point._popup._source.feature.properties.lid) {
-						i = i === MI.Atlas.playlist.list.length - 1 ? 0 : i+1;
-						MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break;
-					}
-				}	
-			}); 
+						i = i === MI.Atlas.playlist.list.length - 1 ? 0 : i+1; MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break; }}});
 		}
 		if (MI.options.timerange) {
-			MI.Interface.timeslider.lower = MI.options.timerange.lower;
-			MI.Interface.timeslider.upper = MI.options.timerange.upper;
-			MI.Interface.OnTimeUpdate();
-	
+			MI.Interface.timeslider.lower = MI.options.timerange.lower; MI.Interface.timeslider.upper = MI.options.timerange.upper; MI.Interface.OnTimeUpdate();
+
 			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
 			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);
 		}
-		
 	}
+
 
 	SetupSamplelistHandlers() {
 		const previews = document.getElementById('samples-previews'), spacer = document.getElementById('samples-spacer');
@@ -457,7 +507,7 @@ class ManifestUI {
 			if (previews.classList.contains('open')) { previews.classList.remove('open'); spacer.classList.add('closed'); previews.style.height = 'auto'; e.stopPropagation(); }
 		}); });
 	}
-	KeyHandler(e) {
+	KeyHandlerDown(e) {
 		// Modal Keys
 		if (document.getElementById('samples-previews') && document.getElementById('samples-previews').classList.contains('open')) {			
 			if (e.key === 'ArrowDown') {  
@@ -504,6 +554,11 @@ class ManifestUI {
 			if (e.key === 'Escape' || e.key === 'Enter') {  MI.Interface.StopVideoPlayback(); document.getElementById('fullscreen-modal').classList.toggle('closed'); }	
 			e.stopImmediatePropagation();		
 		}
+		if (e.key === 'Alt') { document.querySelector('.leaflet-overlay-pane canvas').style.pointerEvents = 'none'; }
+	}
+	KeyHandlerUp(e) {
+		if (e.key === 'Alt') { document.querySelector('.leaflet-overlay-pane canvas').style.pointerEvents = 'all'; }
+	
 	}
 	Link(link, event) {
 		event.preventDefault(); event.stopPropagation();
@@ -624,7 +679,8 @@ class ManifestUI {
 			if (Object.keys(sc.details.measures).length > 0) { 
 				measured = false;
 				for (let measure of Object.keys(sc.details.measures)) { if (!['starttime','endtime','start','end','date'].includes(measure)) { measured = true; } }
-			}			
+			}
+			sc.graph.measures = measured;			
 		}
 		if (directed) { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.removeAttribute('hidden'); el.removeAttribute('disabled');});
 		} else { document.getElementById('viz-choices').querySelectorAll('.graph-dependent').forEach(el => { el.setAttribute('hidden',''); el.setAttribute('disabled','');}); }
@@ -643,7 +699,7 @@ class ManifestUI {
 	
 	AddDataLayer(ref) {	
 		let type = ref.split('.').pop();
-		if (type === 'geojson' || type === 'pmtiles' || type === 'jpg' || type === 'png') {
+		if (type === 'json' || type === 'geojson' || type === 'pmtiles' || type === 'jpg' || type === 'png') {
 			MI.Atlas.LoadExternalDataLayer(type, ref);
 		} else {
 			this.ShowMessage("This kind of data layer is not supported. Manifest currently supports geojson and pmtiles data.");

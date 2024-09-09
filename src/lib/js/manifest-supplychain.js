@@ -5,50 +5,47 @@ class ManifestSupplyChain {
 		this.linetypes = { greatcircle: 'GREAT_CIRCLE_LINE', bezier: 'BEZIER_LINE', straight: 'STRAIGHT_LINE' };
 	}
 	/** Setup the supply chain rendering by adding it to the user interface */
-	Setup(d) {	
-		const index = MI.supplychains.push(d)-1, id = d.details.id;
+	Setup(m) {	
+		let index = m.index, manifest = m.manifest, options = m.options, data = m.data;
+		
+		const id = manifest.details.id;
 		const defs = 	{ 
 							type: 'FeatureCollection', 
 							properties: { title: 'Supply Chain', description: ''}, 
 							graph: { links: [], nodes: [] } 
 						};	
-		d.properties = Object.assign(defs.properties, d.properties); d.graph = Object.assign(defs.graph, d.graph);
-		this.SetupStyle(d);
+		manifest.properties = Object.assign(defs.properties, manifest.properties); manifest.graph = Object.assign(defs.graph, manifest.graph);
+		MI.Supplychain.SetupStyle(manifest); Object.assign(options, {style: manifest.details.style});
 	
-		let storymode = MI.options.urlparams.storyMap !== 'false' ? (MI.options.storyMap || MI.options.embed) || (d.setOptions && d.setOptions.storyMap && MI.supplychains.length === 1) : false;
-		let mobject = 	`<div id="mheader-${id}" style="${storymode ? `background-color: ${d.details.style.fillColor};` : ''}" class="mheader" data-scref="${d.details.id}">
-							<div class="mtitle" style="${!storymode ? `background-color: ${d.details.style.fillColor};` : ''} color: ${d.details.style.textColor};">
-								<i id="menumap-${id}" class="menumap fas fa-globe-${d.details.globe}"></i><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}" onclick="event.preventDefault(); MI.Interface.URLSet('${d.details.url}');"` : ''}>${d.properties.title}</a>
+		let mobject = 	`<div id="mheader-${id}" style="${options.storymode ? `background-color: ${manifest.details.style.fillColor};` : ''}" class="mheader" data-scref="${manifest.details.id}">
+							<div class="mtitle" style="${!options.storymode ? `background-color: ${manifest.details.style.fillColor};` : ''} color: ${manifest.details.style.textColor};">
+								<i id="menumap-${id}" class="menumap fas fa-globe-${manifest.details.globe}"></i><a ${manifest.details.url !== '' ? `href="${ManifestUtilities.Slugify(manifest.details.url)}" onclick="event.preventDefault(); MI.Interface.URLSet('${manifest.details.url}');"` : ''}>${manifest.properties.title}</a>
 								<div class="menu-options">
 									<i id="share-${id}" class="share-button fas fa-share-square"></i>          
-									<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${d.details.style.textColor};"></i>
+									<i id="closemap-${id}" class="fas fa-times-circle closemap" style="color: ${manifest.details.style.textColor};"></i>
 								</div>
 		
 							</div>		
 						</div>
-						${storymode ? `<div id="storybanner" style="background-color: ${MI.options.embed ? `${tinycolor(d.details.style.fillColor).setAlpha(0.8)}` :  `${d.details.style.fillColor}`}"><span id="minfo"><a ${d.details.url !== '' ? `href="${ManifestUtilities.Slugify(d.details.url)}?storymap=false&embed=false"` : ''}>${d.properties.title}</a> on <a href="./">Manifest</a></span></div>` : ''}
+						${options.storymode ? `<div id="storybanner" style="background-color: ${options.embed ? `${tinycolor(manifest.details.style.fillColor).setAlpha(0.8)}` :  `${manifest.details.style.fillColor}`}"><span id="minfo"><a ${manifest.details.url !== '' ? `href="${ManifestUtilities.Slugify(manifest.details.url)}?storymap=false&embed=false"` : ''}>${manifest.properties.title}</a> on <a href="./">Manifest</a></span></div>` : ''}
 
 						<div id="mdetails-${id}" class="mdetails">
 						    <div id="share-options-${id}" class="share-container closed">
-							    <ul class="share-menu" style="color:${d.details.style.fillColor}; background:${d.details.style.lightColor};">
+							    <ul class="share-menu" style="color:${manifest.details.style.fillColor}; background:${manifest.details.style.lightColor};">
 									<span>Share:</span>
-							        <li><a onclick="window.open('${ManifestUtilities.Slugify(d.details.url)}', '_blank');">Open</a> <i class="fas fa-window-restore"></i></li>
+							        <li><a onclick="window.open('${ManifestUtilities.Slugify(manifest.details.url)}', '_blank');">Open</a> <i class="fas fa-window-restore"></i></li>
 							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'embed');">Embed</a> <i class="fas fa-window-restore"></i></li>		
 							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'markdown');">Markdown</a> <i class="fas fa-file-download"></i></li>
 							        <li><a onclick="MI.ExportManifest(${id}, ${id}, 'json');">JSON</a> <i class="fas fa-file-download"></i></li>
 							    </ul>
 							</div>
-							<div class="mdescription">${ManifestUtilities.Linkify(d.properties.description)}</div>
+							<div class="mdescription">${ManifestUtilities.Linkify(manifest.properties.description)}</div>
 						</div>
 						<ul id="mlist-${id}" class="mlist"></ul>
 					`;
-		document.getElementById('manifestlist').insertAdjacentHTML('beforeend', mobject);
-		document.getElementById('mheader-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowHeader(nodeid); });
-		document.getElementById('share-'+id).addEventListener('click', (e, nodeid=id) => { MI.Interface.ShowShare(nodeid); });
-		document.getElementById('closemap-'+id).addEventListener('click', (e, nodeid=id) => { MI.Supplychain.Remove(nodeid); });
-		
+					
 		let supplycatmap = {}, supplycats = {};
-		for (let ft of d.features) {
+		for (let ft of manifest.features) {
 			if (ft.geometry.type === 'Point') {
 				if (ft.properties.category) { for (let cat of ft.properties.category.split(',')) {
 					if (cat !== '') {
@@ -58,73 +55,37 @@ class ManifestSupplyChain {
 			}
 		}
 		
-		let supplycat = `<div id="supplycat-${id}" class="supplycatgroup"><span class="supplyrow"><label for="chain-${id}" class="supplycatheader"><input type="checkbox" id="chain-${id}" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${d.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span></div>`;
-		document.getElementById('supplycategories').insertAdjacentHTML('beforeend', supplycat);	
-		
-		document.getElementById('supplytoggle-'+id).addEventListener('click', (e) => { 
-			document.getElementById('supplycatsub-'+id).classList.toggle('closed');
-			document.getElementById('supplytoggle-'+id).classList.toggle('plus');
-		});
-		
-		let supplycatsub = document.createElement('div');
-		supplycatsub.id = 'supplycatsub-'+id; supplycatsub.classList.add('supplycatsub', 'closed'); 
-		
-		supplycatsub.innerHTML += 
-			`<span class="supplyrow"><label id="nodeheader-${id}" for="nodes-${id}" class="nodelineheader nodes"><input id="nodes-${id}" type="checkbox" value="nodes-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Nodes for ${d.properties.title}</label></span>`;
-		supplycatsub.innerHTML += 
-			`<span class="supplyrow"><label id="lineheader-${id}" for="lines-${id}" class="nodelineheader lines"><input id="lines-${id}" type="checkbox" value="lines-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Lines for ${d.properties.title} </label></span>`;
+		let supplycat = `<div id="supplycat-${id}" class="supplycatgroup"><span class="supplyrow"><label for="chain-${id}" class="supplycatheader"><input type="checkbox" id="chain-${id}" value="chain-${id}" checked><span class="chaincheckmark"><i class="fas"></i></span> ${manifest.properties.title}</label><span id="supplytoggle-${id}" class="supplytoggle plus"><i class="fas fa-plus-circle"></i></span></span>`;
+		supplycat += `<div id="supplycatsub-${id}" class="supplycatsub closed">`;
+		supplycat += 
+			`<span class="supplyrow"><label id="nodeheader-${id}" for="nodes-${id}" class="nodelineheader nodes"><input id="nodes-${id}" type="checkbox" value="nodes-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Nodes for ${manifest.properties.title}</label></span>`;
+		supplycat += 
+			`<span class="supplyrow"><label id="lineheader-${id}" for="lines-${id}" class="nodelineheader lines"><input id="lines-${id}" type="checkbox" value="lines-${id}" checked><span class="nodelinecheckmark"><i class="fas"></i></span> Lines for ${manifest.properties.title} </label></span>`;
 		
 		// TODO: Shouldn't show this if all nodes are categorized. 
 		if (Object.entries(supplycatmap).length > 1) {
-			supplycatsub.innerHTML += `<span class="supplyrow"><label for="cat-${id}-uncategorized" class="supplycat"><input id="cat-${id}-uncategorized" type="checkbox" value="cat-${id}-uncategorized" checked><span class="supplycatcheckmark"><i class="fas"></i></span> Uncategorized Nodes</label></span>`;			
+			supplycat += `<span class="supplyrow"><label for="cat-${id}-uncategorized" class="supplycat"><input id="cat-${id}-uncategorized" type="checkbox" value="cat-${id}-uncategorized" checked><span class="supplycatcheckmark"><i class="fas"></i></span> Uncategorized Nodes</label></span>`;			
 		}	 
 		for (const [key, value] of Object.entries(supplycatmap)) {
-			supplycatsub.innerHTML += `<span class="supplyrow"><label for="cat-${id}-${key}" class="supplycat"><input id="cat-${id}-${key}" type="checkbox" value="cat-${id}-${key}" checked><span class="supplycatcheckmark"><i class="fas"></i></span> ${key}</label></span>`;
+			supplycat += `<span class="supplyrow"><label for="cat-${id}-${key}" class="supplycat"><input id="cat-${id}-${key}" type="checkbox" value="cat-${id}-${key}" checked><span class="supplycatcheckmark"><i class="fas"></i></span> ${key}</label></span>`;
 			supplycats[key] = [];
 		}
-		supplycatsub.innerHTML += '</span>';
-		MI.supplychains[index].categories = supplycats;
-		document.getElementById('supplycat-'+id).append(supplycatsub);	
-	
-		document.getElementById('supplycat-'+id).querySelectorAll('.supplycatheader input').forEach(el => { el.addEventListener('click', (e) => { 
-			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
-			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
-		});
-		document.getElementById('supplycat-'+id).querySelectorAll('.nodelineheader input').forEach(el => { el.addEventListener('click', (e) => { 
-			if (el.checked) { this.Hide(el.value.split('-')[1], false, el.value.split('-')[0]);}
-			else { this.Hide(el.value.split('-')[1], true, el.value.split('-')[0]); } });
-		});
-		document.getElementById('supplycat-'+id).querySelectorAll('.supplycat input').forEach(el => { el.addEventListener('click', (e) => { 
-			MI.Interface.filter.clear = false;
-			MI.Interface.Search(document.getElementById('searchbar').value, true);
-		});});
-		
-		document.getElementById('manifestlist').querySelectorAll('#mdetails-'+id+',#mlist-'+id).forEach(el => { MI.Interface.observer.observe(el); });
-		
-		// Finalize UI
-		let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
-		let roffset = 0; Array.from(document.getElementById('manifestlist').querySelectorAll('.mheader')).reverse().forEach(el => { if (el.style.display !== 'none') { el.style.bottom = roffset+'px'; roffset += el.offsetHeight;}});
-		
-		MI.Interface.SetupTime();
-		
-		if (document.getElementById('searchbar').value !== '' || document.getElementById('supplycategories').querySelectorAll('.supplycat input:not(:checked)').length > 0) { 
-			MI.Interface.ClearSearch(); MI.Interface.Search(); 
-		}
-			
-		if (MI.Interface.IsMobile()) { MI.Interface.Mobilify(id, index); }
-		MI.Interface.SetDocumentTitle();
-	
-		return index;
+		supplycat += '</span></div></div>';
+		manifest.categories = supplycats;
+						
+		data.id = id; data.supplycat = supplycat; data.mobject = mobject;
+		return {index:index, manifest:manifest, options:options, data:data};
 	}
-
+	
 	/** Setup the supply chain map **/
-	Map(index) {
-		let d = MI.supplychains[index];
+	Map(m) {
+		let index = m.index, manifest = m.manifest, options = m.options, data = m.data;
+		
 		let points = {type: 'FeatureCollection', features:[] }, lines = {type: 'FeatureCollection', features:[] }, arrows = {type: 'FeatureCollection', features:[] };
 		let nodelist = [];
 		
-		for (let [i, ft] of d.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: d.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false, disabled: false}, geometry: { type: 'Point', coordinates: [] } };
+		for (let [i, ft] of manifest.features.entries()) {
+			const defs = { type: 'Feature', properties: { lid: manifest.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false, disabled: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -134,43 +95,25 @@ class ManifestSupplyChain {
 			ft.properties = Object.assign(ft.properties, expandedProperties);
 			ft.properties.placename = (ft.properties.placename !== '') ? ft.properties.placename : (ft.properties.address ? ft.properties.address : ''); 
 			
-			if (d.mapper) { 
-				if (ft.properties.index) { d.mapper[Number(ft.properties.index-1)] = ft; } // manifest
-				else { d.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
+			if (manifest.mapper) { 
+				if (ft.properties.index) { manifest.mapper[Number(ft.properties.index-1)] = ft; } // manifest
+				else { manifest.mapper['map'+ft.properties.placename.replace(/[^a-zA-Z0-9]/g, '') + ft.properties.title.replace(/[^a-zA-Z0-9]/g, '')] = ft; } // smap
 			}
 			
 			if (ft.geometry.type === 'Point') {				
-				let pointblob = this.SetupPoint(ft, d, index); 				
+				let pointblob = this.SetupPoint(ft, manifest, index); 				
 				nodelist.push(pointblob.li); 
 				if (ft.geometry.coordinates[0] !== '' && ft.geometry.coordinates[1] !== '') { points.features.push(pointblob.ft); }
 			} else { 
-				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, d, index) : this.SetupLine(ft, d, index); 
+				let line = MI.options.simpleLines ? this.SetupSimpleLine(ft, manifest, index) : this.SetupLine(ft, manifest, index); 
 					
 				if (line !== false) {
 					let arrow = MI.options.simpleLines ? 
-						this.SetupSimpleArrow(JSON.parse(JSON.stringify(line)), d, index) : this.SetupArrow(JSON.parse(JSON.stringify(line)), d, index);
+						this.SetupSimpleArrow(line, manifest, index) : this.SetupArrow(line, manifest, index);
 					lines.features.push(line); arrows.features.push(arrow);
 				}
 			}				
 		}
-		document.getElementById('mlist-'+d.details.id).innerHTML = nodelist.join('');
-		
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.cat-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Search(el.textContent); e.stopPropagation(); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.measure-link').forEach(el => { el.addEventListener('click', (e) => { document.getElementById('measure-choices').value = el.dataset.measure; MI.Atlas.MeasureSort(); e.stopPropagation(); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.mnode').forEach(el => { el.addEventListener('click', (e) => {  if (!MI.options.storyMap) { MI.Atlas.PointFocus(el.id.split('_').pop()); } }); });
-		document.getElementById('mdetails-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.manifest-link').forEach(el => { el.addEventListener('click', (e) => {  MI.Interface.Link(el.href, e); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.node-sources').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-left').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), -1); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-display-right').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(el.id.split('_').pop(), 1); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.images-spot').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); MI.Interface.ImageScroll(e.currentTarget.dataset.lid, 0, e.currentTarget.dataset.index); }); });	
-		document.getElementById('mlist-'+d.details.id).querySelectorAll('.ftimg').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('fullscreen-modal').classList.toggle('closed'); MI.Interface.ModalSet(el); 		
- });});
-		
-		if (lines.features.length === 0) { document.querySelectorAll('.nodelineheader.lines').forEach(el => { 
-			let inputs = el.querySelectorAll('input');
-			for (let inp of inputs) { if (inp.value.split('-')[1] === String(d.details.id)) { el.remove(); } }
-		}); }	
 
 		for (let i in lines.features) { 
 			for (let j in points.features) {
@@ -190,13 +133,13 @@ class ManifestSupplyChain {
 		let maplayergroup =  L.layerGroup();
 				
 		let lineLayer = new L.geoJSON(lines, { style: MI.Atlas.styles.line });	
-		d.details.layers.push(maplayergroup.addLayer(lineLayer));		
+		manifest.details.layers.push(maplayergroup.addLayer(lineLayer));		
 
 		let arrowLayer = new L.geoJSON(arrows, { onEachFeature: MI.Atlas.RenderLine, pointToLayer: function (feature, latlng) { 
 			MI.Atlas.styles.arrow.rotation = feature.properties.angle;
 			return L.triangleMarker(latlng, MI.Atlas.styles.arrow);
 		} });
-		d.details.layers.push(maplayergroup.addLayer(arrowLayer));	
+		manifest.details.layers.push(maplayergroup.addLayer(arrowLayer));	
 		
 		// Setup Pointlayer
 		for (let i in points.features) { 
@@ -232,23 +175,27 @@ class ManifestSupplyChain {
 		
 		pointLayer.on('mouseup', function(e){	});
 		
-		MI.Atlas.maplayer.push({id: d.details.id, points: pointLayer, lines: lineLayer, arrows: arrowLayer});
+		MI.Atlas.maplayer.push({id: manifest.details.id, points: pointLayer, lines: lineLayer, arrows: arrowLayer});
 		
-		d.details.layers.push(maplayergroup.addLayer(pointLayer));
-		d.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
+		manifest.details.layers.push(maplayergroup.addLayer(pointLayer));
+		manifest.details.layers.push(MI.Atlas.map.addLayer(maplayergroup));
 		
 		for (let l in MI.Atlas.maplayer) { if (MI.Atlas.maplayer[l].points) { MI.Atlas.maplayer[l].points.bringToFront(); } }
 	
-		MI.Interface.OnMapComplete(d.details.id);
 		
-		return d;
+		// UI
+		if (lines.features.length === 0) { document.querySelectorAll('.nodelineheader.lines').forEach(el => { 
+			let inputs = el.querySelectorAll('input');
+			for (let inp of inputs) { if (inp.value.split('-')[1] === String(manifest.details.id)) { el.remove(); } }
+		}); }
+			
+		data.nodelist = nodelist;
+		return {index:index, manifest:manifest, options:options, data:data}; 
 	}
 		
 	SetupStyle(d) {
 		d.options = d.options ? d.options : {};
-		
-		MI.Atlas.styles.point.fontsize = d.options.fontsize ? d.options.fontsize : MI.Atlas.styles.point.fontsize;
-		
+				
 		let colors =  typeof d.setOptions.color !== 'undefined' ? d.setOptions.color.value.split(',').map(c => '#' + c) : typeof d.options.color !== 'undefined' ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
@@ -283,7 +230,7 @@ class ManifestSupplyChain {
 				
 				${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
 				`<iframe class="ftimg" src="${img.URL}?si=N9SHiMo-QTcPyqdP&enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` : 
-				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title} ${img.caption ? '' : `image`}"/>` ) : '').join('')} 	
+				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title}${img.caption ? '' : ` image`}"/>` ) : '').join('')} 	
 			</div>` : ''}
 			
 			${ft.properties.images.length > 1 ? 
@@ -552,9 +499,9 @@ class ManifestSupplyChain {
 		for (let vl in MI.Atlas.vdatalayers) {			
 			if (MI.Atlas.vdatalayers[vl].scid && MI.Atlas.vdatalayers[vl].scid === id) {
 				if ( MI.Atlas.glMap.getLayer(MI.Atlas.vdatalayers[vl].id) !== undefined) { MI.Atlas.glMap.removeLayer(MI.Atlas.vdatalayers[vl].id); }  	
-				if ( MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) !== undefined) { 
-					MI.Atlas.glMap.removeSource('mlayer-'+MI.Atlas.vdatalayers[vl].id); }  
+				if ( MI.Atlas.glMap.getSource('mlayer-'+MI.Atlas.vdatalayers[vl].id) !== undefined) { MI.Atlas.glMap.removeSource('mlayer-'+MI.Atlas.vdatalayers[vl].id); }  
 				document.getElementById('lc-'+MI.Atlas.vdatalayers[vl].id).remove();
+				delete MI.Atlas.vdatalayers[vl];
 			}
 		}
 		MI.Atlas.Refresh(); MI.Atlas.map.fitBounds(MI.Atlas.map.getBounds());

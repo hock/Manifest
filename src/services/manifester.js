@@ -26,25 +26,16 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/thumb/:name', async (req, res) => {
-    let file = path.join('../json/samples/thumbnails/',req.params.name);
-
-	console.log(file);
-    let type = mime[path.extname(file).slice(1)] || 'text/plain';
-    let s = fs.createReadStream(file);
-    s.on('open', function () {
-        res.set('Content-Type', type);
-        s.pipe(res);
-    });
-    s.on('error', function () {
-		file = path.join('../images/','card.jpg');
-		type = mime[path.extname(file).slice(1)] || 'text/plain';
-		console.log(file);
-		let g = fs.createReadStream(file);
-	
-	    g.on('open', function () { console.log('g open'); res.set('Content-Type', type); g.pipe(res); });
-	    g.on('error', function () { console.log('g error'); res.set('Content-Type', 'text/plain'); res.status(404).end('Not found 2'); });
-    });
+app.get('/thumb/', async (req, res) => {
+	if (typeof req.query.img === 'undefined') {
+		res.sendFile(path.resolve('../json/samples/thumbnails/card/default.png'));		
+	} else {
+		let manifest = '';
+		if (req.query.img.split('/').pop() === '') { manifest = req.query.img.split('/').slice(-2, -1)[0]; } 
+		else { manifest = req.query.img.split('/').pop(); }
+		if (fs.existsSync('../json/samples/thumbnails/'+manifest+'.png')) { res.sendFile(path.resolve('../json/samples/thumbnails/card/'+manifest+'.png'));} 
+		else { res.sendFile(path.resolve('../json/samples/thumbnails/card/default.png')); }
+	}
 });
 	
 app.get('/marinetraffic/', async (req, res) => {});

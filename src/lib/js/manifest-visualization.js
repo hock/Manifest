@@ -80,9 +80,15 @@ class ManifestVisualization {
 					}
 				} 
 			}
-			if (type === 'forcegraph') { this.forcegraph = new ForceGraph(graph);  this.forcegraph.Run(); 
-			} else if (type === 'flow') { this.sankeydiagram = new SankeyDiagram(graph);
-			} else if (type === 'chord') { this.chorddiagram = new ChordDiagram(graph); }
+			if (type === 'forcegraph') { try { this.forcegraph = new ForceGraph(graph); this.forcegraph.Run(); } catch (error) { 
+				MI.Interface.ShowMessage('There was a problem rendering the graph.');
+				document.getElementById('missing-viz').classList.remove('closed'); }
+			} else if (type === 'flow') { try { this.sankeydiagram = new SankeyDiagram(graph);} catch (error) { 
+				MI.Interface.ShowMessage('There was a problem rendering the diagram.');
+				document.getElementById('missing-viz').classList.remove('closed'); }
+			} else if (type === 'chord') { try {this.chorddiagram = new ChordDiagram(graph);} catch (error) { 
+				MI.Interface.ShowMessage('There was a problem rendering the diagram.');
+				document.getElementById('missing-viz').classList.remove('closed'); } }
 		}
 	}
 	
@@ -98,64 +104,71 @@ class ManifestVisualization {
 		if (MI.supplychains.length > 0) {		
 			let sc = 0;
 			for (let i in MI.supplychains) {
-				
 				if (document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { sc = i; }
 			}
-			let canvascolor = MI.supplychains[sc].details.colorchoice[0];
-			document.getElementById('chartview').style.backgroundColor = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
-			
-			if (MI.Visualization.active_scid && Object.keys(MI.supplychains[sc].details.measures).length > 0) {
-				document.getElementById('missing-viz').classList.add('closed');
-				
-				if (!(Object.keys(MI.supplychains[sc].details.measures).includes(document.getElementById('measure-choices').value))) {
-					document.querySelectorAll('#measure-choices option').forEach(el => { 
-						if (Object.keys(MI.supplychains[sc].details.measures).includes(el.value)) { document.getElementById('measure-choices').value = el.value; }
-					}); 	
-				}
-				const measureSort = document.getElementById('measure-choices').value;
-
-				this.chartview = `<table id="charttable" style="background:${window.getComputedStyle(document.body).getPropertyValue('--viz-bg')}; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;				
-				
-				let color_range = [
-					tinycolor(canvascolor).darken(5).toString(),tinycolor(canvascolor).toString(),tinycolor(canvascolor).brighten(5).toString(),tinycolor(canvascolor).brighten(10).toString(),tinycolor(canvascolor).brighten(15).toString(),tinycolor(canvascolor).brighten(20).toString(),tinycolor(canvascolor).brighten(25).toString()];
-				let color_index = 0;	
-				let alternate = false;
-				
-				for (let node of MI.supplychains[sc].graph.nodes) { if (!(node.ref.properties.hidden)) {
-					color_index++; if (color_index >= color_range.length) {color_index = 0;}
-					
-					if (node.ref.properties.measures.some(m => m.GetType() === measureSort)) {
-						const measure = node.ref.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop();
-						const measureMax = MI.supplychains[sc].details.measures[measureSort].max;		
-						this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
-								
-					}
-					alternate = !alternate;
-				} }
-				document.getElementById('chartview').innerHTML = this.chartview += '</table>';
-				document.getElementById('chartview').style.background = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
-				document.getElementById('chartview').querySelectorAll('.chart-row').forEach(el => { el.addEventListener('click', (e) => { 
-					MI.Atlas.MapPointClick(el.id.split('-').pop()); MI.Atlas.active_point = el.id.split('-').pop(); 
-				}); }); 
-				
-				const getCellValue = (tr, idx) => tr.children[idx].dataset.value || tr.children[idx].innerText || tr.children[idx].textContent;
-
-				const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-				    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-				    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-
-					document.getElementById('chartview').querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-				    const table = th.closest('table');
-					document.getElementById('chartview').querySelectorAll('th').forEach(el => { el.classList.remove('asc'); el.classList.remove('desc'); }); 
-					if (this.asc === undefined || this.asc === false ) { th.classList.add('asc'); } else { th.classList.add('desc'); }
-				    Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
-				        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-				        .forEach(tr => table.appendChild(tr) );
-				})));
-			} else if (MI.Visualization.active_scid) {
-				MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[sc].properties.title+'" (no measures to compare).');	
+			if ( MI.supplychains[sc].graph.measures === false) {
+				MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[sc].properties.title+'" (no quantitative measures).');
 				document.getElementById('missing-viz').classList.remove('closed');
-			}	
+			}
+			else {
+				let canvascolor = MI.supplychains[sc].details.colorchoice[0];
+				document.getElementById('chartview').style.backgroundColor = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
+			
+				if (MI.Visualization.active_scid && Object.keys(MI.supplychains[sc].details.measures).length > 0) {
+					document.getElementById('missing-viz').classList.add('closed');
+				
+					if (!(Object.keys(MI.supplychains[sc].details.measures).includes(document.getElementById('measure-choices').value))) {
+						document.querySelectorAll('#measure-choices option').forEach(el => { 
+							if (Object.keys(MI.supplychains[sc].details.measures).includes(el.value)) { document.getElementById('measure-choices').value = el.value; }
+						}); 	
+					}
+					const measureSort = document.getElementById('measure-choices').value;
+
+					this.chartview = `<table id="charttable" style="background:${window.getComputedStyle(document.body).getPropertyValue('--viz-bg')}; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;				
+				
+					let color_range = [
+						tinycolor(canvascolor).darken(5).toString(),tinycolor(canvascolor).toString(),tinycolor(canvascolor).brighten(5).toString(),tinycolor(canvascolor).brighten(10).toString(),tinycolor(canvascolor).brighten(15).toString(),tinycolor(canvascolor).brighten(20).toString(),tinycolor(canvascolor).brighten(25).toString()];
+					let color_index = 0;	
+					let alternate = false;
+
+					for (let node of MI.supplychains[sc].graph.nodes) { if (!(node.ref.properties.hidden)) {
+						color_index++; if (color_index >= color_range.length) {color_index = 0;}
+					
+						if (node.ref.properties.measures.some(m => m.GetType() === measureSort)) {
+							const measure = node.ref.properties.measures.filter(m => { return m.GetType() === measureSort; }).pop();
+							const measureMax = MI.supplychains[sc].details.measures[measureSort].max;		
+							this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
+								
+						} else {
+							this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td></tr>`;
+						}
+						alternate = !alternate;
+					} }
+					document.getElementById('chartview').innerHTML = this.chartview += '</table>';
+					document.getElementById('chartview').style.background = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
+					document.getElementById('chartview').querySelectorAll('.chart-row').forEach(el => { el.addEventListener('click', (e) => { 
+						MI.Atlas.MapPointClick(el.id.split('-').pop()); MI.Atlas.active_point = el.id.split('-').pop(); 
+					}); }); 
+				
+					const getCellValue = (tr, idx) => tr.children[idx].dataset.value || tr.children[idx].innerText || tr.children[idx].textContent;
+
+					const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+					    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+					    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+
+						document.getElementById('chartview').querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+					    const table = th.closest('table');
+						document.getElementById('chartview').querySelectorAll('th').forEach(el => { el.classList.remove('asc'); el.classList.remove('desc'); }); 
+						if (this.asc === undefined || this.asc === false ) { th.classList.add('asc'); } else { th.classList.add('desc'); }
+					    Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+					        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+					        .forEach(tr => table.appendChild(tr) );
+					})));
+				} else if (MI.Visualization.active_scid) {
+					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[sc].properties.title+'" (no measures to compare).');	
+					document.getElementById('missing-viz').classList.remove('closed');
+				}	
+			}
 		}
 	}
 	
@@ -195,15 +208,15 @@ class ManifestVisualization {
 				return `<li class="entry ${values.zebra ? 'zebra' : ''}" style=background:${values.zebra ? tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), values.color, 20).toHexString() : tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), values.color, 10).toHexString()};>
 							<div class="manifest col">${values.manifest}</div>
 				
-							<div class="index col">${values.index}</div>
+							<div class="index col">${values.index ? values.index : ''}</div>
 			
-							<div class="name col">${values.name}</div>
-							<div class="description col">${values.description}</div>
-							<div class="placename col">${values.placename}</div>
-							<div class="geocode col">${values.geocode}</div>
+							<div class="name col">${values.name ? values.name : ''}</div>
+							<div class="description col">${values.description ? values.description  : ''}</div>
+							<div class="placename col">${values.placename ? values.placename : ''}</div>
+							<div class="geocode col">${values.geocode ? values.geocode : ''}</div>
 			
-							<div class="categories col">${values.categories}</div>
-							<div class="notes col">${values.notes}</div>
+							<div class="categories col">${values.categories ? values.categories : ''}</div>
+							<div class="notes col">${values.notes ? values.notes : ''}</div>
 							<div class="clear"></div>
 			
 			
