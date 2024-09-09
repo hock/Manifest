@@ -1,21 +1,19 @@
 <!-- build:process -->
-<link rel="stylesheet" href="<%= css_core_path %>" media="screen">
-<link href="<%= css_path %>" rel="preload" as="style" media="screen" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="<%= css_path %>" media="screen"></noscript>
+<link rel="stylesheet" href="<%= css_path %>" media="screen">
 <link rel="stylesheet" href="<%= css_printpath %>" media="print">
 
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
 
 <!--#set var="request" value="|$REQUEST_URI|" --><!--#if expr="$request=|/Manifest/dist/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
 <!--#elif expr="$request=|/dev/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
 <!--#elif expr="$request=|/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
 <!--#endif -->
