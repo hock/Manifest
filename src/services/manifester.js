@@ -28,13 +28,13 @@ app.get('/', (req, res) => {
 
 app.get('/thumb/', async (req, res) => {
 	if (typeof req.query.img === 'undefined') {
-		res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/default.png'));		
+		res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/default.webp'));		
 	} else {
 		let manifest = '';
 		if (req.query.img.split('/').pop() === '') { manifest = req.query.img.split('/').slice(-2, -1)[0]; } 
 		else { manifest = req.query.img.split('/').pop(); }
-		if (fs.existsSync('../lib/json/samples/thumbnails/'+manifest+'.png')) { res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/'+manifest+'.png'));} 
-		else { res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/default.png')); }
+		if (fs.existsSync('../lib/json/samples/thumbnails/'+manifest+'.webp')) { res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/'+manifest+'.webp'));} 
+		else { res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/default.webp')); }
 	}
 });
 	

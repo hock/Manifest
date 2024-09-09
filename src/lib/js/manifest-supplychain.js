@@ -163,7 +163,7 @@ class ManifestSupplyChain {
 		// Reverse so cluster order makes sense
 		points.features = points.features.reverse();
 		let pointLayer = new L.geoJSON(points, { onEachFeature: MI.Atlas.RenderPoint, pointToLayer: function (feature, latlng) { 
-			if (feature.properties.icon !== '') { feature.properties.style.img = { url: 'images/markers/'+feature.properties.icon+'.png' }; }
+			if (feature.properties.icon !== '') { feature.properties.style.img = { url: 'images/markers/'+feature.properties.icon+'.webp' }; }
 			return L.circleMarker(latlng, MI.Atlas.styles.point); 
 		} });	
 		

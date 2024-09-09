@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		    
 			let samples = `<div id="samples-spacer" class="closed"></div><div id="samples-previews">`;	
 			for (let s in manifests.collection) { 
-				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.png),url(json/samples/thumbnails/48/default.png);">
+				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.webp),url(json/samples/thumbnails/48/default.webp);">
 					<div class="sample-title">${manifests.collection[s].title}</div>
 					<div class="sample-description">${manifests.collection[s].description.replaceAll('**','')}</div>
 				</div>`;

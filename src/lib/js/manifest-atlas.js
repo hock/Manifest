@@ -11,8 +11,8 @@ class ManifestAtlas {
 		this.glMapLoaded = false;
 		this.playlist = {index: 0, list: [], runtime: null};
 		
-		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.png';
-		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.png';
+		this.clusterimg = { el: document.createElement('img') }; this.clusterimg.el.src = 'images/markers/cluster.webp';
+		this.highlightimg = { el: document.createElement('img') }; this.highlightimg.el.src = 'images/markers/star.webp';
 		this.baselayer = options.map ? options.map : options.darkmode ? 'dark' : 'default';
 
 		this.colorsets = [['#3498DB','#dbedf9', '#dbedf9'],['#FF0080','#f9dbde','#f9dbde'],['#34db77','#dbf9e7','#dbf9e7'],['#ff6500','#f6d0ca','#f6d0ca'],['#4d34db','#dfdbf9','#dfdbf9'],  ['#5E2BFF','#E0D6FF','#E0D6FF'],['#EE4266','#FAC7D2','#FAC7D2'],['#3BCEAC','#CEF3EA','#CEF3EA'],['#00ABE7','#C2EFFF','#C2EFFF'],['#F85A3E','#FEDDD8','#FEDDD8']];
@@ -755,7 +755,7 @@ class ManifestAtlas {
 			        });
 					/*
 					if (!MI.Atlas.glMap.hasImage('boat')) {
-						MI.Atlas.glMap.loadImage('https://hockbook.local/Manifest/dist/images/markers/boat-angle.png', function(error, image) {
+						MI.Atlas.glMap.loadImage('https://hockbook.local/Manifest/dist/images/markers/boat-angle.webp', function(error, image) {
 							if (error) { throw error; }
 							MI.Atlas.glMap.addImage('boat', image); 
 							MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'symbol', 'source': 'mlayer-'+dlid, 'layout': { 'icon-image': 'boat', 'icon-size': 0.15, 'icon-rotate': ['get', 'heading'] }, 'filter': ['==', '$type', 'Point']});
