@@ -1,3 +1,40 @@
+<!-- build:process -->
+<link rel="stylesheet" href="<%= css_core_path %>" media="screen">
+<link href="<%= css_path %>" rel="preload" as="style" media="screen" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="<%= css_path %>" media="screen"></noscript>
+<link rel="stylesheet" href="<%= css_printpath %>" media="print">
+
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
+
+<!--#set var="request" value="|$REQUEST_URI|" --><!--#if expr="$request=|/Manifest/dist/|" -->
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+<!--#elif expr="$request=|/dev/|" -->
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+<!--#elif expr="$request=|/|" -->
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="1json/manifest.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+<!--#endif -->
+
+<meta property="og:url" content="<%= baseurl %>">	
+<link rel="canonical" href="<%= baseurl %>">
+
+<script> 
+	const mversion = "<%= version %>";		
+	const mtarget = "<%= target %>";		
+	const mbaseurl = "<%= baseurl %>";
+	
+	if (mtarget === 'development' || mtarget === 'production') { 
+		var console = {}; console.log = function(){}; console.dir = function(){}; console.trace = function(){}; window.console = console;
+		console.log = function tag(msg) { gtag("event", "manifest_log", { "message": msg, "value": msg }); };
+	}
+</script>
+<!-- /build -->
+
 <meta name="description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">
 <meta name="manifest-description" content="Manifest is an investigative toolkit intended for researchers, journalists, students, and scholars interested in visualizing, analyzing, and documenting supply chains, production lines, and trade networks.">	
 <meta property="og:title" content="Manifest: Supply Chain Platform">

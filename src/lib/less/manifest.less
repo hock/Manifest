@@ -85,7 +85,7 @@
 	} 
 
 	#view-wrapper { 
-		background:var(--map-bg); overflow:hidden;  position: absolute; top: 0; right: 0; bottom: 0; width: calc(100% - 29rem); *height:100%; 
+		background:url("../images/logo.svg") center center no-repeat; background-color:var(--map-bg); overflow:hidden;  position: absolute; top: 0; right: 0; bottom: 0; width: calc(100% - 29rem); *height:100%; 
 		#map { position: absolute; top: 0; right: 0; bottom: 0; width:100%; *height:100%; background:var(--map-bg); }
 		#vizwrap { width:100%; }
 	}
@@ -189,7 +189,7 @@
 				&:not(:has(*)) { margin:0; }
 				.node-images { height: calc(100vh / 4); margin:0; position:relative; background:var(--inverse-bg); border-radius:0.25rem; 
 					.ftimg { 
-							object-fit:cover; object-position:center center; height:0; min-height:calc(100% - 1px); width:calc(100% - 2px); cursor:zoom-in; display:none; border: 1px solid var(--sep-border); border-radius:0.25rem;
+							object-fit:cover; object-position:center center; height:calc(100vh / 4); width:calc(100% - 2px); cursor:zoom-in; display:none; border: 1px solid var(--sep-border); border-radius:0.25rem;
 							&:first-child{ display:block;}
 					 }
  					&.multiple { border-radius:0.25rem 0.25rem 0 0; 
