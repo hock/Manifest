@@ -6,11 +6,36 @@
 
 	<title>Manifest: Supply Chain Platform</title>
 	<meta property="og:title" content="Manifest: Supply Chain Platform">
-
+	<!--#set var="request" value="|$REQUEST_URI|" -->
+	
 	<!-- build:process -->
-	<base href="<%= baseurl %>">
+	<base href="<%= baseurl %>/">
 	<link rel="preload" href="images/logo.svg" as="image" type="image/svg+xml">
 	<link rel="preconnect" href="https://fonts.gstatic.com/">
+	<link rel="preconnect" href="https://api.maptiler.com">
+	
+	<link rel="stylesheet" href="<%= css_path %>" media="screen">
+	<link rel="stylesheet" href="<%= css_printpath %>" media="print">
+
+	<!--#if expr="$request=|/Manifest/dist/|" -->
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler_local.json">
+	<!--#else -->
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler_server.json">
+	<!--#endif -->
+
+	<!--#if expr="$request=|/Manifest/dist/|" -->
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+	<!--#elif expr="$request=|/dev/|" -->
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+	<!--#elif expr="$request=|/|" -->
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
+	<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
+	<!--#endif -->
 	<!-- /build -->
 	
 	<!-- build:section layout.loader --><!-- /build -->	

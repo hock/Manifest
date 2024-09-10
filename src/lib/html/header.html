@@ -1,30 +1,12 @@
 <!-- build:process -->
-<link rel="stylesheet" href="<%= css_path %>" media="screen">
-<link rel="stylesheet" href="<%= css_printpath %>" media="print">
-
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler.json">
-
-<!--#set var="request" value="|$REQUEST_URI|" --><!--#if expr="$request=|/Manifest/dist/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
-<!--#elif expr="$request=|/dev/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
-<!--#elif expr="$request=|/|" -->
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
-<!--#endif -->
-
-<meta property="og:url" content="<%= baseurl %>">	
+<meta property="og:url" content="<%= baseurl %><!--#echo var='REQUEST_URI' -->">	
 <link rel="canonical" href="<%= baseurl %><!--#echo var='REQUEST_URI' -->">
 
 <script> 
 	const mversion = "<%= version %>";		
 	const mtarget = "<%= target %>";		
-	const mbaseurl = "<%= baseurl %>";
+	const mbaseurl = "<%= baseurl %>/";
+	const serverurl = "<%= serverurl %>";		
 	
 	if (mtarget === 'development' || mtarget === 'production') { 
 		var console = {}; console.log = function(){}; console.dir = function(){}; console.trace = function(){}; window.console = console;

@@ -8,20 +8,11 @@
 	<meta property="og:title" content="Manifest - Edit">
 
 	<!-- build:process -->
-	<base href="<%= baseurl %>">	
+	<base href="<%= baseurl %>/">	
 	<link rel="stylesheet" href="<%= css_editpath %>"> 
-	<meta property="og:url" content="<%= baseurl %>edit/">	
-	<link rel="canonical" href="<%= baseurl %>edit/">
-	<script> 
-		const mversion = "<%= version %>";		
-		const mtarget = "<%= target %>";		
-		const serverurl = "<%= serverurl %>";		
-		
-		if (mtarget === 'development' || mtarget === 'production') { var console = {}; console.log = function(){}; window.console = console;}
-	</script>
 	<!-- /build -->
 
-	<!-- build:section layout.header --><!-- /build -->
+	<!-- build:section recursive layout.header --><!-- /build -->
 </head>
 
 <body class="editor textpage">
