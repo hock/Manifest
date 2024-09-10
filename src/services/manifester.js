@@ -48,7 +48,7 @@ app.get('/sitemap/', async (req, res) => {
 	fs.readFile("../lib/json/samples.json", function(err, data) { 
 	    if (err) throw err; 
 		
-		const mtime = new Date(fs.statSync("../lib/json/samples.json").mtime).toISOString().replace(/T/, ' ').replace(/\..+/, '');
+		const mtime = new Date(fs.statSync("../lib/json/samples.json").mtime).toISOString().split('T')[0];
 	    const manifests = JSON.parse(data); 
 		const pages = ['about','data','edit']
 		let doc = `<?xml version="1.0" encoding="UTF-8"?>
