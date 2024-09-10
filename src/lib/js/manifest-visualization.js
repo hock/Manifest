@@ -107,6 +107,8 @@ class ManifestVisualization {
 				if (document.getElementById('mheader-'+MI.supplychains[i].details.id).style.display !== 'none' && String(MI.supplychains[i].details.id) === MI.Visualization.active_scid) { sc = i; }
 			}
 			if ( MI.supplychains[sc].graph.measures === false) {
+				let canvascolor = MI.supplychains[sc].details.colorchoice[0];
+				document.getElementById('chartview').style.backgroundColor = tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10);
 				MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[sc].properties.title+'" (no quantitative measures).');
 				document.getElementById('missing-viz').classList.remove('closed');
 			}
@@ -140,7 +142,7 @@ class ManifestVisualization {
 							this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="${measure.GetValue()}"><span class="measurebar" data-content="${measure.PrintUnit()}" style="background:${color_range[color_index]}; color:${tinycolor.mostReadable(color_range[color_index], [tinycolor(color_range[color_index]).darken(50), tinycolor(color_range[color_index]).brighten(50)]).toHexString()}; width: ${measure.GetValue()/measureMax * 100}%;">${measure.PrintValue()}</span></td></tr>`;
 								
 						} else {
-							this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td></tr>`;
+							this.chartview += `<tr class="chart-row" id="chart-row-${node.ref.properties.lid}" style="${alternate ? `background:${tinycolor.mix(window.getComputedStyle(document.body).getPropertyValue('--viz-bg'), canvascolor, 10)};` : ``}"><td class="chartlabel" style="color:${color_range[color_index]};">${node.name}</td><td class="chartmeasure" data-value="0"><span class="measurebar"></span></td></tr>`;
 						}
 						alternate = !alternate;
 					} }

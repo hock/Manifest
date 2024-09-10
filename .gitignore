@@ -8,3 +8,8 @@ Gruntfile.js
 .stylelintrc.json
 src/tools/protomaps.pmtiles
 Gruntfile.js
+.idea/vcs.xml
+.idea/modules.xml
+.idea/Manifest.iml
+.idea/jsLinters/jshint.xml
+.idea/inspectionProfiles/Project_Default.xml
