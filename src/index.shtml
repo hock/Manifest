@@ -94,7 +94,7 @@
 			<div id="fullscreen-menu"><i class="fas fa-expand"></i></div>
 			<div id="messages" class="closed"><p id="messages-text"></p></div>
 			<div id="mapcapture"><i class="fas fa-camera"></i></div>
-			<label id="colorscheme-switch" for="colorscheme-checkbox" class="switch"> <input id="colorscheme-checkbox" name="colorscheme-checkbox" type="checkbox"> <span class="slider round"></span> </label>
+			<label id="colorscheme-switch" for="colorscheme-checkbox" class="switch"><input id="colorscheme-checkbox" name="colorscheme-checkbox" type="checkbox"><span class="slider round"></span></label>
 			<nav id="mapmenu-window" class="closed">
 				<i id="close-mapmenu" class="fas fa-times-circle close-mapmenu"></i>
 		

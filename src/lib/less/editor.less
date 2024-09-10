@@ -269,13 +269,13 @@
 	}
 	body.textpage .ft-slides-container::-webkit-scrollbar{width:0;height:0;}
 	body.textpage .ft-slide{width:100%;flex:1 0 100%;padding:1rem 0;}
-	body.textpage .ft-slide .featured-image{height:50rem;text-align:center;border:1px solid #ccc;border-radius:0.5rem;background:#000;}
+	body.textpage .ft-slide .featured-image{text-align:center;}
 	body.textpage .ft-slide .featured-caption { padding:0 0 1rem 0;}
 	body.textpage .ft-slide img {
     	object-fit:contain; object-position:center center;
 		width:100%;
-		margin-bottom:1rem;
 	  	max-height: 100%;
+		border-radius:0.5rem;
 	}
 	body.textpage .ft-slide-arrow {
 	  position: absolute;
@@ -484,6 +484,7 @@
 	body.textpage .ft-slide img {
         margin: 0 -1rem;
         width: calc(100% + 2rem);
+		border-radius:0;
 	}
 	body.textpage .ft-slide .featured-caption {
 		font-size:1rem;
