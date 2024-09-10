@@ -18,12 +18,6 @@
 	<link rel="stylesheet" href="<%= css_printpath %>" media="print">
 
 	<!--#if expr="$request=|/Manifest/dist/|" -->
-	<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler_local.json">
-	<!--#else -->
-	<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler_server.json">
-	<!--#endif -->
-
-	<!--#if expr="$request=|/Manifest/dist/|" -->
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="json/samples.json">
 	<link rel="preload" as="fetch" crossOrigin="anonymous" href="CHANGELOG.md">
