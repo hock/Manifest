@@ -38,6 +38,30 @@ app.get('/thumb/', async (req, res) => {
 	}
 });
 	
+app.get('/sitemap/', async (req, res) => {
+	function Slugify(str) {
+		let slug = str; 
+		if (slug.substring(0,1) === '#') { slug = slug.substring(1,slug.length); }
+		if (slug.substring(0,14) === 'manifest-json/') { return 'manifest/'+slug.substring(14,slug.length).split('.')[0]+'/'; } 
+		else { return str; } 
+	}
+	fs.readFile("../lib/json/samples.json", function(err, data) { 
+	    if (err) throw err; 
+		
+		const mtime = fs.statSync("../lib/json/samples.json").mtime;
+	    const manifests = JSON.parse(data); 
+		
+		let doc = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+		for (let s in manifests.collection) { doc += `<url><loc>https://manifest.supplystudies.com/${Slugify(manifests.collection[s].id)}</loc> <lastmod>${mtime}</lastmod></url>`; }
+		doc += `</urlset>`;
+
+		res.setHeader('content-type', 'application/xml');		
+		res.send(doc); 
+	}); 	
+});
+
+
 app.get('/marinetraffic/', async (req, res) => {});
 
 app.get('/maptiler/:type', async (req, res) => {

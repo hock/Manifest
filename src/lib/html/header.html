@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="<%= css_path %>" media="screen">
 <link rel="stylesheet" href="<%= css_printpath %>" media="print">
 
-<link rel="preload" as="fetch" crossOrigin="anonymous" href="<%= baseurl %>services/maps/maptiler.json">
+<link rel="preload" as="fetch" crossOrigin="anonymous" href="services/maps/maptiler.json">
 
 <!--#set var="request" value="|$REQUEST_URI|" --><!--#if expr="$request=|/Manifest/dist/|" -->
 <link rel="preload" as="fetch" crossOrigin="anonymous" href="json/manifest.json">
@@ -19,7 +19,7 @@
 <!--#endif -->
 
 <meta property="og:url" content="<%= baseurl %>">	
-<link rel="canonical" href="<%= baseurl %>">
+<link rel="canonical" href="<%= baseurl %><!--#echo var='REQUEST_URI' -->">
 
 <script> 
 	const mversion = "<%= version %>";		
