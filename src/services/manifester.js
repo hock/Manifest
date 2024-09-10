@@ -50,10 +50,13 @@ app.get('/sitemap/', async (req, res) => {
 		
 		const mtime = fs.statSync("../lib/json/samples.json").mtime;
 	    const manifests = JSON.parse(data); 
-		
+		const pages = ['about','data','edit']
 		let doc = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-		for (let s in manifests.collection) { doc += `<url><loc>https://manifest.supplystudies.com/${Slugify(manifests.collection[s].id)}</loc> <lastmod>${mtime}</lastmod></url>`; }
+				   <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+				   <url><loc>https://manifest.supplystudies.com/</loc><lastmod>${mtime}</lastmod></url>`;
+		
+		for (let p in pages) { doc += `<url><loc>https://manifest.supplystudies.com/${pages[p]}/</loc><lastmod>${mtime}</lastmod></url>`; }
+		for (let s in manifests.collection) { doc += `<url><loc>https://manifest.supplystudies.com/${Slugify(manifests.collection[s].id)}</loc><lastmod>${mtime}</lastmod></url>`; }
 		doc += `</urlset>`;
 
 		res.setHeader('content-type', 'application/xml');		
