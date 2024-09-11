@@ -826,7 +826,7 @@ class ManifestUI {
 
 	IsMobile(options=false) { 
 		if (!options && typeof MI !== 'undefined') { options = MI.options; }
-		if (options && (options.storyMap || options.embed)) { return false; } else { return window.innerWidth > 920 ? false : true; }
+		if (options && (options.storyMap || options.embed)) { return false; } else { return (window.matchMedia('(max-device-width: 920px)').matches); }
 	}
 	
 	StopVideoPlayback() {
