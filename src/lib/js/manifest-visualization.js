@@ -7,8 +7,11 @@ class ManifestVisualization {
 	
 	Set(type, scid, refresh=false) {
 		if (MI.Interface.IsMobile() && MI.supplychains[0]) { scid = String(MI.supplychains[0].details.id); }
-		if (MI.Interface.IsMobile() && type !== 'map' && type !== this.type) { document.getElementById('sidewrap').classList.remove('top'); 
-			document.getElementById('sidewrap').classList.remove('middle'); document.getElementById('sidewrap').classList.add('bottom'); }
+		if (MI.Interface.IsMobile() && type !== this.type) {
+			const sideclass = document.getElementById('sidewrap').classList;
+			if (type !== 'map') { sideclass.remove('top'); sideclass.remove('middle'); sideclass.add('bottom'); }
+			else {sideclass.remove('top'); sideclass.remove('bottom'); sideclass.add('middle'); }
+		}
 		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {			
 			MI.Visualization.active_scid = scid; 
 			MI.Interface.ClearMessages();
