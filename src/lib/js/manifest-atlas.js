@@ -332,7 +332,11 @@ class ManifestAtlas {
 			let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${MI.options.darkmode ? tinycolor(feature.properties.style.color).lighten(30).toString() : feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</div>`;
 			layer.bindTooltip(tooltipContent);
 			//layer.bindPopup(popupContent);
-		}	
+		}
+		feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line, 
+					{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString(),
+					 fillColor: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
+		layer.setStyle(feature.properties.style);		
 	}
 
 	/** Focus on a point on the map and open its popup. **/

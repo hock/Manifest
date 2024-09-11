@@ -132,7 +132,13 @@ class ManifestSupplyChain {
 		// Prepare to add layers
 		let maplayergroup =  L.layerGroup();
 				
-		let lineLayer = new L.geoJSON(lines, { style: MI.Atlas.styles.line });	
+		//let lineLayer = new L.geoJSON(lines, { style: MI.Atlas.styles.line });	
+		let lineLayer = new L.geoJSON(lines, { onEachFeature: function (feature, layer) { 
+			feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line, 
+						{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
+			layer.setStyle(feature.properties.style);	
+		}});
+		
 		manifest.details.layers.push(maplayergroup.addLayer(lineLayer));		
 
 		let arrowLayer = new L.geoJSON(arrows, { onEachFeature: MI.Atlas.RenderLine, pointToLayer: function (feature, latlng) { 
@@ -208,7 +214,7 @@ class ManifestSupplyChain {
 		// Individual point color
 		if ( ft.properties.color ) { 
 			let ftcolors = ft.properties.color.split(',');
-			setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
+			setup.basestyle = setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
 		}
 		// Customized point colors for storymap 
 		Object.assign(ft.properties, setup);

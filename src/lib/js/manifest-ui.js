@@ -752,7 +752,7 @@ class ManifestUI {
 				if (document.getElementById('manifestbar').scrollHeight > document.getElementById('manifestbar').clientHeight) {
 					document.getElementById('manifestbar').classList.add('scroll'); document.getElementById('samples-previews').classList.add('scroll');
 				} else { if (document.getElementById('manifestbar').classList.contains('scroll')) { document.getElementById('manifestbar').classList.remove('scroll'); document.getElementById('samples-previews').classList.remove('scroll'); } }
-			} else { document.getElementById('sidepanel').style.top = '4rem'; }
+			} //else { document.getElementById('sidepanel').style.top = '4rem'; }
 		}
 		MI.Visualization.Resize(); 
 	}
