@@ -688,9 +688,10 @@
 			display: flex; flex-flow: column wrap; width:100vw; min-width:100vw; max-width:100vw; 
 			#mapmenu, #mapcapture, #fullscreen-menu, .leaflet-control-layers, #mapcapture, .leaflet-control-zoomhome, .leaflet-control-attribution, .fulltext, .fas.closemap, .leaflet-left .leaflet-control, .leaflet-popup-pane, .leaflet-tooltip-pane, .footer, .share-button, #time-slider {display:none;}
 	
-			#manifestbar { position: absolute; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000; overflow-x:scroll; max-height: calc(100% - 4rem);
+			#manifestbar { position: absolute; width:calc(100% - 1rem); display:block; margin:0.5rem; padding:0; border-radius:0.5rem; border:none; z-index:13000; overflow-x:scroll;
 				#minfoheader { background:#4d34db;position:sticky;top:0;padding:0.75rem 1rem;margin:0;}
 				#minfodetail { padding:0.1rem 1rem 1rem 1rem; margin:0; box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);}
+				&.open { height:calc(100% - 1rem);max-height:calc(100% - 1rem); #minfodetail { height:100%; }}
 			} 
 			#loadlistpanel #loadlist-group-samples #samples-previews.open:not(.scroll), #loadlistpanel #loadlist-group-samples #samples-previews.open.scroll { 
 			    width: calc(100% - 4rem);
