@@ -384,7 +384,7 @@ class ManifestAtlas {
 							}
 							this.SetActivePoint({_latlng: l.feature.properties.latlng}); 
 							if (!l.feature.properties.disabled) {							
-								l.setStyle({fillColor: l.feature.properties.style.highlightColor});	
+								l.setStyle({color: l.feature.properties.style.highlightColor, fillColor: l.feature.properties.style.highlightColor});	
 							}
 						}
 						if (MI.options.storyMap || MI.options.embed) { l.bringToFront(); }
