@@ -85,7 +85,7 @@ class ManifestSupplyChain {
 		let nodelist = [];
 		
 		for (let [i, ft] of manifest.features.entries()) {
-			const defs = { type: 'Feature', properties: { lid: manifest.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false, disabled: false}, geometry: { type: 'Point', coordinates: [] } };
+			const defs = { type: 'Feature', properties: { mid:manifest.details.id, lid: manifest.details.id * 10000 + Number(i), mindex: Number(i)+1, title: 'Node', description: '', placename: '', category: '', images: '', icon: '', color: '', measures: [], sources: '', notes: '', clustered: [], latlng: '', hidden: false, disabled: false}, geometry: { type: 'Point', coordinates: [] } };
 					   
 			ft = { type: 'Feature', properties: Object.assign(defs.properties, ft.properties), geometry: Object.assign(defs.geometry, ft.geometry) };			
 			for (let p of ['description','placename','category','images','icon','sources']) { if (typeof ft.properties[p] === 'undefined') { ft.properties[p] = '';}}
@@ -136,6 +136,7 @@ class ManifestSupplyChain {
 		let lineLayer = new L.geoJSON(lines, { onEachFeature: function (feature, layer) { 
 			feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line, 
 						{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
+			layer.options.interactive = false;
 			layer.setStyle(feature.properties.style);	
 		}});
 		
@@ -202,7 +203,7 @@ class ManifestSupplyChain {
 	SetupStyle(d) {
 		d.options = d.options ? d.options : {};
 				
-		let colors =  typeof d.setOptions.color !== 'undefined' ? d.setOptions.color.value.split(',').map(c => '#' + c) : typeof d.options.color !== 'undefined' ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor());
+		let colors =  typeof d.setOptions.color !== 'undefined' ? d.setOptions.color.value.split(',').map(c => '#' + c) : typeof d.options.color !== 'undefined' ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(d.details.id));
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
 			

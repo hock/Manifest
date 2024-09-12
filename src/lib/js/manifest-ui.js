@@ -215,6 +215,8 @@ class ManifestUI {
 		while (mheader.previousSibling) {
 			mheader = mheader.previousSibling;
 			if (mheader.nodeType === 1 && mheader.classList.contains('mheader') && mheader.style.display !== 'none') { offset += mheader.clientHeight; }
+			if (mheader.nodeType === 1 && mheader.classList.contains('mlist') && mheader.style.display !== 'none') { mheader.querySelectorAll('.mnode').forEach(el => 
+				{ el.style.contentVisibility = 'visible'; }); }
 		}
 		
 		let moffset = 0; document.getElementById('manifestlist').querySelectorAll('.mheader').forEach(el => { if (el.style.display !== 'none') { el.style.top = moffset+'px'; moffset += el.offsetHeight; }});		
@@ -476,6 +478,13 @@ class ManifestUI {
 
 			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
 			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);
+		}
+		if (!(MI.initialized) || MI.Atlas.active_point === null) { MI.Atlas.SetView(MI.options.view); }
+
+		if (MI.Interface.IsMobile()) {		
+			if (document.getElementById('viz-choices').querySelector('option[value='+document.getElementById('viz-choices').value+']').disabled) { 
+				MI.Visualization.type = 'map'; }
+			MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);		
 		}
 	}
 

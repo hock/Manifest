@@ -158,7 +158,7 @@
 							}
 						}
 					},
-				    "default": [ { "mtype": "","mvalue":"","munit":"" } ],
+				    "default": [],
 					
 					"options": { "disable_collapse": true, "disable_array_reorder": "true", 
 								 "disable_array_delete_all_rows": "true", "disable_array_delete_last_row": "true" }

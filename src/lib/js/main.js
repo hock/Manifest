@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			
 		}
 	} else { // No manifest has been requested, so we load the introduction sample setup
-		fetch("CHANGELOG.md").then(c => c.text()).then(changelog => LoadIntroduction(changelog, (!MI.options.storyMap && !MI.options.embed) ));
+		LoadIntroduction((!MI.options.storyMap && !MI.options.embed));
 	}
 
 	function LoadError(error, status=0) { 
@@ -107,23 +107,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		}		
 	}
 	
-	function LoadIntroduction(changelog, sample) {
-		MI.changelog = changelog;
+	function LoadIntroduction(sample) {
+		MI.changelog = mchanges;
 	
 		if (!MI.Interface.IsMobile()) {
+			MI.Process('manifest', mstarter, {id: ManifestUtilities.Hash("json/manifest.json"), url: "json/manifest.json"});
 			if (sample) {				
-				fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-				.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url}))).then(fetch("json/manifest.json")
-				.then(r => r.json()).then(data => MI.Process('manifest', data, {delay: true, id: ManifestUtilities.Hash("json/manifest.json"), url: "json/manifest.json"})))
-				.catch(e => LoadError(e));
-			} else {			
-				fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(fetch("json/manifest.json")
-				.then(r => r.json()).then(data => MI.Process('manifest', data, {id: ManifestUtilities.Hash("json/manifest.json"), url: "json/manifest.json"})))
-				.catch(e => LoadError(e));
-			}
+				const starter = LoadSample(msamples);
+				fetch(starter.url).then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url:starter.url})).catch(e => LoadError(e)).then(e => MI.Atlas.Surface(ManifestUtilities.Hash("json/manifest.json")));
+			} else { LoadSample(msamples); }
 		} else {
-			fetch("json/samples.json").then(c => c.json()).then(data => LoadSample(data) ).then(starter => fetch(starter.url)
-			.then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url}))).catch(e => LoadError(e));
+			const starter = LoadSample(msamples);
+			fetch(starter.url).then(s => s.json()).then(d => MI.Process(starter.type, d, {id: starter.id, url: starter.url})).catch(e => LoadError(e));
 		}
 	}
 
@@ -132,7 +127,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		// Setup basic sample options list
 		document.getElementById('load-samples-group').innerHTML = document.getElementById('load-custom-group').innerHTML = '';
 		let optionblob = '';
-		for (let s in manifests.collection) { optionblob += `<option value="${manifests.collection[s].id}">${manifests.collection[s].title}</option>`; }
+		manifests.featured = manifests.collection.filter(function (entry) { return entry.featured === true; });
+		
+		manifests.collection.sort(function(a, b) { 
+			if (a.featured && b.featured) { return a.title.localeCompare(b.title); }
+			else if (a.featured || b.featured) { return a.featured ? -1 : 1; }
+			else { return a.title.localeCompare(b.title); }
+		});
+
+
+		for (let s in manifests.collection) { optionblob += `<option value="${manifests.collection[s].id}">${manifests.collection[s].featured ? '&#11088; ' : ''}${manifests.collection[s].title}</option>`; }
 		document.getElementById('load-samples-group').insertAdjacentHTML('beforeend', optionblob);
 		
 		// Setup fancy list if this isn't a special collection and we aren't in a mobile view
@@ -142,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			let samples = `<div id="samples-spacer" class="closed"></div><div id="samples-previews">`;	
 			for (let s in manifests.collection) { 
 				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.webp),url(json/samples/thumbnails/48/default.webp);">
-					<div class="sample-title">${manifests.collection[s].title}</div>
+					<div class="sample-title">${manifests.collection[s].featured ? '&#11088; ' : ''}${manifests.collection[s].title}</div>
 					<div class="sample-description">${manifests.collection[s].description.replaceAll('**','')}</div>
 				</div>`;
 			} 

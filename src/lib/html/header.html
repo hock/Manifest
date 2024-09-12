@@ -36,6 +36,28 @@
     document.documentElement.classList.add('js');
 </script>
 
+<!-- build:process -->
+<!--#if expr="$request=|/Manifest/dist/|" -->
+<script>
+	const mstarter = <%= mstarter %>;
+	const msamples = <%= msamples %>;
+	const mchanges = `<%= mchanges %>`;
+</script>
+<!--#elif expr="$request=|/dev/|" -->
+<script>
+	const mstarter = <%= mstarter %>;
+	const msamples = <%= msamples %>;
+	const mchanges = `<%= mchanges %>`;
+</script>
+<!--#elif expr="$request=|/|" -->
+<script>
+	const mstarter = <%= mstarter %>;
+	const msamples = <%= msamples %>;
+	const mchanges = `<%= mchanges %>`;
+</script>
+<!--#endif -->
+<!-- /build -->
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NQ2V8E9JCX"></script>
 <script>

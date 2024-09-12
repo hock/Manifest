@@ -325,18 +325,21 @@ class ManifestAtlas {
 
 	/** Render lines by setting up a GeoJSON feature for display **/
 	RenderLine(feature, layer) {		
+		feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.arrow, 
+					{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString(),
+					 fillColor: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
+		layer.options.interactive = true;
+		layer.setStyle(feature.properties.style);		
+				
 		let title = feature.properties.title === 'Node' ? '' : feature.properties.title, fid = feature.properties.lid;
 		if (title !== '') {
 			let popupContent = `
 			<h2 id="popup-${fid}" class="popuphop" style="background: ${feature.properties.style.fillColor}; color: ${feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</h2>`;
-			let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${MI.options.darkmode ? tinycolor(feature.properties.style.color).lighten(30).toString() : feature.properties.style.color}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</div>`;
+			let tooltipContent = `<div id="tooltip-${fid}" class="mtooltip" style="background: ${feature.properties.style.fillColor}; color: ${MI.options.darkmode ? tinycolor(feature.properties.style.color).lighten(30).toString() : tinycolor(feature.properties.style.color).lighten(30).toString()}">${title.split('|').join('<br/><i class="fas fa-chevron-down"></i><br/>')}</div>`;
 			layer.bindTooltip(tooltipContent);
 			//layer.bindPopup(popupContent);
 		}
-		feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line, 
-					{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString(),
-					 fillColor: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
-		layer.setStyle(feature.properties.style);		
+	
 	}
 
 	/** Focus on a point on the map and open its popup. **/
@@ -619,6 +622,8 @@ class ManifestAtlas {
 				this.active_point = pt;
 				let latlng = pt._latlng ? pt._latlng : pt._popup._latlng;
 				this.homecontrol.setHomeCoordinates(latlng, 3);
+				const mid = pt.feature ? pt.feature.properties.mid : pt._popup._source.feature.properties.mid;
+				MI.Atlas.Surface(mid);
 			}
 			else {
 				this.active_point = null;
@@ -657,6 +662,12 @@ class ManifestAtlas {
 				} else { MI.Atlas.PointFocus(nodeId, {fit: true, open: popup}); } 					
 			}
 		} else if (type === 'center') { MI.Atlas.map.setView(MI.options.position, MI.options.zoom, {animate:false}); }
+	}
+	
+	Surface(mid) {
+		for (let l in MI.Atlas.map._layers) {							
+			if (MI.Atlas.map._layers[l].feature && MI.Atlas.map._layers[l].feature.properties.mid === mid) { MI.Atlas.map._layers[l].bringToFront(); }		
+		}
 	}
 	
 	DisplayLayers(show=true) {
@@ -863,13 +874,16 @@ class ManifestAtlas {
 		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr'; 
 	}
 	
-	/** Cycle through the colors for supply chains randomly **/
-	SupplyColor() {
-		let copy = this.colorsets.slice(0);
-		if (copy.length < 1) { copy = this.colorsets.slice(0); }
-		let index = Math.floor(Math.random() * copy.length);
-		let item = copy[index];
-		copy.splice(index, 1);
+	/** Select a supply chain color **/
+	SupplyColor(id, random=false) {
+		let item;
+		if (random) {
+			let copy = this.colorsets.slice(0);
+			if (copy.length < 1) { copy = this.colorsets.slice(0); }
+			let index = Math.floor(Math.random() * copy.length);
+			item = copy[index];
+			copy.splice(index, 1);
+		} else { item = this.colorsets[id % this.colorsets.length]; }
 		return item;
 	}
 }

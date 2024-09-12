@@ -22,21 +22,6 @@ class Manifest {
 		this.Messenger = new ManifestMessenger(this.Atlas);
 		this.Util = new ManifestUtilities();
 	}
-	Start(delay=false) {
-		if (!(MI.initialized) || MI.Atlas.active_point === null) { MI.Atlas.SetView(MI.options.view, !(delay)); }
-
-		if (MI.supplychains.length > 0) {
-			if (!(MI.initialized || delay)) { 
-				MI.Interface.CleanupInterface(); document.dispatchEvent( new Event("Manifested"));
-				if (MI.options.demoMode) { MI.ManifestTests(); }
-			}   
-		}
-
-		if (MI.Interface.IsMobile()) {		
-			if (document.getElementById('viz-choices').querySelector('option[value='+document.getElementById('viz-choices').value+']').disabled) { MI.Visualization.type = 'map'; }
-			MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element);		
-		}
-	}
 	
 	ManifestTests() {
 		MI.Interface.ShowMessage('Welcome to Manifest!');
@@ -73,14 +58,15 @@ class Manifest {
 				d.manifest.setOptions = this.ProcessOptions(d.manifest.setOptions, d.manifest); break;
 			case 'smap':  d = this.SMAPGraph(this.Supplychain.Map(this.Supplychain.Setup(this.FormatSMAP({index:index, manifest:d.geo, options:options, data:{graph:d.graph}})))); 
 				MI.supplychains.push(d.manifest); break;
-				
-				
 			case 'gsheet': d = this.ManifestGraph(this.Supplychain.Map(this.Supplychain.Setup(this.FormatGSHEET({index:index, manifest:d, options:options, data:{}})))); 
 				MI.supplychains.push(d.manifest);			
 				d.manifest.setOptions = this.ProcessOptions(d.manifest.setOptions, d.manifest); break;
 		}
 		MI.Interface.OnProcessComplete(index, d.manifest.details.id, d.data); 
-		MI.Start(d.options.delay);		
+		if (MI.supplychains.length > 0 && !(MI.initialized)) {
+			MI.Interface.CleanupInterface(); document.dispatchEvent( new Event("Manifested"));
+			if (MI.options.demoMode) { MI.ManifestTests(); }   
+		}
 	}
 	
 	ProcessOptions(options, d) {
