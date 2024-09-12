@@ -3178,7 +3178,7 @@
   			this._zoom = zoom;
   			return this;
   		}
-		if (MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
+		if (typeof MI !== 'undefined' && MI.Atlas.active_point !== null && typeof MI.Atlas.active_point._popup !== 'undefined') {
 		    return this.setView(MI.Atlas.active_point._popup._source.feature.properties.latlng, zoom, {zoom: options});
 		} else {
 			return this.setView(this.getCenter(), zoom, {zoom: options});

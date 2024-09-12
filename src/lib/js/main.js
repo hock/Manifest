@@ -144,9 +144,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			document.getElementById('load-samples').classList.add('closed');
 		    
 			let samples = `<div id="samples-spacer" class="closed"></div><div id="samples-previews">`;	
+			let divider = true;
 			for (let s in manifests.collection) { 
-				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.webp),url(json/samples/thumbnails/48/default.webp);">
-					<div class="sample-title">${manifests.collection[s].featured ? '&#11088; ' : ''}${manifests.collection[s].title}</div>
+				if (divider && !manifests.collection[s].featured) {
+					samples += `<div class="sample-preview-divider"><hr /></div>`; divider = false;
+				}
+				samples += `<div class="sample-preview ${(s === '0') ? 'selected' : ''}" tabindex="0" title="${manifests.collection[s].description.replaceAll('**','')}" data-id="${manifests.collection[s].id}" data-hash="${ManifestUtilities.Hash(manifests.collection[s].id.split('-').splice(1).join('-'))}" id="sample-${ManifestUtilities.Slugify(manifests.collection[s].id)}" style="background-image:url(json/samples/thumbnails/48/${manifests.collection[s].id.split('/')[(manifests.collection[s].id.split('/')).length-1].split('.')[0]}.webp),url(json/samples/thumbnails/48/default.webp);">${manifests.collection[s].featured ? '<i class="fa-solid fa-star"></i>' : ''}
+					<div class="sample-title">${manifests.collection[s].title}</div>
 					<div class="sample-description">${manifests.collection[s].description.replaceAll('**','')}</div>
 				</div>`;
 			} 

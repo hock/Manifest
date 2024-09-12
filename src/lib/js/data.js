@@ -2,7 +2,7 @@ let util = new ManifestUtilities();
 
 function Start() { 	
 	fetch('json/smapindex.json').then(r => r.json()).then(d => RenderSMAP(JSON.parse(d))); 
-	fetch('json/samples.json').then(r => r.json()).then(d => RenderManifest(d.collection)); 
+	fetch('json/samples.json').then(r => r.json()).then(d => RenderManifest(d.collection.sort(function(a, b) { return a.title.localeCompare(b.title); }))); 
 }
 
 function RenderSamples(data) {
@@ -31,7 +31,7 @@ function RenderManifest(data) {
 							<h3 class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></h3>
 							<div class="sampleauthor">${values.author}</div>
 							<div class="sampletags"><ul>${values.categories.split(',').map(s => `<li>${s}</li>`).join('')}</ul></div>
-							<img src="json/samples/thumbnails/256/${thumb}.png" onerror="this.onerror=null; this.src='json/samples/thumbnails/256/default.png'" loading="lazy"/>
+							<img src="json/samples/thumbnails/256/${thumb}.webp" onerror="this.onerror=null; this.src='json/samples/thumbnails/256/default.webp'" loading="lazy"/>
 							<div class="sampledescription">${util.markdowner.makeHtml(values.description)}</div>
 						</div>
 					</li>`;

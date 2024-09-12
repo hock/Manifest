@@ -258,6 +258,7 @@
 					border:1px solid var(--sep-border);box-shadow:0.1rem 0.1rem rgba(0,0,0,0.2); min-height:3rem;
 					
 					.sample-preview { display:block; background-color:var(--alt-bg-2); }
+					.sample-preview-divider { display:block; }
 				}
 				&.open:not(.scroll) { position:fixed;width:24rem; }
 				&.open.scroll { position:absolute;width:24rem; }
@@ -265,16 +266,17 @@
 				.sample-preview {
 					width:calc(100% - 4rem); padding:0.25rem 0.25rem 0.25rem 3.5rem; border:1px solid var(--sep-border); margin:0.25rem 0;
 					height:2.5rem; overflow:hidden; display:none; border-radius:0.25rem; background:var(--controls-bg);
-					background-repeat: no-repeat; background-size:3rem 100%; background-position:left center; 
+					background-repeat: no-repeat; background-size:3rem 100%; background-position:left center; position:relative;
 					.sample-title { font-size:1rem; overflow:hidden;white-space:nowrap;text-overflow:ellipsis; color:var(--sample-list-header);
 						 user-select:none;-moz-user-select:none;-webkit-text-select:none;-webkit-user-select:none; }
 					.sample-description { font-size:0.8rem; overflow:hidden;white-space:nowrap;text-overflow:ellipsis; color:var(--sample-list-text);
 						 user-select:none;-moz-user-select:none;-webkit-text-select:none;-webkit-user-select:none; }
-					
+					.fa-star { position:absolute;left:0.75rem;top:0.75rem;color:var(--m-purple-bright);-webkit-text-stroke:1px var(--controls-bg);font-size:1.5rem;}
 					&.selected { display:block;}
-					&.loaded { filter: grayscale(100%); .sample-title { color:var(--disabled-text); } .sample-description { color:var(--disabled-text); }}
+					&.loaded { filter: grayscale(100%); .sample-title { color:var(--disabled-text); } .sample-description { color:var(--disabled-text); } .fa-star { opacity:0.5; }}
 					&:hover { background-color:var(--primary-bg);cursor:pointer;}
 				}
+				.sample-preview-divider { display:none; padding:0.25rem 0; hr { display:block;height:1px;border:0;border-top:1px solid var(--primary-bg);}}
 			}
 		}
 		.launcher-load-text{margin-bottom:0.25rem;}
