@@ -236,8 +236,8 @@ class ManifestSupplyChain {
 			${ft.properties.images.length !== 0 ? `<div class="node-images ${ft.properties.images.length > 1 ? `multiple` : ''}" ${ft.properties.images.length > 1 ? `data-index="1"` : ''}>
 				
 				${ft.properties.images.map((img,i) => img.URL ? (img.URL.substring(0,24) === 'https://www.youtube.com/' ? 
-				`<iframe class="ftimg" src="${img.URL}?si=N9SHiMo-QTcPyqdP&enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` : 
-				`<img class="ftimg" ${i !== 0 || ft.properties.mindex !== 1 ? `loading="lazy"` : ''} src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title}${img.caption ? '' : ` image`}"/>` ) : '').join('')} 	
+				`<iframe class="ftimg" src="${img.URL}?si=N9SHiMo-QTcPyqdP&enablejsapi=1&origin=${window.location.origin}&color=white&controls=0" width="560" height="315" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` : 
+				`<img class="ftimg" loading="${MI.Interface.LoadingImages(i) ? 'auto' : 'lazy'}" src="${img.URL}" title="${img.caption ? img.caption : ft.properties.title}" alt="${img.caption ? img.caption : ft.properties.title}${img.caption ? '' : ` image`}"/>` ) : '').join('')} 	
 			</div>` : ''}
 			
 			${ft.properties.images.length > 1 ? 

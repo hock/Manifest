@@ -4,6 +4,7 @@ class ManifestUI {
 		this.filter = {clear: true, term: null};
 		this.active_element = null; this.paneldisplay = {};
 		this.timeslider = false;
+		this.initialimages = 3;
 		this.observer = this.SetupObserver();
 
 		document.getElementById('fullscreen-menu').addEventListener('click', (e) => { MI.Interface.ToggleFullscreen(); });
@@ -567,7 +568,6 @@ class ManifestUI {
 	}
 	KeyHandlerUp(e) {
 		if (e.key === 'Alt') { document.querySelector('.leaflet-overlay-pane canvas').style.pointerEvents = 'all'; }
-	
 	}
 	Link(link, event) {
 		event.preventDefault(); event.stopPropagation();
@@ -585,6 +585,12 @@ class ManifestUI {
 		else {
 			this.LoadFromLauncher(link, false);
 		}
+	}
+	LoadingImages(i) {
+		if (i === 0 && MI.Interface.initialimages > 0) {
+			MI.Interface.initialimages--;
+			return true;
+		} else { return false; }
 	}
 	
 	ImageScroll(lid, n, jump=false, modal=false, popup=null) {
