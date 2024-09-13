@@ -38,18 +38,21 @@
 
 <!-- build:process -->
 <!--#if expr="$request=|/Manifest/dist/|" -->
+<link rel="preload" as="image" href="json/samples/manifest/code.webp">
 <script>
 	const mstarter = <%= mstarter %>;
 	const msamples = <%= msamples %>;
 	const mchanges = `<%= mchanges %>`;
 </script>
 <!--#elif expr="$request=|/dev/|" -->
+<link rel="preload" as="image" href="json/samples/manifest/code.webp">	
 <script>
 	const mstarter = <%= mstarter %>;
 	const msamples = <%= msamples %>;
 	const mchanges = `<%= mchanges %>`;
 </script>
 <!--#elif expr="$request=|/|" -->
+<link rel="preload" as="image" href="json/samples/manifest/code.webp">
 <script>
 	const mstarter = <%= mstarter %>;
 	const msamples = <%= msamples %>;

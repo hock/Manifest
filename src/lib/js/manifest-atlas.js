@@ -406,7 +406,7 @@ class ManifestAtlas {
 	}
 	
 	/** The UI side of the focus function, scrolls the user interface to a point based on map (or functional) action **/
-	MapPointClick(node, speed='smooth') {
+	MapPointClick(node, speed='instant') {
 		if (node === null) { return; }
 		let id = null;		
 		
@@ -424,6 +424,12 @@ class ManifestAtlas {
 		if (!MI.initialized) {
 			document.getElementById('sidepanel').scrollTo({left: 0, top: 0, behavior: speed});	
 		} else if (!MI.options.embed) {
+			const scrolling = setInterval(function() {
+				if (document.getElementById('sidepanel').scrollTop !== document.getElementById('node_'+id).offsetTop + (-1*offset) && 
+					(Math.abs(document.getElementById('sidepanel').scrollHeight - document.getElementById('sidepanel').clientHeight - document.getElementById('sidepanel').scrollTop) > 1)) {
+					document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('node_'+id).offsetTop + (-1*offset), behavior: speed});	
+				} else { clearInterval(scrolling); }
+			}, 10);
 			document.getElementById('sidepanel').scrollTo({left: 0, top: document.getElementById('node_'+id).offsetTop + (-1*offset), behavior: speed});	
 		} else if (MI.options.embed){ 			
 			document.getElementsByClassName('mlist')[0].scrollTo({left: document.getElementById('node_'+id).offsetLeft - ManifestUtilities.RemToPixels(1), top: 0, behavior:'instant'});		

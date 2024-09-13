@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		hash = location.hash.substr(1).split("-");
 	}
 	MI.options.initialurl = hash ? hash.slice(1).join('-') : '';
-	
+
 	// If a specific manifest has been requested, we see what kind it is and begin to load it
 	if (hash) { 
 		let hashtype = hash[0], hashid = [hash.shift(), hash.join('-')][1];
@@ -64,11 +64,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				.then(data => { let gsheet = {g: data[0], r: data[1] }; MI.Process('gsheet', gsheet, {id: ManifestUtilities.Hash(hashid), idref: hashid, url: MI.options.serviceurl + '/gsheet' + hashid});}).catch(e => LoadError(e));}}); break;
 				case 'manifest': 
 					if (hashid === 'json/manifest.json') {
-						fetch("CHANGELOG.md").then(c => c.text()).then(changelog => LoadIntroduction(changelog, false) );
-					} else { 
+						fetch("CHANGELOG.md").then(c => c.text()).then(t => MI.changelog = t);
+					} 
 						fetch(hashid).then(r => {if (!r.ok) { r.text().then(e => { LoadError(e, r.status); }); } else { r.json()
 						.then(data => MI.Process('manifest', data, {id: ManifestUtilities.Hash(hashid), url: hashid})).catch(e => LoadError(e));}}); 
-					} break;
+					break;
 				default: LoadError(`<h3>This option is not supported.</h3>
 									See the <a href="https://github.com/hock/Manifest/wiki/5.-Additional-Options">Manifest Wiki</a> section on 
 									<a href="https://github.com/hock/Manifest/wiki/5.-Additional-Options">Additional Options</a> for the formats we support.`);
@@ -102,7 +102,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				.then(s => s.json()).then(d => {
 					if (starter.type === 'gsheet') { let gsheet = {g: d[0], r: d[1] }; MI.Process('gsheet', gsheet, {id: starter.id, idref: starter.ref, url: MI.options.serviceurl + '/gsheet' + starter.id}); } else { MI.Process(starter.type, d, {id: starter.id, idref: starter.ref, url: starter.url}); }
 				})).catch(e => LoadError(e));
-		} else if (!o.manifest) {
+		} else if (!o.manifest || MI.options.initialurl === 'json/manifest.json') {
+			console.log('normal');
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
 	}

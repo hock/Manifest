@@ -26,14 +26,19 @@
 
 		<p class="biggertext callout">Manifest has been deployed in a variety of different contexts, from academic research projects and courses to workshops for organizers and activists. This page collects only those Manifests and datasets that have been identified for broad publication.</p>
 		<p class="bigtext">One note about this collection is that <em>Manifest is not a database</em>. User-created Manifests are not shared with the install at <a href="https://manifest.supplystudies.com">manifest.supplystudies.com</a> and this page includes only those that have been explicitly shared for publication. If you have created Manifest documents or have deployed Manifest in classrooms or workshops and would like the results indexed here, please <a href="mailto:mhockenberry@fordham.edu">get in touch</a>.</p>
+		
 		<section id="manifestsamples">
-			<div id="datasort">Sort by <span class='sort' data-sort='id'>Index</span>, <span class='sort' data-sort='title'>Name</span>, <span class='sort' data-sort='author'>Author</span>, or </div>
-			<input type="search" id="datasearch" class="search" placeholder="Keyword">
+			<div class="sortcontrols">
+				<div id="datasort">
+					Sort by <span class='sort' data-sort='id'>Index</span>, <span class='sort' data-sort='title'>Name</span>, <span class='sort' data-sort='author'>Author</span>, or <input type="search" id="datasearch" class="search" placeholder="Keyword">
+				</div>		    
+				<ul class="pagination"></ul>	
+				<div class="clear"></div>
+			</div>
 			<ul id="samplelist" class="list"></ul>
-		    <ul class="pagination"></ul>	
 		</section>
 		
-		<h1 id="otherdatasets">Other Datasets</h1>
+		<h2 id="otherdatasets">Other Datasets</h2>
 		<h3><a id="cases">Courses, Workshops, and Deployments</a></h3>
 		<p>This is a collection of Manifests developed as a result of courses, workshops, or in other deployments. For example, Manifest is regularly used as part of the coursework for Media Logistics at Fordham, with the final projects including a partial Manifest document of the media object investigated by a student.</p>
 	
@@ -72,11 +77,15 @@
 		<p>This is an archive of the data collected by the MIT Center for Civic Media's Sourcmap Project from 2006-2014. That means that this data is <em>old</em>. Because Sourcemap evolved significantly during this relatively long span of time, and because one of the development goals was to avoid breaking user projects, it also means this data is <em>inconsistent</em>. Some attributes and properties that were added in, for example, 2008, probably didn't exist in 2006. And it is also true that some early attributes and properties were depreciated or changed over time. While these have been preserved in the raw data files referenced below, only a subset of more or less standard information is directly viewable in Manfest.</p>
 	
 		<div id="datalist" class="dataviewer smapviewer">
-			<div id="datasort">Sort by <span class='sort' data-sort='id'>Index</span>, <span class='sort' data-sort='nm'>Name</span>, or </div>
-			<input type="search" id="datasearch" class="search" placeholder="Keyword">			
+			<div class="sortcontrols">
+				<div id="datasort">
+					Sort by <span class='sort' data-sort='id'>Index</span>, <span class='sort' data-sort='nm'>Name</span>, or 
+					<input type="search" id="datasearch" class="search" placeholder="Keyword">	
+				</div>
+			    <ul class="pagination"></ul>	
+				<div class="clear"></div>
+			</div>
 			<ul class=list></ul>
-		    <ul class="pagination"></ul>	
-			<div class="clear"></div>
 		</div>
 	
 	<!-- build:section layout.footer --><!-- /build -->
