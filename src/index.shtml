@@ -32,8 +32,7 @@
 	</section>
 	<section id="sidewrap">
 		<section id="sidepanel">
-			<div id="manifestlist">
-			</div>
+			<div id="manifestlist"></div>
 		</section>
 	</section>
 	<main id="view-wrapper" class="view-wrapper">

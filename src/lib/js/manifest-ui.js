@@ -92,7 +92,7 @@ class ManifestUI {
 		window.onresize = this.ManifestResize;	
 		window.onbeforeprint = this.PrintBefore;
 		window.onafterprint = this.PrintAfter;
-		if (MI.Visualization.type !== 'map') { document.getElementById('vizwrap').classList.remove('closed'); MI.Visualization.Resize(); }
+		if (MI.Visualization.type !== 'map') { document.getElementById('vizwrap').classList.remove('closed');}
 		document.getElementById('sidepanel').scrollTo(0,0);
 		MI.initialized = true; 
 	}
