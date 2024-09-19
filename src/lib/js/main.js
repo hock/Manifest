@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					if (starter.type === 'gsheet') { let gsheet = {g: d[0], r: d[1] }; MI.Process('gsheet', gsheet, {id: starter.id, idref: starter.ref, url: MI.options.serviceurl + '/gsheet' + starter.id}); } else { MI.Process(starter.type, d, {id: starter.id, idref: starter.ref, url: starter.url}); }
 				})).catch(e => LoadError(e));
 		} else if (!o.manifest || MI.options.initialurl === 'json/manifest.json') {
-			console.log('normal');
 			fetch(collection).then(c => c.json()) .then(data => LoadSample(data) );
 		}		
 	}

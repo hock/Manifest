@@ -628,8 +628,10 @@ class ManifestAtlas {
 				this.active_point = pt;
 				let latlng = pt._latlng ? pt._latlng : pt._popup._latlng;
 				this.homecontrol.setHomeCoordinates(latlng, 3);
-				const mid = pt.feature ? pt.feature.properties.mid : pt._popup._source.feature.properties.mid;
-				MI.Atlas.Surface(mid);
+				if (!(MI.options.storyMap || MI.options.embed)) {
+					const mid = pt.feature ? pt.feature.properties.mid : pt._popup._source.feature.properties.mid;
+					MI.Atlas.Surface(mid);
+				}
 			}
 			else {
 				this.active_point = null;

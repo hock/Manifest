@@ -620,8 +620,8 @@ class ManifestUI {
 				popspots[i].classList.remove('selected');
 	  		}
 	    }
-		document.getElementById('node_'+lid).querySelectorAll('.images-caption')[0].textContent = slides[slideIndex-1].getAttribute('title');
-	 	if (pop) { popup.querySelectorAll('.images-caption')[0].textContent = slides[slideIndex-1].getAttribute('title'); }
+		document.getElementById('node_'+lid).querySelectorAll('.images-caption')[0].textContent = slides[slideIndex-1].dataset.caption === 'true' ? slides[slideIndex-1].getAttribute('title') : '';
+	 	if (pop) { popup.querySelectorAll('.images-caption')[0].textContent = slides[slideIndex-1].dataset.caption === 'true' ? slides[slideIndex-1].getAttribute('title') : ''; }
 		
 		if (modal) { MI.Interface.ModalSet(slides[slideIndex-1]); }
 		

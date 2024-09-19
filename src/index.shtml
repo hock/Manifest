@@ -6,7 +6,11 @@
 
 	<title>Manifest: Supply Chain Platform</title>
 	<meta property="og:title" content="Manifest: Supply Chain Platform">
-	<!--#set var="request" value="|$REQUEST_URI|" -->
+	<!--#if expr="$REQUEST_URI = /([^?]+)\?.*/" -->
+	    <!--#set var="mrequest" value="|$1|" -->
+	<!--#else -->	
+		<!--#set var="mrequest" value="|$REQUEST_URI|" -->
+	<!--#endif -->
 	
 	<!-- build:process -->
 	<base href="<%= baseurl %>/">

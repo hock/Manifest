@@ -23,16 +23,17 @@ function RenderSamples(data) {
 }
 function RenderManifest(data) {	
 	var options = {
-	  valueNames: ['id','title','author', 'categories', 'description'],
+	  valueNames: ['id','title','author', 'categories', 'description', 'date'],
 	    item: function(values) {
 			let thumb = values.id.split('/')[(values.id.split('/')).length-1].split('.')[0];
 			return `<li class="entry">
 						<div class="samplewrap">
 							<span class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></span>
-							<div class="sampleauthor">${values.author}</div>
-							<div class="sampletags"><ul>${values.categories.split(',').map(s => `<li>${s}</li>`).join('')}</ul></div>
+							<div class="sampleauthor">${values.author}</div>			
+							<div class="sampletags">${values.categories.split(',').map(s => `${s}`).join(', ')}</div>
 							<img alt="${values.title}" src="json/samples/thumbnails/256/${thumb}.webp" onerror="this.onerror=null; this.src='json/samples/thumbnails/256/default.webp'" loading="lazy"/>
-							<div class="sampledescription">${util.markdowner.makeHtml(values.description)}</div>
+							<div class="sampledescription" title="${values.description.replace(/\[(.*?)\]\(.*?\)/g,'$1').replaceAll('**','')}">${util.markdowner.makeHtml(values.description)}</div>
+							<div class="sampledate">${new Date(values.date).toLocaleDateString()}</div>
 						</div>
 					</li>`;
 		},

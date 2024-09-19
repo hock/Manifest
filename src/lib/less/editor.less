@@ -334,7 +334,7 @@
 	#datasort .sort.asc::after{content:"\025B2";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
 	#datasort .sort.desc::after{content:"\0025BC";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
 	
-	#datasort .sort, #datasearch { display:inline-block; font-size:0.9rem; color:#555; }
+	#datasort .sort, #datasearch, #mdatasearch { display:inline-block; font-size:0.9rem; color:#555; }
 	
 	ul.pagination { float:right;display:block;padding:0;margin:0;}
 	ul.pagination li { display:inline; cursor:pointer; padding:0.25rem;}
@@ -346,8 +346,8 @@
 	#datalist ul.pagination li { font-size:0.9rem; padding:0.25rem 0.75rem; display:inline-block; border-radius:1rem; margin:0; color:#555;}
 	#datalist ul.pagination li.active { background:#efecfa; }
 	
-	#datasearch {margin:0; border:1px solid #ccc;}
-	#datasearch::placeholder { color:#555;}
+	#datasearch, #mdatasearch {margin:0; border:1px solid #ccc;}
+	#datasearch::placeholder, #mdatasearch::placeholder { color:#555;}
 	
 	#manifestsamples { margin: 2rem -2rem 1rem -2rem; padding: 1rem 0; min-height:30rem; }
 	#samplelist { display:flex; flex-wrap: wrap; justify-content:stretch; list-style:none;padding:0;width:100%;margin:0.5rem 0 0 0;}
@@ -357,16 +357,18 @@
 		a, a:visited {text-decoration: none; }
 	}
 	#samplelist .sampletags { 
-		font-size:0.8rem; color:#666; padding:0 0 0.5rem 0; height:2.5rem; overflow:hidden; 
+		font-size:0.8rem; color:#666; padding:0 0 0.5rem 0; overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
 		ul { list-style:none; display:inline-block; padding:0; margin:0;}
 		li { display:inline-block;width:auto;box-shadow:none;padding:0;margin:0 0.25rem 0.25rem 0;background:none; }
 	}
 	#samplelist .sampleauthor { font-size:1rem;padding:0;margin:0 0 0.5rem 0; overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+	#samplelist .sampledate { font-size:0.8rem; color:#666; padding:0 0 0.5rem 0; overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:right;}
+	
 	#samplelist p:empty { display:inline;}
 	
 	#samplelist img { width: calc(100% - 2px); border:1px solid #000; border-radius: 0.5rem; max-height:calc(100vw / 5);}
-	#samplelist p { font-size:1rem; height:7rem; overflow:auto;}
-	#samplelist li { width:calc(20% - 3rem); box-shadow: 0 0 5px rgba(150, 150, 150, 0.1); padding:1rem; background:rgba(223,219,249,0.4); margin:0.5rem; border-radius:0.5rem;}
+	#samplelist .sampledescription p{height:7.2rem;font-size:1rem;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;}
+	#samplelist li { width:calc(25% - 3rem); box-shadow: 0 0 5px rgba(150, 150, 150, 0.1); padding:1rem; background:rgba(223,219,249,0.4); margin:0.5rem; border-radius:0.5rem;}
 	
 	body.textpage #infowrap #otherdatasets { margin:0;padding:2rem 0 0 0; clear:both; font-size:3rem;line-height:3rem;color:#333;}
 	body.textpage .dataviewer table { font-size:1.1rem; width:100%;   table-layout: fixed;}
@@ -438,7 +440,7 @@
 	
 	#manifestsamples { margin:0; padding:0; box-shadow:none;}
 	#manifestsamples ul.pagination { display:none;}
-	#manifestsamples #datasearch { display:none; }
+	#manifestsamples #mdatasearch { display:none; }
 	body.textpage #infowrap #otherdatasets { margin:0;padding:2rem 1rem 0 1rem; }
 	
 	#samplelist { width:100%; margin:0;}
@@ -565,5 +567,5 @@
 	body.datapage ul.pagination { display:block;padding:1rem 1rem 0 1rem;margin:0;float:none;}
 	body.datapage #manifestlist li { border:0; padding-left:5rem;padding-right:1rem;width:calc(100% - 5rem);}
 	body.datapage #datasort { display:none;}
-	body.datapage #datasearch { display:inline; width:calc(100% - 2rem); margin-left: 1rem; margin-right:1rem;}
+	body.datapage #mdatasearch, body.datapage #datasearch { display:inline; width:calc(100% - 2rem); margin-left: 1rem; margin-right:1rem;}
  }

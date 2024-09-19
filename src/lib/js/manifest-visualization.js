@@ -12,7 +12,10 @@ class ManifestVisualization {
 			if (type !== 'map') { sideclass.remove('top'); sideclass.remove('middle'); sideclass.add('bottom'); }
 			else {sideclass.remove('top'); sideclass.remove('bottom'); sideclass.add('middle'); }
 		}
-		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {			
+		// @TODO Confirm change of line from this: (with ismobile)
+		// 	if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || MI.Interface.IsMobile() || refresh) {			
+
+		if (scid !== MI.Visualization.active_scid || type !== MI.Visualization.type || refresh) {			
 			MI.Visualization.active_scid = scid; 
 			MI.Interface.ClearMessages();
 			
