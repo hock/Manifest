@@ -778,7 +778,7 @@ class ManifestAtlas {
 			        });
 					/*
 					if (!MI.Atlas.glMap.hasImage('boat')) {
-						MI.Atlas.glMap.loadImage('https://hockbook.local/Manifest/dist/images/markers/boat-angle.webp', function(error, image) {
+						MI.Atlas.glMap.loadImage('images/markers/boat-angle.webp', function(error, image) {
 							if (error) { throw error; }
 							MI.Atlas.glMap.addImage('boat', image); 
 							MI.Atlas.glMap.addLayer({ 'id': dlid+'-point', 'type': 'symbol', 'source': 'mlayer-'+dlid, 'layout': { 'icon-image': 'boat', 'icon-size': 0.15, 'icon-rotate': ['get', 'heading'] }, 'filter': ['==', '$type', 'Point']});
@@ -879,7 +879,7 @@ class ManifestAtlas {
 	GetTileImage(lat, lon, zoom, type='toner-v2') {
 	    let xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 	    let ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * (1<<zoom) ));
-		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr'; 
+		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr';
 	}
 	
 	/** Select a supply chain color **/

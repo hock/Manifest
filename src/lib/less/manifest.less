@@ -4,7 +4,7 @@
 @media only screen and (min-device-width: 768px) {
 	#sidewrap {
 		width:29rem;
-		#sidepanel{width:27rem;} 
+		#sidepanel{width:27rem;}
 	}
 	#manifestbar{width:25rem;}
 	#view-wrapper{width:calc(100% - 29rem);}
@@ -184,6 +184,8 @@
 				.measures { 
 					display:block; font-size:0.8rem; color:var(--tertiary-text);
 					.measure-link { display:inline-block; text-decoration:underline;cursor:pointer; margin-right: 0.25rem; cursor:pointer; color:var(--link-color); &:hover { color:var(--link-highlight-color);}}
+					.measure-entry { display:inline-block; margin-right: 0.25rem; }
+
 					.mtype:after { content: ": ";}
 				}
 			}	
@@ -326,7 +328,7 @@
 			.inputfile { width:0.1px;height:0.1px;opacity:0;overflow:hidden;position:absolute;z-index:-1; }
 			.inputfile + label { 
 				font-weight:400;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:inline-block;overflow:hidden;margin-left:0.25rem;
-				padding:.375;line-height:1.5;padding:.375rem;font-size:1rem;border-radius:.25rem;border:1px solid var(--sep-border); text-align:center; 
+				padding:0.375rem;line-height:1.5;font-size:1rem;border-radius:.25rem;border:1px solid var(--sep-border);text-align:center;
 			}
 			.inputfile.closed + label { display:none; }
 			.inputfile + label svg { width:1em;height:1em;vertical-align:middle;fill:currentColor;margin-top:-0.25em;margin-right:0.25em; }
@@ -491,10 +493,10 @@
 	  input:focus + .slider{box-shadow:0 0 1px var(--controls-bg);}
 	  input:checked + .slider:before{-webkit-transform:translateX(13px);-ms-transform:translateX(13px);transform:translateX(13px);}
 	  .slider {
-		  position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#eee;-webkit-transition:0;transition:0;box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
+		  position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#eee;-webkit-transition:none;transition:none;box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
 	  	&.round{ border-radius:17px; &:before{border-radius:50%;}}
 		&:before {
-		  position:absolute;content:"";height:13px;width:13px;left:2px;bottom:2px;background-color:var(--primary-bg);-webkit-transition:0;transition:0;box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
+		  position:absolute;content:"";height:13px;width:13px;left:2px;bottom:2px;background-color:var(--primary-bg);-webkit-transition:none;transition:none;box-shadow: 0.1rem 0.1rem rgba(0,0,0,0.2);
 		}
 	  }
   	  &.animated .slider{-webkit-transition:.4s;transition:.4s;&:before{-webkit-transition:.4s;transition:.4s;}}

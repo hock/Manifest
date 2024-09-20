@@ -9,10 +9,10 @@ const fs = require('fs');
 
 const app = express();
 
-const cors = require('cors')
+const cors = require('cors');
 const corsOptions = {
-  origin: ['https://manifest.supplystudies.com','http://localhost','https://hockbook.local']
-}
+  origin: ['https://manifest.supplystudies.com','http://localhost','https://hockmax.local']
+};
 
 const mime = { html: 'text/html', txt: 'text/plain', css: 'text/css', gif: 'image/gif', jpg: 'image/jpeg', png: 'image/png', svg: 'image/svg+xml', js: 'application/javascript' };
 
@@ -30,7 +30,7 @@ app.get('/thumb/', async (req, res) => {
 	if (typeof req.query.img === 'undefined') {
 		res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/default.webp'));		
 	} else {
-		let manifest = '';
+		let manifest;
 		if (req.query.img.split('/').pop() === '') { manifest = req.query.img.split('/').slice(-2, -1)[0]; } 
 		else { manifest = req.query.img.split('/').pop(); }
 		if (fs.existsSync('../lib/json/samples/thumbnails/'+manifest+'.webp')) { res.sendFile(path.resolve('../lib/json/samples/thumbnails/card/'+manifest+'.webp'));} 
@@ -46,11 +46,11 @@ app.get('/sitemap/', async (req, res) => {
 		else { return str; } 
 	}
 	fs.readFile("../lib/json/samples.json", function(err, data) { 
-	    if (err) throw err; 
+	    if (err) { throw err; }
 		
 		const mtime = new Date(fs.statSync("../lib/json/samples.json").mtime).toISOString().split('T')[0];
 	    const manifests = JSON.parse(data); 
-		const pages = ['about','data','edit']
+		const pages = ['about','data','edit'];
 		let doc = `<?xml version="1.0" encoding="UTF-8"?>
 				   <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 				   <url><loc>https://manifest.supplystudies.com/</loc><lastmod>${mtime}</lastmod></url>`;
@@ -71,7 +71,7 @@ app.get('/maptiler/:type', async (req, res) => {
 	console.log("Requested Map Tile: "+req.params.type);	
 	
 	if (req.params.type === 'raster') {
-		const data = 'https://api.maptiler.com/maps/791a2394-6b08-4ef6-ab01-bc385f68ac37/{z}/{x}/{y}.webp?key='+maptiler.key;
+		const data = 'https://api.maptiler.com/maps/791a2394-6b08-4ef6-ab01-bc385f68ac37/{z}/{x}/{y}.png?key='+maptiler.key;
 		res.send(data);		
 	} else {
 		const response = await fetch('https://api.maptiler.com/maps/'+req.params.type+'/style.json?key='+maptiler.key, {
@@ -87,7 +87,7 @@ app.get('/geocode/:type/:query', async (req, res) => {
 	console.log("Geocoding: "+req.params.query);
 	
 	let options = '';	
-	if (req.params.type !== 'reverse') { otpions = '&proximity=ip&autocomplete=true&fuzzyMatch=true&limit=3'; }
+	if (req.params.type !== 'reverse') { options = '&proximity=ip&autocomplete=true&fuzzyMatch=true&limit=3'; }
 	const response = await fetch('https://api.maptiler.com/geocoding/'+req.params.query+'.json?key='+maptiler.key+options, {
 		headers: {'Referer': 'https://service.supplystudies.com/',}
 	});

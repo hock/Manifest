@@ -1,6 +1,6 @@
 {
   "name": "Manifest",
-  "version": "0.10.189",
+  "version": "0.11.570",
   "devDependencies": {
     "grunt": "^1.3.0",
     "grunt-changelog-customizable": "^0.5.2",

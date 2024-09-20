@@ -28,16 +28,16 @@ function RenderManifest(data) {
 			let thumb = values.id.split('/')[(values.id.split('/')).length-1].split('.')[0];
 			return `<li class="entry">
 						<div class="samplewrap">
-							<span class="sampletitle"><a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></span>
+							<span class="sampletitle">${values.featured ? '<i class="fa-solid fa-star"></i>' : ''}<a href="./${ManifestUtilities.Slugify(values.id)}">${values.title}</a></span>
 							<div class="sampleauthor">${values.author}</div>			
 							<div class="sampletags">${values.categories.split(',').map(s => `${s}`).join(', ')}</div>
 							<img alt="${values.title}" src="json/samples/thumbnails/256/${thumb}.webp" onerror="this.onerror=null; this.src='json/samples/thumbnails/256/default.webp'" loading="lazy"/>
 							<div class="sampledescription" title="${values.description.replace(/\[(.*?)\]\(.*?\)/g,'$1').replaceAll('**','')}">${util.markdowner.makeHtml(values.description)}</div>
-							<div class="sampledate">${new Date(values.date).toLocaleDateString()}</div>
+							<div class="sampledate">${new Date(Date.UTC(values.date.split('-')[0],Number(values.date.split('-')[1])-1,Number(values.date.split('-')[2]), 12, 0, 0)).toLocaleDateString('en-US')}</div>
 						</div>
 					</li>`;
 		},
-		page:20,
+		page:16,
 	    pagination: [ { paginationClass: "pagination", innerWindow: 2, left: 1, right: 1, item: '<li><span class="page"></span></li>'}]	
 	};
 

@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		options: true,
 		darkmode: false,
 		serviceurl: '<%= mserverurl %>',
-		 //serviceurl: 'http://hockbook.local:3000/',
+		 //serviceurl: 'http://hockmax.local:3000/',
 		
 		view: 'interest', position: {lat: 0, lng: 0}, zoom: 3,
 		 hoverHighlight: false, retinaTiles: false, simpleLines: false, storyMap: false, demoMode: false

@@ -1,6 +1,7 @@
 {
   "esversion": 8,
   "browser": true,
+  "node": true,
   "devel": true,
   "curly": true,
   "freeze": true,

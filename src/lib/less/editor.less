@@ -116,7 +116,7 @@
 	body.editor #editor_holder div[data-schemapath="root.nodes"] .je-child-editor-holder .json-editor-btn-add, body.editor #editor_holder div[data-schemapath="root.options"] .je-child-editor-holder .json-editor-btn-add { margin-bottom:1rem; }	
 	body.editor #editor_holder .je-tab--top { padding:0.25rem 0.5rem;}
 
-	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-collapse { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.25 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #999; border-color: #999; display:inline-block; }	
+	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-collapse { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.25rem 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #999; border-color: #999; display:inline-block; }
 	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-add, body.editor #editor_holder div[data-schemapath="root.options"] .json-editor-btn-add  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: #4d34db; border-color: #4d34db; display:inline-block; }	
 	body.editor #editor_holder div[data-schemapath="root.nodes"] .json-editor-btn-delete, body.editor #editor_holder div[data-schemapath="root.options"] .json-editor-btn-delete  { font-weight: 400; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none; padding: 0.5rem; font-size: 1rem; border-radius: .25rem; border:1px solid;  color: #fff; background-color: red; border-color: red; display:inline-block; }
 	
@@ -147,8 +147,7 @@
 	/* Upload input box */
 	body.editor .inputbox{ display:inline-flex;}
 	.inputfile{width:0.1px;height:0.1px;opacity:0;overflow:hidden;position:absolute;z-index:-1;}
-	.inputfile + label{font-weight:400;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:inline-block;overflow:hidden;margin:2px;
-		padding:.375;line-height:1.5;padding:.375rem;font-size:1rem;border-radius:.25rem;border:1px solid; text-align:center;}
+	.inputfile + label{font-weight:400;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;display:inline-block;overflow:hidden;margin:2px;line-height:1.5;padding:.375rem;font-size:1rem;border-radius:.25rem;border:1px solid; text-align:center;}
 	.inputfile.closed + label{display:none;}
 	.inputfile + label svg{width:1em;height:1em;vertical-align:middle;fill:currentColor;margin-top:-0.25em;margin-right:0.25em;}
 	.file-input + label{background-color:#4d34db;border-color:#4d34db;color:#fff;}
@@ -328,19 +327,19 @@
 	.dataviewer ul.pagination { display:block;}
 	.dataviewer ul.pagination li { display:inline; cursor:pointer; padding:0.25rem;}
 	
-	#datasort { display:inline; color:#555; font-size:0.9rem; float:left; line-height:1rem;}
-	#datasort .sort { cursor:pointer; border-bottom:1px solid #ccc; }
-	#datasort .sort.asc, #datasort .sort.desc { }
-	#datasort .sort.asc::after{content:"\025B2";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
-	#datasort .sort.desc::after{content:"\0025BC";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
+	.datasort { display:inline; color:#555; font-size:0.9rem; float:left; line-height:1rem;}
+	.datasort .sort { cursor:pointer; border-bottom:1px solid #ccc; }
+	.datasort .sort.asc, .datasort .sort.desc { }
+	.datasort .sort.asc::after{content:"\025B2";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
+	.datasort .sort.desc::after{content:"\0025BC";padding-left:0.25rem;font-size:0.9rem; color:#999; vertical-align:bottom; }
 	
-	#datasort .sort, #datasearch, #mdatasearch { display:inline-block; font-size:0.9rem; color:#555; }
+	.datasort .sort, #datasearch, #mdatasearch { display:inline-block; font-size:0.9rem; color:#555; }
 	
 	ul.pagination { float:right;display:block;padding:0;margin:0;}
 	ul.pagination li { display:inline; cursor:pointer; padding:0.25rem;}
 	ul.pagination li { font-size:0.9rem; padding:0.25rem 0.75rem; display:inline-block; border-radius:1rem; margin:0; color:#555;}
 	ul.pagination li.active { background:#efecfa; }
-	#manifestsamples #datasort { padding-left:2rem; }
+	#manifestsamples .datasort { padding-left:2rem; }
 	#manifestsamples ul.pagination { padding-right:2rem; }
 
 	#datalist ul.pagination li { font-size:0.9rem; padding:0.25rem 0.75rem; display:inline-block; border-radius:1rem; margin:0; color:#555;}
@@ -535,7 +534,7 @@
 
 	body.editor section[data-theme="html"] .je-indented-panel {
 	padding: 0.5rem;
-	margin:none;
+	margin:0;
 	border:none;
 	}
 
@@ -566,6 +565,6 @@
 	
 	body.datapage ul.pagination { display:block;padding:1rem 1rem 0 1rem;margin:0;float:none;}
 	body.datapage #manifestlist li { border:0; padding-left:5rem;padding-right:1rem;width:calc(100% - 5rem);}
-	body.datapage #datasort { display:none;}
+	body.datapage .datasort { display:none;}
 	body.datapage #mdatasearch, body.datapage #datasearch { display:inline; width:calc(100% - 2rem); margin-left: 1rem; margin-right:1rem;}
  }
