@@ -66,7 +66,7 @@ class Manifest {
 		if (MI.supplychains.length > 0 && !(MI.initialized)) {
 			MI.Interface.CleanupInterface(); document.dispatchEvent( new Event("Manifested"));
 			if (MI.options.demoMode) { MI.ManifestTests(); }   
-		}
+		} else { MI.Atlas.Refresh(); }
 	}
 	
 	ProcessOptions(options, d) {
