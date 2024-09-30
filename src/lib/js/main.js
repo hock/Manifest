@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		options: true,
 		darkmode: false,
 		serviceurl: '<%= mserverurl %>',
+		maptiler_key: '<%= mmaptiler_key %>',
 		 //serviceurl: 'http://hockmax.local:3000/',
 		
 		view: 'interest', position: {lat: 0, lng: 0}, zoom: 3,
@@ -130,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		manifests.featured = manifests.collection.filter(function (entry) { return entry.featured === true; });
 		
 		manifests.collection.sort(function(a, b) { 
-			if (a.featured && b.featured) { return a.title.localeCompare(b.title); }
+			if (a.featured && b.featured) { return b.date.localeCompare(a.date); }
 			else if (a.featured || b.featured) { return a.featured ? -1 : 1; }
 			else { return a.title.localeCompare(b.title); }
 		});

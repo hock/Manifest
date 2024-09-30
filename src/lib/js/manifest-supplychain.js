@@ -206,16 +206,17 @@ class ManifestSupplyChain {
 		let colors =  typeof d.setOptions.color !== 'undefined' ? d.setOptions.color.value.split(',').map(c => '#' + c) : typeof d.options.color !== 'undefined' ? d.options.color : (d.properties.title === 'Manifest' ? ['#4d34db','#dfdbf9','#dfdbf9'] : MI.Atlas.SupplyColor(d.details.id));
 		let styling = {color: colors, style: Object.assign({}, MI.Atlas.styles.point)};	
 		let globes = ['americas','asia','europe','africa'];
-			
+
 		Object.assign(d.details, {style: Object.assign(styling.style, {fillColor: styling.color[0], color: MI.options.darkmode ? tinycolor(styling.color[1]).darken(50).toString() : styling.color[1], textColor: styling.color[2], darkerColor: tinycolor(styling.color[0]).darken(30).toString(), darkColor: tinycolor(styling.color[0]).darken(10).toString(), highlightColor: tinycolor(styling.color[0]).spin(30).saturate(100).toString(), lightColor: styling.color[2]}), colorchoice: styling.color, globe: globes[Math.floor(Math.random() * globes.length)]});
 	}
 	
 	SetupPoint(ft, d, index) {
 		let setup = { index: index, type: 'node', style: JSON.parse(JSON.stringify(d.details.style)), basestyle: JSON.parse(JSON.stringify(d.details.style)), latlng: new L.LatLng(ft.geometry.coordinates[1], ft.geometry.coordinates[0]), measures: this.SetupMeasures(ft, d.details)};
+
 		// Individual point color
 		if ( ft.properties.color ) { 
 			let ftcolors = ft.properties.color.split(',');
-			setup.basestyle = setup.style = {fillColor: ftcolors[0], color: ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
+			setup.basestyle = setup.style = {fillColor: ftcolors[0], color: MI.options.darkmode ? tinycolor(ftcolors[1]).darken(50).toString() : ftcolors[1], textColor: ftcolors[2], darkerColor: tinycolor(ftcolors[0]).darken(30).toString(), darkColor: tinycolor(ftcolors[0]).darken(10).toString(), highlightColor: tinycolor(ftcolors[0]).spin(30).saturate(100).toString(), lightColor: tinycolor(ftcolors[0]).setAlpha(0.1).toString()};
 		}
 		// Customized point colors for storymap 
 		Object.assign(ft.properties, setup);

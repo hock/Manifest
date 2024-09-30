@@ -21,15 +21,17 @@ class ManifestAtlas {
 		map_tiler_key = '3l62IEM16L7oUgCXLpag';
 		
 		this.tiletypes = {
-			DEFAULT: 'services/maps/maptiler.json',	
+			DEFAULT: 'services/maps/default.json',
 			//DEFAULT: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
 			//PROTO: 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.mvt?key=e66d42174e71874a',
-			SATELLITE:  options.serviceurl + 'maptiler/' + 'satellite',
+			SATELLITE: 'services/maps/satellite.json',
 			//ESRI_WORLD: 'services/maps/esri-world-imagery.json',	
-			TOPO: options.serviceurl + 'maptiler/' + 'topo-v2',				
-			GRAYSCALE: options.serviceurl + 'maptiler/' + 'backdrop',				
-			BW: options.serviceurl + 'maptiler/' + 'toner-v2',		
-			DARK: options.serviceurl + 'maptiler/' + 'dataviz-dark',		
+			TOPO: 'services/maps/topo-v2.json',
+			GRAYSCALE: 'services/maps/backdrop.json',
+			BW: 'services/maps/toner-v2.json',
+			//DARK: options.serviceurl + 'maptiler/' + 'dataviz-dark',
+			DARK: 'services/maps/dataviz-dark.json',
+
 			MARINE: 'https://tiles.marinetraffic.com/ais_helpers/shiptilesingle.aspx?output=png&sat=1&grouping=shiptype&tile_size=256&legends=1&X={x}&Y={y}&zoom={z}',
 		};
 		
@@ -879,7 +881,7 @@ class ManifestAtlas {
 	GetTileImage(lat, lon, zoom, type='toner-v2') {
 	    let xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
 	    let ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * (1<<zoom) ));
-		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key=v6o4lBqX0HjNRonNxTdr';
+		return 'https://api.maptiler.com/maps/'+type+'/'+zoom+'/'+xtile+'/'+ytile+'.png?key='+MI.options.maptiler_key;
 	}
 	
 	/** Select a supply chain color **/

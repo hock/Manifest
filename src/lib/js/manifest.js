@@ -493,7 +493,7 @@ class Manifest {
 			if (off === 0) { off = Number(node.id.split('-')[1]); } if (off >= Number(node.id.split('-')[1])) { off = Number(node.id.split('-')[1]); }
 			let n = {overview:{index:Number(node.id.split('-')[1])+1,name:node.ref.properties.title,description:node.ref.properties.description},
 				location:{address:node.ref.properties.placename,geocode:node.ref.geometry.coordinates[1]+','+node.ref.geometry.coordinates[0]},
-				attributes:{destinationindex:[],category:node.ref.properties.category,image:node.ref.properties.images,icon:node.ref.properties.icon,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
+				attributes:{destinationindex:[],category:node.ref.properties.category,image:node.ref.properties.images,icon:node.ref.properties.icon,color:node.ref.properties.color,sources:node.ref.properties.sources.map(s => ({'source':s}))}, measures:{measures:[]},notes:{markdown:'',keyvals:[{key:'',value:''}]}};
 			for (let m of node.ref.properties.measures) { if (Number(m.mvalue) !== 0) { n.measures.measures.push(m); } }						
 			s.nodes[Number(node.id.split('-')[1])] = n;
 		}
