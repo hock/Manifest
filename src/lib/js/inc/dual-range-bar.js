@@ -652,23 +652,29 @@
 									var n, r;
 									t.prevClientX = (null === (n = e.touches.item(0)) || void 0 === n ? void 0 : n.clientX) || 0, t.prevClientY = (null === (r = e.touches.item(0)) || void 0 === r ? void 0 : r.clientY) || 0
 								};
-								this.doms.startSlider.addEventListener("mousedown", (function() {
+								this.doms.startSlider.addEventListener("mousedown", (function(e) {
+									e.stopPropagation(); e.preventDefault();
 									t.underDragging = "start"
 								}), {
 									passive: true
 								}), this.doms.startSlider.addEventListener("touchstart", (function(n) {
+									n.stopPropagation(); n.preventDefault();
 									e(n), t.underDragging = "start"
 								}), {
 									passive: true
-								}), this.doms.endSlider.addEventListener("mousedown", (function() {
+								}), this.doms.endSlider.addEventListener("mousedown", (function(e) {
+									e.stopPropagation(); e.preventDefault();
 									t.underDragging = "end"
 								})), this.doms.endSlider.addEventListener("touchstart", (function(n) {
+									n.stopPropagation(); n.preventDefault();
 									e(n), t.underDragging = "end"
 								}), {
 									passive: true
-								}), this.doms.rangeSlider.addEventListener("mousedown", (function() {
+								}), this.doms.rangeSlider.addEventListener("mousedown", (function(e) {
+									e.stopPropagation(); e.preventDefault();
 									t.underDragging = "range"
 								})), this.doms.rangeSlider.addEventListener("touchstart", (function(n) {
+									n.stopPropagation(); n.preventDefault();
 									e(n), t.underDragging = "range"
 								}), {
 									passive: true

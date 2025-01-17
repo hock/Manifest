@@ -131,14 +131,13 @@ class ManifestSupplyChain {
 		}	
 		// Prepare to add layers
 		let maplayergroup =  L.layerGroup();
-				
-		//let lineLayer = new L.geoJSON(lines, { style: MI.Atlas.styles.line });	
-		let lineLayer = new L.geoJSON(lines, { onEachFeature: function (feature, layer) { 
-			feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line, 
+
+		let lineLayer = manifest.mtype !== 'smap' ? new L.geoJSON(lines, { onEachFeature: function (feature, layer) {
+			feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.line,
 						{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
 			layer.options.interactive = false;
-			layer.setStyle(feature.properties.style);	
-		}});
+			layer.setStyle(feature.properties.style);
+		}}) : new L.geoJSON(lines, { style: MI.Atlas.styles.line });
 		
 		manifest.details.layers.push(maplayergroup.addLayer(lineLayer));		
 

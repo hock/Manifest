@@ -128,7 +128,7 @@ class ManifestUI {
 		MI.Supplychain.ReloadAll();
 	}
 	SetupTime() {
-		let timeset = false, starttime = false, endtime = false;
+		let timeset = false, starttime = false, endtime = false, startrange = false, endrange = false;
 		MI.Interface.timeslider = false;
 		document.getElementById('time-slider').innerHTML = '';
 		for (let s in MI.supplychains) { 
@@ -142,15 +142,25 @@ class ManifestUI {
 		}
 		if (timeset) {
 			document.getElementById('time-slider').innerHTML = `<div id="timer-lower-value"></div> <div id="time-control-wrap"><div id="time-control"></div></div> <div id="timer-upper-value"></div>`;
-			MI.Interface.timeslider = new DualHRange('time-control', { lowerBound: starttime, upperBound:endtime, lower: starttime, upper: endtime });
+
+			startrange = starttime; endrange = endtime;
+			if(MI.supplychains.length === 1) {
+				for (let s in MI.supplychains) {
+					if (MI.supplychains[s].setOptions.timerange) {
+						startrange = MI.supplychains[s].setOptions.timerange.lower;
+						endrange = MI.supplychains[s].setOptions.timerange.upper;
+					}
+				}
+			}
+			MI.Interface.timeslider = new DualHRange('time-control', { lowerBound: starttime, upperBound:endtime, lower: startrange, upper: endrange });
 			MI.Interface.timeslider.addEventListener('update', (event) => {
 				MI.Interface.OnTimeUpdate();
-		
+
 				document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.lower);
 				document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(event.detail.upper);	
 			}, {passive: true} );
-			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(starttime);
-			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(endtime);
+			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(startrange);
+			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(endrange);
 		}
 	}
 	
@@ -283,6 +293,7 @@ class ManifestUI {
 					let m = (type === 'gsheet') ? {
 						g: d[0], r: d[1] } : d; MI.Process(type, m, {id: id, idref: idref, url:loadurl, start:(MI.supplychains.length === 0)});})
 				.catch( err => {
+					console.log(err);
 					if (!silent) { this.ShakeAlert(document.getElementById('manifestbar')); } this.ShowMessage("We couldn't find a valid Manifest format at that address.");
 				}).then(function() { 
 					if (MI.Visualization.type !== 'map') { MI.Visualization.Set(MI.Visualization.type, MI.Interface.active_element, true);}});}});
@@ -475,7 +486,8 @@ class ManifestUI {
 						i = i === MI.Atlas.playlist.list.length - 1 ? 0 : i+1; MI.Atlas.MapPointClick(MI.Atlas.playlist.list[i].feature.properties.lid); break; }}});
 		}
 		if (MI.options.timerange) {
-			MI.Interface.timeslider.lower = MI.options.timerange.lower; MI.Interface.timeslider.upper = MI.options.timerange.upper; MI.Interface.OnTimeUpdate();
+			MI.Interface.timeslider.lower = MI.options.timerange.lower; MI.Interface.timeslider.upper = MI.options.timerange.upper;
+			MI.Interface.OnTimeUpdate();
 
 			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
 			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);

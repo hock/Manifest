@@ -327,10 +327,14 @@ class ManifestAtlas {
 	PopMLink(str) { return str.replaceAll('class="manifest-link"','class="manifest-link" onclick="MI.Interface.Link(event.target.href, event);"'); }
 
 	/** Render lines by setting up a GeoJSON feature for display **/
-	RenderLine(feature, layer) {		
-		feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.arrow, 
-					{color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString(),
-					 fillColor: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()});
+	RenderLine(feature, layer) {
+		if (feature.properties.connections) {
+			feature.properties.basestyle = feature.properties.style = Object.assign(MI.Atlas.styles.arrow,
+				{
+					color: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString(),
+					fillColor: tinycolor(feature.properties.connections.from.properties.basestyle.fillColor).darken(10).toString()
+				});
+		} else { feature.properties.basestyle = feature.properties.style = MI.Atlas.styles.arrow; }
 		layer.options.interactive = true;
 		layer.setStyle(feature.properties.style);		
 				
@@ -713,7 +717,7 @@ class ManifestAtlas {
 		else { return MI.Atlas._linearScale(measureVal,this.radius,(cluster && ft.properties.clustered.length > 0) ? 30 : 20,measureMin,measureMax); }
 	}
 	_linearScale(unscaledNum, minAllowed, maxAllowed, min, max) {
-	  return Math.max(minAllowed,(maxAllowed - minAllowed) * (unscaledNum - min) / (max - min) + minAllowed || 0);
+	  return Math.min(50,Math.max(minAllowed,(maxAllowed - minAllowed) * (unscaledNum - min) / (max - min) + minAllowed || 0));
 	}
 	
 	SwitchBasemap(map, tile) {

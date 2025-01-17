@@ -107,7 +107,13 @@ class ManifestVisualization {
 		if (MI.Atlas.active_point && MI.Atlas.active_point._popup) { this.last_active = MI.Atlas.active_point._popup._source.feature.properties.lid; } else { this.last_active = null; }
 		MI.Atlas.DisplayLayers(false);
 
-		document.querySelectorAll('.viz, #vizshell defs, #charttable').forEach(el => { el.remove(); }); 
+		let sortrecall = '';
+		if(document.getElementById('charttable') !== null) {
+			let msort = document.getElementById('charttable').getElementsByClassName('chartmeasure')[0];
+			if(msort.classList.contains('asc')) { sortrecall = 'asc'; } else if(msort.classList.contains('desc')) { sortrecall = 'desc'; }
+		}
+
+		document.querySelectorAll('.viz, #vizshell defs, #charttable').forEach(el => { el.remove(); });
 		
 		if (MI.supplychains.length > 0) {		
 			let sc = 0;
@@ -134,7 +140,7 @@ class ManifestVisualization {
 					}
 					const measureSort = document.getElementById('measure-choices').value;
 
-					this.chartview = `<table id="charttable" style="background:${window.getComputedStyle(document.body).getPropertyValue('--viz-bg')}; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;				
+					this.chartview = `<table id="charttable" style="background:${window.getComputedStyle(document.body).getPropertyValue('--viz-bg')}; border-color:${tinycolor.mix('#ffffff', canvascolor, 50)}"><tr><th class="chartlabel" style="background:${canvascolor};">Name</th><th class="chartmeasure" style="background:${canvascolor};">${measureSort}</th></tr>`;
 				
 					let color_range = [
 						tinycolor(canvascolor).darken(5).toString(),tinycolor(canvascolor).toString(),tinycolor(canvascolor).brighten(5).toString(),tinycolor(canvascolor).brighten(10).toString(),tinycolor(canvascolor).brighten(15).toString(),tinycolor(canvascolor).brighten(20).toString(),tinycolor(canvascolor).brighten(25).toString()];
@@ -166,14 +172,20 @@ class ManifestVisualization {
 					    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
 					    )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
+
 						document.getElementById('chartview').querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
 					    const table = th.closest('table');
-						document.getElementById('chartview').querySelectorAll('th').forEach(el => { el.classList.remove('asc'); el.classList.remove('desc'); }); 
+						document.getElementById('chartview').querySelectorAll('th').forEach(el => { el.classList.remove('asc'); el.classList.remove('desc'); });
+						if(sortrecall === 'asc') { this.asc = false; sortrecall = '';}
+						else if(sortrecall === 'desc') { this.asc = true; sortrecall = '';}
 						if (this.asc === undefined || this.asc === false ) { th.classList.add('asc'); } else { th.classList.add('desc'); }
 					    Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
 					        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
 					        .forEach(tr => table.appendChild(tr) );
 					})));
+					if(sortrecall !== '') {
+						document.getElementById('charttable').getElementsByClassName('chartmeasure')[0].click();
+					}
 				} else if (MI.Visualization.active_scid) {
 					MI.Interface.ShowMessage('Skipped visualizing "'+MI.supplychains[sc].properties.title+'" (no measures to compare).');	
 					document.getElementById('missing-viz').classList.remove('closed');

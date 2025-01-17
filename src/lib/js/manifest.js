@@ -70,7 +70,7 @@ class Manifest {
 	}
 	
 	ProcessOptions(options, d) {
-		if (d.setOptions.map && MI.supplychains.length === 1 && !(MI.options.urlparams.map)) { 		
+		if (d.setOptions.map && MI.supplychains.length === 1 && !(MI.options.urlparams.map)) {
 		    fetch(MI.Atlas.tiletypes[d.setOptions.map.value.toUpperCase()]).then(r => r.json()).then(s => {
 		        const newStyle = s; MI.Atlas.glMap.setStyle(newStyle);
 				document.getElementById('basemap-chooser').value = d.setOptions.map.value;
@@ -81,13 +81,18 @@ class Manifest {
 		if (d.setOptions.position && MI.supplychains.length === 1 && !(MI.options.urlparams.position)) { 
 			MI.options.position = {lat:Number(d.setOptions.position.value.split(',')[0]),lng:Number(d.setOptions.position.value.split(',')[1])}; MI.options.view = 'center';}
 		if (d.setOptions.zoom && MI.supplychains.length === 1 && !(MI.options.urlparams.zoom)) { MI.options.zoom = Number(d.setOptions.zoom.value); MI.options.view = 'center'; }
-		if (d.setOptions.timerange && MI.Interface.timeslider) { 	
-			MI.Interface.timeslider.lower = MI.options.timerange.lower;
-			MI.Interface.timeslider.upper = MI.options.timerange.upper;
+
+		if (d.setOptions.timerange) {
+			d.setOptions.timerange.lower = d.setOptions.timerange.lower ? Number(d.setOptions.timerange.lower) : Number(d.setOptions.timerange.value.lower);
+			d.setOptions.timerange.upper = d.setOptions.timerange.upper ? Number(d.setOptions.timerange.upper) : Number(d.setOptions.timerange.value.upper);
+		}
+		if (d.setOptions.timerange && MI.Interface.timeslider) {
+			MI.Interface.timeslider.lower = d.setOptions.timerange.lower;
+			MI.Interface.timeslider.upper = d.setOptions.timerange.upper;
 			MI.Interface.OnTimeUpdate();
 	
-			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.lower);
-			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(MI.options.timerange.upper);
+			document.getElementById('timer-lower-value').innerHTML = ManifestUtilities.PrintUTCDate(d.setOptions.timerange.lower);
+			document.getElementById('timer-upper-value').innerHTML = ManifestUtilities.PrintUTCDate(d.setOptions.timerange.upper);
 		}
 		
 		if (d.setOptions.storyMap && MI.supplychains.length === 1 && !(MI.options.urlparams.storyMap)) { 	
@@ -168,6 +173,7 @@ class Manifest {
 		
 		Object.assign(options, {style: d.details.style});
 		d.options = options;
+		console.log(d);
 		return {index:index, manifest:d, options:options, data:data};				
 	}
 
@@ -406,7 +412,8 @@ class Manifest {
 		let adjgraph = [];
 		for (let l = 0; l < sc.nodes.length; l++) { if (typeof sc.nodes[l] !== 'undefined') { adjgraph.push(sc.nodes[l]); } }
 		sc.nodes = adjgraph.reverse();
-		d.graph = sc;	
+		d.graph = sc;
+
 		return {index:index, manifest:d, options:options, data:data};			
 	}
 

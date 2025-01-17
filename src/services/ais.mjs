@@ -9,8 +9,8 @@ const subscriptionMessage = {
   BoundingBoxes: [ [ [-90, -180], [90, 180], ], ],
 };
 
-setInterval(() => { 
-	console.log('Reading ================================================');
+function UpdateAIS() {
+	console.log('['+new Date(Date.now()).toUTCString()+'] :: '+'Reading AIS...');
 	const socket = new WebSocket("wss://stream.aisstream.io/v0/stream");
 	let features = [];
 
@@ -18,28 +18,23 @@ setInterval(() => {
 	  socket.send(JSON.stringify(subscriptionMessage));
  
 	  setTimeout(() => { 
-		  socket.close(); 
-  
+		  socket.close();
 		  const geojson = JSON.stringify({ 'type': 'FeatureCollection', 'features': features });
-  
-		  fs.writeFile("data/ais.geojson", geojson, (err) => {
-		    if (err)
-		      console.log(err);
-		    else {
-		      console.log("+++ File written successfully +++");
-		    }
-		  });
-  
-	  }, "5000");
+		  for (const path of AIS.writepath) {
+			  fs.writeFile(path + "ais.geojson", geojson, (err) => {
+				  if (err) { console.log(err);
+				  } else { console.log('[' + new Date(Date.now()).toUTCString() + '] :: ' + '+++ AIS Written to '+path);}
+			  });
+		  }
+	  }, "60000"); // Run for 1 minute
 	});
 
 	socket.addEventListener("error", (event) => {
-	  console.log(event);
+		console.log(event);
 	});
 
 	socket.addEventListener("message", (event) => {
-	  let aisMessage = JSON.parse(event.data);
-	  let heading;
+	  let aisMessage = JSON.parse(event.data), heading;
 
 	 // console.log(aisMessage);
 	  //'ShipStaticData',
@@ -59,5 +54,7 @@ setInterval(() => {
 		features.push(ft);
 	  }
 	});
-  
-}, "15000");
+	setTimeout(() => { UpdateAIS();}, "3600000"); // Run every hour
+}
+
+UpdateAIS();
