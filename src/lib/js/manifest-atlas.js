@@ -277,7 +277,7 @@ class ManifestAtlas {
 			for (const ft of fts) {
 				popupContent += `
 				<div id="popup-${ft.properties.lid}" class="mpopup popuplink clusterbox">
-					<h2 style="background: ${ft.properties.style.textColor}; color: ${ft.properties.style.fillColor}">
+					<h2 style="background: ${MI.options.darkmode ? tinycolor(ft.properties.style.fillColor).darken(40).toString() : ft.properties.style.textColor}; color: ${MI.options.darkmode ? tinycolor(ft.properties.style.textColor).lighten(40).toString() : ft.properties.style.fillColor}">
 						<i class="fa-solid fa-circle-dot" onclick="MI.Atlas.TagClick(${ft.properties.lid},${ft.properties.latlng.lat},${ft.properties.latlng.lng});"></i> 
 						<span onclick="MI.Atlas.MapPointClick(${ft.properties.lid});">${ft.properties.title}</span>
 					</h2>
