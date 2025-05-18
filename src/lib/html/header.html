@@ -20,7 +20,7 @@
 	const serverurl = "<%= serverurl %>";		
 	
 	if (mtarget === 'development' || mtarget === 'production') { 
-		var console = {}; console.log = function(){}; console.dir = function(){}; console.trace = function(){}; window.console = console;
+		var console = {}; console.log = function(){}; console.dir = function(){}; console.trace = function(){}; console.warn = function(){}; window.console = console;
 		console.log = function tag(msg) { gtag("event", "manifest_log", { "message": msg, "value": msg }); };
 	}
 </script>
